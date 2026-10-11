@@ -7,6 +7,7 @@ import {
   getNeroMarbleTextures,
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
+import { createTabletScreen } from '../../utils/cyberScreens.js';
 
 export default function LoungeStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -21,8 +22,19 @@ export default function LoungeStation({ onSelect, onHover }) {
   const marbleTable = useMemo(() => getNeroMarbleTextures(1, 1), []);
   const brassMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#ca8a04'), []);
 
+  // Functional Biometric Security Tablet Screen
+  const tabletScreen = useMemo(() => createTabletScreen(), []);
+  const tabletTimer = useRef(0);
+
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
+
+    // 0. Update Tablet Screen
+    tabletTimer.current += delta;
+    if (tabletTimer.current > 0.04) {
+      tabletScreen.update(tabletTimer.current);
+      tabletTimer.current = 0;
+    }
 
     // Tablet pulse
     if (tabletGlowRef.current) {
@@ -120,17 +132,17 @@ export default function LoungeStation({ onSelect, onHover }) {
             <boxGeometry args={[0.22, 0.15, 0.01]} />
             <meshStandardMaterial color="#0f172a" roughness={0.2} metalness={0.8} />
           </mesh>
-          {/* Screen with glowing cyan display */}
+          {/* Screen with dynamic scanning biometric clearance display */}
           <mesh position={[0, 0, 0.006]}>
             <planeGeometry args={[0.2, 0.13]} />
-            <meshBasicMaterial color="#0369a1" />
+            <meshBasicMaterial map={tabletScreen.texture} toneMapped={false} />
           </mesh>
           <pointLight
             ref={tabletGlowRef}
             position={[0, 0, 0.06]}
             color="#38bdf8"
-            intensity={1.2}
-            distance={0.7}
+            intensity={1.8}
+            distance={0.9}
           />
         </group>
       </group>

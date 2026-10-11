@@ -7,6 +7,7 @@ import {
   getPebbledLeatherTextures,
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
+import { createProjectorScreen } from '../../utils/cyberScreens.js';
 
 export default function ConferenceStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -21,8 +22,19 @@ export default function ConferenceStation({ onSelect, onHover }) {
   const chairLeather = useMemo(() => getPebbledLeatherTextures(2, 2, '#141f17'), []);
   const darkMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#181818'), []);
 
+  // Live Animated Global Cyber Attack Map Screen
+  const projectorScreen = useMemo(() => createProjectorScreen(), []);
+  const screenTimer = useRef(0);
+
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
+
+    // 0. Update Projector Screen
+    screenTimer.current += delta;
+    if (screenTimer.current > 0.04) {
+      projectorScreen.update(screenTimer.current);
+      screenTimer.current = 0;
+    }
 
     // 1. Holographic Ring Spin on BRICS Trophy
     if (bricsRingRef.current) {
@@ -38,7 +50,7 @@ export default function ConferenceStation({ onSelect, onHover }) {
 
     // 3. Projector Beam Intensity Pulse
     if (beamRef.current) {
-      beamRef.current.intensity = 3.5 + Math.sin(time * 2.8) * 0.5;
+      beamRef.current.intensity = (hovered ? 5.5 : 4.0) + Math.sin(time * 2.8) * 0.5;
     }
 
     // 4. Decay trophy spins after click
@@ -92,19 +104,19 @@ export default function ConferenceStation({ onSelect, onHover }) {
           <meshStandardMaterial color="#070b09" roughness={0.6} />
         </mesh>
 
-        {/* High-Gain White Projector Fabric Screen */}
+        {/* Live Functional Global Threat Intelligence Screen */}
         <mesh position={[0, 0, 0.022]}>
           <planeGeometry args={[2.96, 1.86]} />
-          <meshBasicMaterial color={hovered ? '#143020' : '#0c1a12'} />
+          <meshBasicMaterial map={projectorScreen.texture} toneMapped={false} />
         </mesh>
 
         {/* Ambient Projector Beam Glow */}
         <pointLight
           ref={beamRef}
           position={[0, 0, 0.5]}
-          color="#4ade80"
+          color="#38bdf8"
           intensity={hovered ? 5.0 : 3.5}
-          distance={2.8}
+          distance={3.2}
         />
       </group>
 

@@ -11,6 +11,8 @@ import StudioArchitecture from './studio/StudioArchitecture.jsx';
 import WorkstationStation from './studio/WorkstationStation.jsx';
 import ConferenceStation from './studio/ConferenceStation.jsx';
 import ArchiveStation from './studio/ArchiveStation.jsx';
+import ServerRackStation from './studio/ServerRackStation.jsx';
+import CyberSentinelDrone from './studio/CyberSentinelDrone.jsx';
 import LoungeStation from './studio/LoungeStation.jsx';
 import PrinterStation from './studio/PrinterStation.jsx';
 import CommsStation from './studio/CommsStation.jsx';
@@ -219,6 +221,8 @@ function SceneContents({
         <WorkstationStation onSelect={onSelect} onHover={onHover} />
         <ConferenceStation onSelect={onSelect} onHover={onHover} />
         <ArchiveStation onSelect={onSelect} onHover={onHover} />
+        <ServerRackStation />
+        <CyberSentinelDrone />
         <LoungeStation onSelect={onSelect} onHover={onHover} />
         <PrinterStation onSelect={onSelect} onHover={onHover} />
         <CommsStation onSelect={onSelect} onHover={onHover} />

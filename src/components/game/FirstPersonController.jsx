@@ -61,6 +61,14 @@ const STATIONS = [
     maxDist: 3.0,
     targetRadius: 0.8,
   },
+  {
+    id: 'server_rack',
+    title: '42U Mainframe Server Rack',
+    action: 'INSPECT NETWORK MAINFRAME // TELEMETRY',
+    position: [-2.3, 1.4, -4.2],
+    maxDist: 3.2,
+    targetRadius: 1.0,
+  },
 ];
 
 // Room Obstacle Bounding Boxes for AABB Collision Response
@@ -71,6 +79,8 @@ const OBSTACLES = [
   { minX: -2.6, maxX: 0.35, minZ: -3.4, maxZ: -1.0 },
   // Archive Bookcase (Back wall center)
   { minX: -0.5, maxX: 1.7, minZ: -4.85, maxZ: -4.0 },
+  // 42U Server Rack (Back wall left between conference and archive)
+  { minX: -2.85, maxX: -1.75, minZ: -4.85, maxZ: -4.0 },
   // Lounge Sofa & Coffee Table
   { minX: 1.5, maxX: 3.8, minZ: 0.6, maxZ: 2.4 },
   // Printer Credenza

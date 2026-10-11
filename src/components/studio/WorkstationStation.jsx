@@ -7,6 +7,8 @@ import {
   getPebbledLeatherTextures,
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
+import { createTerminalScreen, createRadarScreen } from '../../utils/cyberScreens.js';
+import HackerDeskGadgets from './HackerDeskGadgets.jsx';
 
 export default function WorkstationStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -25,8 +27,21 @@ export default function WorkstationStation({ onSelect, onHover }) {
   const deskMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#1c1c1c'), []);
   const chairMetal = useMemo(() => getBrushedMetalTextures(1, 1, '#888888'), []);
 
+  // Functional Animated Cyber Screens
+  const terminalScreen = useMemo(() => createTerminalScreen(), []);
+  const radarScreen = useMemo(() => createRadarScreen(), []);
+  const screenUpdateTimer = useRef(0);
+
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
+
+    // 0. Update Live PC Screens (Throttled to smooth 25 FPS for optimal 60fps performance)
+    screenUpdateTimer.current += delta;
+    if (screenUpdateTimer.current > 0.04) {
+      terminalScreen.update(screenUpdateTimer.current);
+      radarScreen.update(screenUpdateTimer.current);
+      screenUpdateTimer.current = 0;
+    }
 
     // 1. Spinning PC Fans
     if (fan1Ref.current) fan1Ref.current.rotation.z += delta * 14;
@@ -46,7 +61,7 @@ export default function WorkstationStation({ onSelect, onHover }) {
       steam3Ref.current.scale.setScalar(0.8 + (((time + 1.0) * 0.12) % 0.14) * 5);
     }
 
-    // 3. Mug Bounce animation when clicked (Direct ref update, zero state churn)
+    // 3. Mug Bounce animation when clicked
     if (mugRef.current && mugBounceRef.current > 0) {
       mugRef.current.position.y = 0.04 + Math.sin(mugBounceRef.current * Math.PI) * 0.03;
       mugBounceRef.current = Math.max(0, mugBounceRef.current - delta * 4);
@@ -62,11 +77,23 @@ export default function WorkstationStation({ onSelect, onHover }) {
     e.stopPropagation();
     playClickSound(1050, 0.08);
     mugBounceRef.current = 1.0;
+    terminalScreen.injectCommand('curl -s https://api.coffee/brew | jq .status');
   };
 
   const handleKeyboardClick = (e) => {
     e.stopPropagation();
     playClickSound(850 + Math.random() * 300, 0.03);
+    const cyberCommands = [
+      'nmap -T4 -A -p 22,80,443,8080 192.168.1.1/24',
+      'msfconsole -q -x "use exploit/multi/handler"',
+      'hydra -l admin -P wordlist.txt 10.0.4.1 ssh',
+      'hashcat -m 0 -a 0 hashes.txt rockyou.txt',
+      'tcpdump -i eth0 -n -c 10 port 443',
+      'sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT',
+      './privilege_escalation.sh --target=ctos_core',
+    ];
+    const cmd = cyberCommands[Math.floor(Math.random() * cyberCommands.length)];
+    terminalScreen.injectCommand(cmd);
   };
 
   return (
@@ -205,6 +232,9 @@ export default function WorkstationStation({ onSelect, onHover }) {
         </group>
       </group>
 
+      {/* Real Cyber Hacking Hardware Gadgets on Desk */}
+      <HackerDeskGadgets />
+
       {/* 3. Dual Curved Workstation Monitors (CLICKABLE HOTSPOT FOR PROJECTS) */}
       <group
         position={[0, 0.78, -0.25]}
@@ -236,44 +266,44 @@ export default function WorkstationStation({ onSelect, onHover }) {
           <meshStandardMaterial color="#1c1c1c" metalness={0.9} roughness={0.2} />
         </mesh>
 
-        {/* Left Monitor (Terminal) - Angled slightly right */}
+        {/* Left Monitor (Functional Kali Linux Terminal) - Angled slightly right */}
         <group position={[-0.56, 0.42, 0]} rotation={[0, 0.12, 0]}>
           {/* Bezel */}
           <mesh castShadow>
             <boxGeometry args={[0.96, 0.54, 0.03]} />
             <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.8} />
           </mesh>
-          {/* Screen Glass Face (Displays Terminal Code) */}
+          {/* Live Dynamic Kali Terminal Screen Face */}
           <mesh position={[0, 0, 0.018]}>
             <planeGeometry args={[0.92, 0.5]} />
-            <meshBasicMaterial color={hovered ? '#081c12' : '#040b08'} />
+            <meshBasicMaterial map={terminalScreen.texture} toneMapped={false} />
           </mesh>
-          {/* Subtle Screen Ambient Glow */}
+          {/* Screen Ambient Glow */}
           <pointLight
             position={[0, 0, 0.15]}
-            color="#38bdf8"
-            intensity={hovered ? 4.0 : 2.5}
-            distance={1.4}
+            color="#34d399"
+            intensity={hovered ? 4.5 : 3.0}
+            distance={1.6}
           />
         </group>
 
-        {/* Right Monitor (IDE Inspector) - Angled slightly left */}
+        {/* Right Monitor (Functional Cyber Threat Radar & SOC Dashboard) - Angled slightly left */}
         <group position={[0.56, 0.42, 0]} rotation={[0, -0.12, 0]}>
           {/* Bezel */}
           <mesh castShadow>
             <boxGeometry args={[0.96, 0.54, 0.03]} />
             <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.8} />
           </mesh>
-          {/* Screen Glass Face */}
+          {/* Live Dynamic SOC Radar Screen Face */}
           <mesh position={[0, 0, 0.018]}>
             <planeGeometry args={[0.92, 0.5]} />
-            <meshBasicMaterial color={hovered ? '#0b2416' : '#06120b'} />
+            <meshBasicMaterial map={radarScreen.texture} toneMapped={false} />
           </mesh>
           <pointLight
             position={[0, 0, 0.15]}
-            color="#55f69a"
-            intensity={hovered ? 4.0 : 2.5}
-            distance={1.4}
+            color="#38bdf8"
+            intensity={hovered ? 4.5 : 3.0}
+            distance={1.6}
           />
         </group>
       </group>
