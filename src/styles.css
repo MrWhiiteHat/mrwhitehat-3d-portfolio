@@ -4279,6 +4279,280 @@ button, a {
   color: #94a3b8;
 }
 
+/* ======================================================== */
+/* 10. COMPREHENSIVE RESPONSIVE DESIGN (MOBILE & TABLET)    */
+/* ======================================================== */
+
+/* Safe area insets & Dynamic Viewport Height for mobile Safari/Chrome */
+html, body, .portfolio-container {
+  height: 100%;
+  height: 100dvh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Tablet & Moderate Screens (<= 900px) */
+@media (max-width: 900px) {
+  .hud-top-bar {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .hud-agent-card {
+    padding: 5px 10px;
+    gap: 7px;
+  }
+
+  .agent-callsign {
+    font-size: 10px;
+  }
+
+  .agent-archetype {
+    font-size: 8px;
+  }
+
+  .hud-mission-chip {
+    padding: 5px 10px;
+    gap: 8px;
+  }
+
+  .mission-label {
+    font-size: 8px;
+  }
+
+  .hud-right-actions {
+    gap: 6px;
+  }
+
+  .hud-theme-pill {
+    padding: 4px 8px;
+    font-size: 9px;
+  }
+
+  .hud-action-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Info Panel on Tablet */
+  .info-panel {
+    top: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: min(440px, calc(100vw - 32px));
+  }
+}
+
+/* Mobile Phones (<= 640px) */
+@media (max-width: 640px) {
+  .hud-top-bar {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .hud-agent-card {
+    padding: 4px 8px;
+    gap: 5px;
+    border-radius: 20px;
+  }
+
+  .agent-callsign {
+    font-size: 9.5px;
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .agent-archetype {
+    display: none;
+  }
+
+  .hud-mission-chip {
+    padding: 4px 8px;
+    gap: 5px;
+    border-radius: 20px;
+  }
+
+  .mission-label {
+    display: none;
+  }
+
+  .mission-count {
+    font-size: 10px;
+  }
+
+  .hud-theme-pill span {
+    display: none;
+  }
+
+  .hud-theme-pill {
+    padding: 6px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+  }
+
+  .hud-right-actions {
+    gap: 4px;
+  }
+
+  .hud-action-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* Hide Desktop Keyboard Guide on Phones to prevent horizontal scroll */
+  .hud-bottom-bar {
+    display: none !important;
+  }
+
+  /* Tactical WASD Keypad on Mobile Phones */
+  .hud-wasd-widget {
+    bottom: 16px;
+    left: 12px;
+    padding: 7px 9px 9px;
+    border-radius: 12px;
+    transform: scale(0.88);
+    transform-origin: bottom left;
+  }
+
+  .wasd-widget-header {
+    font-size: 8px;
+  }
+
+  .wasd-hud-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .wasd-hud-letter {
+    font-size: 12px;
+  }
+
+  .wasd-hud-tag {
+    font-size: 6.5px;
+  }
+
+  /* Mobile Touch Interact Button */
+  .hud-mobile-interact-btn {
+    bottom: 20px;
+    right: 16px;
+    width: 62px;
+    height: 62px;
+    font-size: 8.5px;
+  }
+
+  /* Proximity Prompt on Mobile */
+  .hud-proximity-prompt {
+    top: 55%;
+    width: 90%;
+    max-width: 320px;
+  }
+
+  .proximity-action-btn {
+    padding: 8px 14px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .prompt-station-name {
+    font-size: 7.5px;
+  }
+
+  .prompt-action-text {
+    font-size: 10.5px;
+  }
+
+  /* Character Select Modal on Mobile */
+  .char-select-overlay {
+    padding: 8px;
+    align-items: flex-start;
+  }
+
+  .char-select-card {
+    max-height: 94vh;
+    border-radius: 14px;
+  }
+
+  .char-card-header {
+    padding: 10px 12px;
+  }
+
+  .char-body-grid {
+    grid-template-columns: 1fr !important;
+    padding: 12px;
+    gap: 12px;
+    max-height: 62vh;
+    overflow-y: auto;
+  }
+
+  .preview-canvas-box {
+    height: 160px;
+  }
+
+  .char-card-footer {
+    padding: 10px 12px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-launch-game {
+    width: 100%;
+    justify-content: center;
+    padding: 11px 16px;
+    font-size: 11px;
+  }
+
+  .footer-brief {
+    display: none;
+  }
+
+  /* Station Inspection Header on Mobile */
+  .station-inspect-header {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 6px;
+  }
+
+  .station-back-walk-btn {
+    padding: 6px 12px;
+    font-size: 9.5px;
+    gap: 4px;
+  }
+
+  .station-title-badge {
+    display: none !important;
+  }
+
+  /* Slide-Over Info Panel on Mobile */
+  .info-panel {
+    top: 52px;
+    left: 8px;
+    right: 8px;
+    bottom: 10px;
+    width: auto !important;
+    border-radius: 12px;
+  }
+
+  .panel-topline {
+    padding: 12px 14px;
+  }
+
+  .panel-body {
+    padding: 12px;
+  }
+
+  .mini-game-card {
+    padding: 12px;
+  }
+}
+
+
 
 
 

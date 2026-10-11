@@ -398,6 +398,69 @@ export default function FirstPersonController({
       isDragging.current = false;
     };
 
+    // 4. Touch Look for Mobile Phones & Tablets
+    let touchLookId = null;
+    let touchLastX = 0;
+    let touchLastY = 0;
+    let touchStartTime = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const onTouchStart = (e) => {
+      const target = e.target;
+      if (
+        target &&
+        target.closest &&
+        target.closest(
+          'button, input, a, .hud-top-bar, .hud-bottom-bar, .hud-wasd-widget, .hud-mobile-joystick-zone, .hud-mobile-interact-btn, .proximity-action-btn'
+        )
+      ) {
+        return;
+      }
+
+      if (touchLookId === null && e.changedTouches.length > 0) {
+        const touch = e.changedTouches[0];
+        touchLookId = touch.identifier;
+        touchLastX = touch.clientX;
+        touchLastY = touch.clientY;
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchStartTime = Date.now();
+      }
+    };
+
+    const onTouchMove = (e) => {
+      if (touchLookId === null) return;
+      const touch = Array.from(e.changedTouches).find((t) => t.identifier === touchLookId);
+      if (!touch) return;
+
+      const dx = touch.clientX - touchLastX;
+      const dy = touch.clientY - touchLastY;
+      touchLastX = touch.clientX;
+      touchLastY = touch.clientY;
+
+      const touchSensitivity = 0.0036;
+      targetYaw.current -= dx * touchSensitivity;
+      targetPitch.current -= dy * touchSensitivity;
+      targetPitch.current = Math.max(-1.3, Math.min(1.3, targetPitch.current));
+    };
+
+    const onTouchEnd = (e) => {
+      if (touchLookId === null) return;
+      const touch = Array.from(e.changedTouches).find((t) => t.identifier === touchLookId);
+      if (!touch) return;
+
+      const elapsed = Date.now() - touchStartTime;
+      const dist = Math.hypot(touch.clientX - touchStartX, touch.clientY - touchStartY);
+      touchLookId = null;
+
+      // Quick tap without dragging on a targeted station triggers interaction
+      if (elapsed < 300 && dist < 12 && activeTargetRef.current) {
+        playClickSound(1100);
+        onInteract(activeTargetRef.current.id);
+      }
+    };
+
     window.addEventListener('keydown', onKeyDown, { passive: false });
     window.addEventListener('keyup', onKeyUp, { passive: false });
     window.addEventListener('blur', onWindowBlur);
@@ -406,6 +469,11 @@ export default function FirstPersonController({
     document.addEventListener('pointerlockchange', onPointerLockChange);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
+
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
     return () => {
       window.removeEventListener('keydown', onKeyDown);
@@ -416,6 +484,12 @@ export default function FirstPersonController({
       document.removeEventListener('pointerlockchange', onPointerLockChange);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
+
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
+
       if (document.pointerLockElement === canvas && document.exitPointerLock) {
         try {
           document.exitPointerLock();
