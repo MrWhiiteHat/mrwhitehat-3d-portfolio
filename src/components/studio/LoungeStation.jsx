@@ -1,7 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
+import {
+  getPebbledLeatherTextures,
+  getNeroMarbleTextures,
+  getBrushedMetalTextures,
+} from '../../utils/textures.js';
 
 export default function LoungeStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -9,6 +14,12 @@ export default function LoungeStation({ onSelect, onHover }) {
   const lampLightRef = useRef();
   const tabletGlowRef = useRef();
   const plaqueGlowRef = useRef();
+
+  // High-End Procedural PBR Textures
+  const leatherCushions = useMemo(() => getPebbledLeatherTextures(2, 2, '#1a241e'), []);
+  const leatherBase = useMemo(() => getPebbledLeatherTextures(3, 1, '#131a16'), []);
+  const marbleTable = useMemo(() => getNeroMarbleTextures(1, 1), []);
+  const brassMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#ca8a04'), []);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -37,31 +48,31 @@ export default function LoungeStation({ onSelect, onHover }) {
         {/* Base Cushion Platform */}
         <mesh position={[0, 0.22, 0]} castShadow receiveShadow>
           <boxGeometry args={[2.0, 0.24, 0.82]} />
-          <meshStandardMaterial color="#171e19" roughness={0.7} metalness={0.1} />
+          <meshStandardMaterial {...leatherBase} roughness={0.55} metalness={0.12} />
         </mesh>
 
         {/* 3 Tufted Seat Cushions */}
         {[-0.6, 0, 0.6].map((x, i) => (
           <mesh key={`cushion-${i}`} position={[x, 0.38, 0.05]} castShadow>
             <boxGeometry args={[0.58, 0.14, 0.68]} />
-            <meshStandardMaterial color="#1a241e" roughness={0.65} metalness={0.1} />
+            <meshStandardMaterial {...leatherCushions} roughness={0.46} metalness={0.12} />
           </mesh>
         ))}
 
         {/* Backrest Cushion */}
         <mesh position={[0, 0.62, -0.34]} rotation={[-0.12, 0, 0]} castShadow>
           <boxGeometry args={[1.96, 0.44, 0.2]} />
-          <meshStandardMaterial color="#141c17" roughness={0.7} metalness={0.1} />
+          <meshStandardMaterial {...leatherCushions} roughness={0.48} metalness={0.12} />
         </mesh>
 
         {/* Left & Right Armrests */}
         <mesh position={[-0.98, 0.48, 0]} castShadow>
           <boxGeometry args={[0.16, 0.36, 0.8]} />
-          <meshStandardMaterial color="#121814" roughness={0.75} />
+          <meshStandardMaterial {...leatherBase} roughness={0.55} />
         </mesh>
         <mesh position={[0.98, 0.48, 0]} castShadow>
           <boxGeometry args={[0.16, 0.36, 0.8]} />
-          <meshStandardMaterial color="#121814" roughness={0.75} />
+          <meshStandardMaterial {...leatherBase} roughness={0.55} />
         </mesh>
 
         {/* Brushed Brass Tapered Legs */}
@@ -73,7 +84,7 @@ export default function LoungeStation({ onSelect, onHover }) {
         ].map((pos, i) => (
           <mesh key={`couch-leg-${i}`} position={pos} castShadow>
             <cylinderGeometry args={[0.02, 0.015, 0.12, 12]} />
-            <meshStandardMaterial color="#ca8a04" metalness={0.9} roughness={0.2} />
+            <meshStandardMaterial {...brassMetal} metalness={0.88} roughness={0.25} />
           </mesh>
         ))}
       </group>
@@ -83,12 +94,12 @@ export default function LoungeStation({ onSelect, onHover }) {
         {/* Tabletop Marble Disc */}
         <mesh position={[0, 0.38, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[0.5, 0.5, 0.04, 32]} />
-          <meshStandardMaterial color="#0b110e" roughness={0.2} metalness={0.4} />
+          <meshStandardMaterial {...marbleTable} roughness={0.16} metalness={0.12} />
         </mesh>
         {/* Brass Rim */}
         <mesh position={[0, 0.38, 0]}>
           <cylinderGeometry args={[0.505, 0.505, 0.038, 32]} />
-          <meshStandardMaterial color="#eab308" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial {...brassMetal} metalness={0.9} roughness={0.2} />
         </mesh>
         {/* Tripod Brass Legs */}
         {[0, (2 * Math.PI) / 3, (4 * Math.PI) / 3].map((angle, i) => (
@@ -99,7 +110,7 @@ export default function LoungeStation({ onSelect, onHover }) {
             castShadow
           >
             <cylinderGeometry args={[0.015, 0.015, 0.36, 12]} />
-            <meshStandardMaterial color="#ca8a04" metalness={0.9} roughness={0.2} />
+            <meshStandardMaterial {...brassMetal} metalness={0.9} roughness={0.2} />
           </mesh>
         ))}
 

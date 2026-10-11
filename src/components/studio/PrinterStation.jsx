@@ -1,13 +1,22 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playHackingBeep, playWhooshSound } from '../../utils/audio.js';
+import {
+  getWalnutWoodTextures,
+  getBrushedMetalTextures,
+} from '../../utils/textures.js';
 
 export default function PrinterStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
   const [paperOffset, setPaperOffset] = useState(0);
   const paperRef = useRef();
   const ledRef = useRef();
+
+  // High-End Procedural PBR Textures
+  const cabinetWood = useMemo(() => getWalnutWoodTextures(2, 2), []);
+  const brassMetal = useMemo(() => getBrushedMetalTextures(1, 1, '#ca8a04'), []);
+  const darkMetal = useMemo(() => getBrushedMetalTextures(1, 1, '#1a1a1a'), []);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -41,21 +50,21 @@ export default function PrinterStation({ onSelect, onHover }) {
         {/* Main Cabinet Body */}
         <mesh castShadow receiveShadow>
           <boxGeometry args={[1.2, 0.84, 0.65]} />
-          <meshStandardMaterial color="#1a1410" roughness={0.4} metalness={0.15} />
+          <meshStandardMaterial {...cabinetWood} roughness={0.38} metalness={0.12} />
         </mesh>
         {/* Dual Cabinet Doors with Brass Gap Line */}
         <mesh position={[0, 0, 0.33]}>
           <boxGeometry args={[1.16, 0.78, 0.02]} />
-          <meshStandardMaterial color="#241a14" roughness={0.5} />
+          <meshStandardMaterial {...cabinetWood} roughness={0.42} />
         </mesh>
         {/* Modern Brass Pull Handles */}
         <mesh position={[-0.08, 0.05, 0.35]}>
           <boxGeometry args={[0.02, 0.14, 0.02]} />
-          <meshStandardMaterial color="#eab308" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial {...brassMetal} metalness={0.9} roughness={0.2} />
         </mesh>
         <mesh position={[0.08, 0.05, 0.35]}>
           <boxGeometry args={[0.02, 0.14, 0.02]} />
-          <meshStandardMaterial color="#eab308" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial {...brassMetal} metalness={0.9} roughness={0.2} />
         </mesh>
         {/* Metal Legs */}
         {[
@@ -66,7 +75,7 @@ export default function PrinterStation({ onSelect, onHover }) {
         ].map((pos, i) => (
           <mesh key={`cred-leg-${i}`} position={pos} castShadow>
             <cylinderGeometry args={[0.02, 0.02, 0.12, 12]} />
-            <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.2} />
+            <meshStandardMaterial {...darkMetal} metalness={0.9} roughness={0.2} />
           </mesh>
         ))}
       </group>

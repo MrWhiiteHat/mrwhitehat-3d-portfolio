@@ -1,7 +1,23 @@
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
+import {
+  getParquetFloorTextures,
+  getPlasterWallTextures,
+  getWalnutWoodTextures,
+  getTechCarpetTextures,
+  getCeilingTileTextures,
+  getBrushedMetalTextures,
+} from '../../utils/textures.js';
 
 export default function StudioArchitecture() {
+  const parquetFloor = useMemo(() => getParquetFloorTextures(8, 8), []);
+  const plasterWall = useMemo(() => getPlasterWallTextures(3, 2), []);
+  const walnutWood = useMemo(() => getWalnutWoodTextures(1, 4), []);
+  const techCarpetWorkstation = useMemo(() => getTechCarpetTextures(4, 3, '#0f1c16'), []);
+  const techCarpetLounge = useMemo(() => getTechCarpetTextures(3, 3, '#141d18'), []);
+  const ceilingTiles = useMemo(() => getCeilingTileTextures(8, 8), []);
+  const brushedMetal = useMemo(() => getBrushedMetalTextures(2, 2, '#18201a'), []);
+
   // Generate skyline building silhouettes for both back and front panoramic windows
   const buildingsBack = useMemo(() => {
     return [
@@ -29,30 +45,22 @@ export default function StudioArchitecture() {
       {/* ========================================================================= */}
       {/* 1. FLOOR & CARPETS                                                        */}
       {/* ========================================================================= */}
-      {/* Main Parquet Hardwood Floor */}
+      {/* Main Parquet Hardwood Floor with Realistic Grain, Bump & Roughness */}
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[10.3, 0.1, 10.3]} />
-        <meshStandardMaterial
-          color="#1e1813"
-          roughness={0.42}
-          metalness={0.12}
-        />
+        <meshStandardMaterial {...parquetFloor} />
       </mesh>
 
       {/* Floor Border Brass / Dark Walnut Trim */}
       <mesh position={[0, 0.005, 0]}>
         <boxGeometry args={[10.2, 0.01, 10.2]} />
-        <meshStandardMaterial color="#3a2f23" roughness={0.5} />
+        <meshStandardMaterial {...walnutWood} />
       </mesh>
 
       {/* Central Designer Tech Rug under workstation */}
       <mesh position={[-0.8, 0.012, 0.6]} receiveShadow>
         <boxGeometry args={[4.4, 0.015, 3.6]} />
-        <meshStandardMaterial
-          color="#0f1c16"
-          roughness={0.8}
-          metalness={0.08}
-        />
+        <meshStandardMaterial {...techCarpetWorkstation} />
       </mesh>
       {/* Rug Emerald Border Line */}
       <mesh position={[-0.8, 0.02, 0.6]}>
@@ -63,11 +71,7 @@ export default function StudioArchitecture() {
       {/* Lounge Area Plush Rug */}
       <mesh position={[2.6, 0.012, 1.6]} receiveShadow>
         <boxGeometry args={[3.4, 0.015, 3.2]} />
-        <meshStandardMaterial
-          color="#151e18"
-          roughness={0.85}
-          metalness={0.05}
-        />
+        <meshStandardMaterial {...techCarpetLounge} />
       </mesh>
 
       {/* ========================================================================= */}
@@ -77,26 +81,26 @@ export default function StudioArchitecture() {
         {/* Main Solid Wall Surface */}
         <mesh receiveShadow>
           <boxGeometry args={[0.2, 4.5, 10.3]} />
-          <meshStandardMaterial color="#1a251e" roughness={0.7} />
+          <meshStandardMaterial {...plasterWall} />
         </mesh>
 
         {/* Baseboard */}
         <mesh position={[0.105, -2.15, 0]}>
           <boxGeometry args={[0.03, 0.2, 10.3]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Top Cornice Molding */}
         <mesh position={[0.105, 2.18, 0]}>
           <boxGeometry args={[0.04, 0.14, 10.3]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Vertical Wood Slat Acoustic Paneling (behind presentation & awards) */}
         {Array.from({ length: 18 }).map((_, i) => (
           <mesh key={`left-slat-${i}`} position={[0.11, 0.1, -4.5 + i * 0.25]}>
             <boxGeometry args={[0.02, 3.9, 0.12]} />
-            <meshStandardMaterial color="#32261b" roughness={0.5} />
+            <meshStandardMaterial {...walnutWood} />
           </mesh>
         ))}
       </group>
@@ -108,33 +112,33 @@ export default function StudioArchitecture() {
         {/* Left Section (Solid wall behind Bookcase) */}
         <mesh position={[-1.6, 0, 0]} receiveShadow>
           <boxGeometry args={[6.9, 4.5, 0.2]} />
-          <meshStandardMaterial color="#18221b" roughness={0.7} />
+          <meshStandardMaterial {...plasterWall} />
         </mesh>
 
         {/* Back Wall Slat Paneling behind archive */}
         {Array.from({ length: 16 }).map((_, i) => (
           <mesh key={`back-slat-${i}`} position={[-1.2 + i * 0.22, 0.1, 0.11]}>
             <boxGeometry args={[0.11, 3.9, 0.02]} />
-            <meshStandardMaterial color="#302318" roughness={0.5} />
+            <meshStandardMaterial {...walnutWood} />
           </mesh>
         ))}
 
         {/* Baseboard left */}
         <mesh position={[-1.6, -2.15, 0.105]}>
           <boxGeometry args={[6.9, 0.2, 0.03]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Top Cornice left */}
         <mesh position={[-1.6, 2.18, 0.105]}>
           <boxGeometry args={[6.9, 0.14, 0.04]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Back-Right Corner Wall Filler */}
         <mesh position={[4.95, 0, 0]}>
           <boxGeometry args={[0.4, 4.5, 0.2]} />
-          <meshStandardMaterial color="#18221b" roughness={0.7} />
+          <meshStandardMaterial {...plasterWall} />
         </mesh>
 
         {/* Right Section: Large Panoramic Window (Centered at X = 3.35) */}
@@ -167,15 +171,18 @@ export default function StudioArchitecture() {
             <meshStandardMaterial color="#0b100d" roughness={0.3} metalness={0.8} />
           </mesh>
 
-          {/* Window Glass Pane */}
+          {/* Window Glass Pane with Physical Optical Transmission */}
           <mesh position={[0, 0, 0.05]}>
             <boxGeometry args={[2.76, 3.45, 0.02]} />
-            <meshStandardMaterial
+            <meshPhysicalMaterial
               color="#93c5fd"
               transparent
-              opacity={0.2}
-              roughness={0.08}
-              metalness={0.15}
+              opacity={0.28}
+              roughness={0.06}
+              metalness={0.1}
+              transmission={0.88}
+              ior={1.52}
+              thickness={0.06}
             />
           </mesh>
 
@@ -202,52 +209,52 @@ export default function StudioArchitecture() {
         {/* Wall Section A: Rear of Entrance Portal (Z from -5.05 to -3.8) */}
         <mesh position={[0, 0, -4.425]} receiveShadow>
           <boxGeometry args={[0.2, 4.5, 1.25]} />
-          <meshStandardMaterial color="#1a251e" roughness={0.7} />
+          <meshStandardMaterial {...plasterWall} />
         </mesh>
         <mesh position={[-0.105, -2.15, -4.425]}>
           <boxGeometry args={[0.03, 0.2, 1.25]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Doorway Header Wall above Entrance (Z = -2.8, Y from 3.0 to 4.5m) */}
         <mesh position={[0, 1.5, -2.8]} receiveShadow>
           <boxGeometry args={[0.2, 1.5, 2.0]} />
-          <meshStandardMaterial color="#1a251e" roughness={0.7} />
+          <meshStandardMaterial {...plasterWall} />
         </mesh>
 
         {/* Architectural Entrance Frame Jambs */}
         <mesh position={[-0.08, 0, -3.85]}>
           <boxGeometry args={[0.1, 4.5, 0.15]} />
-          <meshStandardMaterial color="#0b120e" roughness={0.4} metalness={0.6} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
         <mesh position={[-0.08, 0, -1.75]}>
           <boxGeometry args={[0.1, 4.5, 0.15]} />
-          <meshStandardMaterial color="#0b120e" roughness={0.4} metalness={0.6} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
         <mesh position={[-0.08, 0.8, -2.8]}>
           <boxGeometry args={[0.1, 0.16, 2.1]} />
-          <meshStandardMaterial color="#0b120e" roughness={0.4} metalness={0.6} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Wall Section B: Front of Entrance Portal (Z from -1.8 to +5.05) */}
         <mesh position={[0, 0, 1.625]} receiveShadow>
           <boxGeometry args={[0.2, 4.5, 6.85]} />
-          <meshStandardMaterial color="#1a251e" roughness={0.7} />
+          <meshStandardMaterial {...plasterWall} />
         </mesh>
         <mesh position={[-0.105, -2.15, 1.625]}>
           <boxGeometry args={[0.03, 0.2, 6.85]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
         <mesh position={[-0.105, 2.18, 1.625]}>
           <boxGeometry args={[0.04, 0.14, 6.85]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Vertical Acoustic Walnut Wood Slats along Right Wall Lounge Area */}
         {Array.from({ length: 14 }).map((_, i) => (
           <mesh key={`right-slat-${i}`} position={[-0.11, 0.1, 0.2 + i * 0.28]}>
             <boxGeometry args={[0.02, 3.9, 0.14]} />
-            <meshStandardMaterial color="#32261b" roughness={0.5} />
+            <meshStandardMaterial {...walnutWood} />
           </mesh>
         ))}
 
@@ -282,29 +289,29 @@ export default function StudioArchitecture() {
         {/* Left Section (Solid architectural wall, X from -5.05 to -2.0) */}
         <mesh position={[-3.525, 0, 0]} receiveShadow>
           <boxGeometry args={[3.05, 4.5, 0.2]} />
-          <meshStandardMaterial color="#18221b" roughness={0.7} />
+          <meshStandardMaterial {...plasterWall} />
         </mesh>
         <mesh position={[-3.525, -2.15, -0.105]}>
           <boxGeometry args={[3.05, 0.2, 0.03]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
         <mesh position={[-3.525, 2.18, -0.105]}>
           <boxGeometry args={[3.05, 0.14, 0.04]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Right Section (Solid architectural corner wall, X from +3.2 to +5.05) */}
         <mesh position={[4.125, 0, 0]} receiveShadow>
           <boxGeometry args={[1.85, 4.5, 0.2]} />
-          <meshStandardMaterial color="#18221b" roughness={0.7} />
+          <meshStandardMaterial {...plasterWall} />
         </mesh>
         <mesh position={[4.125, -2.15, -0.105]}>
           <boxGeometry args={[1.85, 0.2, 0.03]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
         <mesh position={[4.125, 2.18, -0.105]}>
           <boxGeometry args={[1.85, 0.14, 0.04]} />
-          <meshStandardMaterial color="#121a15" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Center: Large Panoramic Skyline Window (X from -2.0 to +3.2, Width 5.2m) */}
@@ -312,11 +319,11 @@ export default function StudioArchitecture() {
           {/* Wall Cutout Header & Sill */}
           <mesh position={[0, 2.05, 0]}>
             <boxGeometry args={[5.2, 0.4, 0.2]} />
-            <meshStandardMaterial color="#18221b" roughness={0.7} />
+            <meshStandardMaterial {...plasterWall} />
           </mesh>
           <mesh position={[0, -2.05, 0]}>
             <boxGeometry args={[5.2, 0.4, 0.2]} />
-            <meshStandardMaterial color="#18221b" roughness={0.7} />
+            <meshStandardMaterial {...plasterWall} />
           </mesh>
 
           {/* Window Outer Perimeter Metal Frame */}
@@ -337,15 +344,18 @@ export default function StudioArchitecture() {
             <meshStandardMaterial color="#0b100d" roughness={0.3} metalness={0.8} />
           </mesh>
 
-          {/* Window Glass Pane */}
+          {/* Window Glass Pane with Optical Transmission */}
           <mesh position={[0, 0, -0.05]}>
             <boxGeometry args={[5.05, 3.45, 0.02]} />
-            <meshStandardMaterial
+            <meshPhysicalMaterial
               color="#93c5fd"
               transparent
-              opacity={0.18}
-              roughness={0.08}
-              metalness={0.15}
+              opacity={0.28}
+              roughness={0.06}
+              metalness={0.1}
+              transmission={0.88}
+              ior={1.52}
+              thickness={0.06}
             />
           </mesh>
 
@@ -381,43 +391,39 @@ export default function StudioArchitecture() {
         {/* Main Ceiling Slab (Completely encloses top of room, prevents dark void) */}
         <mesh receiveShadow castShadow={false}>
           <boxGeometry args={[10.3, 0.08, 10.3]} />
-          <meshStandardMaterial
-            color="#0d1410"
-            roughness={0.8}
-            metalness={0.1}
-          />
+          <meshStandardMaterial {...ceilingTiles} />
         </mesh>
 
         {/* Coffered Ceiling Structural Cross Beams (3x3 Grid of Architectural Coffers) */}
         {[-3.2, 0, 3.2].map((bx, idx) => (
           <mesh key={`ceil-beam-x-${idx}`} position={[bx, -0.06, 0]} castShadow={false}>
             <boxGeometry args={[0.22, 0.12, 10.1]} />
-            <meshStandardMaterial color="#141c17" roughness={0.6} />
+            <meshStandardMaterial {...brushedMetal} />
           </mesh>
         ))}
         {[-3.2, 0, 3.2].map((bz, idx) => (
           <mesh key={`ceil-beam-z-${idx}`} position={[0, -0.06, bz]} castShadow={false}>
             <boxGeometry args={[10.1, 0.12, 0.22]} />
-            <meshStandardMaterial color="#141c17" roughness={0.6} />
+            <meshStandardMaterial {...brushedMetal} />
           </mesh>
         ))}
 
         {/* Perimeter Ceiling Cornice Drop */}
         <mesh position={[0, -0.08, -5.05]}>
           <boxGeometry args={[10.3, 0.16, 0.15]} />
-          <meshStandardMaterial color="#101713" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
         <mesh position={[0, -0.08, 5.05]}>
           <boxGeometry args={[10.3, 0.16, 0.15]} />
-          <meshStandardMaterial color="#101713" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
         <mesh position={[-5.05, -0.08, 0]}>
           <boxGeometry args={[0.15, 0.16, 10.3]} />
-          <meshStandardMaterial color="#101713" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
         <mesh position={[5.05, -0.08, 0]}>
           <boxGeometry args={[0.15, 0.16, 10.3]} />
-          <meshStandardMaterial color="#101713" roughness={0.5} />
+          <meshStandardMaterial {...brushedMetal} />
         </mesh>
 
         {/* Ambient Recessed LED Light Trough Lines inside ceiling coffers */}

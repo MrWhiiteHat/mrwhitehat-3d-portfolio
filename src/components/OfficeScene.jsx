@@ -330,6 +330,13 @@ export default function OfficeScene({
           antialias: true,
           stencil: false,
           depth: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.15,
+        }}
+        onCreated={({ gl }) => {
+          gl.shadowMap.type = THREE.PCFSoftShadowMap;
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1.15;
         }}
         camera={{ position: [10.2, 8.2, 10.2], fov: 34, near: 0.1, far: 100 }}
         onError={() => setFailed(true)}

@@ -2,6 +2,10 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
+import {
+  getWalnutWoodTextures,
+  getBrushedMetalTextures,
+} from '../../utils/textures.js';
 
 export default function ArchiveStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -10,6 +14,10 @@ export default function ArchiveStation({ onSelect, onHover }) {
   const led1Ref = useRef();
   const led2Ref = useRef();
   const led3Ref = useRef();
+
+  // High-End Procedural PBR Textures
+  const shelfWood = useMemo(() => getWalnutWoodTextures(3, 1), []);
+  const uprightMetal = useMemo(() => getBrushedMetalTextures(1, 4, '#0f172a'), []);
 
   // Generate procedural book stacks for the shelves
   const bookShelves = useMemo(() => {
@@ -82,16 +90,16 @@ export default function ArchiveStation({ onSelect, onHover }) {
         {/* Bookcase Vertical Side Uprights (Steel Frames) */}
         <mesh position={[-1.15, 1.75, 0]} castShadow>
           <boxGeometry args={[0.06, 3.5, 0.48]} />
-          <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.3} />
+          <meshStandardMaterial {...uprightMetal} metalness={0.85} roughness={0.3} />
         </mesh>
         <mesh position={[1.15, 1.75, 0]} castShadow>
           <boxGeometry args={[0.06, 3.5, 0.48]} />
-          <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.3} />
+          <meshStandardMaterial {...uprightMetal} metalness={0.85} roughness={0.3} />
         </mesh>
         {/* Back Panel */}
         <mesh position={[0, 1.75, -0.22]} receiveShadow>
           <boxGeometry args={[2.34, 3.5, 0.02]} />
-          <meshStandardMaterial color="#1a1410" roughness={0.7} />
+          <meshStandardMaterial {...shelfWood} roughness={0.65} metalness={0.05} />
         </mesh>
 
         {/* 5 Horizontal Solid Oak Shelves */}
@@ -99,7 +107,7 @@ export default function ArchiveStation({ onSelect, onHover }) {
           <group key={`shelf-${i}`} position={[0, y, 0]}>
             <mesh castShadow receiveShadow>
               <boxGeometry args={[2.36, 0.05, 0.46]} />
-              <meshStandardMaterial color="#2b1f17" roughness={0.4} metalness={0.1} />
+              <meshStandardMaterial {...shelfWood} roughness={0.36} metalness={0.1} />
             </mesh>
             {/* Shelf Under-Glow Warm LED Strip */}
             <pointLight

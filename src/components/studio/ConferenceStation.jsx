@@ -1,7 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playBreachFanfare, playClickSound, playWhooshSound } from '../../utils/audio.js';
+import {
+  getWalnutWoodTextures,
+  getPebbledLeatherTextures,
+  getBrushedMetalTextures,
+} from '../../utils/textures.js';
 
 export default function ConferenceStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -9,6 +14,12 @@ export default function ConferenceStation({ onSelect, onHover }) {
   const bricsRingRef = useRef();
   const bricsStarRef = useRef();
   const beamRef = useRef();
+
+  // High-End Procedural PBR Textures
+  const walnutCredenza = useMemo(() => getWalnutWoodTextures(3, 1), []);
+  const walnutTable = useMemo(() => getWalnutWoodTextures(2, 2), []);
+  const chairLeather = useMemo(() => getPebbledLeatherTextures(2, 2, '#141f17'), []);
+  const darkMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#181818'), []);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -72,7 +83,7 @@ export default function ConferenceStation({ onSelect, onHover }) {
         {/* Top Motorized Metal Housing Roll */}
         <mesh position={[0, 1.05, 0]} castShadow>
           <boxGeometry args={[3.2, 0.1, 0.12]} />
-          <meshStandardMaterial color="#0a0e0c" roughness={0.3} metalness={0.8} />
+          <meshStandardMaterial {...darkMetal} roughness={0.3} metalness={0.8} />
         </mesh>
 
         {/* Outer Matte Black Border Frame */}
@@ -102,12 +113,12 @@ export default function ConferenceStation({ onSelect, onHover }) {
         {/* Media Credenza Console */}
         <mesh castShadow receiveShadow>
           <boxGeometry args={[2.8, 0.45, 0.45]} />
-          <meshStandardMaterial color="#1a1410" roughness={0.4} metalness={0.2} />
+          <meshStandardMaterial {...walnutCredenza} roughness={0.38} metalness={0.12} />
         </mesh>
         {/* Credenza Fluted Wood Slats Accent */}
         <mesh position={[0, 0, 0.23]}>
           <boxGeometry args={[2.74, 0.38, 0.02]} />
-          <meshStandardMaterial color="#2c2219" roughness={0.5} />
+          <meshStandardMaterial {...walnutCredenza} roughness={0.45} />
         </mesh>
 
         {/* Award Trophy 1: Gold Cyber Cup (Odisha Skills 2021) */}
@@ -202,12 +213,12 @@ export default function ConferenceStation({ onSelect, onHover }) {
         {/* Conference Oval Meeting Table */}
         <mesh position={[0, 0.72, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[0.75, 0.75, 0.06, 32]} />
-          <meshStandardMaterial color="#1f1813" roughness={0.35} metalness={0.2} />
+          <meshStandardMaterial {...walnutTable} roughness={0.32} metalness={0.12} />
         </mesh>
         {/* Center Pedestal Base */}
         <mesh position={[0, 0.34, 0]} castShadow>
           <cylinderGeometry args={[0.18, 0.32, 0.68, 24]} />
-          <meshStandardMaterial color="#111" metalness={0.8} roughness={0.3} />
+          <meshStandardMaterial {...darkMetal} metalness={0.88} roughness={0.25} />
         </mesh>
 
         {/* Swivel Conference Chairs around table */}
@@ -219,15 +230,15 @@ export default function ConferenceStation({ onSelect, onHover }) {
           >
             <mesh position={[0, 0.42, 0]} castShadow>
               <boxGeometry args={[0.42, 0.08, 0.42]} />
-              <meshStandardMaterial color="#141f17" roughness={0.7} />
+              <meshStandardMaterial {...chairLeather} roughness={0.5} metalness={0.1} />
             </mesh>
             <mesh position={[0, 0.7, -0.18]} castShadow>
               <boxGeometry args={[0.4, 0.5, 0.05]} />
-              <meshStandardMaterial color="#141f17" roughness={0.7} />
+              <meshStandardMaterial {...chairLeather} roughness={0.5} metalness={0.1} />
             </mesh>
             <mesh position={[0, 0.2, 0]}>
               <cylinderGeometry args={[0.03, 0.22, 0.4, 4]} />
-              <meshStandardMaterial color="#222" metalness={0.8} />
+              <meshStandardMaterial {...darkMetal} metalness={0.88} roughness={0.25} />
             </mesh>
           </group>
         ))}

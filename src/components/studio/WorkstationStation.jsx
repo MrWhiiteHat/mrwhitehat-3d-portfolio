@@ -1,7 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playHackingBeep, playWhooshSound } from '../../utils/audio.js';
+import {
+  getWalnutWoodTextures,
+  getPebbledLeatherTextures,
+  getBrushedMetalTextures,
+} from '../../utils/textures.js';
 
 export default function WorkstationStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -13,6 +18,12 @@ export default function WorkstationStation({ onSelect, onHover }) {
   const steam3Ref = useRef();
   const deskLedRef = useRef();
   const mugRef = useRef();
+
+  // High-End Procedural PBR Textures
+  const walnutDesk = useMemo(() => getWalnutWoodTextures(2, 1), []);
+  const chairLeather = useMemo(() => getPebbledLeatherTextures(2, 2, '#141c17'), []);
+  const deskMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#1c1c1c'), []);
+  const chairMetal = useMemo(() => getBrushedMetalTextures(1, 1, '#888888'), []);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -65,13 +76,13 @@ export default function WorkstationStation({ onSelect, onHover }) {
         {/* Desk Top Surface */}
         <mesh position={[0, 0.74, 0]} castShadow receiveShadow>
           <boxGeometry args={[2.7, 0.08, 1.3]} />
-          <meshStandardMaterial color="#1a1410" roughness={0.35} metalness={0.1} />
+          <meshStandardMaterial {...walnutDesk} roughness={0.34} metalness={0.08} />
         </mesh>
 
         {/* Desk Matte Black Bevel Under-frame */}
         <mesh position={[0, 0.68, 0]} castShadow>
           <boxGeometry args={[2.6, 0.04, 1.2]} />
-          <meshStandardMaterial color="#0d0d0d" roughness={0.6} metalness={0.8} />
+          <meshStandardMaterial {...deskMetal} roughness={0.5} metalness={0.8} />
         </mesh>
 
         {/* Front Edge Glowing Neon LED Strip */}
@@ -96,14 +107,14 @@ export default function WorkstationStation({ onSelect, onHover }) {
         ].map((pos, i) => (
           <mesh key={`desk-leg-${i}`} position={pos} castShadow>
             <boxGeometry args={[0.07, 0.7, 0.07]} />
-            <meshStandardMaterial color="#1f1f1f" roughness={0.3} metalness={0.9} />
+            <meshStandardMaterial {...deskMetal} roughness={0.3} metalness={0.9} />
           </mesh>
         ))}
 
         {/* Cable Raceway & Privacy Backplate */}
         <mesh position={[0, 0.45, -0.55]} castShadow>
           <boxGeometry args={[2.4, 0.4, 0.02]} />
-          <meshStandardMaterial color="#141414" roughness={0.7} metalness={0.4} />
+          <meshStandardMaterial {...deskMetal} roughness={0.65} metalness={0.5} />
         </mesh>
       </group>
 
@@ -312,36 +323,36 @@ export default function WorkstationStation({ onSelect, onHover }) {
         {/* 5-Star Caster Wheel Base */}
         <mesh position={[0, 0.08, 0]} castShadow>
           <cylinderGeometry args={[0.32, 0.35, 0.05, 5]} />
-          <meshStandardMaterial color="#111" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial {...deskMetal} metalness={0.9} roughness={0.2} />
         </mesh>
         {/* Hydraulic Piston Lift Cylinder */}
         <mesh position={[0, 0.25, 0]}>
           <cylinderGeometry args={[0.03, 0.03, 0.28, 16]} />
-          <meshStandardMaterial color="#888" metalness={0.95} roughness={0.1} />
+          <meshStandardMaterial {...chairMetal} metalness={0.95} roughness={0.15} />
         </mesh>
         {/* Contoured Seat Cushion */}
         <mesh position={[0, 0.42, 0.05]} castShadow>
           <boxGeometry args={[0.55, 0.1, 0.52]} />
-          <meshStandardMaterial color="#18221b" roughness={0.8} />
+          <meshStandardMaterial {...chairLeather} roughness={0.48} metalness={0.1} />
         </mesh>
         {/* High Mesh Backrest & Lumbar */}
         <mesh position={[0, 0.8, -0.18]} rotation={[-0.08, 0, 0]} castShadow>
           <boxGeometry args={[0.5, 0.65, 0.06]} />
-          <meshStandardMaterial color="#131c16" roughness={0.7} />
+          <meshStandardMaterial {...chairLeather} roughness={0.48} metalness={0.1} />
         </mesh>
         {/* Ergonomic Headrest */}
         <mesh position={[0, 1.18, -0.22]} rotation={[-0.08, 0, 0]}>
           <boxGeometry args={[0.28, 0.14, 0.06]} />
-          <meshStandardMaterial color="#1a251e" roughness={0.7} />
+          <meshStandardMaterial {...chairLeather} roughness={0.48} metalness={0.1} />
         </mesh>
         {/* Left & Right 3D Armrests */}
         <mesh position={[-0.28, 0.62, 0.05]}>
           <boxGeometry args={[0.07, 0.04, 0.28]} />
-          <meshStandardMaterial color="#1c1c1c" metalness={0.6} />
+          <meshStandardMaterial {...deskMetal} metalness={0.7} roughness={0.4} />
         </mesh>
         <mesh position={[0.28, 0.62, 0.05]}>
           <boxGeometry args={[0.07, 0.04, 0.28]} />
-          <meshStandardMaterial color="#1c1c1c" metalness={0.6} />
+          <meshStandardMaterial {...deskMetal} metalness={0.7} roughness={0.4} />
         </mesh>
       </group>
     </group>
