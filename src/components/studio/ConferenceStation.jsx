@@ -1,0 +1,237 @@
+import React, { useRef, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import { playBreachFanfare, playClickSound, playWhooshSound } from '../../utils/audio.js';
+
+export default function ConferenceStation({ onSelect, onHover }) {
+  const [hovered, setHovered] = useState(false);
+  const [trophySpins, setTrophySpins] = useState({ gold: 0, brics: 0, bronze: 0 });
+  const bricsRingRef = useRef();
+  const bricsStarRef = useRef();
+  const beamRef = useRef();
+
+  useFrame((state, delta) => {
+    const time = state.clock.getElapsedTime();
+
+    // 1. Holographic Ring Spin on BRICS Trophy
+    if (bricsRingRef.current) {
+      bricsRingRef.current.rotation.y += delta * 1.8;
+      bricsRingRef.current.rotation.x += delta * 0.9;
+    }
+
+    // 2. Floating Star Bob
+    if (bricsStarRef.current) {
+      bricsStarRef.current.position.y = 0.14 + Math.sin(time * 2.2) * 0.02;
+      bricsStarRef.current.rotation.y += delta * 0.4;
+    }
+
+    // 3. Projector Beam Intensity Pulse
+    if (beamRef.current) {
+      beamRef.current.intensity = 3.5 + Math.sin(time * 2.8) * 0.5;
+    }
+
+    // 4. Decay trophy spins after click
+    if (trophySpins.gold > 0 || trophySpins.brics > 0 || trophySpins.bronze > 0) {
+      setTrophySpins((prev) => ({
+        gold: Math.max(0, prev.gold - delta * 5),
+        brics: Math.max(0, prev.brics - delta * 5),
+        bronze: Math.max(0, prev.bronze - delta * 5),
+      }));
+    }
+  });
+
+  const handleTrophyClick = (type) => (e) => {
+    e.stopPropagation();
+    playClickSound(1200, 0.08);
+    setTrophySpins((prev) => ({ ...prev, [type]: prev[type] + Math.PI * 2 }));
+  };
+
+  return (
+    <group position={[-4.88, 0, -2.0]} name="ConferenceStation">
+      {/* 1. Large Motorized Presentation Projector Screen (Left Wall, facing +X) */}
+      <group
+        position={[0, 2.15, 0]}
+        rotation={[0, Math.PI / 2, 0]}
+        onClick={(e) => {
+          e.stopPropagation();
+          playWhooshSound();
+          onSelect?.({ section: 'achievements', label: 'Presentation Area · Achievements' });
+        }}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHovered(true);
+          document.body.style.cursor = 'pointer';
+          onHover?.('Presentation Area · Achievements');
+        }}
+        onPointerOut={() => {
+          setHovered(false);
+          document.body.style.cursor = 'auto';
+          onHover?.(null);
+        }}
+      >
+        {/* Top Motorized Metal Housing Roll */}
+        <mesh position={[0, 1.05, 0]} castShadow>
+          <boxGeometry args={[3.2, 0.1, 0.12]} />
+          <meshStandardMaterial color="#0a0e0c" roughness={0.3} metalness={0.8} />
+        </mesh>
+
+        {/* Outer Matte Black Border Frame */}
+        <mesh position={[0, 0, 0]} castShadow>
+          <boxGeometry args={[3.08, 1.98, 0.04]} />
+          <meshStandardMaterial color="#070b09" roughness={0.6} />
+        </mesh>
+
+        {/* High-Gain White Projector Fabric Screen */}
+        <mesh position={[0, 0, 0.022]}>
+          <planeGeometry args={[2.96, 1.86]} />
+          <meshBasicMaterial color={hovered ? '#143020' : '#0c1a12'} />
+        </mesh>
+
+        {/* Ambient Projector Beam Glow */}
+        <pointLight
+          ref={beamRef}
+          position={[0, 0, 0.5]}
+          color="#4ade80"
+          intensity={hovered ? 5.0 : 3.5}
+          distance={2.8}
+        />
+      </group>
+
+      {/* 2. Floating Media Credenza with 3D Trophies & Awards below screen */}
+      <group position={[0.25, 0.45, 0]} rotation={[0, Math.PI / 2, 0]}>
+        {/* Media Credenza Console */}
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[2.8, 0.45, 0.45]} />
+          <meshStandardMaterial color="#1a1410" roughness={0.4} metalness={0.2} />
+        </mesh>
+        {/* Credenza Fluted Wood Slats Accent */}
+        <mesh position={[0, 0, 0.23]}>
+          <boxGeometry args={[2.74, 0.38, 0.02]} />
+          <meshStandardMaterial color="#2c2219" roughness={0.5} />
+        </mesh>
+
+        {/* Award Trophy 1: Gold Cyber Cup (Odisha Skills 2021) */}
+        <group
+          position={[-0.8, 0.32, 0]}
+          rotation={[0, trophySpins.gold, 0]}
+          onClick={handleTrophyClick('gold')}
+          onPointerOver={() => {
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = 'auto';
+          }}
+        >
+          {/* Marble Base */}
+          <mesh castShadow>
+            <boxGeometry args={[0.14, 0.08, 0.14]} />
+            <meshStandardMaterial color="#1f2937" roughness={0.2} metalness={0.5} />
+          </mesh>
+          {/* Gold Cup Stem & Bowl */}
+          <mesh position={[0, 0.1, 0]} castShadow>
+            <cylinderGeometry args={[0.07, 0.03, 0.14, 16]} />
+            <meshStandardMaterial color="#eab308" metalness={0.9} roughness={0.2} />
+          </mesh>
+          {/* Subtle Trophy Light */}
+          <pointLight position={[0, 0.15, 0.08]} color="#eab308" intensity={1.2} distance={0.8} />
+        </group>
+
+        {/* Award Trophy 2: Crystal Diamond Star (BRICS Hi-Tech 2026) */}
+        <group
+          position={[0, 0.34, 0]}
+          rotation={[0, trophySpins.brics, 0]}
+          onClick={handleTrophyClick('brics')}
+          onPointerOver={() => {
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = 'auto';
+          }}
+        >
+          <mesh castShadow>
+            <cylinderGeometry args={[0.08, 0.1, 0.08, 16]} />
+            <meshStandardMaterial color="#111827" roughness={0.3} metalness={0.6} />
+          </mesh>
+          {/* Floating Octahedron Star */}
+          <mesh ref={bricsStarRef} position={[0, 0.14, 0]} castShadow>
+            <octahedronGeometry args={[0.09, 0]} />
+            <meshPhysicalMaterial
+              color="#38bdf8"
+              transmission={0.85}
+              roughness={0.1}
+              metalness={0.2}
+              emissive="#38bdf8"
+              emissiveIntensity={0.4}
+            />
+          </mesh>
+          {/* Spinning Holographic Halo Ring */}
+          <group ref={bricsRingRef} position={[0, 0.14, 0]}>
+            <mesh>
+              <torusGeometry args={[0.13, 0.006, 8, 24]} />
+              <meshBasicMaterial color="#38bdf8" transparent opacity={0.7} />
+            </mesh>
+          </group>
+          <pointLight position={[0, 0.16, 0.1]} color="#38bdf8" intensity={1.8} distance={1.0} />
+        </group>
+
+        {/* Award Trophy 3: Bronze Medal Plaque (Odisha Skills 2025-2026) */}
+        <group
+          position={[0.8, 0.32, 0]}
+          rotation={[0, trophySpins.bronze, 0]}
+          onClick={handleTrophyClick('bronze')}
+          onPointerOver={() => {
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = 'auto';
+          }}
+        >
+          <mesh castShadow>
+            <boxGeometry args={[0.14, 0.08, 0.14]} />
+            <meshStandardMaterial color="#1f2937" roughness={0.2} metalness={0.5} />
+          </mesh>
+          <mesh position={[0, 0.09, 0]} rotation={[0.2, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.065, 0.065, 0.02, 16]} />
+            <meshStandardMaterial color="#b45309" metalness={0.85} roughness={0.25} />
+          </mesh>
+        </group>
+      </group>
+
+      {/* 3. Modern Conference Table & Meeting Chairs */}
+      <group position={[1.8, 0, 0]}>
+        {/* Conference Oval Meeting Table */}
+        <mesh position={[0, 0.72, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.75, 0.75, 0.06, 32]} />
+          <meshStandardMaterial color="#1f1813" roughness={0.35} metalness={0.2} />
+        </mesh>
+        {/* Center Pedestal Base */}
+        <mesh position={[0, 0.34, 0]} castShadow>
+          <cylinderGeometry args={[0.18, 0.32, 0.68, 24]} />
+          <meshStandardMaterial color="#111" metalness={0.8} roughness={0.3} />
+        </mesh>
+
+        {/* Swivel Conference Chairs around table */}
+        {[-0.95, 0.95].map((xOffset, i) => (
+          <group
+            key={`conf-chair-${i}`}
+            position={[xOffset, 0, 0]}
+            rotation={[0, i === 0 ? Math.PI / 2 : -Math.PI / 2, 0]}
+          >
+            <mesh position={[0, 0.42, 0]} castShadow>
+              <boxGeometry args={[0.42, 0.08, 0.42]} />
+              <meshStandardMaterial color="#141f17" roughness={0.7} />
+            </mesh>
+            <mesh position={[0, 0.7, -0.18]} castShadow>
+              <boxGeometry args={[0.4, 0.5, 0.05]} />
+              <meshStandardMaterial color="#141f17" roughness={0.7} />
+            </mesh>
+            <mesh position={[0, 0.2, 0]}>
+              <cylinderGeometry args={[0.03, 0.22, 0.4, 4]} />
+              <meshStandardMaterial color="#222" metalness={0.8} />
+            </mesh>
+          </group>
+        ))}
+      </group>
+    </group>
+  );
+}
