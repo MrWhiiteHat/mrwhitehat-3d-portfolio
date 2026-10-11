@@ -69,6 +69,14 @@ const STATIONS = [
     maxDist: 3.2,
     targetRadius: 1.0,
   },
+  {
+    id: 'hologram_drone',
+    title: 'Cyber Sentinel Drone',
+    action: 'INSPECT OPERATOR HOLOGRAM // MR. WHITE HAT',
+    position: [-1.7, 1.6, -1.8],
+    maxDist: 3.5,
+    targetRadius: 1.2,
+  },
 ];
 
 // Room Obstacle Bounding Boxes for AABB Collision Response

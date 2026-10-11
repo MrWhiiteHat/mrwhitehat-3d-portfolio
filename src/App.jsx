@@ -30,7 +30,9 @@ import { profile } from './data.js';
 import {
   isMuted,
   playAirlockDoorSound,
+  playBreachFanfare,
   playClickSound,
+  playHackingBeep,
   playWhooshSound,
   toggleAmbientHum,
   toggleMute,
@@ -122,6 +124,22 @@ export default function App() {
     (stationId) => {
       if (stationId === 'core') {
         handleCycleTheme();
+        return;
+      }
+      if (stationId === 'hologram_drone') {
+        playBreachFanfare();
+        playWhooshSound();
+        setSection('about');
+        setGameState('INSPECT_STATION');
+        setUnlockedStations((prev) => new Set([...prev, 'about']));
+        return;
+      }
+      if (stationId === 'server_rack') {
+        playHackingBeep(1800);
+        playWhooshSound();
+        setSection('skills');
+        setGameState('INSPECT_STATION');
+        setUnlockedStations((prev) => new Set([...prev, 'skills']));
         return;
       }
       playWhooshSound();
