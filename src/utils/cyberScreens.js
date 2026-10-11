@@ -358,8 +358,8 @@ export function createRadarScreen() {
  * Renders global vector cyber warfare arcs, real-time blocked counter, and threat matrix.
  */
 export function createProjectorScreen() {
-  const width = 1024;
-  const height = 512;
+  const width = 512;
+  const height = 256;
   const canvas = createScreenCanvas(width, height);
   if (!canvas) return { texture: null, update: () => {} };
 
@@ -371,15 +371,15 @@ export function createProjectorScreen() {
   let animTime = 0;
   let blockedCount = 1489214;
 
-  // Major cyber operations centers
+  // Major cyber operations centers (scaled to 512x256)
   const hubs = [
-    { name: 'DELHI/BBSR', x: 670, y: 260, color: '#34d399' },
-    { name: 'TOKYO', x: 860, y: 210, color: '#38bdf8' },
-    { name: 'LONDON', x: 480, y: 160, color: '#fbbf24' },
-    { name: 'SAN FRANCISCO', x: 190, y: 200, color: '#f43f5e' },
-    { name: 'FRANKFURT', x: 520, y: 175, color: '#34d399' },
-    { name: 'SINGAPORE', x: 740, y: 310, color: '#38bdf8' },
-    { name: 'SYDNEY', x: 890, y: 390, color: '#a78bfa' },
+    { name: 'DELHI/BBSR', x: 335, y: 130, color: '#34d399' },
+    { name: 'TOKYO', x: 430, y: 105, color: '#38bdf8' },
+    { name: 'LONDON', x: 240, y: 80, color: '#fbbf24' },
+    { name: 'SAN FRANCISCO', x: 95, y: 100, color: '#f43f5e' },
+    { name: 'FRANKFURT', x: 260, y: 88, color: '#34d399' },
+    { name: 'SINGAPORE', x: 370, y: 155, color: '#38bdf8' },
+    { name: 'SYDNEY', x: 445, y: 195, color: '#a78bfa' },
   ];
 
   // Attack arcs connecting hubs
@@ -403,50 +403,50 @@ export function createProjectorScreen() {
 
     // 2. Global Cyber Grid Background Dots
     ctx.fillStyle = 'rgba(56, 189, 248, 0.12)';
-    for (let x = 40; x < width - 40; x += 32) {
-      for (let y = 50; y < height - 70; y += 32) {
-        ctx.fillRect(x, y, 2, 2);
+    for (let x = 20; x < width - 20; x += 16) {
+      for (let y = 25; y < height - 35; y += 16) {
+        ctx.fillRect(x, y, 1.5, 1.5);
       }
     }
 
     // 3. Header Banner
     ctx.fillStyle = '#081e28';
-    ctx.fillRect(0, 0, width, 44);
+    ctx.fillRect(0, 0, width, 24);
     ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 18px monospace';
-    ctx.fillText('● GLOBAL THREAT INTELLIGENCE COMMAND // MR. WHITE HAT DEFENSE GRID', 24, 28);
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText('● GLOBAL THREAT INTELLIGENCE COMMAND // MR. WHITE HAT DEFENSE GRID', 12, 16);
     ctx.fillStyle = '#34d399';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText(`ATTACKS MITIGATED: ${blockedCount.toLocaleString()}`, width - 360, 28);
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText(`ATTACKS MITIGATED: ${blockedCount.toLocaleString()}`, width - 210, 16);
 
     ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(0, 44);
-    ctx.lineTo(width, 44);
+    ctx.moveTo(0, 24);
+    ctx.lineTo(width, 24);
     ctx.stroke();
 
     // 4. Simplified Stylized World Landmass Wireframe
     ctx.strokeStyle = 'rgba(52, 211, 153, 0.35)';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1;
 
     // Americas
-    ctx.strokeRect(120, 130, 220, 240);
+    ctx.strokeRect(60, 65, 110, 120);
     // Europe/Africa
-    ctx.strokeRect(440, 120, 160, 260);
+    ctx.strokeRect(220, 60, 80, 130);
     // Asia/Australia
-    ctx.strokeRect(640, 110, 280, 280);
+    ctx.strokeRect(320, 55, 140, 140);
 
     // 5. Connecting Cyber Arcs with Traveling Packet Pulses
     arcs.forEach((arc, i) => {
       const h1 = hubs[arc.from];
       const h2 = hubs[arc.to];
       const cx = (h1.x + h2.x) / 2;
-      const cy = Math.min(h1.y, h2.y) - 60 - (i % 3) * 20;
+      const cy = Math.min(h1.y, h2.y) - 30 - (i % 3) * 10;
 
       // Arc curve
       ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
-      ctx.lineWidth = 1.2;
+      ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(h1.x, h1.y);
       ctx.quadraticCurveTo(cx, cy, h2.x, h2.y);
@@ -459,12 +459,12 @@ export function createProjectorScreen() {
 
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.arc(px, py, 2.5, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = '#38bdf8';
       ctx.beginPath();
-      ctx.arc(px, py, 7, 0, Math.PI * 2);
+      ctx.arc(px, py, 4.5, 0, Math.PI * 2);
       ctx.fill();
     });
 
@@ -473,34 +473,34 @@ export function createProjectorScreen() {
       // Glow circle
       ctx.fillStyle = hub.color;
       ctx.beginPath();
-      ctx.arc(hub.x, hub.y, 6, 0, Math.PI * 2);
+      ctx.arc(hub.x, hub.y, 3.5, 0, Math.PI * 2);
       ctx.fill();
 
       // Outer ring
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(hub.x, hub.y, 11 + Math.sin(animTime * 4) * 2, 0, Math.PI * 2);
+      ctx.arc(hub.x, hub.y, 6 + Math.sin(animTime * 4) * 1.2, 0, Math.PI * 2);
       ctx.stroke();
 
       // Label
       ctx.fillStyle = '#e2e8f0';
-      ctx.font = 'bold 11px monospace';
-      ctx.fillText(hub.name, hub.x - 30, hub.y + 20);
+      ctx.font = 'bold 8px monospace';
+      ctx.fillText(hub.name, hub.x - 18, hub.y + 12);
     });
 
     // 7. Footer Status Telemetry Bar
     ctx.fillStyle = '#061720';
-    ctx.fillRect(0, height - 48, width, 48);
+    ctx.fillRect(0, height - 26, width, 26);
     ctx.strokeStyle = '#0284c7';
     ctx.lineWidth = 1;
-    ctx.strokeRect(0, height - 48, width, 48);
+    ctx.strokeRect(0, height - 26, width, 26);
 
     ctx.fillStyle = '#38bdf8';
-    ctx.font = '12px monospace';
-    ctx.fillText('STATUS: ZERO-TRUST SENTINEL ARMED // BGP ROUTE HIJACK PROTECTION: ACTIVE', 24, height - 20);
+    ctx.font = '8px monospace';
+    ctx.fillText('STATUS: ZERO-TRUST SENTINEL ARMED // BGP ROUTE HIJACK: ACTIVE', 12, height - 10);
     ctx.fillStyle = '#4ade80';
-    ctx.fillText('ALL GLOBAL POPs: 100% HEALTHY', width - 260, height - 20);
+    ctx.fillText('GLOBAL POPs: 100% OK', width - 130, height - 10);
 
     texture.needsUpdate = true;
   }

@@ -68,6 +68,9 @@ function HotspotPins({ onSelect, activeSection }) {
   );
 }
 
+// Hoisted temporary vector for 60fps zero-allocation camera lerping
+const _tempTarget = new THREE.Vector3();
+
 function CameraDirector({
   gameState,
   activeSection,
@@ -127,12 +130,12 @@ function CameraDirector({
       camera.position.lerpVectors(desired.current.startCamera, desired.current.endCamera, ease);
       camera.position.y = 1.68 + Math.sin(t * Math.PI * 4) * 0.022;
 
-      const currentTarget = new THREE.Vector3().lerpVectors(
+      _tempTarget.lerpVectors(
         desired.current.startTarget,
         desired.current.endTarget,
         ease
       );
-      camera.lookAt(currentTarget);
+      camera.lookAt(_tempTarget);
 
       if (t >= 1.0 && airlockStarted.current) {
         airlockStarted.current = false;

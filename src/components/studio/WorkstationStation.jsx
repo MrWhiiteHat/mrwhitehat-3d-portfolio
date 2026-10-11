@@ -35,9 +35,9 @@ export default function WorkstationStation({ onSelect, onHover }) {
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Live PC Screens (Throttled to smooth 25 FPS for optimal 60fps performance)
+    // 0. Update Live PC Screens (Throttled to smooth ~15 FPS for optimal 60fps performance)
     screenUpdateTimer.current += delta;
-    if (screenUpdateTimer.current > 0.04) {
+    if (screenUpdateTimer.current > 0.066) {
       terminalScreen.update(screenUpdateTimer.current);
       radarScreen.update(screenUpdateTimer.current);
       screenUpdateTimer.current = 0;

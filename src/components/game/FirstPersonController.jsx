@@ -203,6 +203,9 @@ function clampToRoomBounds(pos, vel, radius) {
   }
 }
 
+// Hoisted temporary vector for 60fps zero-allocation crosshair raycasting
+const _tempCamDir = new THREE.Vector3();
+
 export default function FirstPersonController({
   isActive,
   onProximityChange,
@@ -649,8 +652,7 @@ export default function FirstPersonController({
     // Shows details ONLY when the crosshair is directly aiming at an interactive object.
     // If the crosshair is pointing at the ceiling, floor, or empty air, NOTHING is shown.
     // =========================================================================
-    const camDir = new THREE.Vector3();
-    camera.getWorldDirection(camDir);
+    camera.getWorldDirection(_tempCamDir);
 
     let bestTarget = null;
     let minPerpDist = Infinity;
@@ -666,7 +668,7 @@ export default function FirstPersonController({
       if (dist > st.maxDist) continue;
 
       // Project onto crosshair ray direction: t is the distance along the crosshair ray
-      const t = vx * camDir.x + vy * camDir.y + vz * camDir.z;
+      const t = vx * _tempCamDir.x + vy * _tempCamDir.y + vz * _tempCamDir.z;
 
       // Object must be in front of the camera
       if (t <= 0.25) continue;

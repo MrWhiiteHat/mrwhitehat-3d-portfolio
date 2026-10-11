@@ -129,7 +129,9 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_MATRIX', onCy
       holoCoreRef.current.position.y = 1.08 + Math.sin(time * 2.4) * 0.05;
 
       const scaleTarget = hoveredCore ? 1.25 : 1.0;
-      holoCoreRef.current.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), 0.1);
+      const currentScale = holoCoreRef.current.scale.x;
+      const newScale = THREE.MathUtils.lerp(currentScale, scaleTarget, 0.1);
+      holoCoreRef.current.scale.setScalar(newScale);
     }
     if (holoOuterRingRef.current) {
       holoOuterRingRef.current.rotation.z -= delta * 1.5;
