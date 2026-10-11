@@ -1,6 +1,24 @@
 # MrWhiteHat — Interactive 3D Portfolio
 
-A React + Vite portfolio built around your existing `isometric_office.glb` model. Visitors can rotate/zoom the office, click model meshes to open portfolio panels, and use ordinary navigation as an accessible fallback. Selecting an object triggers a smooth camera move toward the click point.
+🌐 **Live 24/7 Deployment:** [https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/](https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/)
+
+A 3D cybersecurity operations studio with first-person free-roam locomotion, character customization, interactive terminal stations, and cyber mini-games.
+
+### Locomotion Controls:
+* **W**: Walk Forward (aligned with camera view)
+* **A**: Strafe Left
+* **S**: Walk Backward
+* **D**: Strafe Right
+* **Shift**: Sprint
+* **Mouse**: Look Around (click to lock cursor)
+* **Left Click / E**: Hack / Inspect targeted terminal
+* **Esc**: Unlock Cursor / Menu
+* **Virtual Keypad**: On-screen tactical WASD pad & touch joystick for mobile/touch devices
+
+## Deploy to GitHub Pages (1 Command)
+```bash
+npm run deploy
+```
 
 ## Requirements
 - Node.js 18.18+ (Node 20 LTS recommended)
