@@ -57,7 +57,7 @@ const STATIONS = [
     id: 'core',
     title: 'Holographic Cyber Core',
     action: 'CYCLE ATMOSPHERE THEME (T)',
-    position: [2.2, 0.9, 1.6],
+    position: [1.95, 0.9, 0.85],
     maxDist: 3.0,
     targetRadius: 0.8,
   },
@@ -80,19 +80,30 @@ const STATIONS = [
 ];
 
 // Room Obstacle Bounding Boxes for AABB Collision Response
+// Precisely aligned to 3D furniture meshes with zero phantom invisible barriers.
 const OBSTACLES = [
-  // Workstation Desk & PC
-  { minX: -2.6, maxX: 0.25, minZ: -0.3, maxZ: 1.25 },
-  // Conference Table & Chairs
-  { minX: -2.6, maxX: 0.35, minZ: -3.4, maxZ: -1.0 },
-  // Archive Bookcase (Back wall center)
-  { minX: -0.5, maxX: 1.7, minZ: -4.85, maxZ: -4.0 },
-  // 42U Server Rack (Back wall left between conference and archive)
-  { minX: -2.85, maxX: -1.75, minZ: -4.85, maxZ: -4.0 },
-  // Lounge Sofa & Coffee Table
-  { minX: 1.5, maxX: 3.8, minZ: 0.6, maxZ: 2.4 },
-  // Printer Credenza
-  { minX: -4.1, maxX: -2.9, minZ: 0.8, maxZ: 2.0 },
+  // 1. Workstation Executive Desk (Top: 2.7m x 1.3m centered at [-1.2, 0, 0.4])
+  { minX: -2.55, maxX: 0.15, minZ: -0.25, maxZ: 1.05 },
+  // 2. Workstation Executive Swivel Chair (Centered at [-1.2, 0, 1.25])
+  { minX: -1.5, maxX: -0.9, minZ: 0.98, maxZ: 1.55 },
+  // 3. Conference Table & Surrounding Chairs (Centered at [-3.08, 0, -2.0])
+  { minX: -4.3, maxX: -1.9, minZ: -2.8, maxZ: -1.2 },
+  // 4. Media Credenza under presentation screen (Left Wall, X = -4.63)
+  { minX: -4.85, maxX: -4.4, minZ: -3.4, maxZ: -0.6 },
+  // 5. Cyber Security Archive Bookcase (Back Wall Center, [0.6, 0, -4.75])
+  { minX: -0.6, maxX: 1.8, minZ: -4.95, maxZ: -4.5 },
+  // 6. 42U Mainframe Server Rack (Back Wall Left, [-2.3, 0, -4.55])
+  { minX: -2.75, maxX: -1.85, minZ: -4.95, maxZ: -4.12 },
+  // 7. Lounge Leather Couch (Rotated 45 deg, [2.8, 0, 1.6])
+  { minX: 2.0, maxX: 3.8, minZ: 0.8, maxZ: 2.5 },
+  // 8. Lounge Coffee Table (Marble Disc, [1.95, 0, 0.85])
+  { minX: 1.45, maxX: 2.45, minZ: 0.35, maxZ: 1.35 },
+  // 9. Laser Printer Credenza Storage ([-3.6, 0, 0.8])
+  { minX: -4.2, maxX: -3.0, minZ: 0.47, maxZ: 1.13 },
+  // 10. Tall Designer Monstera Plant (Back Right Corner, [2.2, 0, -4.2])
+  { minX: 1.9, maxX: 2.5, minZ: -4.5, maxZ: -3.9 },
+  // 11. Potted Plant (Left Front Corner, [-4.4, 0, 1.8])
+  { minX: -4.7, maxX: -4.1, minZ: 1.5, maxZ: 2.1 },
 ];
 
 /**
@@ -155,49 +166,50 @@ function resolveCircleAABB(pos, vel, box, radius) {
 
 /**
  * Clamps player to room outer walls and airlock doorway without freezing.
+ * Room walls inner boundaries: X in [-4.95, 4.95], Z in [-4.95, 4.95].
+ * Airlock doorway on right wall at Z in [-3.75, -1.85] allows stepping into airlock vestibule up to X = 6.6.
  */
 function clampToRoomBounds(pos, vel, radius) {
-  // Doorway on right wall at Z in [-3.6, -2.0] allows stepping into airlock vestibule up to X = 5.6
-  const inDoorwayZ = pos.z >= -3.6 && pos.z <= -2.0;
+  const inDoorwayZ = pos.z >= -3.75 && pos.z <= -1.85;
 
   // Left wall
-  if (pos.x < -4.65 + radius) {
-    pos.x = -4.65 + radius;
+  if (pos.x < -4.85 + radius) {
+    pos.x = -4.85 + radius;
     if (vel.x < 0) vel.x = 0;
   }
 
   // Right wall & entrance doorway
   if (inDoorwayZ) {
-    if (pos.x > 5.6 - radius) {
-      pos.x = 5.6 - radius;
+    if (pos.x > 6.6 - radius) {
+      pos.x = 6.6 - radius;
       if (vel.x > 0) vel.x = 0;
     }
   } else {
-    if (pos.x > 4.65 - radius) {
-      pos.x = 4.65 - radius;
+    if (pos.x > 4.85 - radius) {
+      pos.x = 4.85 - radius;
       if (vel.x > 0) vel.x = 0;
     }
   }
 
   // Front & Back walls (adjusting for vestibule corridor)
-  if (pos.x > 4.65) {
+  if (pos.x > 4.85) {
     // Inside airlock vestibule
-    if (pos.z < -3.5 + radius) {
-      pos.z = -3.5 + radius;
+    if (pos.z < -3.65 + radius) {
+      pos.z = -3.65 + radius;
       if (vel.z < 0) vel.z = 0;
     }
-    if (pos.z > -2.1 - radius) {
-      pos.z = -2.1 - radius;
+    if (pos.z > -1.95 - radius) {
+      pos.z = -1.95 - radius;
       if (vel.z > 0) vel.z = 0;
     }
   } else {
     // Inside room
-    if (pos.z < -4.65 + radius) {
-      pos.z = -4.65 + radius;
+    if (pos.z < -4.85 + radius) {
+      pos.z = -4.85 + radius;
       if (vel.z < 0) vel.z = 0;
     }
-    if (pos.z > 4.65 - radius) {
-      pos.z = 4.65 - radius;
+    if (pos.z > 4.85 - radius) {
+      pos.z = 4.85 - radius;
       if (vel.z > 0) vel.z = 0;
     }
   }
@@ -593,19 +605,19 @@ export default function FirstPersonController({
     // =========================================================================
     // 3. ROBUST COLLISION DETECTION & SLIDING (NEVER GETS STUCK)
     // =========================================================================
-    const playerRadius = 0.28;
+    const playerRadius = 0.22;
 
     // Apply movement delta
     playerPos.current.x += velocity.current.x * clampedDelta;
     playerPos.current.z += velocity.current.z * clampedDelta;
 
-    // Resolve obstacles using circle-AABB depenetration
-    for (const obs of OBSTACLES) {
-      resolveCircleAABB(playerPos.current, velocity.current, obs, playerRadius);
+    // Resolve obstacles using continuous circle-AABB depenetration (2-pass for multi-obstacle sliding)
+    for (let iter = 0; iter < 2; iter++) {
+      for (const obs of OBSTACLES) {
+        resolveCircleAABB(playerPos.current, velocity.current, obs, playerRadius);
+      }
+      clampToRoomBounds(playerPos.current, velocity.current, playerRadius);
     }
-
-    // Clamp to room bounds & doorway
-    clampToRoomBounds(playerPos.current, velocity.current, playerRadius);
 
     // =========================================================================
     // 4. SMOOTH HEAD-BOB, SUBTLE ROLL & PROCEDURAL FOOTSTEPS
