@@ -1,13 +1,92 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playBreachFanfare, playHackingBeep } from '../../utils/audio.js';
 import mrWhiteHatImg from '../../assets/mrwhitehat-hologram.jpg';
 
 /**
- * Autonomous Cyber Sentinel Recon Drone with Exact Hologram Projection
- * Projects a high-tech, luminous hologram of MrWhiteHat with biometric HUD elements,
- * volumetric projector cone, animated laser scanline, and interactive audio feedback.
+ * Converts a portrait photo into a true sci-fi cyan/neon hologram texture
+ * with soft elliptical edge falloff, horizontal scanline grooves, and luminance emission.
+ */
+function createHologramTexture(imgSrc, onTextureReady) {
+  if (typeof document === 'undefined') return null;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 640;
+  const ctx = canvas.getContext('2d');
+
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = imgSrc;
+
+  img.onload = () => {
+    // 1. Draw raw photo
+    ctx.drawImage(img, 0, 0, 512, 640);
+
+    // 2. Pixel-level Cyber Hologram Shader Simulation
+    const imgData = ctx.getImageData(0, 0, 512, 640);
+    const d = imgData.data;
+
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i];
+      const g = d[i + 1];
+      const b = d[i + 2];
+      // Luminance
+      const lum = r * 0.299 + g * 0.587 + b * 0.114;
+
+      // Soft elliptical fade (eliminates hard square photo corners into smooth ambient air)
+      const px = (i / 4) % 512;
+      const py = Math.floor(i / 4 / 512);
+      const dx = (px - 256) / 235;
+      const dy = (py - 320) / 295;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      let edgeAlpha = 1.0;
+      if (dist > 0.55) {
+        edgeAlpha = Math.max(0, 1.0 - (dist - 0.55) / 0.45);
+        edgeAlpha = Math.pow(edgeAlpha, 1.4);
+      }
+
+      // True Sci-Fi Hologram Palette: Electric Cyan, Aqua Emerald & White Highlights
+      const red = Math.floor((lum * 0.12 + 10) * edgeAlpha);
+      const green = Math.floor((lum * 0.88 + 35) * edgeAlpha);
+      const blue = Math.floor((lum * 1.15 + 65) * edgeAlpha);
+      const alpha = Math.floor(Math.min(255, lum * 1.5 + 45) * edgeAlpha);
+
+      d[i] = red;
+      d[i + 1] = green;
+      d[i + 2] = blue;
+      d[i + 3] = alpha;
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+
+    // 3. Hologram Scanline Grooves across the texture
+    ctx.fillStyle = 'rgba(2, 20, 32, 0.4)';
+    for (let y = 0; y < 640; y += 4) {
+      ctx.fillRect(0, y, 512, 1.8);
+    }
+
+    // 4. Subtle Outer Cyan Aura Glow
+    const auraGrad = ctx.createRadialGradient(256, 320, 120, 256, 320, 250);
+    auraGrad.addColorStop(0, 'rgba(56, 189, 248, 0.0)');
+    auraGrad.addColorStop(1, 'rgba(56, 189, 248, 0.18)');
+    ctx.fillStyle = auraGrad;
+    ctx.fillRect(0, 0, 512, 640);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    onTextureReady?.(texture);
+  };
+
+  return null;
+}
+
+/**
+ * Autonomous Cyber Sentinel Recon Drone with True Hologram Projection in the Back of Studio
  */
 export default function CyberSentinelDrone() {
   const droneGroupRef = useRef();
@@ -17,15 +96,14 @@ export default function CyberSentinelDrone() {
   const haloRing1Ref = useRef();
   const haloRing2Ref = useRef();
   const hologramMeshRef = useRef();
+  const [hologramTex, setHologramTex] = useState(null);
   const [scanPulse, setScanPulse] = useState(false);
 
-  // Load the exact user photo texture
-  const hologramTexture = useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    const tex = loader.load(mrWhiteHatImg);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.generateMipmaps = true;
-    return tex;
+  // Initialize the processed sci-fi hologram texture
+  useEffect(() => {
+    createHologramTexture(mrWhiteHatImg, (tex) => {
+      setHologramTex(tex);
+    });
   }, []);
 
   useFrame((state, delta) => {
@@ -45,12 +123,12 @@ export default function CyberSentinelDrone() {
 
     // 3. Projector lens intensity pulse
     if (laserRef.current) {
-      laserRef.current.intensity = (scanPulse ? 5.0 : 3.2) + Math.sin(time * 4) * 0.5;
+      laserRef.current.intensity = (scanPulse ? 5.5 : 3.5) + Math.sin(time * 4) * 0.5;
     }
 
     // 4. Oscillating Laser Scanline moving up and down the hologram face
     if (scanlineRef.current) {
-      scanlineRef.current.position.y = -0.72 + Math.sin(time * 2.8) * 0.48;
+      scanlineRef.current.position.y = -0.72 + Math.sin(time * 2.6) * 0.48;
     }
 
     // 5. Rotating Holographic Halo Rings
@@ -63,7 +141,7 @@ export default function CyberSentinelDrone() {
 
     // 6. Hologram Subtle Float & Glitch Flicker
     if (hologramMeshRef.current) {
-      const flicker = 0.9 + Math.sin(time * 15) * 0.04 + (Math.random() > 0.98 ? -0.15 : 0);
+      const flicker = 0.88 + Math.sin(time * 18) * 0.04 + (Math.random() > 0.985 ? -0.15 : 0);
       hologramMeshRef.current.material.opacity = scanPulse ? 1.0 : flicker;
     }
   });
@@ -78,8 +156,8 @@ export default function CyberSentinelDrone() {
   return (
     <group
       ref={droneGroupRef}
-      position={[-1.7, 2.38, -1.8]}
-      rotation={[0, 0.42, 0]}
+      position={[-3.35, 2.38, -3.85]}
+      rotation={[0, 0.65, 0]}
       name="CyberSentinelDrone"
       onClick={handleDroneClick}
       onPointerOver={() => {
@@ -170,8 +248,8 @@ export default function CyberSentinelDrone() {
           ref={laserRef}
           position={[0, -0.15, 0]}
           color="#38bdf8"
-          intensity={3.2}
-          distance={3.8}
+          intensity={3.5}
+          distance={4.0}
         />
 
         {/* Volumetric Holographic Light Cone connecting lens to the hologram */}
@@ -180,7 +258,8 @@ export default function CyberSentinelDrone() {
           <meshBasicMaterial
             color="#38bdf8"
             transparent
-            opacity={scanPulse ? 0.28 : 0.12}
+            opacity={scanPulse ? 0.32 : 0.15}
+            blending={THREE.AdditiveBlending}
             side={THREE.DoubleSide}
             depthWrite={false}
           />
@@ -188,32 +267,36 @@ export default function CyberSentinelDrone() {
       </group>
 
       {/* ========================================================================= */}
-      {/* 3. EXACT HOLOGRAM OF MR. WHITE HAT                                        */}
+      {/* 3. TRUE SCI-FI HOLOGRAM OF MR. WHITE HAT (Additive Blending & Cyan Tint) */}
       {/* ========================================================================= */}
       <group position={[0, 0, 0]}>
-        {/* Main Hologram Portrait Mesh (Exact Photo) */}
-        <mesh
-          ref={hologramMeshRef}
-          position={[0, -0.74, 0.22]}
-          rotation={[-0.08, 0, 0]}
-        >
-          <planeGeometry args={[0.85, 1.1]} />
-          <meshBasicMaterial
-            map={hologramTexture}
-            transparent
-            opacity={0.92}
-            side={THREE.DoubleSide}
-            depthWrite={false}
-          />
-        </mesh>
+        {/* Main Hologram Portrait Mesh with Additive Glowing Emission */}
+        {hologramTex && (
+          <mesh
+            ref={hologramMeshRef}
+            position={[0, -0.74, 0.22]}
+            rotation={[-0.08, 0, 0]}
+          >
+            <planeGeometry args={[0.88, 1.15]} />
+            <meshBasicMaterial
+              map={hologramTex}
+              transparent
+              opacity={0.9}
+              blending={THREE.AdditiveBlending}
+              side={THREE.DoubleSide}
+              depthWrite={false}
+            />
+          </mesh>
+        )}
 
-        {/* Hologram Backlit Illumination Plane (Provides glowing cyan aura behind photo) */}
-        <mesh position={[0, -0.74, 0.215]} rotation={[-0.08, 0, 0]}>
-          <planeGeometry args={[0.87, 1.12]} />
+        {/* Hologram Backlit Cyan Volumetric Aura */}
+        <mesh position={[0, -0.74, 0.21]} rotation={[-0.08, 0, 0]}>
+          <planeGeometry args={[0.9, 1.18]} />
           <meshBasicMaterial
             color="#0ea5e9"
             transparent
             opacity={scanPulse ? 0.45 : 0.2}
+            blending={THREE.AdditiveBlending}
             side={THREE.DoubleSide}
             depthWrite={false}
           />
@@ -222,12 +305,18 @@ export default function CyberSentinelDrone() {
         {/* Animated Horizontal Laser Scanline (Sweeps across the face) */}
         <group ref={scanlineRef} position={[0, -0.72, 0.23]} rotation={[-0.08, 0, 0]}>
           <mesh>
-            <planeGeometry args={[0.9, 0.008]} />
-            <meshBasicMaterial color="#ffffff" side={THREE.DoubleSide} />
+            <planeGeometry args={[0.92, 0.008]} />
+            <meshBasicMaterial color="#ffffff" blending={THREE.AdditiveBlending} side={THREE.DoubleSide} />
           </mesh>
           <mesh position={[0, 0, 0]}>
-            <planeGeometry args={[0.9, 0.024]} />
-            <meshBasicMaterial color="#38bdf8" transparent opacity={0.6} side={THREE.DoubleSide} />
+            <planeGeometry args={[0.92, 0.032]} />
+            <meshBasicMaterial
+              color="#38bdf8"
+              transparent
+              opacity={0.75}
+              blending={THREE.AdditiveBlending}
+              side={THREE.DoubleSide}
+            />
           </mesh>
         </group>
 
@@ -236,62 +325,58 @@ export default function CyberSentinelDrone() {
         {/* ======================================================================= */}
         <group position={[0, -0.74, 0.225]} rotation={[-0.08, 0, 0]}>
           {/* Top-Left Corner Bracket */}
-          <group position={[-0.43, 0.55, 0]}>
+          <group position={[-0.45, 0.58, 0]}>
             <mesh position={[0.04, 0, 0]}>
               <boxGeometry args={[0.08, 0.008, 0.002]} />
-              <meshBasicMaterial color="#38bdf8" />
+              <meshBasicMaterial color="#38bdf8" blending={THREE.AdditiveBlending} />
             </mesh>
             <mesh position={[0, -0.04, 0]}>
               <boxGeometry args={[0.008, 0.08, 0.002]} />
-              <meshBasicMaterial color="#38bdf8" />
+              <meshBasicMaterial color="#38bdf8" blending={THREE.AdditiveBlending} />
             </mesh>
           </group>
 
           {/* Top-Right Corner Bracket */}
-          <group position={[0.43, 0.55, 0]}>
+          <group position={[0.45, 0.58, 0]}>
             <mesh position={[-0.04, 0, 0]}>
               <boxGeometry args={[0.08, 0.008, 0.002]} />
-              <meshBasicMaterial color="#38bdf8" />
+              <meshBasicMaterial color="#38bdf8" blending={THREE.AdditiveBlending} />
             </mesh>
             <mesh position={[0, -0.04, 0]}>
               <boxGeometry args={[0.008, 0.08, 0.002]} />
-              <meshBasicMaterial color="#38bdf8" />
+              <meshBasicMaterial color="#38bdf8" blending={THREE.AdditiveBlending} />
             </mesh>
           </group>
 
           {/* Bottom-Left Corner Bracket */}
-          <group position={[-0.43, -0.55, 0]}>
+          <group position={[-0.45, -0.58, 0]}>
             <mesh position={[0.04, 0, 0]}>
               <boxGeometry args={[0.08, 0.008, 0.002]} />
-              <meshBasicMaterial color="#38bdf8" />
+              <meshBasicMaterial color="#38bdf8" blending={THREE.AdditiveBlending} />
             </mesh>
             <mesh position={[0, 0.04, 0]}>
               <boxGeometry args={[0.008, 0.08, 0.002]} />
-              <meshBasicMaterial color="#38bdf8" />
+              <meshBasicMaterial color="#38bdf8" blending={THREE.AdditiveBlending} />
             </mesh>
           </group>
 
           {/* Bottom-Right Corner Bracket */}
-          <group position={[0.43, -0.55, 0]}>
+          <group position={[0.45, -0.58, 0]}>
             <mesh position={[-0.04, 0, 0]}>
               <boxGeometry args={[0.08, 0.008, 0.002]} />
-              <meshBasicMaterial color="#38bdf8" />
+              <meshBasicMaterial color="#38bdf8" blending={THREE.AdditiveBlending} />
             </mesh>
             <mesh position={[0, 0.04, 0]}>
               <boxGeometry args={[0.008, 0.08, 0.002]} />
-              <meshBasicMaterial color="#38bdf8" />
+              <meshBasicMaterial color="#38bdf8" blending={THREE.AdditiveBlending} />
             </mesh>
           </group>
 
           {/* Top Holographic Header Tag Bar */}
-          <group position={[0, 0.62, 0]}>
+          <group position={[0, 0.65, 0]}>
             <mesh>
-              <boxGeometry args={[0.76, 0.065, 0.004]} />
-              <meshBasicMaterial color="#0284c7" transparent opacity={0.85} />
-            </mesh>
-            <mesh position={[0, 0, 0.004]}>
-              <boxGeometry args={[0.74, 0.055, 0.002]} />
-              <meshBasicMaterial color="#0369a1" />
+              <boxGeometry args={[0.78, 0.065, 0.004]} />
+              <meshBasicMaterial color="#0284c7" transparent opacity={0.8} blending={THREE.AdditiveBlending} />
             </mesh>
             {/* Pulsing Status Dot */}
             <mesh position={[-0.32, 0, 0.006]}>
@@ -301,10 +386,10 @@ export default function CyberSentinelDrone() {
           </group>
 
           {/* Bottom Biometric Clearance Status Bar */}
-          <group position={[0, -0.62, 0]}>
+          <group position={[0, -0.65, 0]}>
             <mesh>
-              <boxGeometry args={[0.82, 0.07, 0.004]} />
-              <meshBasicMaterial color="#0c4a6e" transparent opacity={0.88} />
+              <boxGeometry args={[0.84, 0.07, 0.004]} />
+              <meshBasicMaterial color="#0c4a6e" transparent opacity={0.85} blending={THREE.AdditiveBlending} />
             </mesh>
             {/* Status Indicator LED Nodes */}
             {[-0.34, -0.26, 0.26, 0.34].map((lx, i) => (
@@ -317,13 +402,14 @@ export default function CyberSentinelDrone() {
         </group>
 
         {/* 5. Spinning Circular Holographic Halo Rings at base of hologram */}
-        <group position={[0, -1.32, 0.22]} rotation={[Math.PI / 2, 0, 0]}>
+        <group position={[0, -1.35, 0.22]} rotation={[Math.PI / 2, 0, 0]}>
           <mesh ref={haloRing1Ref}>
             <ringGeometry args={[0.48, 0.52, 32]} />
             <meshBasicMaterial
               color="#38bdf8"
               transparent
               opacity={0.65}
+              blending={THREE.AdditiveBlending}
               side={THREE.DoubleSide}
             />
           </mesh>
@@ -333,6 +419,7 @@ export default function CyberSentinelDrone() {
               color="#34d399"
               transparent
               opacity={0.45}
+              blending={THREE.AdditiveBlending}
               side={THREE.DoubleSide}
             />
           </mesh>

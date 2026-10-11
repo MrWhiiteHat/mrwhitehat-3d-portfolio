@@ -73,7 +73,7 @@ const STATIONS = [
     id: 'hologram_drone',
     title: 'Cyber Sentinel Drone',
     action: 'INSPECT OPERATOR HOLOGRAM // MR. WHITE HAT',
-    position: [-1.7, 1.6, -1.8],
+    position: [-3.35, 1.6, -3.85],
     maxDist: 3.5,
     targetRadius: 1.2,
   },
