@@ -3,56 +3,63 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playFootstepSound, playProximityChime } from '../../utils/audio.js';
 
-// Station interaction coordinates & radii
+// Station interaction coordinates, reach limits & aim hit-radii
 const STATIONS = [
   {
     id: 'projects',
     title: 'Dual-Monitor Workstation',
     action: 'HACK NETWORK CIRCUIT // PROJECTS',
-    position: [-1.2, 0.74, 0.4],
-    radius: 2.8,
+    position: [-1.2, 0.9, 0.4],
+    maxDist: 3.5,
+    targetRadius: 1.0,
   },
   {
     id: 'skills',
     title: 'Cyber Security Bookcase',
     action: 'INSPECT ARCHIVE // SKILLS',
     position: [0.6, 1.8, -4.4],
-    radius: 3.0,
+    maxDist: 3.8,
+    targetRadius: 1.2,
   },
   {
     id: 'achievements',
     title: 'Auditorium Projector',
     action: 'BYPASS RADAR FIREWALL // ACHIEVEMENTS',
     position: [-4.6, 2.1, -2.0],
-    radius: 3.2,
+    maxDist: 4.0,
+    targetRadius: 1.3,
   },
   {
     id: 'about',
     title: 'Executive Wall Plaque',
     action: 'ALIGN CIPHER TUMBLERS // ABOUT',
     position: [4.6, 2.1, 1.6],
-    radius: 3.0,
+    maxDist: 3.8,
+    targetRadius: 1.1,
   },
   {
     id: 'resume',
     title: 'Laser Printer Output Tray',
     action: 'SPLICE SYSTEM WIRES // RESUME',
     position: [-3.5, 1.0, 1.1],
-    radius: 2.8,
+    maxDist: 3.0,
+    targetRadius: 0.8,
   },
   {
     id: 'contact',
     title: 'Desk Intercom Console',
     action: 'TUNE FREQUENCY // CONTACT',
-    position: [-0.15, 0.78, 0.6],
-    radius: 2.6,
+    position: [-0.15, 0.85, 0.6],
+    maxDist: 2.8,
+    targetRadius: 0.75,
   },
   {
     id: 'core',
     title: 'Holographic Cyber Core',
     action: 'CYCLE ATMOSPHERE THEME (T)',
     position: [2.2, 0.9, 1.6],
-    radius: 2.6,
+    maxDist: 3.0,
+    targetRadius: 0.8,
   },
 ];
 
@@ -620,33 +627,42 @@ export default function FirstPersonController({
     camera.rotation.z = rollZ.current;
 
     // =========================================================================
-    // 5. VIEW-CONE GAZE & PROXIMITY TARGETING FOR MOUSE CLICK INTERACTION
+    // 5. PRECISE CROSSHAIR RAY TARGETING
+    // Shows details ONLY when the crosshair is directly aiming at an interactive object.
+    // If the crosshair is pointing at the ceiling, floor, or empty air, NOTHING is shown.
     // =========================================================================
     const camDir = new THREE.Vector3();
     camera.getWorldDirection(camDir);
 
     let bestTarget = null;
-    let bestScore = -Infinity;
+    let minPerpDist = Infinity;
 
     for (const st of STATIONS) {
-      const dx = st.position[0] - playerPos.current.x;
-      const dy = st.position[1] - playerPos.current.y;
-      const dz = st.position[2] - playerPos.current.z;
-      const dist = Math.hypot(dx, dy, dz);
+      // Vector from camera viewpoint to station interactive center
+      const vx = st.position[0] - camera.position.x;
+      const vy = st.position[1] - camera.position.y;
+      const vz = st.position[2] - camera.position.z;
+      const distSq = vx * vx + vy * vy + vz * vz;
+      const dist = Math.sqrt(distSq);
 
-      if (dist < st.radius) {
-        const normDx = dx / dist;
-        const normDy = dy / dist;
-        const normDz = dz / dist;
+      if (dist > st.maxDist) continue;
 
-        const dot = camDir.x * normDx + camDir.y * normDy + camDir.z * normDz;
+      // Project onto crosshair ray direction: t is the distance along the crosshair ray
+      const t = vx * camDir.x + vy * camDir.y + vz * camDir.z;
 
-        if (dot > 0.35) {
-          const score = dot * 2.0 - dist * 0.35;
-          if (score > bestScore) {
-            bestScore = score;
-            bestTarget = { ...st, dist, dot, isAimed: dot > 0.65 };
-          }
+      // Object must be in front of the camera
+      if (t <= 0.25) continue;
+
+      // Perpendicular distance from crosshair ray to station center
+      const perpDistSq = distSq - t * t;
+      if (perpDistSq < 0) continue;
+      const perpDist = Math.sqrt(perpDistSq);
+
+      // Only target if the crosshair ray actually passes through the object's physical volume
+      if (perpDist <= st.targetRadius) {
+        if (perpDist < minPerpDist) {
+          minPerpDist = perpDist;
+          bestTarget = { ...st, dist, perpDist, isAimed: true };
         }
       }
     }
