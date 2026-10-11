@@ -455,9 +455,23 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Github size={13} />
-                      <span>Open GitHub Repository</span>
+                      <span>Open Repository</span>
                       <ArrowUpRight size={12} />
                     </a>
+                    {projects[selectedProject]?.demoLink && (
+                      <a
+                        href={projects[selectedProject].demoLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ide-github-btn"
+                        style={{ background: '#7c3aed', color: '#ffffff' }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Globe size={13} />
+                        <span>Launch Demo</span>
+                        <ArrowUpRight size={12} />
+                      </a>
+                    )}
                     <button
                       className="ide-next-btn"
                       onClick={() =>

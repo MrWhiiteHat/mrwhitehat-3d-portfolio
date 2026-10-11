@@ -140,9 +140,22 @@ export default function InfoPanel({ section, objectLabel, onClose }) {
                             <span key={t}>{t}</span>
                           ))}
                         </div>
-                        <a href={p.link} target="_blank" rel="noreferrer" className="text-link">
-                          View repository <ArrowUpRight size={14} />
-                        </a>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '10px', flexWrap: 'wrap' }}>
+                          <a href={p.link} target="_blank" rel="noreferrer" className="text-link">
+                            View repository <ArrowUpRight size={14} />
+                          </a>
+                          {p.demoLink && (
+                            <a
+                              href={p.demoLink}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-link"
+                              style={{ color: '#a78bfa', fontWeight: 600 }}
+                            >
+                              Launch Demo <ArrowUpRight size={14} />
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </article>
                   ))}

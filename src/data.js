@@ -161,6 +161,32 @@ export const projects = [
     description:
       'A multimodal agricultural intelligence chatbot deployed on WhatsApp, featuring sub-second asynchronous response processing, crop disease computer-vision diagnosis with 94.7% accuracy, voice queries via Whisper, and zero-hallucination guardrails.',
   },
+  {
+    id: 'neuroflux-input',
+    title: 'NeuroFlux – Multimodal Real-Time Input Pipeline',
+    short: 'Real-time hand gesture tracking and speech command capture pipeline deployed on Vercel',
+    period: '2025',
+    status: 'Live Web Application',
+    type: 'Personal Project',
+    link: 'https://neuroflux-alpha.vercel.app',
+    demoLink: 'https://neuroflux-alpha.vercel.app',
+    tags: [
+      'TypeScript',
+      'React 18',
+      'Computer Vision',
+      'Speech Recognition',
+      'WebSockets',
+      'Vercel',
+      'Tailwind CSS',
+    ],
+    highlights: [
+      'Engineered an ultra-low-latency browser-based multimodal interaction pipeline combining real-time camera hand gesture classification with live voice command recognition.',
+      'Constructed modular streaming input adapters enabling hands-free, voice-assisted control for security monitoring dashboards and automated workspaces.',
+      'Deployed live on Vercel with responsive mobile and desktop client interfaces.',
+    ],
+    description:
+      'A real-time multimodal interaction system combining computer-vision hand gesture tracking with speech recognition pipelines to provide hands-free control and telemetry routing in cyber operations environments.',
+  },
 ];
 
 export const skills = [
