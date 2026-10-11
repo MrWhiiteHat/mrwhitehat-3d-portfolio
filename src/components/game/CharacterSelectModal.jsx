@@ -15,6 +15,8 @@ import {
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
 
 const CODENAME_PRESETS = [
+  'MrWhiteHat',
+  'Sadashiba',
   'Cipher_Zero',
   'Ghost_Netrunner',
   'Valkyrie_99',
@@ -153,7 +155,7 @@ function HolographicAvatarPreview({ archetype, visor, accentColor }) {
 }
 
 export default function CharacterSelectModal({ onStartGame, currentThemeKey, onSetTheme }) {
-  const [codename, setCodename] = useState('Cipher_Zero');
+  const [codename, setCodename] = useState('MrWhiteHat');
   const [selectedArchetype, setSelectedArchetype] = useState(ARCHETYPES[0]);
   const [selectedVisor, setSelectedVisor] = useState(VISOR_STYLES[0].id);
   const [selectedPalette, setSelectedPalette] = useState(NEON_PALETTES[0]);

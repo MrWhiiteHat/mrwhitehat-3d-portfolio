@@ -1,61 +1,264 @@
 export const profile = {
-  name: 'MrWhiteHat',
-  role: 'Cybersecurity Engineer · AI Developer',
-  intro: 'I build security-focused tools and intelligent systems that turn complex technical problems into practical solutions.',
-  location: 'India',
-  email: 'your.email@example.com',
+  name: 'Sadashiba Sarangi',
+  alias: 'MrWhiteHat',
+  displayName: 'Sadashiba Sarangi (MrWhiteHat)',
+  role: 'Cybersecurity-Focused Software Developer · AppSec & AI Engineer',
+  intro:
+    'Cybersecurity-focused Software Developer with expertise in Application Security (AppSec), Vulnerability Assessment, Penetration Testing, and SSDLC. 2x Bronze Medalist at Odisha Skills (Cyber Security). Experienced in LLM-powered security automation, mobile penetration testing, RAG systems, and full-stack web development. Proficient in Python, TypeScript, and JavaScript with hands-on Linux administration, network security, and OWASP compliance.',
+  bio:
+    'Passionate about securing digital infrastructure, reverse-engineering mobile applications, and building intelligent autonomous security agents. Combines deep offensive red-team insights with secure software development life-cycle (SSDLC) practices to engineer resilient, privacy-preserving systems.',
+  location: 'Bhubaneswar, Odisha, India',
+  email: 'kanhasarangi39@gmail.com',
+  phone: '+91 8917512439',
+  tel: '+918917512439',
   github: 'https://github.com/MrWhiiteHat',
-  linkedin: 'https://www.linkedin.com/',
-  resume: '/resume.pdf',
+  linkedin: 'https://www.linkedin.com/in/sadashiba-sarangi/',
+  resume: './Sadashiba_Sarangi_Resume.pdf',
+  resumeFilename: 'Sadashiba_Sarangi_Resume.pdf',
+  education: [
+    {
+      institution: 'C.V. Raman Global University (CGU)',
+      location: 'Bhubaneswar, Odisha',
+      degree: 'Bachelor of Technology (B.Tech)',
+      field: 'Computer Science and Information Technology',
+      period: '2023 – Present',
+      status: 'Pursuing',
+    },
+    {
+      institution: 'C.V. Raman Polytechnic',
+      location: 'Bhubaneswar, Odisha',
+      degree: 'Diploma',
+      field: 'Computer Science Engineering',
+      period: 'August 2019 – April 2023',
+      status: 'Completed',
+    },
+  ],
+  certifications: [
+    {
+      title: '3rd Position (Bronze Medal) — Odisha Skills Competition 2025–2026',
+      track: 'Cyber Security',
+      issuer: 'Skill Development & Technical Education Department, Govt. of Odisha',
+      year: '2025–2026',
+      details:
+        'Evaluated on incident response, network traffic forensics, system hardening, and web application exploitation under competitive live-fire environments.',
+    },
+    {
+      title: '3rd Position (Bronze Medal) — Odisha Skills Competition 2020–2021',
+      track: 'Cyber Security',
+      issuer: 'Skill Development & Technical Education Department, Govt. of Odisha',
+      year: '2020–2021',
+      details:
+        'Demonstrated state-level proficiency in penetration testing, vulnerability assessment, cryptography, and defensive packet forensics.',
+    },
+    {
+      title: 'BRICS Hi-Tech Future Skills Development Program',
+      track: 'International Cybersecurity Skills Initiative',
+      issuer: 'BRICS Future Skills Development & Technology Innovation Workgroup',
+      year: '2026',
+      details:
+        'Represented technical skill in international future skills initiative focused on resilient digital infrastructure, AI security, and cross-border defense.',
+    },
+  ],
+  additionalExperience: [
+    {
+      title: 'Web Application Exploitation & Bug Hunting',
+      description:
+        'Hands-on exploitation of SQL Injection (SQLi), Cross-Site Scripting (XSS), Authentication Bypass, and Privilege Escalation in CTF competitions and vulnerability research.',
+    },
+    {
+      title: 'Network Forensics & PCAP Telemetry',
+      description:
+        'Deep packet inspection using Wireshark, traffic anomaly detection, Linux privilege escalation, system hardening labs, and custom iptables rule enforcement.',
+    },
+    {
+      title: 'SSDLC & Vulnerability Management',
+      description:
+        'Secure Software Development Lifecycle compliance, automated SAST/DAST scanning pipelines, OWASP Mobile Top 10 (2024), and OWASP API Top 10 (2023) benchmarking.',
+    },
+  ],
 };
 
 export const projects = [
   {
-    title: 'Mobile Security Agent',
-    short: 'LLM-assisted mobile application security analysis',
-    description: 'A mobile application security research project combining static analysis, reverse-engineering signals, vulnerability mapping, retrieval-augmented knowledge, and an LLM-assisted false-positive review workflow.',
-    tags: ['Python', 'Android Security', 'RAG', 'Ollama'],
-    link: 'https://github.com/MrWhiiteHat',
-    status: 'Research project',
+    id: 'mobile-sec-agent',
+    title: 'LLM-Based Autonomous Mobile App Security Penetration Testing Agent',
+    short: '10-phase autonomous Android APK penetration testing pipeline with local Ollama RAG reasoning',
+    period: '2025 – 2026',
+    status: 'Flagship Research Project',
+    type: 'Personal Project',
+    link: 'https://github.com/MrWhiiteHat/LLM-Powered-Autonomous-Mobile-Application-Security-Penetration-Testing-Platform',
+    tags: [
+      'Python',
+      'FastAPI',
+      'Frida',
+      'Ollama',
+      'RAG',
+      'Qwen 2.5-Coder',
+      'Android Security',
+      'ADB',
+      'OWASP Mobile Top 10',
+    ],
+    highlights: [
+      'Architected a 10-phase autonomous security scanning pipeline for Android APK vulnerability detection using Python, FastAPI, and Frida, achieving a 94.2% detection rate with only 7.8% false positives.',
+      'Engineered a Retrieval-Augmented Generation (RAG) engine indexing 2,075 security documents (OWASP, CWE, CAPEC, NVD) with BM25 and TF-IDF hybrid retrieval and Reciprocal Rank Fusion for context-grounded LLM reasoning.',
+      'Integrated Ollama-hosted Qwen 2.5-Coder LLM (1.5B parameters) for vulnerability classification, false-positive filtering, and automated remediation code patch generation.',
+      'Implemented dynamic runtime analysis using Frida instrumentation and ADB for hooking Android API calls; achieved full OWASP Mobile Top 10 (2024) and OWASP API Top 10 (2023) coverage across 104 real-world applications.',
+      'Designed a 100% privacy-preserving architecture with zero cloud dependency – all LLM inference and data processing executed locally via Ollama.',
+    ],
+    description:
+      'A mobile application security research project combining static analysis, reverse-engineering signals, vulnerability mapping, retrieval-augmented knowledge, and an LLM-assisted false-positive review workflow. Achieves 94.2% detection rate with 100% offline, privacy-preserving local LLM inference.',
   },
   {
-    title: 'AegisAI',
-    short: 'AI-powered Discord moderation platform',
-    description: 'A modular moderation platform concept using a Discord bot, API services, persistent storage, and AI-assisted content intelligence to help communities respond to risky content.',
-    tags: ['TypeScript', 'Python', 'FastAPI', 'PostgreSQL'],
-    link: 'https://github.com/MrWhiiteHat',
-    status: 'Platform project',
+    id: 'ksecurity-platform',
+    title: 'KSecurity – AI-Powered Community Threat Intelligence Platform',
+    short: 'Real-time AI threat detection protecting Discord communities with 3 parallel analyzers and GPT-4o-mini',
+    period: '2025',
+    status: 'Platform Project',
+    type: 'Personal Project',
+    link: 'https://github.com/MrWhiiteHat/KSecurity-Ai-Intelligence-Discord-bot',
+    tags: [
+      'TypeScript',
+      'Next.js 14',
+      'Node.js',
+      'OpenAI API',
+      'PostgreSQL',
+      'Docker',
+      'Railway CI/CD',
+    ],
+    highlights: [
+      'Built a real-time AI-powered threat detection platform protecting Discord communities from phishing and social engineering using three parallel analyzers (LLM classifier, URL phishing engine, behavioral tracker) with weighted composite risk scoring.',
+      'Integrated OpenAI GPT-4o-mini for real-time message classification across 6 threat categories with a 3-second circuit breaker and automatic heuristic fallback for zero-downtime detection.',
+      'Engineered a URL phishing analysis engine with typosquatting detection for 10+ brands and a behavioral anomaly tracker with Jaccard similarity for spam detection, burst monitoring, and account-age risk scoring.',
+      'Built a Next.js 14 admin dashboard with JWT authentication, real-time threat analytics, and audit logs; architected a TypeScript monorepo with Docker Compose, Railway PaaS, and GitHub Actions CI/CD pipeline.',
+    ],
+    description:
+      'A modular moderation and threat intelligence platform using Discord bot services, persistent PostgreSQL storage, and AI-assisted content intelligence to mitigate phishing, brand impersonation, and social engineering in high-volume communities.',
   },
   {
-    title: 'RealFake Detection',
-    short: 'Deepfake detection web application',
-    description: 'A computer-vision project for classifying manipulated facial media, with a model-serving API and a web interface for submitting media for analysis.',
-    tags: ['PyTorch', 'ResNet50', 'FastAPI', 'Docker'],
-    link: 'https://github.com/MrWhiiteHat',
-    status: 'Deployed project',
+    id: 'krishimitra-assistant',
+    title: 'KrishiMitra – Multimodal AI-Powered Agricultural Assistant',
+    short: 'Multimodal WhatsApp advisory assistant for farmers with Gemini NLP, MobileNetV2 CNN (94.7%), and Whisper',
+    period: '2025',
+    status: 'Deployed Production System',
+    type: 'Personal Project',
+    link: 'https://github.com/MrWhiiteHat/AI-Powered-Agricultural-Advisory-Chatbot-for-Indian-Farmers',
+    tags: [
+      'Python',
+      'FastAPI',
+      'Google Gemini',
+      'TensorFlow',
+      'MobileNetV2',
+      'OpenAI Whisper',
+      'Twilio',
+      'MongoDB',
+      'Redis',
+    ],
+    highlights: [
+      'Led development of a multimodal AI chatbot deployed on WhatsApp (via Twilio) providing real-time agricultural advisory to Indian farmers, routing text, image, and audio to independent AI pipelines – Gemini for NLP, MobileNetV2 CNN (94.7% accuracy on 54,000+ images), and Whisper for speech-to-text.',
+      'Engineered zero-shot prompt guardrails achieving 0% out-of-domain hallucination rate; integrated weather APIs and a RAG-based knowledge retrieval engine for government scheme eligibility.',
+      'Resolved production bottlenecks: mitigated Twilio 15-second webhook timeouts via async job queues, eliminated HTTP 429 rate-limit exhaustion with Redis caching layer, and tuned MongoDB connection pooling for high-concurrency throughput.',
+    ],
+    description:
+      'A multimodal agricultural intelligence chatbot deployed on WhatsApp, featuring sub-second asynchronous response processing, crop disease computer-vision diagnosis with 94.7% accuracy, voice queries via Whisper, and zero-hallucination guardrails.',
   },
 ];
 
 export const skills = [
-  { group: 'Security', items: ['Mobile application security', 'Static analysis', 'Reverse engineering', 'Burp Suite', 'Wireshark'] },
-  { group: 'AI / ML', items: ['Python', 'PyTorch', 'LLM integration', 'RAG', 'Model evaluation'] },
-  { group: 'Development', items: ['JavaScript / TypeScript', 'React', 'Node.js', 'FastAPI', 'REST APIs'] },
-  { group: 'Infrastructure', items: ['Docker', 'PostgreSQL', 'Git / GitHub', 'Vercel', 'Linux'] },
+  {
+    group: 'Cybersecurity & AppSec',
+    items: [
+      'Application Security (AppSec)',
+      'Mobile Pen Testing (Android)',
+      'Static & Dynamic Analysis',
+      'Frida Instrumentation & ADB',
+      'Vulnerability Assessment (VAPT)',
+      'OWASP Mobile Top 10 (2024)',
+      'OWASP API Top 10 (2023)',
+      'Burp Suite & OWASP ZAP',
+      'Wireshark & PCAP Forensics',
+      'Metasploit & Nmap Recon',
+      'Linux Hardening & Privilege Escalation',
+      'Secure SDLC (SSDLC)',
+    ],
+  },
+  {
+    group: 'AI & Machine Learning',
+    items: [
+      'Local LLM Deployment (Ollama)',
+      'Qwen 2.5-Coder (1.5B Parameters)',
+      'Retrieval-Augmented Generation (RAG)',
+      'Hybrid Retrieval (BM25 + TF-IDF + RRF)',
+      'Google Gemini API',
+      'OpenAI API (GPT-4o-mini)',
+      'TensorFlow & CNN (MobileNetV2)',
+      'OpenAI Whisper (Audio/Speech-to-Text)',
+      'LangChain & Prompt Guardrails',
+      'Vector Embeddings & Semantic Search',
+    ],
+  },
+  {
+    group: 'Full-Stack Development',
+    items: [
+      'Python (FastAPI, AsyncIO, PyTorch)',
+      'TypeScript & Modern JavaScript (ESNext)',
+      'Next.js 14 (App Router, Server Actions)',
+      'React 18 & Three.js / R3F',
+      'Node.js & Express.js',
+      'Tailwind CSS & Modern UI',
+      'REST APIs & Webhooks Architecture',
+      'Java & Bash Shell Scripting',
+      'SQL & Schema Optimization',
+    ],
+  },
+  {
+    group: 'DevOps & Infrastructure',
+    items: [
+      'Docker & Docker Compose',
+      'PostgreSQL & MongoDB',
+      'Redis In-Memory Caching',
+      'GitHub Actions CI/CD Pipelines',
+      'Kali Linux, Ubuntu & Windows',
+      'Railway PaaS Deployment',
+      'Git Version Control & Monorepo',
+      'Zero-Trust Network Hardening',
+    ],
+  },
 ];
 
 export const achievements = [
-  { title: 'Odisha Skills — Cyber Security', detail: 'Bronze medal · 2021', note: 'Add the official event or certificate link here.' },
-  { title: 'Odisha Skills — Cyber Security', detail: 'Bronze medal · 2025–2026', note: 'Add the official event or certificate link here.' },
-  { title: 'BRICS Hi-Tech Future Skills', detail: 'Cybersecurity international skills development session · 2026', note: 'Add a certificate or event page if available.' },
+  {
+    title: '3rd Position (Bronze Medal) — Odisha Skills Competition',
+    detail: 'State Championship · Cyber Security · 2025–2026',
+    issuer: 'Skill Development & Technical Education Department, Govt. of Odisha',
+    note: 'Awarded Bronze Medal for state-level cybersecurity excellence: live network defense, CTF exploitation, vulnerability analysis, and incident response under competitive constraints.',
+    year: '2025–2026',
+    level: 'State Championship',
+  },
+  {
+    title: '3rd Position (Bronze Medal) — Odisha Skills Competition',
+    detail: 'State Championship · Cyber Security · 2020–2021',
+    issuer: 'Skill Development & Technical Education Department, Govt. of Odisha',
+    note: 'Recognized as state bronze medalist in cyber defense: infrastructure hardening, packet capture forensics, network traffic telemetry, and vulnerability remediation.',
+    year: '2020–2021',
+    level: 'State Championship',
+  },
+  {
+    title: 'BRICS Hi-Tech Future Skills Development Program',
+    detail: 'International Cybersecurity Skills Development · 2026',
+    issuer: 'BRICS Future Skills Development & Technology Innovation Workgroup',
+    note: 'Selected to participate in the prestigious international cybersecurity future skills initiative, collaborating on next-generation digital defense and cross-border cyber resilience.',
+    year: '2026',
+    level: 'International Program',
+  },
 ];
 
 export const objectMap = [
   { match: /monitor|screen|computer|keyboard|simple_desk|desk/i, section: 'projects', label: 'Workstation · Projects' },
   { match: /book|cabinet|shelf|wardrobe|box/i, section: 'skills', label: 'Bookshelf & Archives · Skills' },
   { match: /projector|meeting table|remote|clock/i, section: 'achievements', label: 'Presentation Area · Achievements' },
-  { match: /chair|armchair|couch|reception/i, section: 'about', label: 'Office Lounge · About Me' },
+  { match: /chair|armchair|couch|reception|drone/i, section: 'about', label: 'Office Lounge · About Me' },
   { match: /printer|paper/i, section: 'resume', label: 'Printer Station · Resume' },
-  { match: /water|mug|phone|mobile/i, section: 'contact', label: 'Refreshment & Phone · Contact' },
+  { match: /water|mug|phone|mobile|phonecall/i, section: 'contact', label: 'Refreshment & Phone · Contact' },
 ];
 
 export const hotspots = [
@@ -66,4 +269,3 @@ export const hotspots = [
   { id: 'resume', label: 'Resume', position: [-3.6, 1.45, 1.05], icon: '📄' },
   { id: 'contact', label: 'Contact', position: [-0.15, 1.15, 0.65], icon: '📞' },
 ];
-

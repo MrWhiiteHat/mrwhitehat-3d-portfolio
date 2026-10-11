@@ -54,7 +54,7 @@ export default function App() {
 
   // Player customized avatar & telemetry
   const [playerData, setPlayerData] = useState({
-    codename: 'Cipher_Zero',
+    codename: 'MrWhiteHat',
     archetype: 'Alpha',
     archetypeName: 'Operative Alpha',
     visor: 'mono',

@@ -424,6 +424,17 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                   <p className="ide-project-summary">{projects[selectedProject]?.short}</p>
                   <p className="ide-project-desc">{projects[selectedProject]?.description}</p>
 
+                  {projects[selectedProject]?.highlights && (
+                    <div className="ide-highlights-box" style={{ marginTop: '8px', marginBottom: '8px' }}>
+                      <span className="stack-header" style={{ color: '#38bdf8' }}>KEY ARCHITECTURE & PERFORMANCE SIGNALS:</span>
+                      <ul style={{ margin: '4px 0 0 14px', padding: 0, fontSize: '9px', color: '#cbd5e1', lineHeight: '1.45' }}>
+                        {projects[selectedProject].highlights.map((h, hIdx) => (
+                          <li key={hIdx} style={{ marginBottom: '2px' }}>{h}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
                   <div className="ide-stack-wrap">
                     <span className="stack-header">STACK SPECIFICATION:</span>
                     <div className="ide-stack-pills">
@@ -578,8 +589,8 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                   <ShieldCheck size={28} />
                 </div>
                 <div className="plaque-crest-text">
-                  <span className="crest-label">OFFICE OF CYBER DEFENSE & APPLIED AI</span>
-                  <h2 className="plaque-name">{profile.name}</h2>
+                  <span className="crest-label">OFFICE OF CYBER DEFENSE & APPLIED AI // DOSSIER</span>
+                  <h2 className="plaque-name">{profile.name} <span style={{ fontSize: '13px', color: '#fbbf24', fontWeight: 600 }}>({profile.alias})</span></h2>
                   <span className="plaque-role">{profile.role}</span>
                 </div>
               </div>
@@ -589,7 +600,7 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
               <div className="plaque-stats-grid">
                 <div className="plaque-stat-cell">
                   <span className="stat-label">CLEARANCE / ROLE</span>
-                  <strong className="stat-value">Security Researcher</strong>
+                  <strong className="stat-value">AppSec & AI Engineer</strong>
                 </div>
                 <div className="plaque-stat-cell">
                   <span className="stat-label">LOCATION</span>
@@ -597,7 +608,7 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                 </div>
                 <div className="plaque-stat-cell">
                   <span className="stat-label">SPECIALTY</span>
-                  <strong className="stat-value">Mobile Sec & AI</strong>
+                  <strong className="stat-value">Android Pen Testing & RAG</strong>
                 </div>
                 <div className="plaque-stat-cell">
                   <span className="stat-label">STATUS</span>
@@ -607,7 +618,18 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
 
               <p className="plaque-bio-text">{profile.intro}</p>
 
-              <div className="plaque-action-row">
+              {/* Education Credentials */}
+              <div className="plaque-edu-box" style={{ background: 'rgba(251, 191, 36, 0.05)', border: '1px solid rgba(251, 191, 36, 0.2)', borderRadius: '6px', padding: '8px 10px' }}>
+                <span className="stat-label" style={{ marginBottom: '4px' }}>ACADEMIC CREDENTIALS & DEGREES</span>
+                {profile.education?.map((edu) => (
+                  <div key={edu.institution} style={{ marginBottom: '4px', fontSize: '9.5px', color: '#cbd5e1' }}>
+                    <strong style={{ color: '#fbbf24' }}>{edu.degree} – {edu.field}</strong>
+                    <div style={{ color: '#94a3b8', fontSize: '8.5px' }}>{edu.institution}, {edu.location} ({edu.period}) · {edu.status}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="plaque-action-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <a
                   href={profile.github}
                   target="_blank"
@@ -615,9 +637,31 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                   className="plaque-cta-btn"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Github size={14} />
-                  <span>Inspect GitHub Profile</span>
-                  <ArrowUpRight size={12} />
+                  <Github size={13} />
+                  <span>GitHub Profile</span>
+                  <ArrowUpRight size={11} />
+                </a>
+                <a
+                  href={profile.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="plaque-cta-btn"
+                  style={{ background: '#0284c7', color: '#ffffff' }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <BriefcaseBusiness size={13} />
+                  <span>LinkedIn Network</span>
+                  <ArrowUpRight size={11} />
+                </a>
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="plaque-cta-btn"
+                  style={{ background: '#10b981', color: '#022c22' }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Mail size={13} />
+                  <span>Email Direct</span>
+                  <Send size={11} />
                 </a>
               </div>
             </div>
@@ -631,8 +675,11 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
               <div className="paper-header">
                 <div className="paper-header-left">
                   <span className="doc-num">DOC-CV-2026 // A4 LASER PRINT</span>
-                  <h2 className="doc-title">{profile.name}</h2>
+                  <h2 className="doc-title">{profile.name} <span style={{ fontSize: '13px', color: '#16a34a', fontWeight: 600 }}>({profile.alias})</span></h2>
                   <span className="doc-subtitle">{profile.role}</span>
+                  <div style={{ fontSize: '9px', color: '#475569', marginTop: '3px' }}>
+                    {profile.location} · {profile.email} · {profile.phone}
+                  </div>
                 </div>
                 <div className="paper-stamp">OFFICIAL CV</div>
               </div>
@@ -646,24 +693,37 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                 </div>
 
                 <div className="paper-section">
-                  <h4 className="paper-heading">CORE SECURITY CAPABILITIES</h4>
+                  <h4 className="paper-heading">ACADEMIC BACKGROUND & DEGREES</h4>
+                  {profile.education?.map((edu) => (
+                    <div key={edu.institution} style={{ marginBottom: '4px' }}>
+                      <strong style={{ fontSize: '10px', color: '#0f172a' }}>{edu.degree} – {edu.field}</strong>
+                      <div style={{ fontSize: '8.5px', color: '#64748b' }}>{edu.institution}, {edu.location} ({edu.period}) · {edu.status}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="paper-section">
+                  <h4 className="paper-heading">CORE SECURITY & AI CAPABILITIES</h4>
                   <div className="paper-tag-cloud">
-                    <span>Mobile App Sec</span>
-                    <span>Static Analysis</span>
-                    <span>Reverse Engineering</span>
-                    <span>Burp Suite</span>
-                    <span>Python</span>
-                    <span>PyTorch</span>
-                    <span>FastAPI</span>
-                    <span>Docker</span>
+                    <span>Mobile App Sec (Android)</span>
+                    <span>Frida & ADB Hooking</span>
+                    <span>OWASP Mobile Top 10</span>
+                    <span>VAPT & Static Analysis</span>
+                    <span>Burp Suite & Wireshark</span>
+                    <span>Python & FastAPI</span>
+                    <span>Local LLMs (Ollama / Qwen 2.5)</span>
+                    <span>RAG (Hybrid BM25 + TF-IDF)</span>
+                    <span>Next.js 14 & React 18</span>
+                    <span>Docker & CI/CD</span>
                   </div>
                 </div>
 
                 <div className="paper-section">
-                  <h4 className="paper-heading">RECOGNITIONS</h4>
+                  <h4 className="paper-heading">HONORS & RECOGNITIONS</h4>
                   <p className="paper-text">
-                    • Bronze Medalist — Odisha Skills Cybersecurity (2021, 2025–2026)
-                    <br />• BRICS Hi-Tech International Future Skills Participant (2026)
+                    • 3rd Position (Bronze Medal) — Odisha Skills Competition (Cyber Security · 2025–2026)
+                    <br />• 3rd Position (Bronze Medal) — Odisha Skills Competition (Cyber Security · 2020–2021)
+                    <br />• BRICS Hi-Tech International Future Skills Development Session (2026)
                   </p>
                 </div>
               </div>
@@ -671,12 +731,12 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
               <div className="paper-tearoff-tray">
                 <a
                   href={profile.resume}
-                  download
+                  download="Sadashiba_Sarangi_Resume.pdf"
                   className="paper-download-btn"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Download size={14} />
-                  <span>Download Laser-Printed PDF Document</span>
+                  <span>Download Laser-Printed PDF Document ({profile.resumeFilename})</span>
                 </a>
               </div>
             </div>
@@ -704,10 +764,25 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                       <Mail size={16} />
                     </div>
                     <div className="channel-info">
-                      <span className="ch-tag">CHANNEL 01 · DIRECT MAIL</span>
+                      <span className="ch-tag">CHANNEL 01 · DIRECT EMAIL</span>
                       <strong className="ch-val">{profile.email}</strong>
                     </div>
                     <Send size={12} className="ch-arrow" />
+                  </a>
+
+                  <a
+                    href={`tel:${profile.tel || '+918917512439'}`}
+                    className="console-channel-btn"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="channel-icon-wrap">
+                      <PhoneCall size={16} />
+                    </div>
+                    <div className="channel-info">
+                      <span className="ch-tag">CHANNEL 02 · SECURE VOICE / WHATSAPP</span>
+                      <strong className="ch-val">{profile.phone}</strong>
+                    </div>
+                    <ExternalLink size={12} className="ch-arrow" />
                   </a>
 
                   <a
@@ -721,7 +796,7 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                       <Github size={16} />
                     </div>
                     <div className="channel-info">
-                      <span className="ch-tag">CHANNEL 02 · GITHUB PORTAL</span>
+                      <span className="ch-tag">CHANNEL 03 · GITHUB REPOSITORIES</span>
                       <strong className="ch-val">github.com/MrWhiiteHat</strong>
                     </div>
                     <ExternalLink size={12} className="ch-arrow" />
@@ -738,8 +813,8 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                       <BriefcaseBusiness size={16} />
                     </div>
                     <div className="channel-info">
-                      <span className="ch-tag">CHANNEL 03 · PROFESSIONAL LINK</span>
-                      <strong className="ch-val">LinkedIn Network</strong>
+                      <span className="ch-tag">CHANNEL 04 · PROFESSIONAL LINKEDIN</span>
+                      <strong className="ch-val">linkedin.com/in/sadashiba-sarangi</strong>
                     </div>
                     <ExternalLink size={12} className="ch-arrow" />
                   </a>
