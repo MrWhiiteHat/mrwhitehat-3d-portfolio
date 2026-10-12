@@ -1391,11 +1391,13 @@ export function createSystemHackedHoloScreen() {
 
 /**
  * 8. EXECUTIVE CYBER SECURITY OPERATIVE DOSSIER SCREEN (About Me)
- * Renders high-end security badge, biometric cipher scanner, verified credentials, and operative identity.
+ * Renders high-end security badge, authentic portrait photograph, verified credentials,
+ * and real-world operative identity for Sadashiba Sarangi (Mr. White Hat).
+ * Performance optimized: bakes static high-res texture and eliminates per-frame GPU re-uploads.
  */
-export function createAboutDossierScreen() {
-  const width = 512;
-  const height = 340;
+export function createAboutDossierScreen(imageUrl) {
+  const width = 1024;
+  const height = 640;
   const canvas = createScreenCanvas(width, height);
   if (!canvas) return { texture: null, update: () => {} };
 
@@ -1403,18 +1405,32 @@ export function createAboutDossierScreen() {
   const texture = new THREE.CanvasTexture(canvas);
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
 
-  let animTimer = 0;
+  let imgElement = null;
+  let imgLoaded = false;
 
-  function update(delta) {
-    animTimer += delta;
+  if (imageUrl) {
+    imgElement = new Image();
+    imgElement.crossOrigin = 'anonymous';
+    imgElement.src = imageUrl;
+    imgElement.onload = () => {
+      imgLoaded = true;
+      render();
+    };
+  }
 
+  function render() {
     // 1. Deep Carbon Plate Background
-    ctx.fillStyle = '#080d0a';
+    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+    bgGrad.addColorStop(0, '#060b08');
+    bgGrad.addColorStop(0.5, '#0b140f');
+    bgGrad.addColorStop(1, '#070c09');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, width, height);
 
     // Subtle Hex Grid Matrix pattern
-    ctx.strokeStyle = 'rgba(217, 119, 6, 0.08)';
+    ctx.strokeStyle = 'rgba(217, 119, 6, 0.07)';
     ctx.lineWidth = 1;
     for (let x = 0; x < width; x += 32) {
       ctx.beginPath();
@@ -1431,132 +1447,236 @@ export function createAboutDossierScreen() {
 
     // 2. Gold/Emerald Outer Inset Border
     ctx.strokeStyle = '#ca8a04';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(10, 10, width - 20, height - 20);
+    ctx.lineWidth = 4;
+    ctx.strokeRect(12, 12, width - 24, height - 24);
 
     ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(16, 16, width - 32, height - 32);
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(20, 20, width - 40, height - 40);
 
     // Corner Tactical Brackets
-    const bLen = 18;
     ctx.fillStyle = '#fbbf24';
     [
-      [10, 10], [width - 10, 10],
-      [10, height - 10], [width - 10, height - 10]
+      [12, 12], [width - 12, 12],
+      [12, height - 12], [width - 12, height - 12]
+    ].forEach(([cx, cy]) => {
+      ctx.fillRect(cx - 5, cy - 5, 10, 10);
+    });
+
+    // 3. Top Security Header Bar
+    ctx.fillStyle = 'rgba(202, 138, 4, 0.16)';
+    ctx.fillRect(26, 26, width - 52, 44);
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 15px monospace';
+    ctx.fillText('🛡️  OFFICE OF CYBER DEFENSE // CLASSIFIED OPERATIVE DOSSIER #001', 42, 54);
+
+    // Top Right Clearance Badge
+    ctx.fillStyle = '#22c55e';
+    ctx.font = 'bold 13px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('● CLEARANCE: TOP SECRET // VERIFIED CLASSIFIED', width - 42, 54);
+    ctx.textAlign = 'left';
+
+    // 4. Left Column: Authentic Operative Portrait Photo Frame
+    const photoBoxX = 36;
+    const photoBoxY = 82;
+    const photoBoxW = 310;
+    const photoBoxH = 480;
+
+    // Photo chassis background
+    ctx.fillStyle = '#030805';
+    ctx.fillRect(photoBoxX, photoBoxY, photoBoxW, photoBoxH);
+    ctx.strokeStyle = '#1e3a29';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(photoBoxX, photoBoxY, photoBoxW, photoBoxH);
+
+    // Render Real Photograph if loaded
+    const photoInnerX = photoBoxX + 12;
+    const photoInnerY = photoBoxY + 12;
+    const photoInnerW = photoBoxW - 24;
+    const photoInnerH = 370;
+
+    if (imgLoaded && imgElement) {
+      ctx.save();
+      // Rounded rect clip for high-end look
+      ctx.beginPath();
+      ctx.rect(photoInnerX, photoInnerY, photoInnerW, photoInnerH);
+      ctx.clip();
+
+      // Cover crop calculation
+      const imgAspect = imgElement.width / imgElement.height;
+      const targetAspect = photoInnerW / photoInnerH;
+      let drawW, drawH, drawX, drawY;
+
+      if (imgAspect > targetAspect) {
+        drawH = photoInnerH;
+        drawW = photoInnerH * imgAspect;
+        drawX = photoInnerX + (photoInnerW - drawW) / 2;
+        drawY = photoInnerY;
+      } else {
+        drawW = photoInnerW;
+        drawH = photoInnerW / imgAspect;
+        drawX = photoInnerX;
+        drawY = photoInnerY + (photoInnerH - drawH) / 2;
+      }
+
+      ctx.drawImage(imgElement, drawX, drawY, drawW, drawH);
+
+      // Fine holographic scanlines over photo
+      ctx.fillStyle = 'rgba(0, 245, 255, 0.05)';
+      for (let sy = photoInnerY; sy < photoInnerY + photoInnerH; sy += 4) {
+        ctx.fillRect(photoInnerX, sy, photoInnerW, 1.5);
+      }
+
+      // Subtle cyan/emerald vignette border around photo
+      const photoGrad = ctx.createLinearGradient(0, photoInnerY, 0, photoInnerY + photoInnerH);
+      photoGrad.addColorStop(0, 'rgba(6, 78, 59, 0.15)');
+      photoGrad.addColorStop(0.85, 'rgba(0, 0, 0, 0)');
+      photoGrad.addColorStop(1, 'rgba(6, 78, 59, 0.55)');
+      ctx.fillStyle = photoGrad;
+      ctx.fillRect(photoInnerX, photoInnerY, photoInnerW, photoInnerH);
+
+      ctx.restore();
+    } else {
+      // Placeholder while loading
+      ctx.fillStyle = '#06170d';
+      ctx.fillRect(photoInnerX, photoInnerY, photoInnerW, photoInnerH);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 14px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('LOADING OPERATIVE PHOTO...', photoInnerX + photoInnerW / 2, photoInnerY + photoInnerH / 2);
+      ctx.textAlign = 'left';
+    }
+
+    // Photo Border & Corner Reticles
+    ctx.strokeStyle = '#ca8a04';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(photoInnerX, photoInnerY, photoInnerW, photoInnerH);
+
+    // Corner crosshair ticks
+    ctx.fillStyle = '#38bdf8';
+    const cLen = 14;
+    [
+      [photoInnerX, photoInnerY],
+      [photoInnerX + photoInnerW, photoInnerY],
+      [photoInnerX, photoInnerY + photoInnerH],
+      [photoInnerX + photoInnerW, photoInnerY + photoInnerH],
     ].forEach(([cx, cy]) => {
       ctx.fillRect(cx - 3, cy - 3, 6, 6);
     });
 
-    // 3. Top Security Header Bar
-    ctx.fillStyle = 'rgba(202, 138, 4, 0.15)';
-    ctx.fillRect(20, 20, width - 40, 36);
-
-    ctx.fillStyle = '#fbbf24';
-    ctx.font = 'bold 11px monospace';
-    ctx.fillText('🛡️  OFFICE OF CYBER DEFENSE & APPLIED AI // DOSSIER #001', 32, 42);
-
-    // Top Right Clearance Badge
-    ctx.fillStyle = '#22c55e';
-    ctx.font = 'bold 10px monospace';
-    ctx.textAlign = 'right';
-    ctx.fillText('● CLEARANCE: TOP SECRET', width - 32, 42);
-    ctx.textAlign = 'left';
-
-    // 4. Operative Identity Title & Alias
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '900 24px monospace';
-    ctx.fillText('SATYABRATA SAHOO', 32, 88);
-
-    ctx.fillStyle = '#fbbf24';
-    ctx.font = 'bold 15px monospace';
-    ctx.fillText('// ALIAS: MR. WHITE HAT', 32, 112);
-
-    ctx.fillStyle = '#34d399';
-    ctx.font = 'bold 13px monospace';
-    ctx.fillText('AppSec & Applied AI Engineer • Pen Tester', 32, 134);
-
-    // Divider Line
-    ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
-    ctx.beginPath();
-    ctx.moveTo(32, 148);
-    ctx.lineTo(width - 32, 148);
-    ctx.stroke();
-
-    // 5. Left Column: Stats & Clearance Grid
-    const stats = [
-      ['SPECIALTY', 'Android Pen Testing & RAG'],
-      ['LOCATION', 'Bhubaneswar, India'],
-      ['EXPERTISE', 'Mobile Security, OWASP, LLMs'],
-      ['STATUS', 'AVAILABLE FOR HIRE / PROJECTS'],
-    ];
-
-    stats.forEach(([label, val], idx) => {
-      const sy = 172 + idx * 26;
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = 'bold 10px monospace';
-      ctx.fillText(label + ':', 32, sy);
-
-      ctx.fillStyle = idx === 3 ? '#22c55e' : '#f8fafc';
-      ctx.font = idx === 3 ? 'bold 11px monospace' : '11px monospace';
-      ctx.fillText(val, 125, sy);
-    });
-
-    // 6. Right Column: Rotating Biometric Cipher Tumbler Ring
-    const ringX = width - 85;
-    const ringY = 210;
-    const ringR = 45;
-
-    ctx.save();
-    ctx.translate(ringX, ringY);
-
-    // Outer rotating arc
-    ctx.rotate(animTimer * 1.4);
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.arc(0, 0, ringR, 0, Math.PI * 1.3);
-    ctx.stroke();
-
-    // Inner counter-rotating arc
-    ctx.rotate(-animTimer * 2.8);
-    ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(0, 0, ringR - 10, 0, Math.PI * 1.5);
-    ctx.stroke();
-
-    ctx.restore();
-
-    // Center Biometric Fingerprint / Key Icon
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 18px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('⚡', ringX, ringY + 6);
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '9px monospace';
-    ctx.fillText('BIOMETRIC OK', ringX, ringY + 32);
-    ctx.textAlign = 'left';
-
-    // 7. Bottom Tactical Action Bar (Interactive Prompt)
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.16)';
-    ctx.fillRect(20, height - 52, width - 40, 36);
-
+    // Operative ID Plate below portrait
+    const idPlateY = photoInnerY + photoInnerH + 12;
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
+    ctx.fillRect(photoInnerX, idPlateY, photoInnerW, 68);
     ctx.strokeStyle = '#10b981';
     ctx.lineWidth = 1;
-    ctx.strokeRect(20, height - 52, width - 40, 36);
+    ctx.strokeRect(photoInnerX, idPlateY, photoInnerW, 68);
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText('CODENAME: MR. WHITE HAT', photoInnerX + 12, idPlateY + 22);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('BADGE ID: SD-SEC-2026-OP01', photoInnerX + 12, idPlateY + 40);
+
+    ctx.fillStyle = '#22c55e';
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('STATUS: ● ACTIVE // RED TEAM APPEC', photoInnerX + 12, idPlateY + 58);
+
+    // 5. Right Column: Authentic Profile & Credentials of Sadashiba Sarangi
+    const infoX = 370;
+
+    // Full Name
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 32px monospace';
+    ctx.fillText('SADASHIBA SARANGI', infoX, 115);
+
+    // Operative Alias & Title
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = 'bold 17px monospace';
+    ctx.fillText('// ALIAS: MR. WHITE HAT', infoX, 142);
+
+    ctx.fillStyle = '#34d399';
+    ctx.font = 'bold 15px monospace';
+    ctx.fillText('Cybersecurity Software Developer · AppSec & Applied AI Engineer', infoX, 168);
+
+    // Sub-badge bar
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.14)';
+    ctx.fillRect(infoX, 182, width - infoX - 40, 28);
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(infoX, 182, width - infoX - 40, 28);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText('★ 2x BRONZE MEDALIST (ODISHA SKILLS)  |  BRICS CYBER FELLOW  |  CGU LEAD', infoX + 12, 201);
+
+    // Divider Line
+    ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+    ctx.beginPath();
+    ctx.moveTo(infoX, 222);
+    ctx.lineTo(width - 40, 222);
+    ctx.stroke();
+
+    // Authentic Experience & Credentials Grid from data.js
+    const credentials = [
+      ['EDUCATION', 'B.Tech in Computer Science & IT — C.V. Raman Global University (CGU)'],
+      ['HONORS', 'Odisha Skills Cyber Security 3rd Rank (2025–26 & 2020–21)'],
+      ['LEADERSHIP', 'Cyber Security Club Lead & Student Coordinator (200+ trained)'],
+      ['SPECIALIZATION', 'Android Pen Testing, OWASP Top 10, Network Forensics (Wireshark)'],
+      ['APPLIED AI', 'LLM Security Automation, AI Red Teaming, RAG Mesh Architecture'],
+      ['TACTICAL STACK', 'Python, TypeScript, JavaScript, Linux, Burp Suite, React, Three.js'],
+      ['LOCATION', 'Bhubaneswar, Odisha, India'],
+      ['COMMS / DISCORD', 'kanhasarangi39@gmail.com  |  mr.whitehat  |  +91 8917512439'],
+      ['AVAILABILITY', 'ACTIVELY AVAILABLE // OPEN FOR HIRE & FULL-TIME / CONTRACT'],
+    ];
+
+    credentials.forEach(([label, val], idx) => {
+      const cy = 252 + idx * 34;
+
+      // Label
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText(label + ':', infoX, cy);
+
+      // Value
+      if (idx === credentials.length - 1) {
+        // Highlighted status
+        ctx.fillStyle = '#22c55e';
+        ctx.font = 'bold 12px monospace';
+        ctx.fillText('● ' + val, infoX + 145, cy);
+      } else {
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '12.5px monospace';
+        ctx.fillText(val, infoX + 145, cy);
+      }
+    });
+
+    // 6. Bottom Tactical Action Bar (Interactive Prompt)
+    const barY = height - 62;
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
+    ctx.fillRect(26, barY, width - 52, 44);
+
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(26, barY, width - 52, 44);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 11px monospace';
+    ctx.font = 'bold 13px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('▶ PRESS [E] OR CLICK TO OPEN COMPLETE OPERATIVE DOSSIER ◀', width / 2, height - 30);
+    ctx.fillText('▶ PRESS [E] OR CLICK TO OPEN COMPLETE OPERATIVE DOSSIER & RESUME ◀', width / 2, barY + 27);
     ctx.textAlign = 'left';
 
     texture.needsUpdate = true;
   }
 
-  update(0);
-  return { texture, update };
+  // Initial draw
+  render();
+
+  return { texture, update: render };
 }
+
 

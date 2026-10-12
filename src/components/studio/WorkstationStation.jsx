@@ -36,9 +36,9 @@ export default function WorkstationStation({ onSelect, onHover }) {
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Live PC Screens (Throttled & Alternated for optimal 60fps pacing)
+    // 0. Update Live PC Screens (Paced to gentle 5 FPS, Alternated 1-per-interval for smooth 60fps)
     screenUpdateTimer.current += delta;
-    if (screenUpdateTimer.current > 0.125) {
+    if (screenUpdateTimer.current > 0.20) {
       if (screenToggle.current) {
         terminalScreen.update(screenUpdateTimer.current);
       } else {
@@ -47,6 +47,7 @@ export default function WorkstationStation({ onSelect, onHover }) {
       screenToggle.current = !screenToggle.current;
       screenUpdateTimer.current = 0;
     }
+
 
     // 1. Spinning PC Fans
     if (fan1Ref.current) fan1Ref.current.rotation.z += delta * 14;

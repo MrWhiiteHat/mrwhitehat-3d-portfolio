@@ -27,16 +27,19 @@ export default function DecorElements() {
 
   // ---------------------------------------------------------------------------
   // Load Real High-Resolution PBR Textures (Leaves, Bark, Wood, Ceramic)
+  // Batched to trigger only a single component re-render when assets are loaded.
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    const loader = new THREE.TextureLoader();
+    const manager = new THREE.LoadingManager();
+    const loader = new THREE.TextureLoader(manager);
+    const loaded = {};
 
     const loadTexture = (key, relativePath, setupFn) => {
       loader.load(
         getAssetUrl(relativePath),
         (tex) => {
           if (setupFn) setupFn(tex);
-          setTextures((prev) => ({ ...prev, [key]: tex }));
+          loaded[key] = tex;
         },
         undefined,
         (err) => {
@@ -97,7 +100,53 @@ export default function DecorElements() {
       t.wrapT = THREE.RepeatWrapping;
       t.repeat.set(2, 2);
     });
+
+    manager.onLoad = () => {
+      setTextures({ ...loaded });
+    };
   }, []);
+
+  // Shared High-Performance Materials (Eliminates redundant material allocations & GPU state switches)
+  const ficusLeafMat = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      map: textures.leafColor || null,
+      normalMap: textures.leafNormal || null,
+      roughnessMap: textures.leafRoughness || null,
+      normalScale: new THREE.Vector2(0.8, 0.8),
+      color: textures.leafColor ? '#a3d9a5' : '#1e4b27',
+      roughness: 0.58,
+      metalness: 0.03,
+      side: THREE.DoubleSide,
+    });
+  }, [textures.leafColor, textures.leafNormal, textures.leafRoughness]);
+
+  const ficusPetioleMat = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#3a5832', roughness: 0.7 }),
+    []
+  );
+
+  const ficusMidribMat = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#4a7c45', roughness: 0.6 }),
+    []
+  );
+
+  const snakeLeafMat = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      map: textures.leafColor || null,
+      normalMap: textures.leafNormal || null,
+      roughnessMap: textures.leafRoughness || null,
+      normalScale: new THREE.Vector2(0.7, 0.7),
+      color: textures.leafColor ? '#66b278' : '#154d24',
+      roughness: 0.54,
+      metalness: 0.05,
+      side: THREE.DoubleSide,
+    });
+  }, [textures.leafColor, textures.leafNormal, textures.leafRoughness]);
+
+  const snakeGoldTrimMat = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#eab308', roughness: 0.65, side: THREE.DoubleSide }),
+    []
+  );
 
   // ---------------------------------------------------------------------------
   // Procedural Ficus Lyrata (Fiddle Leaf Fig) Leaf Blade Geometry
@@ -390,36 +439,31 @@ export default function DecorElements() {
             />
           </mesh>
 
-          {/* 21 Detailed Fiddle Leaf Fig Blades with Real PBR Leaf Texture */}
-          {treeLeaves.map((leaf, idx) => (
-            <group key={`ficus-leaf-${idx}`} position={leaf.pos} rotation={leaf.rot} scale={leaf.s}>
-              {/* Petiole (Leaf Stem) connecting to branch */}
-              <mesh position={[0, -0.04, 0]} rotation={[0.1, 0, 0]} castShadow>
-                <cylinderGeometry args={[0.004, 0.006, 0.12, 8]} />
-                <meshStandardMaterial color="#3a5832" roughness={0.7} />
-              </mesh>
+          {/* 21 Detailed Fiddle Leaf Fig Blades with Real PBR Leaf Texture (Shared materials for 60fps) */}
+          {treeLeaves.map((leaf, idx) => {
+            const isCanopyShadowCaster = idx % 4 === 0;
+            return (
+              <group key={`ficus-leaf-${idx}`} position={leaf.pos} rotation={leaf.rot} scale={leaf.s}>
+                {/* Petiole (Leaf Stem) connecting to branch */}
+                <mesh position={[0, -0.04, 0]} rotation={[0.1, 0, 0]} material={ficusPetioleMat}>
+                  <cylinderGeometry args={[0.004, 0.006, 0.12, 8]} />
+                </mesh>
 
-              {/* Realistic Curved Fiddle Leaf Blade with Real Leaf Scanned Map */}
-              <mesh geometry={fiddleLeafGeometry} castShadow receiveShadow>
-                <meshStandardMaterial
-                  map={textures.leafColor || null}
-                  normalMap={textures.leafNormal || null}
-                  roughnessMap={textures.leafRoughness || null}
-                  normalScale={[0.8, 0.8]}
-                  color={textures.leafColor ? '#a3d9a5' : leaf.color}
-                  roughness={0.58}
-                  metalness={0.03}
-                  side={THREE.DoubleSide}
+                {/* Realistic Curved Fiddle Leaf Blade with Real Leaf Scanned Map */}
+                <mesh
+                  geometry={fiddleLeafGeometry}
+                  material={ficusLeafMat}
+                  castShadow={isCanopyShadowCaster}
+                  receiveShadow
                 />
-              </mesh>
 
-              {/* Raised Midrib Central Spine */}
-              <mesh position={[0, 0.28, 0.004]} castShadow>
-                <cylinderGeometry args={[0.0025, 0.004, 0.54, 6]} />
-                <meshStandardMaterial color="#4a7c45" roughness={0.6} />
-              </mesh>
-            </group>
-          ))}
+                {/* Raised Midrib Central Spine */}
+                <mesh position={[0, 0.28, 0.004]} material={ficusMidribMat}>
+                  <cylinderGeometry args={[0.0025, 0.004, 0.54, 6]} />
+                </mesh>
+              </group>
+            );
+          })}
         </group>
       </group>
 
@@ -460,34 +504,24 @@ export default function DecorElements() {
               scale={lf.scale}
             >
               {/* Variegated Snake Plant Leaf Blade with Gold Edge Tone */}
-              <mesh geometry={snakeLeafGeometry} castShadow receiveShadow>
-                <meshStandardMaterial
-                  map={textures.leafColor || null}
-                  normalMap={textures.leafNormal || null}
-                  roughnessMap={textures.leafRoughness || null}
-                  normalScale={[0.7, 0.7]}
-                  color={textures.leafColor ? '#66b278' : '#154d24'}
-                  roughness={0.54}
-                  metalness={0.05}
-                  side={THREE.DoubleSide}
-                />
-              </mesh>
+              <mesh
+                geometry={snakeLeafGeometry}
+                material={snakeLeafMat}
+                castShadow={idx % 3 === 0}
+                receiveShadow
+              />
               {/* Outer Golden Border Trim Accent */}
               <mesh
                 geometry={snakeLeafGeometry}
+                material={snakeGoldTrimMat}
                 position={[0, 0, -0.002]}
                 scale={[1.04, 1.0, 1.0]}
-              >
-                <meshStandardMaterial
-                  color="#eab308"
-                  roughness={0.65}
-                  side={THREE.DoubleSide}
-                />
-              </mesh>
+              />
             </group>
           ))}
         </group>
       </group>
+
 
       {/* ========================================================================= */}
       {/* 3. CEILING TRACK LIGHTING RAILS WITH ARCHITECTURAL SPOTLIGHTS             */}

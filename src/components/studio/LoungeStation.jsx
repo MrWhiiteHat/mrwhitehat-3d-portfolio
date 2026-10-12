@@ -8,6 +8,7 @@ import {
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
 import { createTabletScreen, createAboutDossierScreen } from '../../utils/cyberScreens.js';
+import mrWhiteHatImg from '../../assets/mrwhitehat-hologram.jpg';
 
 export default function LoungeStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -15,6 +16,7 @@ export default function LoungeStation({ onSelect, onHover }) {
   const lampLightRef = useRef();
   const tabletGlowRef = useRef();
   const plaqueGlowRef = useRef();
+  const cipherRingRef = useRef();
 
   // High-End Procedural PBR Textures
   const leatherCushions = useMemo(() => getPebbledLeatherTextures(2, 2, '#1a241e'), []);
@@ -25,8 +27,7 @@ export default function LoungeStation({ onSelect, onHover }) {
   // Functional Biometric Security Tablet Screen & Executive Dossier Plaque Screen
   const tabletScreen = useMemo(() => createTabletScreen(), []);
   const tabletTimer = useRef(0);
-  const dossierScreen = useMemo(() => createAboutDossierScreen(), []);
-  const dossierTimer = useRef(0);
+  const dossierScreen = useMemo(() => createAboutDossierScreen(mrWhiteHatImg), []);
 
   const toggleLamp = (e) => {
     e?.stopPropagation?.();
@@ -53,11 +54,10 @@ export default function LoungeStation({ onSelect, onHover }) {
       tabletTimer.current = 0;
     }
 
-    // 0b. Update Executive Dossier Screen (About Me)
-    dossierTimer.current += delta;
-    if (dossierTimer.current > 0.1) {
-      dossierScreen.update(dossierTimer.current);
-      dossierTimer.current = 0;
+    // 1. Silky smooth 60fps 3D Cipher Rings (rotates on GPU with ZERO canvas overhead)
+    if (cipherRingRef.current) {
+      cipherRingRef.current.children[0].rotation.z += delta * 1.6;
+      cipherRingRef.current.children[1].rotation.z -= delta * 2.4;
     }
 
     // Tablet pulse
@@ -274,6 +274,22 @@ export default function LoungeStation({ onSelect, onHover }) {
           <planeGeometry args={[1.48, 0.98]} />
           <meshBasicMaterial map={dossierScreen.texture} toneMapped={false} />
         </mesh>
+
+        {/* 3D Cryptographic Hologram Cipher Rings (Zero canvas cost, pure GPU 60fps rotation) */}
+        <group ref={cipherRingRef} position={[0.61, 0.38, 0.033]}>
+          <mesh>
+            <ringGeometry args={[0.038, 0.044, 24, 1, 0, Math.PI * 1.45]} />
+            <meshBasicMaterial color="#38bdf8" side={THREE.DoubleSide} />
+          </mesh>
+          <mesh>
+            <ringGeometry args={[0.026, 0.031, 20, 1, 0, Math.PI * 1.65]} />
+            <meshBasicMaterial color="#fbbf24" side={THREE.DoubleSide} />
+          </mesh>
+          <mesh position={[0, 0, 0.001]}>
+            <circleGeometry args={[0.006, 12]} />
+            <meshBasicMaterial color="#22c55e" />
+          </mesh>
+        </group>
 
         {/* Top Overhead Linear Architectural Sconce Fixture */}
         <group position={[0, 0.62, 0.06]}>

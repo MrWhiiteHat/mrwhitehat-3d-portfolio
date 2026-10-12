@@ -60,9 +60,9 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Live Cyber Screens (Throttled to 8 FPS, Alternated 1-per-frame to prevent GPU spikes)
+    // 0. Update Live Cyber Screens (Paced to gentle 4.5 FPS, Alternated 1-per-interval for buttery 60fps)
     screenTimer.current += delta;
-    if (screenTimer.current > 0.125) {
+    if (screenTimer.current > 0.22) {
       if (screenToggle.current) {
         wiresharkScreen.update(screenTimer.current);
       } else {

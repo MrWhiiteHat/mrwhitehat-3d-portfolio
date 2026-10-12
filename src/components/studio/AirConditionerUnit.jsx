@@ -13,6 +13,7 @@ export default function AirConditionerUnit({ onSelect, onHover }) {
   const mistRef = useRef();
   const flapAngle = useRef(0.55);
   const rotorSpeed = useRef(0);
+  const mistSkip = useRef(0);
 
   // 16 Drifting Cold Air / Frost Vapor Motes
   const mistData = useMemo(() => {
@@ -84,15 +85,16 @@ export default function AirConditionerUnit({ onSelect, onHover }) {
     }
 
     // 3. Cold Vapor Mist Particles Animation (drifting downward and outward)
-    if (mistRef.current) {
-      const posAttr = mistRef.current.geometry.attributes.position;
-      const arr = posAttr.array;
-      const count = mistData.count;
+    if (mistRef.current && isOn) {
+      mistSkip.current = (mistSkip.current + 1) % 2;
+      if (mistSkip.current === 0) {
+        const posAttr = mistRef.current.geometry.attributes.position;
+        const arr = posAttr.array;
+        const count = mistData.count;
 
-      if (isOn) {
         for (let i = 0; i < count; i++) {
-          arr[i * 3 + 1] -= delta * mistData.speeds[i]; // fall down
-          arr[i * 3 + 2] += delta * (mistData.speeds[i] * 0.6); // drift out
+          arr[i * 3 + 1] -= delta * 2 * mistData.speeds[i]; // fall down
+          arr[i * 3 + 2] += delta * 2 * (mistData.speeds[i] * 0.6); // drift out
           if (arr[i * 3 + 1] < -1.4) {
             arr[i * 3 + 0] = (Math.random() - 0.5) * 1.1;
             arr[i * 3 + 1] = -0.15;
