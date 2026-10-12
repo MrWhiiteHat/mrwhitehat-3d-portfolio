@@ -3,79 +3,137 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playFootstepSound, playProximityChime } from '../../utils/audio.js';
 
-// Station interaction coordinates, reach limits & aim hit-radii
+// Station interaction coordinates, reach limits & exact 3D Box3 physical hit-volumes
 const STATIONS = [
-  {
-    id: 'projects',
-    title: 'Dual-Monitor Workstation',
-    action: 'HACK NETWORK CIRCUIT // PROJECTS',
-    position: [-1.2, 0.9, 0.4],
-    maxDist: 3.5,
-    targetRadius: 1.0,
-  },
-  {
-    id: 'skills',
-    title: 'Cyber Security Bookcase',
-    action: 'INSPECT ARCHIVE // SKILLS',
-    position: [0.6, 1.8, -4.4],
-    maxDist: 3.8,
-    targetRadius: 1.2,
-  },
-  {
-    id: 'achievements',
-    title: 'Auditorium Projector',
-    action: 'BYPASS RADAR FIREWALL // ACHIEVEMENTS',
-    position: [-4.6, 2.1, -2.0],
-    maxDist: 4.0,
-    targetRadius: 1.3,
-  },
-  {
-    id: 'about',
-    title: 'Executive Wall Plaque',
-    action: 'ALIGN CIPHER TUMBLERS // ABOUT',
-    position: [4.6, 2.1, 1.6],
-    maxDist: 3.8,
-    targetRadius: 1.1,
-  },
-  {
-    id: 'resume',
-    title: 'Laser Printer Output Tray',
-    action: 'SPLICE SYSTEM WIRES // RESUME',
-    position: [-3.5, 1.0, 1.1],
-    maxDist: 3.0,
-    targetRadius: 0.8,
-  },
+  // 1. Desk Intercom Console (Prioritized small sub-target on desk)
   {
     id: 'contact',
     title: 'Desk Intercom Console',
     action: 'TUNE FREQUENCY // CONTACT',
     position: [-0.15, 0.85, 0.6],
     maxDist: 2.8,
-    targetRadius: 0.75,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-0.4, 0.72, 0.4),
+        new THREE.Vector3(0.1, 1.2, 0.8)
+      ),
+    ],
   },
+  // 2. Dual-Monitor Workstation (Monitors, keyboard, PC tower, desk surface)
+  {
+    id: 'projects',
+    title: 'Dual-Monitor Workstation',
+    action: 'HACK NETWORK CIRCUIT // PROJECTS',
+    position: [-1.2, 0.9, 0.4],
+    maxDist: 3.5,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-2.65, 0.35, -0.35),
+        new THREE.Vector3(0.25, 1.65, 1.25)
+      ),
+    ],
+  },
+  // 3. Cyber Security Bookcase (ArchiveStation shelves and books)
+  {
+    id: 'skills',
+    title: 'Cyber Security Bookcase',
+    action: 'INSPECT ARCHIVE // SKILLS',
+    position: [0.6, 1.8, -4.4],
+    maxDist: 4.2,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-0.65, 0.1, -4.95),
+        new THREE.Vector3(1.85, 3.6, -4.4)
+      ),
+    ],
+  },
+  // 4. Auditorium Projector & Trophies Credenza
+  {
+    id: 'achievements',
+    title: 'Auditorium Projector',
+    action: 'BYPASS RADAR FIREWALL // ACHIEVEMENTS',
+    position: [-4.6, 2.1, -2.0],
+    maxDist: 4.2,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-4.95, 0.2, -3.5),
+        new THREE.Vector3(-4.2, 3.25, -0.5)
+      ),
+    ],
+  },
+  // 5. Executive Wall Plaque & Lounge Tablet
+  {
+    id: 'about',
+    title: 'Executive Wall Plaque',
+    action: 'ALIGN CIPHER TUMBLERS // ABOUT',
+    position: [4.6, 2.1, 1.6],
+    maxDist: 4.0,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(4.2, 1.3, 0.9),
+        new THREE.Vector3(4.95, 2.8, 2.3)
+      ),
+      new THREE.Box3(
+        new THREE.Vector3(1.4, 0.25, 0.4),
+        new THREE.Vector3(3.8, 1.2, 2.4)
+      ),
+    ],
+  },
+  // 6. Laser Printer Output Tray & Credenza
+  {
+    id: 'resume',
+    title: 'Laser Printer Output Tray',
+    action: 'SPLICE SYSTEM WIRES // RESUME',
+    position: [-3.5, 1.0, 1.1],
+    maxDist: 3.2,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-4.3, 0.35, 0.4),
+        new THREE.Vector3(-2.9, 1.55, 1.2)
+      ),
+    ],
+  },
+  // 7. Holographic Cyber Core
   {
     id: 'core',
     title: 'Holographic Cyber Core',
     action: 'CYCLE ATMOSPHERE THEME (T)',
     position: [1.95, 0.9, 0.85],
-    maxDist: 3.0,
-    targetRadius: 0.8,
+    maxDist: 3.2,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(1.7, 0.65, 0.6),
+        new THREE.Vector3(2.2, 1.45, 1.1)
+      ),
+    ],
   },
+  // 8. 42U Mainframe Server Rack
   {
     id: 'server_rack',
     title: '42U Mainframe Server Rack',
     action: 'INSPECT NETWORK MAINFRAME // TELEMETRY',
     position: [-2.3, 1.4, -4.2],
-    maxDist: 3.2,
-    targetRadius: 1.0,
+    maxDist: 3.5,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-2.85, 0.05, -4.95),
+        new THREE.Vector3(-1.75, 2.85, -4.0)
+      ),
+    ],
   },
+  // 9. Cyber Sentinel Drone & Operator Hologram
   {
     id: 'hologram_drone',
     title: 'Cyber Sentinel Drone',
     action: 'INSPECT OPERATOR HOLOGRAM // MR. WHITE HAT',
     position: [-3.35, 1.6, -3.85],
-    maxDist: 3.5,
-    targetRadius: 1.2,
+    maxDist: 3.8,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-3.85, 0.85, -4.35),
+        new THREE.Vector3(-2.85, 2.65, -3.35)
+      ),
+    ],
   },
 ];
 
@@ -215,8 +273,10 @@ function clampToRoomBounds(pos, vel, radius) {
   }
 }
 
-// Hoisted temporary vector for 60fps zero-allocation crosshair raycasting
+// Hoisted temporary objects for 60fps zero-allocation crosshair raycasting
 const _tempCamDir = new THREE.Vector3();
+const _tempRay = new THREE.Ray();
+const _tempHitPoint = new THREE.Vector3();
 
 export default function FirstPersonController({
   isActive,
@@ -660,41 +720,27 @@ export default function FirstPersonController({
     camera.rotation.z = rollZ.current;
 
     // =========================================================================
-    // 5. PRECISE CROSSHAIR RAY TARGETING
-    // Shows details ONLY when the crosshair is directly aiming at an interactive object.
-    // If the crosshair is pointing at the ceiling, floor, or empty air, NOTHING is shown.
+    // 5. TRUE 3D CROSSHAIR RAYCAST TARGETING (EXACT OBJECT PIERCING)
+    // Shows details ONLY when the crosshair ray directly intersects the 3D volume of an object.
+    // If the crosshair is pointing at the window, floor, ceiling, or empty air, NOTHING is shown.
     // =========================================================================
     camera.getWorldDirection(_tempCamDir);
+    _tempRay.origin.copy(camera.position);
+    _tempRay.direction.copy(_tempCamDir);
 
     let bestTarget = null;
-    let minPerpDist = Infinity;
+    let minHitDist = Infinity;
 
     for (const st of STATIONS) {
-      // Vector from camera viewpoint to station interactive center
-      const vx = st.position[0] - camera.position.x;
-      const vy = st.position[1] - camera.position.y;
-      const vz = st.position[2] - camera.position.z;
-      const distSq = vx * vx + vy * vy + vz * vz;
-      const dist = Math.sqrt(distSq);
-
-      if (dist > st.maxDist) continue;
-
-      // Project onto crosshair ray direction: t is the distance along the crosshair ray
-      const t = vx * _tempCamDir.x + vy * _tempCamDir.y + vz * _tempCamDir.z;
-
-      // Object must be in front of the camera
-      if (t <= 0.25) continue;
-
-      // Perpendicular distance from crosshair ray to station center
-      const perpDistSq = distSq - t * t;
-      if (perpDistSq < 0) continue;
-      const perpDist = Math.sqrt(perpDistSq);
-
-      // Only target if the crosshair ray actually passes through the object's physical volume
-      if (perpDist <= st.targetRadius) {
-        if (perpDist < minPerpDist) {
-          minPerpDist = perpDist;
-          bestTarget = { ...st, dist, perpDist, isAimed: true };
+      if (!st.boxes) continue;
+      for (const box of st.boxes) {
+        const hit = _tempRay.intersectBox(box, _tempHitPoint);
+        if (hit !== null) {
+          const hitDist = camera.position.distanceTo(_tempHitPoint);
+          if (hitDist <= st.maxDist && hitDist < minHitDist) {
+            minHitDist = hitDist;
+            bestTarget = { ...st, dist: hitDist, isAimed: true };
+          }
         }
       }
     }
