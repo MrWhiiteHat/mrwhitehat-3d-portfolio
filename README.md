@@ -76,3 +76,17 @@ No backend is required for the current static portfolio. A backend is only neede
 ## Asset attribution
 
 The provided GLB contains metadata indicating CC BY 4.0 and Companion_Cube as author. Preserve appropriate attribution and include a source link for the original asset before publishing. Confirm the original asset page and attribution details from the download source.
+
+## License
+
+Copyright © 2026 **Sadashiba Sarangi (MrWhiteHat)**. All Rights Reserved.
+
+This repository and all original code, custom 3D shaders, dynamic procedural textures, audio synthesis engines, UI designs, and branding are strictly **Proprietary & All Rights Reserved**.
+
+- 🚫 **No Portfolio Cloning**: You are strictly prohibited from copying, rebranding, or deploying this codebase (or substantial parts thereof) as your own personal or commercial portfolio website.
+- 🚫 **Commercial Use Prohibited**: You may not sell, sublicense, monetize, or use this project for any commercial endeavor.
+- 🚫 **No Unauthorized Redistribution**: Mirroring, redistributing, or re-licensing this codebase is forbidden.
+- 👁️ **Evaluation & Educational Study Only**: Permission is granted solely to inspect the source code on GitHub for peer review, educational study, and recruitment evaluation.
+
+For the full legal terms and conditions, see the [LICENSE](LICENSE) file.
+
