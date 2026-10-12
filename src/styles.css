@@ -5097,16 +5097,17 @@ button, a {
 /* Proximity Interaction Prompt */
 .hud-proximity-prompt {
   position: absolute;
-  top: 62%;
+  bottom: 64px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   pointer-events: auto;
-  animation: bounceSlow 1.5s infinite ease-in-out;
+  animation: bounceSlow 1.8s infinite ease-in-out;
+  z-index: 30;
 }
 
 @keyframes bounceSlow {
-  0%, 100% { transform: translate(-50%, -50%); }
-  50% { transform: translate(-50%, -54%); }
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -4px); }
 }
 
 .proximity-action-btn {
@@ -5840,8 +5841,11 @@ html, body, .portfolio-container {
 
   /* Proximity Prompt on Mobile */
   .hud-proximity-prompt {
-    top: 55%;
-    width: 90%;
+    top: auto;
+    bottom: 88px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
     max-width: 320px;
   }
 

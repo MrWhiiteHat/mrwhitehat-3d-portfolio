@@ -201,10 +201,10 @@ export const stationConfigs = {
   },
   visitor_log: {
     // Visitor Count & Access Roster Terminal on Right Wall next to entrance
-    position: [4.94, 2.25, -0.75],
+    position: [4.94, 2.25, -0.4],
     rotation: [0, -Math.PI / 2, 0],
-    camPos: [2.5, 2.25, -0.75],
-    camTarget: [4.94, 2.25, -0.75],
+    camPos: [2.5, 2.25, -0.4],
+    camTarget: [4.94, 2.25, -0.4],
     title: 'CTOS Security Visitor Access Terminal',
     icon: Users,
     distanceFactor: 0.75,
