@@ -219,7 +219,7 @@ export default function InObjectDisplay({
   onClose,
   onNavigate,
   visitorLogs = [],
-  visitorCount = 1488,
+  visitorCount = 1,
   playerData = null,
 }) {
   const [selectedProject, setSelectedProject] = useState(0);

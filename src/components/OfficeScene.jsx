@@ -213,7 +213,7 @@ function SceneContents({
   mobileInput,
   mobileInputRef,
   visitorLogs = [],
-  visitorCount = 1488,
+  visitorCount = 1,
   playerData = null,
 }) {
   useEffect(() => {
@@ -350,7 +350,7 @@ export default function OfficeScene({
   mobileInput,
   mobileInputRef,
   visitorLogs = [],
-  visitorCount = 1488,
+  visitorCount = 1,
   playerData = null,
 }) {
   const controlsRef = useRef(null);

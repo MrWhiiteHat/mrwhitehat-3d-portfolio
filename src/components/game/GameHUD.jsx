@@ -28,7 +28,7 @@ export default function GameHUD({
   onInteract,
   unlockedCount = 0,
   totalStations = 6,
-  visitorCount = 1488,
+  visitorCount = 1,
   onCycleTheme,
   currentThemeName,
   muted,

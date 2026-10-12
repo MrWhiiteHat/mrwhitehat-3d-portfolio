@@ -5,7 +5,7 @@ import { playClickSound, playHackingBeep } from '../../utils/audio.js';
 import { LIGHTING_THEMES } from './CyberAtmosphere.jsx';
 
 export default function VisitorWallCounter({
-  visitorCount = 1488,
+  visitorCount = 1,
   latestVisitor = null,
   currentThemeKey = 'CYBER_NEON_NOIR',
   onSelect,
@@ -187,29 +187,36 @@ export default function VisitorWallCounter({
       ctx.stroke();
 
       // Visitor Name & Archetype Details
-      const rawName = (visitor?.name || 'Visitor').trim();
+      const rawName = (visitor?.name || 'MrWhiteHat').trim();
       // Auto-fit font size based on string length to guarantee NO CLIPPING
       let nameFontSize = 74;
-      if (rawName.length > 20) nameFontSize = 48;
-      else if (rawName.length > 14) nameFontSize = 58;
+      if (rawName.length > 20) nameFontSize = 46;
+      else if (rawName.length > 14) nameFontSize = 56;
       else if (rawName.length > 8) nameFontSize = 66;
 
       ctx.fillStyle = '#ffffff';
       ctx.font = `900 ${nameFontSize}px monospace`;
       ctx.textAlign = 'center';
-      ctx.shadowColor = '#38bdf8';
+      ctx.shadowColor = visitor?.accentColor || '#38bdf8';
       ctx.shadowBlur = 24;
-      ctx.fillText(rawName.toUpperCase(), 1024, visitorBoxY + 195);
+      ctx.fillText(rawName.toUpperCase(), 1024, visitorBoxY + 180);
       ctx.shadowBlur = 0;
 
       // Meta info badge under name
-      const archetype = visitor?.archetypeName || 'Operative';
-      const timeStr = visitor?.timestamp
-        ? new Date(visitor.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : 'LOGGED';
+      const archetype = visitor?.archetypeName || visitor?.archetype || 'Operative';
+      const locStr = visitor?.city && visitor?.country
+        ? `${visitor.city}, ${visitor.country} ${visitor.flag || ''}`
+        : 'VERIFIED OPERATIVE';
+      const nodeStr = visitor?.sessionNode || 'NODE-ROOT';
+      const timeStr = visitor?.timestamp || 'ACTIVE';
+
+      ctx.fillStyle = '#34d399';
+      ctx.font = 'bold 24px monospace';
+      ctx.fillText(`ROLE: ${archetype.toUpperCase()}  |  ORIGIN: ${locStr.toUpperCase()}`, 1024, visitorBoxY + 245);
+
       ctx.fillStyle = '#94a3b8';
-      ctx.font = 'bold 26px monospace';
-      ctx.fillText(`ROLE: ${archetype.toUpperCase()}  |  CHECK-IN: ${timeStr}  |  CLEARANCE: LEVEL 4`, 1024, visitorBoxY + 275);
+      ctx.font = 'bold 22px monospace';
+      ctx.fillText(`TERMINAL: ${nodeStr}  |  CHECK-IN: ${timeStr}  |  STATUS: AUTHENTICATED ✓`, 1024, visitorBoxY + 290);
 
       // =========================================================================
       // 5. BOTTOM INTERACTIVE ACTION STRIP (Sleek Cyber Callout)

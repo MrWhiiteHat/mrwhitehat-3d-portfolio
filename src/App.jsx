@@ -48,6 +48,7 @@ import {
   getVisitorCount,
   getVisitorLogs,
   registerNewVisitor,
+  syncRemoteVisitorData,
 } from './utils/visitorLogService.js';
 
 const NAV_STATIONS = [
@@ -89,6 +90,18 @@ export default function App() {
   // Persistent Visitor Logs & Wall Counter Telemetry
   const [visitorLogs, setVisitorLogs] = useState(() => getVisitorLogs());
   const [visitorCount, setVisitorCount] = useState(() => getVisitorCount());
+
+  // Synchronize genuine cloud visitor count and real check-ins on mount
+  useEffect(() => {
+    syncRemoteVisitorData()
+      .then((data) => {
+        if (data) {
+          if (typeof data.count === 'number') setVisitorCount(data.count);
+          if (Array.isArray(data.logs) && data.logs.length > 0) setVisitorLogs(data.logs);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Station inspect & theme state
   const [section, setSection] = useState(null);
@@ -133,12 +146,15 @@ export default function App() {
       setThemeKey(customPlayerData.themeKey);
     }
 
-    // Register visitor entry and update live wall counter
-    const result = registerNewVisitor(customPlayerData);
-    if (result) {
-      setVisitorLogs(result.logs);
-      setVisitorCount(result.count);
-    }
+    // Register real visitor entry with genuine hardware and geo telemetry
+    registerNewVisitor(customPlayerData)
+      .then((result) => {
+        if (result) {
+          setVisitorLogs(result.logs);
+          setVisitorCount(result.count);
+        }
+      })
+      .catch(() => {});
 
     playAirlockDoorSound();
     setIsGateOpen(true);
