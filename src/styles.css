@@ -4705,42 +4705,174 @@ button, a {
   color: rgba(85, 246, 154, 0.35);
 }
 
-/* Tactical WASD Locomotion Pad */
-.hud-wasd-widget {
+/* Unified Tactical Locomotion Controller */
+.hud-locomotion-widget {
   position: absolute;
   bottom: 24px;
   left: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  background: rgba(9, 15, 12, 0.85);
-  border: 1px solid rgba(85, 246, 154, 0.22);
-  backdrop-filter: blur(14px);
-  padding: 10px 14px 12px;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  gap: 8px;
+  background: rgba(9, 15, 12, 0.88);
+  border: 1px solid rgba(85, 246, 154, 0.28);
+  backdrop-filter: blur(16px);
+  padding: 10px 14px 14px;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(85, 246, 154, 0.08);
   pointer-events: auto;
   user-select: none;
-  z-index: 25;
+  z-index: 30;
+  touch-action: none;
 }
 
-.wasd-widget-header {
+.locomotion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+
+.locomotion-title {
   display: flex;
   align-items: center;
   gap: 6px;
   font-family: var(--mono);
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.08em;
-  color: #819488;
-  margin-bottom: 2px;
+  color: #94a3b8;
 }
 
-.wasd-header-icon {
+.locomotion-icon {
   color: var(--green);
 }
 
+.locomotion-mode-tabs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.locomotion-tab-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.locomotion-tab-btn.is-active {
+  background: rgba(85, 246, 154, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(85, 246, 154, 0.45);
+}
+
+/* Virtual Analog Joystick */
+.hud-joystick-pad {
+  position: relative;
+  width: 126px;
+  height: 126px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(14, 25, 20, 0.9) 0%, rgba(5, 10, 8, 0.96) 70%, rgba(3, 7, 5, 0.98) 100%);
+  border: 1.5px solid rgba(85, 246, 154, 0.35);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.85), 0 0 16px rgba(85, 246, 154, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.hud-joystick-pad:active {
+  cursor: grabbing;
+}
+
+.joy-cardinal {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 7px;
+  font-weight: 700;
+  color: rgba(85, 246, 154, 0.55);
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: 0.05em;
+}
+
+.joy-n { top: 6px; }
+.joy-s { bottom: 6px; }
+.joy-w { left: 6px; }
+.joy-e { right: 6px; }
+
+.joy-ring-inner {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px dashed rgba(85, 246, 154, 0.2);
+  pointer-events: none;
+}
+
+.joy-cross-h {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: rgba(85, 246, 154, 0.08);
+  pointer-events: none;
+}
+
+.joy-cross-v {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  background: rgba(85, 246, 154, 0.08);
+  pointer-events: none;
+}
+
+/* Movable Thumb Puck Knob */
+.joy-thumb-knob {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #24352b 0%, #111a15 65%, #080d0a 100%);
+  border: 2px solid rgba(85, 246, 154, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: transform 0.04s ease-out;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.joy-thumb-grip {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.joy-thumb-core {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Tactical WASD Keypad Styles */
 .wasd-keypad {
   display: flex;
   flex-direction: column;
@@ -4801,53 +4933,14 @@ button, a {
   line-height: 1;
 }
 
-@media (max-width: 768px) {
-  .hud-wasd-widget {
-    bottom: 120px;
-    left: 16px;
-    transform: scale(0.9);
-    transform-origin: bottom left;
-  }
-}
-
-/* Mobile Virtual Joystick & Touch Controls */
-.hud-mobile-joystick-zone {
-  position: absolute;
-  bottom: 30px;
-  left: 30px;
-  width: 90px;
-  height: 90px;
-  pointer-events: auto;
-  touch-action: none;
-}
-
-.joystick-base {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid rgba(85, 246, 154, 0.3);
-  backdrop-filter: blur(12px);
-  display: grid;
-  place-items: center;
-}
-
-.joystick-thumb {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  box-shadow: 0 0 16px rgba(85, 246, 154, 0.5);
-  transition: transform 0.05s ease-out;
-}
-
 .hud-mobile-interact-btn {
   position: absolute;
-  bottom: 40px;
-  right: 30px;
-  width: 72px;
-  height: 72px;
+  bottom: 24px;
+  right: 24px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
-  border: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4859,8 +4952,9 @@ button, a {
   color: #050d08;
   cursor: pointer;
   pointer-events: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(85, 246, 154, 0.4);
   transition: transform 0.1s ease;
+  z-index: 35;
 }
 
 .hud-mobile-interact-btn:active {
@@ -5155,16 +5249,18 @@ html, body, .portfolio-container {
     display: none !important;
   }
 
-  /* Tactical WASD Keypad on Mobile Phones */
+  /* Tactical Locomotion Controller on Mobile Phones */
+  .hud-locomotion-widget,
   .hud-wasd-widget {
     bottom: 16px;
     left: 12px;
     padding: 7px 9px 9px;
     border-radius: 12px;
-    transform: scale(0.88);
+    transform: scale(0.9);
     transform-origin: bottom left;
   }
 
+  .locomotion-title,
   .wasd-widget-header {
     font-size: 8px;
   }

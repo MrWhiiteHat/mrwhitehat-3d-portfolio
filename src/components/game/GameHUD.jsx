@@ -379,90 +379,169 @@ export default function GameHUD({
         </div>
       )}
 
-      {/* 4. Tactical WASD Locomotion Pad (Visual Feedback & Touch/Click Controls) */}
-      <div className="hud-wasd-widget" pointerEvents="auto">
-        <div className="wasd-widget-header">
-          <Footprints size={12} className="wasd-header-icon" />
-          <span>WASD LOCOMOTION</span>
-        </div>
-        <div className="wasd-keypad">
-          <div className="wasd-keypad-row">
-            <button
-              type="button"
-              className={`wasd-hud-btn wasd-btn-w ${pressedKeys.w ? 'is-active' : ''}`}
-              onMouseDown={() => handleVirtualKey('w', true)}
-              onMouseUp={() => handleVirtualKey('w', false)}
-              onMouseLeave={() => handleVirtualKey('w', false)}
-              onTouchStart={(e) => { e.preventDefault(); handleVirtualKey('w', true); }}
-              onTouchEnd={(e) => { e.preventDefault(); handleVirtualKey('w', false); }}
-              title="W = Forward"
-              style={{
-                borderColor: pressedKeys.w ? (playerData.accentColor || '#34d399') : undefined,
-                boxShadow: pressedKeys.w ? `0 0 14px ${playerData.accentColor || '#34d399'}` : undefined,
-                color: pressedKeys.w ? (playerData.accentColor || '#34d399') : undefined,
-              }}
-            >
-              <span className="wasd-hud-letter">W</span>
-              <span className="wasd-hud-tag">FWD</span>
-            </button>
+      {/* 4. Tactical Locomotion Controller (Virtual Analog Joystick for Mobile + Tactical WASD Keypad) */}
+      <div className="hud-locomotion-widget" pointerEvents="auto">
+        <div className="locomotion-header">
+          <div className="locomotion-title">
+            <Compass size={12} className="locomotion-icon" style={{ color: playerData.accentColor || '#34d399' }} />
+            <span>LOCOMOTION</span>
           </div>
-          <div className="wasd-keypad-row">
+          {/* Mode Switcher Tabs */}
+          <div className="locomotion-mode-tabs">
             <button
               type="button"
-              className={`wasd-hud-btn wasd-btn-a ${pressedKeys.a ? 'is-active' : ''}`}
-              onMouseDown={() => handleVirtualKey('a', true)}
-              onMouseUp={() => handleVirtualKey('a', false)}
-              onMouseLeave={() => handleVirtualKey('a', false)}
-              onTouchStart={(e) => { e.preventDefault(); handleVirtualKey('a', true); }}
-              onTouchEnd={(e) => { e.preventDefault(); handleVirtualKey('a', false); }}
-              title="A = Left"
-              style={{
-                borderColor: pressedKeys.a ? (playerData.accentColor || '#34d399') : undefined,
-                boxShadow: pressedKeys.a ? `0 0 14px ${playerData.accentColor || '#34d399'}` : undefined,
-                color: pressedKeys.a ? (playerData.accentColor || '#34d399') : undefined,
+              className={`locomotion-tab-btn ${controlMode === 'joystick' ? 'is-active' : ''}`}
+              onClick={() => {
+                setControlMode('joystick');
+                setStickPos({ x: 0, y: 0 });
+                onMobileMove?.({ x: 0, y: 0 });
               }}
+              title="Virtual Analog Joystick (Touch/Mobile)"
             >
-              <span className="wasd-hud-letter">A</span>
-              <span className="wasd-hud-tag">LEFT</span>
+              🕹️ STICK
             </button>
             <button
               type="button"
-              className={`wasd-hud-btn wasd-btn-s ${pressedKeys.s ? 'is-active' : ''}`}
-              onMouseDown={() => handleVirtualKey('s', true)}
-              onMouseUp={() => handleVirtualKey('s', false)}
-              onMouseLeave={() => handleVirtualKey('s', false)}
-              onTouchStart={(e) => { e.preventDefault(); handleVirtualKey('s', true); }}
-              onTouchEnd={(e) => { e.preventDefault(); handleVirtualKey('s', false); }}
-              title="S = Backward"
-              style={{
-                borderColor: pressedKeys.s ? (playerData.accentColor || '#34d399') : undefined,
-                boxShadow: pressedKeys.s ? `0 0 14px ${playerData.accentColor || '#34d399'}` : undefined,
-                color: pressedKeys.s ? (playerData.accentColor || '#34d399') : undefined,
+              className={`locomotion-tab-btn ${controlMode === 'wasd' ? 'is-active' : ''}`}
+              onClick={() => {
+                setControlMode('wasd');
+                setStickPos({ x: 0, y: 0 });
+                onMobileMove?.({ x: 0, y: 0 });
               }}
+              title="WASD Directional Keypad"
             >
-              <span className="wasd-hud-letter">S</span>
-              <span className="wasd-hud-tag">BACK</span>
-            </button>
-            <button
-              type="button"
-              className={`wasd-hud-btn wasd-btn-d ${pressedKeys.d ? 'is-active' : ''}`}
-              onMouseDown={() => handleVirtualKey('d', true)}
-              onMouseUp={() => handleVirtualKey('d', false)}
-              onMouseLeave={() => handleVirtualKey('d', false)}
-              onTouchStart={(e) => { e.preventDefault(); handleVirtualKey('d', true); }}
-              onTouchEnd={(e) => { e.preventDefault(); handleVirtualKey('d', false); }}
-              title="D = Right"
-              style={{
-                borderColor: pressedKeys.d ? (playerData.accentColor || '#34d399') : undefined,
-                boxShadow: pressedKeys.d ? `0 0 14px ${playerData.accentColor || '#34d399'}` : undefined,
-                color: pressedKeys.d ? (playerData.accentColor || '#34d399') : undefined,
-              }}
-            >
-              <span className="wasd-hud-letter">D</span>
-              <span className="wasd-hud-tag">RIGHT</span>
+              ⌨️ WASD
             </button>
           </div>
         </div>
+
+        {controlMode === 'joystick' ? (
+          /* High-Precision Cyber Virtual Analog Joystick */
+          <div
+            className="hud-joystick-pad"
+            ref={joystickBaseRef}
+            onTouchStart={handleJoystickTouchStart}
+            onTouchMove={handleJoystickTouchMove}
+            onTouchEnd={handleJoystickTouchEnd}
+            onTouchCancel={handleJoystickTouchEnd}
+            onMouseDown={handleJoystickMouseDown}
+          >
+            {/* Cardinal Reticle Indicators */}
+            <span className="joy-cardinal joy-n">▲ FWD</span>
+            <span className="joy-cardinal joy-w">◄ LEFT</span>
+            <span className="joy-cardinal joy-e">RIGHT ►</span>
+            <span className="joy-cardinal joy-s">▼ BACK</span>
+
+            {/* Concentric Guide Rings */}
+            <div className="joy-ring-inner" />
+            <div className="joy-cross-h" />
+            <div className="joy-cross-v" />
+
+            {/* Glowing Movable Thumb Puck */}
+            <div
+              className="joy-thumb-knob"
+              style={{
+                transform: `translate(${stickPos.x}px, ${stickPos.y}px)`,
+                borderColor: playerData.accentColor || '#34d399',
+                boxShadow:
+                  stickPos.x !== 0 || stickPos.y !== 0
+                    ? `0 0 18px ${playerData.accentColor || '#34d399'}, inset 0 0 10px rgba(0,0,0,0.8)`
+                    : '0 4px 12px rgba(0,0,0,0.6)',
+              }}
+            >
+              {/* Concentric Thumb Grip Ring */}
+              <div className="joy-thumb-grip" />
+              {/* Glowing Center Core */}
+              <div
+                className="joy-thumb-core"
+                style={{
+                  backgroundColor: playerData.accentColor || '#34d399',
+                  boxShadow: `0 0 8px ${playerData.accentColor || '#34d399'}`,
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          /* Tactical WASD Keypad */
+          <div className="wasd-keypad">
+            <div className="wasd-keypad-row">
+              <button
+                type="button"
+                className={`wasd-hud-btn wasd-btn-w ${pressedKeys.w ? 'is-active' : ''}`}
+                onMouseDown={() => handleVirtualKey('w', true)}
+                onMouseUp={() => handleVirtualKey('w', false)}
+                onMouseLeave={() => handleVirtualKey('w', false)}
+                onTouchStart={(e) => { e.preventDefault(); handleVirtualKey('w', true); }}
+                onTouchEnd={(e) => { e.preventDefault(); handleVirtualKey('w', false); }}
+                title="W = Forward"
+                style={{
+                  borderColor: pressedKeys.w ? (playerData.accentColor || '#34d399') : undefined,
+                  boxShadow: pressedKeys.w ? `0 0 14px ${playerData.accentColor || '#34d399'}` : undefined,
+                  color: pressedKeys.w ? (playerData.accentColor || '#34d399') : undefined,
+                }}
+              >
+                <span className="wasd-hud-letter">W</span>
+                <span className="wasd-hud-tag">FWD</span>
+              </button>
+            </div>
+            <div className="wasd-keypad-row">
+              <button
+                type="button"
+                className={`wasd-hud-btn wasd-btn-a ${pressedKeys.a ? 'is-active' : ''}`}
+                onMouseDown={() => handleVirtualKey('a', true)}
+                onMouseUp={() => handleVirtualKey('a', false)}
+                onMouseLeave={() => handleVirtualKey('a', false)}
+                onTouchStart={(e) => { e.preventDefault(); handleVirtualKey('a', true); }}
+                onTouchEnd={(e) => { e.preventDefault(); handleVirtualKey('a', false); }}
+                title="A = Left"
+                style={{
+                  borderColor: pressedKeys.a ? (playerData.accentColor || '#34d399') : undefined,
+                  boxShadow: pressedKeys.a ? `0 0 14px ${playerData.accentColor || '#34d399'}` : undefined,
+                  color: pressedKeys.a ? (playerData.accentColor || '#34d399') : undefined,
+                }}
+              >
+                <span className="wasd-hud-letter">A</span>
+                <span className="wasd-hud-tag">LEFT</span>
+              </button>
+              <button
+                type="button"
+                className={`wasd-hud-btn wasd-btn-s ${pressedKeys.s ? 'is-active' : ''}`}
+                onMouseDown={() => handleVirtualKey('s', true)}
+                onMouseUp={() => handleVirtualKey('s', false)}
+                onMouseLeave={() => handleVirtualKey('s', false)}
+                onTouchStart={(e) => { e.preventDefault(); handleVirtualKey('s', true); }}
+                onTouchEnd={(e) => { e.preventDefault(); handleVirtualKey('s', false); }}
+                title="S = Backward"
+                style={{
+                  borderColor: pressedKeys.s ? (playerData.accentColor || '#34d399') : undefined,
+                  boxShadow: pressedKeys.s ? `0 0 14px ${playerData.accentColor || '#34d399'}` : undefined,
+                  color: pressedKeys.s ? (playerData.accentColor || '#34d399') : undefined,
+                }}
+              >
+                <span className="wasd-hud-letter">S</span>
+                <span className="wasd-hud-tag">BACK</span>
+              </button>
+              <button
+                type="button"
+                className={`wasd-hud-btn wasd-btn-d ${pressedKeys.d ? 'is-active' : ''}`}
+                onMouseDown={() => handleVirtualKey('d', true)}
+                onMouseUp={() => handleVirtualKey('d', false)}
+                onMouseLeave={() => handleVirtualKey('d', false)}
+                onTouchStart={(e) => { e.preventDefault(); handleVirtualKey('d', true); }}
+                onTouchEnd={(e) => { e.preventDefault(); handleVirtualKey('d', false); }}
+                title="D = Right"
+                style={{
+                  borderColor: pressedKeys.d ? (playerData.accentColor || '#34d399') : undefined,
+                  boxShadow: pressedKeys.d ? `0 0 14px ${playerData.accentColor || '#34d399'}` : undefined,
+                  color: pressedKeys.d ? (playerData.accentColor || '#34d399') : undefined,
+                }}
+              >
+                <span className="wasd-hud-letter">D</span>
+                <span className="wasd-hud-tag">RIGHT</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 5. Bottom Controls Guide Bar */}
@@ -494,23 +573,6 @@ export default function GameHUD({
         </div>
       </footer>
 
-      {/* 5. Mobile Touch Joystick & Quick Action Button */}
-      <div
-        className="hud-mobile-joystick-zone"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div className="joystick-base">
-          <div
-            className="joystick-thumb"
-            style={{
-              transform: `translate(${stickPos.x}px, ${stickPos.y}px)`,
-              backgroundColor: playerData.accentColor || '#34d399',
-            }}
-          />
-        </div>
-      </div>
 
       {activeProximity && (
         <button
