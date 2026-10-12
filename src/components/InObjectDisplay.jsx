@@ -1096,7 +1096,7 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                   </div>
                   <div className="leadership-content-block">
                     <h3 className="leadership-title">
-                      Cyber Security Club Lead & Student Coordinator
+                      Cyber Security Club Tech Lead & Student Coordinator
                     </h3>
                     <div className="leadership-org">
                       C.V. Raman Global University (CGU) · 2023 – Present

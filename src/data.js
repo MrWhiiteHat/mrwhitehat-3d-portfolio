@@ -20,7 +20,7 @@ export const profile = {
   resumeFilename: 'Sadashiba_Sarangi_Resume.pdf',
   leadership: [
     {
-      role: 'Cyber Security Club Lead & Student Coordinator',
+      role: 'Cyber Security Club Tech Lead & Student Coordinator',
       organization: 'C.V. Raman Global University (CGU)',
       location: 'Bhubaneswar, Odisha',
       period: '2023 – Present',

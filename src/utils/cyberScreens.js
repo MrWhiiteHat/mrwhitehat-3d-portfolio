@@ -1625,7 +1625,7 @@ export function createAboutDossierScreen(imageUrl) {
     const credentials = [
       ['EDUCATION', 'B.Tech in Computer Science & IT — C.V. Raman Global University (CGU)'],
       ['HONORS', 'Odisha Skills Cyber Security 3rd Rank (2025–26 & 2020–21)'],
-      ['LEADERSHIP', 'Cyber Security Club Lead & Student Coordinator (200+ trained)'],
+      ['LEADERSHIP', 'Cyber Security Club Tech Lead & Student Coordinator (200+ trained)'],
       ['SPECIALIZATION', 'Android Pen Testing, OWASP Top 10, Network Forensics (Wireshark)'],
       ['APPLIED AI', 'LLM Security Automation, AI Red Teaming, RAG Mesh Architecture'],
       ['TACTICAL STACK', 'Python, TypeScript, JavaScript, Linux, Burp Suite, React, Three.js'],
