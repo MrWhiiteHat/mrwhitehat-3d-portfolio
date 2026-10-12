@@ -1388,3 +1388,175 @@ export function createSystemHackedHoloScreen() {
   update(0);
   return { texture, update };
 }
+
+/**
+ * 8. EXECUTIVE CYBER SECURITY OPERATIVE DOSSIER SCREEN (About Me)
+ * Renders high-end security badge, biometric cipher scanner, verified credentials, and operative identity.
+ */
+export function createAboutDossierScreen() {
+  const width = 512;
+  const height = 340;
+  const canvas = createScreenCanvas(width, height);
+  if (!canvas) return { texture: null, update: () => {} };
+
+  const ctx = canvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  let animTimer = 0;
+
+  function update(delta) {
+    animTimer += delta;
+
+    // 1. Deep Carbon Plate Background
+    ctx.fillStyle = '#080d0a';
+    ctx.fillRect(0, 0, width, height);
+
+    // Subtle Hex Grid Matrix pattern
+    ctx.strokeStyle = 'rgba(217, 119, 6, 0.08)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < width; x += 32) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < height; y += 32) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+
+    // 2. Gold/Emerald Outer Inset Border
+    ctx.strokeStyle = '#ca8a04';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(10, 10, width - 20, height - 20);
+
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(16, 16, width - 32, height - 32);
+
+    // Corner Tactical Brackets
+    const bLen = 18;
+    ctx.fillStyle = '#fbbf24';
+    [
+      [10, 10], [width - 10, 10],
+      [10, height - 10], [width - 10, height - 10]
+    ].forEach(([cx, cy]) => {
+      ctx.fillRect(cx - 3, cy - 3, 6, 6);
+    });
+
+    // 3. Top Security Header Bar
+    ctx.fillStyle = 'rgba(202, 138, 4, 0.15)';
+    ctx.fillRect(20, 20, width - 40, 36);
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('🛡️  OFFICE OF CYBER DEFENSE & APPLIED AI // DOSSIER #001', 32, 42);
+
+    // Top Right Clearance Badge
+    ctx.fillStyle = '#22c55e';
+    ctx.font = 'bold 10px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('● CLEARANCE: TOP SECRET', width - 32, 42);
+    ctx.textAlign = 'left';
+
+    // 4. Operative Identity Title & Alias
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 24px monospace';
+    ctx.fillText('SATYABRATA SAHOO', 32, 88);
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 15px monospace';
+    ctx.fillText('// ALIAS: MR. WHITE HAT', 32, 112);
+
+    ctx.fillStyle = '#34d399';
+    ctx.font = 'bold 13px monospace';
+    ctx.fillText('AppSec & Applied AI Engineer • Pen Tester', 32, 134);
+
+    // Divider Line
+    ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
+    ctx.beginPath();
+    ctx.moveTo(32, 148);
+    ctx.lineTo(width - 32, 148);
+    ctx.stroke();
+
+    // 5. Left Column: Stats & Clearance Grid
+    const stats = [
+      ['SPECIALTY', 'Android Pen Testing & RAG'],
+      ['LOCATION', 'Bhubaneswar, India'],
+      ['EXPERTISE', 'Mobile Security, OWASP, LLMs'],
+      ['STATUS', 'AVAILABLE FOR HIRE / PROJECTS'],
+    ];
+
+    stats.forEach(([label, val], idx) => {
+      const sy = 172 + idx * 26;
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 10px monospace';
+      ctx.fillText(label + ':', 32, sy);
+
+      ctx.fillStyle = idx === 3 ? '#22c55e' : '#f8fafc';
+      ctx.font = idx === 3 ? 'bold 11px monospace' : '11px monospace';
+      ctx.fillText(val, 125, sy);
+    });
+
+    // 6. Right Column: Rotating Biometric Cipher Tumbler Ring
+    const ringX = width - 85;
+    const ringY = 210;
+    const ringR = 45;
+
+    ctx.save();
+    ctx.translate(ringX, ringY);
+
+    // Outer rotating arc
+    ctx.rotate(animTimer * 1.4);
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, ringR, 0, Math.PI * 1.3);
+    ctx.stroke();
+
+    // Inner counter-rotating arc
+    ctx.rotate(-animTimer * 2.8);
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, ringR - 10, 0, Math.PI * 1.5);
+    ctx.stroke();
+
+    ctx.restore();
+
+    // Center Biometric Fingerprint / Key Icon
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 18px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('⚡', ringX, ringY + 6);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '9px monospace';
+    ctx.fillText('BIOMETRIC OK', ringX, ringY + 32);
+    ctx.textAlign = 'left';
+
+    // 7. Bottom Tactical Action Bar (Interactive Prompt)
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.16)';
+    ctx.fillRect(20, height - 52, width - 40, 36);
+
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(20, height - 52, width - 40, 36);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('▶ PRESS [E] OR CLICK TO OPEN COMPLETE OPERATIVE DOSSIER ◀', width / 2, height - 30);
+    ctx.textAlign = 'left';
+
+    texture.needsUpdate = true;
+  }
+
+  update(0);
+  return { texture, update };
+}
+

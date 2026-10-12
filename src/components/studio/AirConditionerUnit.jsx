@@ -106,7 +106,7 @@ export default function AirConditionerUnit({ onSelect, onHover }) {
 
   return (
     <group
-      position={[-4.90, 3.4, -0.4]}
+      position={[-4.90, 3.75, -2.0]}
       rotation={[0, Math.PI / 2, 0]}
       name="AirConditionerUnit"
       onClick={cycleTemp}

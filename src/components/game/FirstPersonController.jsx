@@ -61,21 +61,21 @@ const STATIONS = [
       ),
     ],
   },
-  // 5. Executive Wall Plaque & Lounge Tablet
+  // 5. Executive Cyber Security Dossier Plaque (About Me)
   {
     id: 'about',
-    title: 'Executive Wall Plaque',
-    action: 'ALIGN CIPHER TUMBLERS // ABOUT',
-    position: [4.6, 2.1, 1.6],
-    maxDist: 4.0,
+    title: 'Executive Cyber Security Dossier',
+    action: 'ALIGN CIPHER TUMBLERS // DECRYPT ABOUT DOSSIER (E)',
+    position: [4.85, 2.15, 1.6],
+    maxDist: 4.2,
     boxes: [
       new THREE.Box3(
-        new THREE.Vector3(4.2, 1.3, 0.9),
-        new THREE.Vector3(4.95, 2.8, 2.3)
+        new THREE.Vector3(4.65, 1.4, 0.75),
+        new THREE.Vector3(5.02, 2.85, 2.45)
       ),
       new THREE.Box3(
-        new THREE.Vector3(1.4, 0.25, 0.4),
-        new THREE.Vector3(3.8, 1.2, 2.4)
+        new THREE.Vector3(1.7, 0.25, 0.6),
+        new THREE.Vector3(2.2, 0.65, 1.1)
       ),
     ],
   },
@@ -182,12 +182,12 @@ const STATIONS = [
     id: 'air_conditioner',
     title: 'Smart Inverter Air Conditioner',
     action: 'CYCLE CLIMATE TEMPERATURE // TOGGLE AC (E)',
-    position: [-4.6, 3.4, -0.4],
-    maxDist: 4.8,
+    position: [-4.6, 3.75, -2.0],
+    maxDist: 5.2,
     boxes: [
       new THREE.Box3(
-        new THREE.Vector3(-4.95, 3.15, -1.15),
-        new THREE.Vector3(-4.5, 3.65, 0.35)
+        new THREE.Vector3(-4.95, 3.5, -2.75),
+        new THREE.Vector3(-4.5, 4.05, -1.25)
       ),
     ],
   },

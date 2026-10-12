@@ -7,7 +7,7 @@ import {
   getNeroMarbleTextures,
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
-import { createTabletScreen } from '../../utils/cyberScreens.js';
+import { createTabletScreen, createAboutDossierScreen } from '../../utils/cyberScreens.js';
 
 export default function LoungeStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -22,9 +22,11 @@ export default function LoungeStation({ onSelect, onHover }) {
   const marbleTable = useMemo(() => getNeroMarbleTextures(1, 1), []);
   const brassMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#ca8a04'), []);
 
-  // Functional Biometric Security Tablet Screen
+  // Functional Biometric Security Tablet Screen & Executive Dossier Plaque Screen
   const tabletScreen = useMemo(() => createTabletScreen(), []);
   const tabletTimer = useRef(0);
+  const dossierScreen = useMemo(() => createAboutDossierScreen(), []);
+  const dossierTimer = useRef(0);
 
   const toggleLamp = (e) => {
     e?.stopPropagation?.();
@@ -49,6 +51,13 @@ export default function LoungeStation({ onSelect, onHover }) {
     if (tabletTimer.current > 0.1) {
       tabletScreen.update(tabletTimer.current);
       tabletTimer.current = 0;
+    }
+
+    // 0b. Update Executive Dossier Screen (About Me)
+    dossierTimer.current += delta;
+    if (dossierTimer.current > 0.1) {
+      dossierScreen.update(dossierTimer.current);
+      dossierTimer.current = 0;
     }
 
     // Tablet pulse
@@ -199,20 +208,21 @@ export default function LoungeStation({ onSelect, onHover }) {
         )}
       </group>
 
-      {/* 4. Executive Wall Plaque (CLICKABLE HOTSPOT FOR ABOUT ME) */}
+      {/* 4. Executive Cyber Security Dossier Plaque (ABOUT ME HOTSPOT) */}
+      {/* Positioned at X = 2.05 in LoungeStation coords (world X = 4.85), clearly in front of walnut slats (X = 4.94) */}
       <group
-        position={[2.2, 2.2, 0]}
+        position={[2.05, 2.15, 0]}
         rotation={[0, -Math.PI / 2, 0]}
         onClick={(e) => {
           e.stopPropagation();
           playWhooshSound();
-          onSelect?.({ section: 'about', label: 'Office Lounge · About Me' });
+          onSelect?.({ section: 'about', label: 'Executive Lounge · About Me' });
         }}
         onPointerOver={(e) => {
           e.stopPropagation();
           setHovered(true);
           document.body.style.cursor = 'pointer';
-          onHover?.('Office Lounge · About Me');
+          onHover?.('Executive Lounge · About Me Dossier');
         }}
         onPointerOut={() => {
           setHovered(false);
@@ -220,32 +230,91 @@ export default function LoungeStation({ onSelect, onHover }) {
           onHover?.(null);
         }}
       >
-        {/* Titanium & Brass Backing Plate */}
-        <mesh castShadow>
-          <boxGeometry args={[1.6, 1.1, 0.04]} />
-          <meshStandardMaterial color="#0f1511" roughness={0.3} metalness={0.8} />
-        </mesh>
-        {/* Gold Inset Frame */}
-        <mesh position={[0, 0, 0.022]}>
-          <boxGeometry args={[1.52, 1.02, 0.01]} />
+        {/* 4 Brushed Gold Architectural Standoff Wall Mounts (Anchored into walnut slats behind) */}
+        {[
+          [-0.72, 0.52],
+          [0.72, 0.52],
+          [-0.72, -0.52],
+          [0.72, -0.52],
+        ].map(([sx, sy], idx) => (
+          <mesh key={`standoff-${idx}`} position={[sx, sy, -0.06]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.022, 0.022, 0.12, 16]} />
+            <meshStandardMaterial color="#ca8a04" metalness={0.92} roughness={0.2} />
+          </mesh>
+        ))}
+
+        {/* Heavy Aerospace Titanium Chassis Frame */}
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[1.62, 1.12, 0.04]} />
           <meshStandardMaterial
-            color={hovered ? '#fbbf24' : '#ca8a04'}
-            metalness={0.9}
+            color={hovered ? '#141e17' : '#0b120d'}
+            roughness={0.25}
+            metalness={0.85}
+          />
+        </mesh>
+
+        {/* Beveled Gold Outer Accent Trim Rim */}
+        <mesh position={[0, 0, 0.021]}>
+          <boxGeometry args={[1.56, 1.06, 0.01]} />
+          <meshStandardMaterial
+            color={hovered ? '#f59e0b' : '#b45309'}
+            metalness={0.94}
             roughness={0.15}
           />
         </mesh>
-        {/* Inner Emerald Plaque Plate */}
-        <mesh position={[0, 0, 0.03]}>
-          <planeGeometry args={[1.44, 0.94]} />
-          <meshBasicMaterial color={hovered ? '#0e2418' : '#09140e'} />
+
+        {/* Dark Emerald Inset Bezel */}
+        <mesh position={[0, 0, 0.026]}>
+          <boxGeometry args={[1.52, 1.02, 0.005]} />
+          <meshBasicMaterial color="#020d06" />
         </mesh>
-        {/* Plaque Sconce Accent Light */}
+
+        {/* Functional High-Res Cyber Security Operative Dossier Screen Face */}
+        <mesh position={[0, 0, 0.03]}>
+          <planeGeometry args={[1.48, 0.98]} />
+          <meshBasicMaterial map={dossierScreen.texture} toneMapped={false} />
+        </mesh>
+
+        {/* Top Overhead Linear Architectural Sconce Fixture */}
+        <group position={[0, 0.62, 0.06]}>
+          {/* Brass Mounting Arm */}
+          <mesh position={[0, -0.02, -0.04]}>
+            <boxGeometry args={[0.04, 0.02, 0.08]} />
+            <meshStandardMaterial color="#ca8a04" metalness={0.9} />
+          </mesh>
+          {/* Horizontal Sconce Bar */}
+          <mesh castShadow>
+            <boxGeometry args={[1.35, 0.03, 0.04]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.8} />
+          </mesh>
+          {/* Downward Warm LED Diffuser Lens */}
+          <mesh position={[0, -0.016, 0]}>
+            <boxGeometry args={[1.3, 0.005, 0.03]} />
+            <meshBasicMaterial color="#fbbf24" />
+          </mesh>
+        </group>
+
+        {/* Bottom Biometric Clearance Touch Sensor Pad */}
+        <group position={[0, -0.52, 0.032]}>
+          <mesh>
+            <boxGeometry args={[0.26, 0.035, 0.008]} />
+            <meshStandardMaterial color="#0f172a" metalness={0.9} />
+          </mesh>
+          {/* Glowing Fingerprint Contact Line */}
+          <mesh position={[0, 0, 0.005]}>
+            <boxGeometry args={[0.22, 0.008, 0.002]} />
+            <meshBasicMaterial color={hovered ? '#22c55e' : '#38bdf8'} />
+          </mesh>
+        </group>
+
+        {/* Warm Ambient Plaque Sconce Wash Light */}
         <pointLight
           ref={plaqueGlowRef}
-          position={[0, 0, 0.35]}
+          position={[0, 0.35, 0.45]}
           color="#fbbf24"
-          intensity={hovered ? 4.0 : 2.5}
-          distance={2.0}
+          intensity={hovered ? 5.0 : 3.2}
+          distance={2.8}
+          decay={2}
         />
       </group>
     </group>
