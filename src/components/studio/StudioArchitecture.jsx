@@ -42,6 +42,11 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
     ];
   }, []);
 
+  // Shared BoxGeometries for 48 acoustic wall slats (zero redundant allocations)
+  const leftSlatGeom = useMemo(() => new THREE.BoxGeometry(0.02, 3.9, 0.12), []);
+  const backSlatGeom = useMemo(() => new THREE.BoxGeometry(0.11, 3.9, 0.02), []);
+  const rightSlatGeom = useMemo(() => new THREE.BoxGeometry(0.02, 3.9, 0.14), []);
+
   return (
     <group name="StudioArchitecture">
       {/* ========================================================================= */}
@@ -100,8 +105,11 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
 
         {/* Vertical Wood Slat Acoustic Paneling (behind presentation & awards) */}
         {Array.from({ length: 18 }).map((_, i) => (
-          <mesh key={`left-slat-${i}`} position={[0.11, 0.1, -4.5 + i * 0.25]}>
-            <boxGeometry args={[0.02, 3.9, 0.12]} />
+          <mesh
+            key={`left-slat-${i}`}
+            position={[0.11, 0.1, -4.5 + i * 0.25]}
+            geometry={leftSlatGeom}
+          >
             <meshStandardMaterial {...walnutWood} />
           </mesh>
         ))}
@@ -119,8 +127,11 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
 
         {/* Back Wall Slat Paneling behind archive */}
         {Array.from({ length: 16 }).map((_, i) => (
-          <mesh key={`back-slat-${i}`} position={[-1.2 + i * 0.22, 0.1, 0.11]}>
-            <boxGeometry args={[0.11, 3.9, 0.02]} />
+          <mesh
+            key={`back-slat-${i}`}
+            position={[-1.2 + i * 0.22, 0.1, 0.11]}
+            geometry={backSlatGeom}
+          >
             <meshStandardMaterial {...walnutWood} />
           </mesh>
         ))}
@@ -251,8 +262,11 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
 
         {/* Vertical Acoustic Walnut Wood Slats along Right Wall Lounge Area */}
         {Array.from({ length: 14 }).map((_, i) => (
-          <mesh key={`right-slat-${i}`} position={[-0.11, 0.1, 0.2 + i * 0.28]}>
-            <boxGeometry args={[0.02, 3.9, 0.14]} />
+          <mesh
+            key={`right-slat-${i}`}
+            position={[-0.11, 0.1, 0.2 + i * 0.28]}
+            geometry={rightSlatGeom}
+          >
             <meshStandardMaterial {...walnutWood} />
           </mesh>
         ))}

@@ -32,9 +32,9 @@ export default function ConferenceStation({ onSelect, onHover }) {
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Projector Screen (Throttled to 10 FPS for optimal GPU pacing)
+    // 0. Update Projector Screen (Paced to gentle 8 FPS for optimal GPU performance)
     screenTimer.current += delta;
-    if (screenTimer.current > 0.1) {
+    if (screenTimer.current > 0.125) {
       projectorScreen.update(screenTimer.current);
       screenTimer.current = 0;
     }

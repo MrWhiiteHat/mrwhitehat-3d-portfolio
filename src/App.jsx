@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Activity,
   ArrowLeft,
@@ -78,7 +78,10 @@ export default function App() {
   const [isGateOpen, setIsGateOpen] = useState(false);
   const [activeProximity, setActiveProximity] = useState(null);
   const [unlockedStations, setUnlockedStations] = useState(new Set());
-  const [mobileInput, setMobileInput] = useState({ x: 0, y: 0 });
+  const mobileInputRef = useRef({ x: 0, y: 0 });
+  const handleMobileMove = useCallback((pos) => {
+    mobileInputRef.current = pos;
+  }, []);
 
   // Persistent Visitor Logs & Wall Counter Telemetry
   const [visitorLogs, setVisitorLogs] = useState(() => getVisitorLogs());
@@ -343,7 +346,7 @@ export default function App() {
         onAirlockEntryComplete={handleAirlockEntryComplete}
         onProximityChange={setActiveProximity}
         onStationInteract={handleStationInteract}
-        mobileInput={mobileInput}
+        mobileInputRef={mobileInputRef}
         visitorLogs={visitorLogs}
         visitorCount={visitorCount}
         playerData={playerData}
@@ -382,7 +385,7 @@ export default function App() {
           muted={muted}
           onToggleMute={handleToggleMute}
           onResetView={handleResetToCustomize}
-          onMobileMove={setMobileInput}
+          onMobileMove={handleMobileMove}
         />
       )}
 

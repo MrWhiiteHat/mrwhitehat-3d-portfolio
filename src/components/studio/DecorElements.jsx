@@ -130,6 +130,16 @@ export default function DecorElements() {
     []
   );
 
+  const ficusPetioleGeom = useMemo(
+    () => new THREE.CylinderGeometry(0.004, 0.006, 0.12, 8),
+    []
+  );
+
+  const ficusMidribGeom = useMemo(
+    () => new THREE.CylinderGeometry(0.0025, 0.004, 0.54, 6),
+    []
+  );
+
   const snakeLeafMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       map: textures.leafColor || null,
@@ -445,9 +455,12 @@ export default function DecorElements() {
             return (
               <group key={`ficus-leaf-${idx}`} position={leaf.pos} rotation={leaf.rot} scale={leaf.s}>
                 {/* Petiole (Leaf Stem) connecting to branch */}
-                <mesh position={[0, -0.04, 0]} rotation={[0.1, 0, 0]} material={ficusPetioleMat}>
-                  <cylinderGeometry args={[0.004, 0.006, 0.12, 8]} />
-                </mesh>
+                <mesh
+                  position={[0, -0.04, 0]}
+                  rotation={[0.1, 0, 0]}
+                  geometry={ficusPetioleGeom}
+                  material={ficusPetioleMat}
+                />
 
                 {/* Realistic Curved Fiddle Leaf Blade with Real Leaf Scanned Map */}
                 <mesh
@@ -458,9 +471,11 @@ export default function DecorElements() {
                 />
 
                 {/* Raised Midrib Central Spine */}
-                <mesh position={[0, 0.28, 0.004]} material={ficusMidribMat}>
-                  <cylinderGeometry args={[0.0025, 0.004, 0.54, 6]} />
-                </mesh>
+                <mesh
+                  position={[0, 0.28, 0.004]}
+                  geometry={ficusMidribGeom}
+                  material={ficusMidribMat}
+                />
               </group>
             );
           })}

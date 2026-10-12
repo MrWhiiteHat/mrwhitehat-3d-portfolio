@@ -393,23 +393,42 @@ export function createProjectorScreen() {
     { from: 3, to: 0, speed: 0.85 },
   ];
 
+  // Pre-render static background onto an offscreen canvas (eliminates 450 per-update fillRect calls)
+  const bgCanvas = createScreenCanvas(width, height);
+  if (bgCanvas) {
+    const bgCtx = bgCanvas.getContext('2d');
+    bgCtx.fillStyle = '#040d12';
+    bgCtx.fillRect(0, 0, width, height);
+
+    // Global Cyber Grid Background Dots
+    bgCtx.fillStyle = 'rgba(56, 189, 248, 0.12)';
+    for (let x = 20; x < width - 20; x += 16) {
+      for (let y = 25; y < height - 35; y += 16) {
+        bgCtx.fillRect(x, y, 1.5, 1.5);
+      }
+    }
+
+    // World Landmass Wireframe
+    bgCtx.strokeStyle = 'rgba(52, 211, 153, 0.35)';
+    bgCtx.lineWidth = 1;
+    bgCtx.strokeRect(60, 65, 110, 120);
+    bgCtx.strokeRect(220, 60, 80, 130);
+    bgCtx.strokeRect(320, 55, 140, 140);
+  }
+
   function update(delta) {
     animTime += delta;
     blockedCount += Math.floor(Math.random() * 3);
 
-    // 1. Dark Cyber Blue Background
-    ctx.fillStyle = '#040d12';
-    ctx.fillRect(0, 0, width, height);
-
-    // 2. Global Cyber Grid Background Dots
-    ctx.fillStyle = 'rgba(56, 189, 248, 0.12)';
-    for (let x = 20; x < width - 20; x += 16) {
-      for (let y = 25; y < height - 35; y += 16) {
-        ctx.fillRect(x, y, 1.5, 1.5);
-      }
+    // 1. Blit pre-rendered background
+    if (bgCanvas) {
+      ctx.drawImage(bgCanvas, 0, 0);
+    } else {
+      ctx.fillStyle = '#040d12';
+      ctx.fillRect(0, 0, width, height);
     }
 
-    // 3. Header Banner
+    // 2. Header Banner
     ctx.fillStyle = '#081e28';
     ctx.fillRect(0, 0, width, 24);
     ctx.fillStyle = '#38bdf8';
@@ -426,18 +445,7 @@ export function createProjectorScreen() {
     ctx.lineTo(width, 24);
     ctx.stroke();
 
-    // 4. Simplified Stylized World Landmass Wireframe
-    ctx.strokeStyle = 'rgba(52, 211, 153, 0.35)';
-    ctx.lineWidth = 1;
-
-    // Americas
-    ctx.strokeRect(60, 65, 110, 120);
-    // Europe/Africa
-    ctx.strokeRect(220, 60, 80, 130);
-    // Asia/Australia
-    ctx.strokeRect(320, 55, 140, 140);
-
-    // 5. Connecting Cyber Arcs with Traveling Packet Pulses
+    // 3. Connecting Cyber Arcs with Traveling Packet Pulses
     arcs.forEach((arc, i) => {
       const h1 = hubs[arc.from];
       const h2 = hubs[arc.to];

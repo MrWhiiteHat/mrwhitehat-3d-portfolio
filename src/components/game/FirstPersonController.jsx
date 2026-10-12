@@ -409,6 +409,7 @@ export default function FirstPersonController({
   onProximityChange,
   onInteract,
   mobileInput = { x: 0, y: 0 },
+  mobileInputRef = null,
 }) {
   const { camera, gl } = useThree();
 
@@ -428,6 +429,7 @@ export default function FirstPersonController({
   const lastFootstepDist = useRef(0);
   const bobY = useRef(0);
   const activeTargetRef = useRef(null);
+  const raycastTimer = useRef(0);
 
   // Key tracking: W = Forward, S = Backward, A = Left, D = Right
   const keys = useRef({
@@ -731,10 +733,15 @@ export default function FirstPersonController({
     const clampedDelta = Math.min(delta, 0.033);
 
     // =========================================================================
-    // 1. SMOOTH MOUSE LOOK DAMPING (Instantaneous, silky-smooth 1:1 camera)
+    // 1. RESPONSIVE MOUSE LOOK (1:1 instant response when pointer locked, smooth damp when dragging)
     // =========================================================================
-    yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 45, clampedDelta);
-    pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 45, clampedDelta);
+    if (isPointerLocked.current) {
+      yaw.current = targetYaw.current;
+      pitch.current = targetPitch.current;
+    } else {
+      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 65, clampedDelta);
+      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 65, clampedDelta);
+    }
 
     // =========================================================================
     // 2. DIRECTIONAL INPUT (W=Forward, S=Backward, A=Left, D=Right) & KINEMATICS
@@ -747,14 +754,15 @@ export default function FirstPersonController({
     if (keys.current.right) inputRight += 1;
     if (keys.current.left) inputRight -= 1;
 
-    // Mobile Virtual Touch Joystick support
-    if (mobileInput && (Math.abs(mobileInput.x) > 0.05 || Math.abs(mobileInput.y) > 0.05)) {
-      inputRight += mobileInput.x;
-      inputForward += -mobileInput.y;
+    // Mobile Virtual Touch Joystick support (zero React re-renders)
+    const mInput = mobileInputRef?.current || mobileInput;
+    if (mInput && (Math.abs(mInput.x) > 0.04 || Math.abs(mInput.y) > 0.04)) {
+      inputRight += mInput.x;
+      inputForward += -mInput.y;
     }
 
     const isMoving = Math.abs(inputForward) > 0.01 || Math.abs(inputRight) > 0.01;
-    const targetSpeed = keys.current.sprint ? 4.4 : 2.8;
+    const targetSpeed = keys.current.sprint ? 4.5 : 2.9;
 
     let targetVelX = 0;
     let targetVelZ = 0;
@@ -769,10 +777,6 @@ export default function FirstPersonController({
       const cosY = Math.cos(yaw.current);
 
       // Camera forward vector in Three.js right-handed coordinate system (YXZ order):
-      // W (Forward):  (-sin(yaw), -cos(yaw))
-      // S (Backward): (+sin(yaw), +cos(yaw))
-      // D (Right):    (+cos(yaw), -sin(yaw))
-      // A (Left):     (-cos(yaw), +sin(yaw))
       const fwdX = -sinY;
       const fwdZ = -cosY;
       const rightX = cosY;
@@ -782,9 +786,8 @@ export default function FirstPersonController({
       targetVelZ = (normFwd * fwdZ + normRight * rightZ) * actualSpeed;
     }
 
-
-    // Velocity momentum damping (smooth acceleration & coasting deceleration)
-    const accelRate = isMoving ? 14.0 : 16.0;
+    // Velocity momentum damping (crisp acceleration & immediate stopping)
+    const accelRate = isMoving ? 26.0 : 22.0;
     velocity.current.x = THREE.MathUtils.damp(velocity.current.x, targetVelX, accelRate, clampedDelta);
     velocity.current.z = THREE.MathUtils.damp(velocity.current.z, targetVelZ, accelRate, clampedDelta);
 
@@ -848,37 +851,39 @@ export default function FirstPersonController({
     camera.rotation.z = rollZ.current;
 
     // =========================================================================
-    // 5. TRUE 3D CROSSHAIR RAYCAST TARGETING (EXACT OBJECT PIERCING)
-    // Shows details ONLY when the crosshair ray directly intersects the 3D volume of an object.
-    // If the crosshair is pointing at the window, floor, ceiling, or empty air, NOTHING is shown.
+    // 5. TRUE 3D CROSSHAIR RAYCAST TARGETING (Paced to 20Hz for zero per-frame CPU drain)
     // =========================================================================
-    camera.getWorldDirection(_tempCamDir);
-    _tempRay.origin.copy(camera.position);
-    _tempRay.direction.copy(_tempCamDir);
+    raycastTimer.current += clampedDelta;
+    if (raycastTimer.current > 0.048) {
+      raycastTimer.current = 0;
+      camera.getWorldDirection(_tempCamDir);
+      _tempRay.origin.copy(camera.position);
+      _tempRay.direction.copy(_tempCamDir);
 
-    let bestTarget = null;
-    let minHitDist = Infinity;
+      let bestTarget = null;
+      let minHitDist = Infinity;
 
-    for (const st of STATIONS) {
-      if (!st.boxes) continue;
-      for (const box of st.boxes) {
-        const hit = _tempRay.intersectBox(box, _tempHitPoint);
-        if (hit !== null) {
-          const hitDist = camera.position.distanceTo(_tempHitPoint);
-          if (hitDist <= st.maxDist && hitDist < minHitDist) {
-            minHitDist = hitDist;
-            bestTarget = { ...st, dist: hitDist, isAimed: true };
+      for (const st of STATIONS) {
+        if (!st.boxes) continue;
+        for (const box of st.boxes) {
+          const hit = _tempRay.intersectBox(box, _tempHitPoint);
+          if (hit !== null) {
+            const hitDist = camera.position.distanceTo(_tempHitPoint);
+            if (hitDist <= st.maxDist && hitDist < minHitDist) {
+              minHitDist = hitDist;
+              bestTarget = { ...st, dist: hitDist, isAimed: true };
+            }
           }
         }
       }
-    }
 
-    if (bestTarget?.id !== activeTargetRef.current?.id) {
-      if (bestTarget && !activeTargetRef.current) {
-        playProximityChime();
+      if (bestTarget?.id !== activeTargetRef.current?.id) {
+        if (bestTarget && !activeTargetRef.current) {
+          playProximityChime();
+        }
+        activeTargetRef.current = bestTarget;
+        onProximityChange(bestTarget);
       }
-      activeTargetRef.current = bestTarget;
-      onProximityChange(bestTarget);
     }
   });
 

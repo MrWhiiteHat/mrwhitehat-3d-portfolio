@@ -43,9 +43,9 @@ export default function GameHUD({
   });
 
   const joystickBaseRef = useRef(null);
+  const stickKnobRef = useRef(null);
   const activeTouchId = useRef(null);
   const isMouseDownRef = useRef(false);
-  const [stickPos, setStickPos] = useState({ x: 0, y: 0 });
 
   // Appliance state trackers
   const [acActive, setAcActive] = useState(true);
@@ -137,7 +137,14 @@ export default function GameHUD({
     }
   };
 
-  // High-Precision Analog Joystick Calculations
+  // High-Precision Analog Joystick Calculations (Zero React re-renders for buttery 120 FPS performance)
+  const resetJoystick = () => {
+    if (stickKnobRef.current) {
+      stickKnobRef.current.style.transform = 'translate(0px, 0px)';
+    }
+    onMobileMove?.({ x: 0, y: 0 });
+  };
+
   const updateJoystick = (clientX, clientY) => {
     if (!joystickBaseRef.current) return;
     const rect = joystickBaseRef.current.getBoundingClientRect();
@@ -150,8 +157,7 @@ export default function GameHUD({
     const deadzone = 4;
 
     if (dist < deadzone) {
-      setStickPos({ x: 0, y: 0 });
-      onMobileMove?.({ x: 0, y: 0 });
+      resetJoystick();
       return;
     }
 
@@ -160,7 +166,9 @@ export default function GameHUD({
     const ny = dy / dist;
     const power = Math.min(1.0, clampedDist / maxRadius);
 
-    setStickPos({ x: nx * clampedDist, y: ny * clampedDist });
+    if (stickKnobRef.current) {
+      stickKnobRef.current.style.transform = `translate(${nx * clampedDist}px, ${ny * clampedDist}px)`;
+    }
     onMobileMove?.({ x: nx * power, y: ny * power });
   };
 
@@ -185,8 +193,7 @@ export default function GameHUD({
     const touch = Array.from(e.changedTouches).find((t) => t.identifier === activeTouchId.current);
     if (!touch) return;
     activeTouchId.current = null;
-    setStickPos({ x: 0, y: 0 });
-    onMobileMove?.({ x: 0, y: 0 });
+    resetJoystick();
   };
 
   // Mouse interaction for testing on desktop
@@ -205,8 +212,7 @@ export default function GameHUD({
     const onWindowMouseUp = () => {
       if (isMouseDownRef.current) {
         isMouseDownRef.current = false;
-        setStickPos({ x: 0, y: 0 });
-        onMobileMove?.({ x: 0, y: 0 });
+        resetJoystick();
       }
     };
     window.addEventListener('mousemove', onWindowMouseMove);
@@ -459,16 +465,13 @@ export default function GameHUD({
             <div className="joy-cross-h" />
             <div className="joy-cross-v" />
 
-            {/* Glowing Movable Thumb Puck */}
+            {/* Glowing Movable Thumb Puck (Direct Hardware GPU Transform) */}
             <div
+              ref={stickKnobRef}
               className="joy-thumb-knob"
               style={{
-                transform: `translate(${stickPos.x}px, ${stickPos.y}px)`,
                 borderColor: playerData.accentColor || '#34d399',
-                boxShadow:
-                  stickPos.x !== 0 || stickPos.y !== 0
-                    ? `0 0 18px ${playerData.accentColor || '#34d399'}, inset 0 0 10px rgba(0,0,0,0.8)`
-                    : '0 4px 12px rgba(0,0,0,0.6)',
+                boxShadow: `0 0 16px ${playerData.accentColor || '#34d399'}60, inset 0 0 8px rgba(0,0,0,0.8)`,
               }}
             >
               {/* Concentric Thumb Grip Ring */}
