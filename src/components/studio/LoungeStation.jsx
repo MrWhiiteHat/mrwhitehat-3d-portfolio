@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
@@ -26,6 +26,21 @@ export default function LoungeStation({ onSelect, onHover }) {
   const tabletScreen = useMemo(() => createTabletScreen(), []);
   const tabletTimer = useRef(0);
 
+  const toggleLamp = (e) => {
+    e?.stopPropagation?.();
+    playClickSound(lampOn ? 450 : 650, 0.08);
+    setLampOn((prev) => !prev);
+  };
+
+  useEffect(() => {
+    window.__TOGGLE_FLOOR_LAMP__ = toggleLamp;
+    window.__FLOOR_LAMP_STATE__ = lampOn;
+    return () => {
+      delete window.__TOGGLE_FLOOR_LAMP__;
+      delete window.__FLOOR_LAMP_STATE__;
+    };
+  }, [lampOn]);
+
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
@@ -46,12 +61,6 @@ export default function LoungeStation({ onSelect, onHover }) {
       plaqueGlowRef.current.intensity = (hovered ? 4.0 : 2.5) + Math.sin(time * 2.0) * 0.4;
     }
   });
-
-  const toggleLamp = (e) => {
-    e.stopPropagation();
-    playClickSound(lampOn ? 450 : 650, 0.08);
-    setLampOn(!lampOn);
-  };
 
   return (
     <group position={[2.8, 0, 1.6]} name="LoungeStation">

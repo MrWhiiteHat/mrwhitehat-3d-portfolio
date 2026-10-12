@@ -128,6 +128,28 @@ export default function App() {
   // 5. Station Proximity Interaction (Triggered by [E] or Click)
   const handleStationInteract = useCallback(
     (stationId) => {
+      // Interactive Studio Appliances (AC, Fan, Lights)
+      if (stationId === 'air_conditioner') {
+        window.__TOGGLE_AC__?.();
+        return;
+      }
+      if (stationId === 'ceiling_fan') {
+        window.__TOGGLE_FAN__?.();
+        return;
+      }
+      if (stationId === 'overhead_neon') {
+        window.__TOGGLE_NEON__?.();
+        return;
+      }
+      if (stationId === 'edison_lamp') {
+        window.__TOGGLE_EDISON__?.();
+        return;
+      }
+      if (stationId === 'floor_lamp') {
+        window.__TOGGLE_FLOOR_LAMP__?.();
+        return;
+      }
+
       if (stationId === 'core') {
         handleCycleTheme();
         return;

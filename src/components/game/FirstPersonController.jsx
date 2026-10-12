@@ -177,6 +177,76 @@ const STATIONS = [
       ),
     ],
   },
+  // 13. Smart Cyber Inverter Air Conditioner (Working AC)
+  {
+    id: 'air_conditioner',
+    title: 'Smart Inverter Air Conditioner',
+    action: 'CYCLE CLIMATE TEMPERATURE // TOGGLE AC (E)',
+    position: [-4.6, 3.4, -0.4],
+    maxDist: 4.8,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-4.95, 3.15, -1.15),
+        new THREE.Vector3(-4.5, 3.65, 0.35)
+      ),
+    ],
+  },
+  // 14. Industrial Studio Ceiling Fan
+  {
+    id: 'ceiling_fan',
+    title: 'Industrial Studio Ceiling Fan',
+    action: 'TOGGLE FAN POWER // AERODYNAMIC BLADES (E)',
+    position: [0, 4.38, 0],
+    maxDist: 4.6,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-1.3, 4.0, -1.3),
+        new THREE.Vector3(1.3, 4.5, 1.3)
+      ),
+    ],
+  },
+  // 15. Overhead Crimson Neon Light Bar
+  {
+    id: 'overhead_neon',
+    title: 'Overhead Crimson Neon Light Bar',
+    action: 'TOGGLE NEON LIGHT BAR // HIGH-VOLTAGE (E)',
+    position: [-1.2, 3.75, 0.2],
+    maxDist: 4.2,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-2.4, 3.5, 0.0),
+        new THREE.Vector3(0.0, 4.0, 0.4)
+      ),
+    ],
+  },
+  // 16. Vintage Suspended Edison Pendant Lamp
+  {
+    id: 'edison_lamp',
+    title: 'Vintage Edison Pendant Lamp',
+    action: 'TOGGLE EDISON FILAMENT LAMP (E)',
+    position: [-0.2, 2.75, 0.6],
+    maxDist: 3.6,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-0.45, 2.5, 0.35),
+        new THREE.Vector3(0.05, 3.0, 0.85)
+      ),
+    ],
+  },
+  // 17. Modern Brass Arched Floor Lamp
+  {
+    id: 'floor_lamp',
+    title: 'Modern Brass Floor Lamp',
+    action: 'TOGGLE LOUNGE FLOOR LAMP (E)',
+    position: [4.2, 2.2, 2.4],
+    maxDist: 3.6,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(3.8, 1.0, 2.0),
+        new THREE.Vector3(4.6, 2.6, 2.8)
+      ),
+    ],
+  },
 ];
 
 // Room Obstacle Bounding Boxes for AABB Collision Response

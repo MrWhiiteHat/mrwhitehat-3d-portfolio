@@ -19,6 +19,7 @@ import CommsStation from './studio/CommsStation.jsx';
 import DecorElements from './studio/DecorElements.jsx';
 import CyberAtmosphere from './studio/CyberAtmosphere.jsx';
 import StudioWallGraphicsAndCurtains from './studio/StudioWallGraphicsAndCurtains.jsx';
+import AirConditionerUnit from './studio/AirConditionerUnit.jsx';
 import AirlockGate from './game/AirlockGate.jsx';
 import FirstPersonController from './game/FirstPersonController.jsx';
 
@@ -233,6 +234,7 @@ function SceneContents({
           <DecorElements />
         </Suspense>
         <StudioWallGraphicsAndCurtains currentThemeKey={themeKey} />
+        <AirConditionerUnit onSelect={onSelect} onHover={onHover} />
 
         {/* Animated Cyber Airlock Entrance Gate */}
         <AirlockGate isOpen={isGateOpen} />

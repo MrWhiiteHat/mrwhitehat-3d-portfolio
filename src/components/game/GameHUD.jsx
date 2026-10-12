@@ -8,6 +8,9 @@ import {
   RotateCcw,
   ShieldAlert,
   ShieldCheck,
+  Snowflake,
+  Fan,
+  Lightbulb,
   Sparkles,
   Terminal,
   Volume2,
@@ -32,6 +35,26 @@ export default function GameHUD({
   const [touchActive, setTouchActive] = useState(false);
   const [stickPos, setStickPos] = useState({ x: 0, y: 0 });
   const touchStartRef = useRef({ x: 0, y: 0 });
+
+  // Appliance state trackers
+  const [acActive, setAcActive] = useState(true);
+  const [fanActive, setFanActive] = useState(true);
+  const [neonActive, setNeonActive] = useState(true);
+
+  const handleToggleAc = () => {
+    window.__TOGGLE_AC__?.();
+    setAcActive((prev) => !prev);
+  };
+
+  const handleToggleFan = () => {
+    window.__TOGGLE_FAN__?.();
+    setFanActive((prev) => !prev);
+  };
+
+  const handleToggleNeon = () => {
+    window.__TOGGLE_NEON__?.();
+    setNeonActive((prev) => !prev);
+  };
 
   // Real-time key state for on-screen tactical WASD feedback
   const [pressedKeys, setPressedKeys] = useState({
@@ -180,6 +203,36 @@ export default function GameHUD({
 
         {/* Quick HUD Controls */}
         <div className="hud-right-actions">
+          {/* Working AC Quick Toggle */}
+          <button
+            type="button"
+            className={`hud-action-btn ${acActive ? 'active-appliance' : 'muted-btn'}`}
+            onClick={handleToggleAc}
+            title={acActive ? 'Air Conditioner [18°C ❄️ ACTIVE] · Click to Toggle' : 'Air Conditioner [OFF] · Click to Turn ON'}
+          >
+            <Snowflake size={15} color={acActive ? '#38bdf8' : '#64748b'} />
+          </button>
+
+          {/* Ceiling Fan Quick Toggle */}
+          <button
+            type="button"
+            className={`hud-action-btn ${fanActive ? 'active-appliance' : 'muted-btn'}`}
+            onClick={handleToggleFan}
+            title={fanActive ? 'Ceiling Fan [SPINNING 🌀] · Click to Turn OFF' : 'Ceiling Fan [OFF] · Click to Turn ON'}
+          >
+            <Fan size={15} color={fanActive ? '#34d399' : '#64748b'} />
+          </button>
+
+          {/* Overhead Crimson Neon Quick Toggle */}
+          <button
+            type="button"
+            className={`hud-action-btn ${neonActive ? 'active-appliance' : 'muted-btn'}`}
+            onClick={handleToggleNeon}
+            title={neonActive ? 'Overhead Crimson Neon [ON 💡] · Click to Turn OFF' : 'Overhead Crimson Neon [OFF] · Click to Turn ON'}
+          >
+            <Lightbulb size={15} color={neonActive ? '#ff1744' : '#64748b'} />
+          </button>
+
           <button
             type="button"
             className="hud-theme-pill"

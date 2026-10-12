@@ -1,19 +1,27 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { playClickSound, playHackingBeep } from '../../utils/audio.js';
+import {
+  playClickSound,
+  playHackingBeep,
+  playSwitchClick,
+  playNeonFlickerSound,
+} from '../../utils/audio.js';
 
-// Lighting atmosphere presets
+// Lighting atmosphere presets - Calibrated for clear shadow visibility and rich contrast
 export const LIGHTING_THEMES = {
   CYBER_NEON_NOIR: {
     id: 'CYBER_NEON_NOIR',
     name: 'Cyber Neon Noir (Red & Cyan)',
-    ambient: '#040714',
-    ambientIntensity: 0.9,
+    ambient: '#0e1628',
+    ambientIntensity: 1.65,
+    hemiSky: '#223249',
+    hemiGround: '#0f172a',
+    hemiIntensity: 0.95,
     dirColor: '#ff2244',
-    dirIntensity: 2.6,
+    dirIntensity: 2.7,
     windowColor: '#00f0ff',
-    windowIntensity: 2.8,
+    windowIntensity: 3.0,
     accentColor: '#00f0ff',
     accentIntensity: 22,
     crimsonColor: '#ff1744',
@@ -24,12 +32,15 @@ export const LIGHTING_THEMES = {
   CYBER_MATRIX: {
     id: 'CYBER_MATRIX',
     name: 'Cyber Command (Matrix Green)',
-    ambient: '#09150e',
-    ambientIntensity: 1.8,
+    ambient: '#0f1f14',
+    ambientIntensity: 2.2,
+    hemiSky: '#1b382b',
+    hemiGround: '#0d1a12',
+    hemiIntensity: 0.9,
     dirColor: '#ffffff',
     dirIntensity: 2.8,
     windowColor: '#60a5fa',
-    windowIntensity: 1.5,
+    windowIntensity: 1.8,
     accentColor: '#34d399',
     accentIntensity: 14,
     crimsonColor: '#34d399',
@@ -40,12 +51,15 @@ export const LIGHTING_THEMES = {
   SYNTHWAVE_NEON: {
     id: 'SYNTHWAVE_NEON',
     name: 'Night City (Synthwave Magenta)',
-    ambient: '#130919',
-    ambientIntensity: 2.0,
+    ambient: '#1a1024',
+    ambientIntensity: 2.4,
+    hemiSky: '#311b47',
+    hemiGround: '#140c1c',
+    hemiIntensity: 0.9,
     dirColor: '#e0e7ff',
-    dirIntensity: 2.4,
+    dirIntensity: 2.5,
     windowColor: '#38bdf8',
-    windowIntensity: 2.2,
+    windowIntensity: 2.4,
     accentColor: '#ec4899',
     accentIntensity: 18,
     crimsonColor: '#f43f5e',
@@ -56,12 +70,15 @@ export const LIGHTING_THEMES = {
   STEALTH_ICE: {
     id: 'STEALTH_ICE',
     name: 'Stealth Ops (Arctic Cyan)',
-    ambient: '#060f17',
-    ambientIntensity: 1.7,
+    ambient: '#0e1a24',
+    ambientIntensity: 2.3,
+    hemiSky: '#1e3347',
+    hemiGround: '#0a141d',
+    hemiIntensity: 0.9,
     dirColor: '#f8fafc',
     dirIntensity: 2.6,
     windowColor: '#38bdf8',
-    windowIntensity: 2.5,
+    windowIntensity: 2.6,
     accentColor: '#06b6d4',
     accentIntensity: 16,
     crimsonColor: '#38bdf8',
@@ -72,12 +89,15 @@ export const LIGHTING_THEMES = {
   WARM_AMBER: {
     id: 'WARM_AMBER',
     name: 'Executive Suite (Warm Amber)',
-    ambient: '#171109',
-    ambientIntensity: 1.9,
+    ambient: '#1f160e',
+    ambientIntensity: 2.3,
+    hemiSky: '#3d2b17',
+    hemiGround: '#171008',
+    hemiIntensity: 0.9,
     dirColor: '#fef3c7',
     dirIntensity: 2.8,
     windowColor: '#93c5fd',
-    windowIntensity: 1.2,
+    windowIntensity: 1.5,
     accentColor: '#f59e0b',
     accentIntensity: 15,
     crimsonColor: '#f59e0b',
@@ -97,6 +117,57 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
   const holoCoreRef = useRef();
   const holoOuterRingRef = useRef();
   const [hoveredCore, setHoveredCore] = useState(false);
+
+  // Interactive toggle states for lights & appliances
+  const [fanOn, setFanOn] = useState(true);
+  const [neonOn, setNeonOn] = useState(true);
+  const [edisonOn, setEdisonOn] = useState(true);
+  const fanSpeed = useRef(2.8);
+
+  const toggleFan = (e) => {
+    e?.stopPropagation?.();
+    setFanOn((prev) => {
+      const next = !prev;
+      playClickSound(next ? 850 : 650, 0.08);
+      return next;
+    });
+  };
+
+  const toggleNeon = (e) => {
+    e?.stopPropagation?.();
+    setNeonOn((prev) => {
+      const next = !prev;
+      if (next) playNeonFlickerSound();
+      else playSwitchClick();
+      return next;
+    });
+  };
+
+  const toggleEdison = (e) => {
+    e?.stopPropagation?.();
+    setEdisonOn((prev) => {
+      const next = !prev;
+      playSwitchClick();
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    window.__TOGGLE_FAN__ = toggleFan;
+    window.__TOGGLE_NEON__ = toggleNeon;
+    window.__TOGGLE_EDISON__ = toggleEdison;
+    window.__FAN_STATE__ = fanOn;
+    window.__NEON_STATE__ = neonOn;
+    window.__EDISON_STATE__ = edisonOn;
+    return () => {
+      delete window.__TOGGLE_FAN__;
+      delete window.__TOGGLE_NEON__;
+      delete window.__TOGGLE_EDISON__;
+      delete window.__FAN_STATE__;
+      delete window.__NEON_STATE__;
+      delete window.__EDISON_STATE__;
+    };
+  }, [fanOn, neonOn, edisonOn]);
 
   const theme = LIGHTING_THEMES[currentThemeKey] || LIGHTING_THEMES.CYBER_MATRIX;
 
@@ -124,9 +195,11 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // Rotate Ceiling Fan smoothly
-    if (fanRef.current) {
-      fanRef.current.rotation.y += delta * 2.8;
+    // 1. Smooth Fan Acceleration & Deceleration physics
+    const targetFanSpeed = fanOn ? 2.8 : 0;
+    fanSpeed.current = THREE.MathUtils.damp(fanSpeed.current, targetFanSpeed, 2.2, delta);
+    if (fanRef.current && fanSpeed.current > 0.001) {
+      fanRef.current.rotation.y += delta * fanSpeed.current;
     }
 
     // Real-time Clock Hands
@@ -171,8 +244,15 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
 
   return (
     <group name="CyberAtmosphere">
-      {/* 1. Dynamic Atmosphere Lighting - Optimized Shadow Map */}
+      {/* 1. Dynamic Atmosphere Lighting - Brightened Shadows & Soft Floor/Ceiling Bounce */}
       <ambientLight color={theme.ambient} intensity={theme.ambientIntensity} />
+      <hemisphereLight
+        args={[
+          theme.hemiSky || '#223249',
+          theme.hemiGround || '#0f172a',
+          theme.hemiIntensity || 0.95,
+        ]}
+      />
       <directionalLight
         position={[9, 14, 8]}
         intensity={theme.dirIntensity}
@@ -192,6 +272,22 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         position={[-8, 9, -8]}
         intensity={theme.windowIntensity}
         color={theme.windowColor}
+      />
+
+      {/* Gentle Fill Lights for Dark Studio Corners (Back-Left & Front-Right) */}
+      <pointLight
+        position={[-3.4, 2.4, -3.2]}
+        color={theme.accentColor || '#38bdf8'}
+        intensity={1.2}
+        distance={7.0}
+        decay={2}
+      />
+      <pointLight
+        position={[3.2, 2.4, 3.2]}
+        color={theme.loungeFillColor || '#f59e0b'}
+        intensity={1.0}
+        distance={6.5}
+        decay={2}
       />
 
       {/* 2. Floating Cyber Ambient Particles */}
@@ -214,8 +310,18 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         />
       </points>
 
-      {/* 3. Modern Industrial Ceiling Fan in center of studio */}
-      <group position={[0, 4.38, 0]}>
+      {/* 3. Modern Industrial Ceiling Fan in center of studio (Interactive Toggle) */}
+      <group
+        position={[0, 4.38, 0]}
+        onClick={toggleFan}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'auto';
+        }}
+      >
         {/* Ceiling Mount Downrod */}
         <mesh position={[0, 0.2, 0]}>
           <cylinderGeometry args={[0.025, 0.025, 0.4, 16]} />
@@ -229,7 +335,11 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         {/* Subtle Under-hub Status Ring */}
         <mesh position={[0, -0.062, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[0.08, 0.14, 24]} />
-          <meshBasicMaterial color={theme.coreColor} transparent opacity={0.6} />
+          <meshBasicMaterial
+            color={fanOn ? (theme.coreColor || '#38bdf8') : '#334155'}
+            transparent
+            opacity={fanOn ? 0.75 : 0.2}
+          />
         </mesh>
 
         {/* 4 Rotating Aerodynamic Carbon Fiber Blades */}
@@ -349,10 +459,20 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
       </group>
 
       {/* ========================================================================= */}
-      {/* 6. OVERHEAD HORIZONTAL CRIMSON NEON FIXTURE (Directly from Image 1)       */}
+      {/* 6. OVERHEAD HORIZONTAL CRIMSON NEON FIXTURE (Interactive Toggle)          */}
       {/* Industrial high-output neon light bar above workstation casting red glow  */}
       {/* ========================================================================= */}
-      <group position={[-1.2, 3.75, 0.2]}>
+      <group
+        position={[-1.2, 3.75, 0.2]}
+        onClick={toggleNeon}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'auto';
+        }}
+      >
         {/* Ceiling Suspension Rods / Brackets dropping from 4.45m down to 3.75m */}
         {[-0.85, 0.85].map((sx, idx) => (
           <group key={`neon-hang-${idx}`} position={[sx, 0.35, 0]}>
@@ -392,9 +512,9 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
             <mesh rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[0.02, 0.02, 2.08, 16]} />
               <meshStandardMaterial
-                color={theme.crimsonColor || '#ff1744'}
-                emissive={theme.crimsonColor || '#ff1744'}
-                emissiveIntensity={3.6}
+                color={neonOn ? (theme.crimsonColor || '#ff1744') : '#1e293b'}
+                emissive={neonOn ? (theme.crimsonColor || '#ff1744') : '#000000'}
+                emissiveIntensity={neonOn ? 3.6 : 0}
                 roughness={0.1}
                 toneMapped={false}
               />
@@ -415,17 +535,27 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         <pointLight
           position={[0, -0.3, 0]}
           color={theme.crimsonColor || '#ff1744'}
-          intensity={theme.crimsonIntensity || 24}
+          intensity={neonOn ? (theme.crimsonIntensity || 24) : 0}
           distance={8.5}
           decay={2}
         />
       </group>
 
       {/* ========================================================================= */}
-      {/* 7. VINTAGE SUSPENDED EDISON PENDANT LAMP (Directly from Image 1)          */}
+      {/* 7. VINTAGE SUSPENDED EDISON PENDANT LAMP (Interactive Toggle)             */}
       {/* Hanging industrial dome shade with warm amber glowing Edison filament     */}
       {/* ========================================================================= */}
-      <group position={[-0.2, 2.75, 0.6]}>
+      <group
+        position={[-0.2, 2.75, 0.6]}
+        onClick={toggleEdison}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'auto';
+        }}
+      >
         {/* Slender Black Braided Suspension Cord from Ceiling (4.45m down to 2.95m) */}
         <mesh position={[0, 0.95, 0]}>
           <cylinderGeometry args={[0.005, 0.005, 1.5, 8]} />
@@ -463,9 +593,9 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         <mesh position={[0, 0.01, 0]}>
           <sphereGeometry args={[0.055, 16, 16]} />
           <meshStandardMaterial
-            color="#f59e0b"
+            color={edisonOn ? '#f59e0b' : '#272018'}
             transparent
-            opacity={0.65}
+            opacity={edisonOn ? 0.65 : 0.3}
             roughness={0.2}
           />
         </mesh>
@@ -473,14 +603,14 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         {/* Glowing Incandescent Zig-Zag Filament Mesh */}
         <mesh position={[0, 0.01, 0]}>
           <torusGeometry args={[0.022, 0.004, 8, 16]} />
-          <meshBasicMaterial color="#ffbe3b" toneMapped={false} />
+          <meshBasicMaterial color={edisonOn ? '#ffbe3b' : '#332617'} toneMapped={false} />
         </mesh>
 
         {/* Warm Amber Downward Pool of Light */}
         <pointLight
           position={[0, -0.15, 0]}
           color={theme.loungeFillColor || '#f59e0b'}
-          intensity={8.5}
+          intensity={edisonOn ? 8.5 : 0}
           distance={5.2}
           decay={2}
         />
