@@ -123,9 +123,9 @@ const STATIONS = [
   },
   // 9. Cyber Sentinel Drone & Operator Hologram
   {
-    id: 'hologram_drone',
-    title: 'Cyber Sentinel Drone',
-    action: 'INSPECT OPERATOR HOLOGRAM // MR. WHITE HAT',
+    id: 'operator',
+    title: 'MrWhiteHat Operative Hologram',
+    action: 'DECRYPT OPERATIVE DOSSIER // MR. WHITE HAT',
     position: [-3.35, 1.6, -3.85],
     maxDist: 3.8,
     boxes: [

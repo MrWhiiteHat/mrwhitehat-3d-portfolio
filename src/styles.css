@@ -4552,6 +4552,395 @@ html, body, .portfolio-container {
   }
 }
 
+/* ==========================================================================
+   7. MRWHITEHAT // OPERATIVE HOLOGRAPHIC DOSSIER STYLES
+   ========================================================================== */
+.physical-operator {
+  width: 500px;
+  background: #040d16;
+  border: 2px solid rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 50px rgba(56, 189, 248, 0.3), inset 0 0 30px rgba(14, 165, 233, 0.08);
+}
+
+.operative-dossier-terminal {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: radial-gradient(circle at 85% 15%, rgba(56, 189, 248, 0.08), transparent 60%);
+}
+
+.operative-hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+  gap: 8px;
+}
+
+.operative-callsign-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.callsign-radar-blip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
+  margin-top: 4px;
+  animation: radarPulse 1.8s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes radarPulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px #38bdf8; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.callsign-level {
+  display: block;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.9px;
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.callsign-title {
+  margin: 2px 0 0 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: #f0f9ff;
+  letter-spacing: -0.3px;
+}
+
+.callsign-highlight {
+  color: #38bdf8;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+}
+
+.callsign-legal {
+  display: block;
+  font-size: 9.5px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.operative-badge-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 8px;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.operative-grid-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.operative-card {
+  background: rgba(10, 22, 35, 0.85);
+  border-radius: 8px;
+  padding: 10px 12px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.operative-card:hover {
+  background: rgba(12, 28, 45, 0.95);
+}
+
+.card-top-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.8px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.live-status-pill {
+  margin-left: auto;
+  font-size: 7.5px;
+  background: rgba(129, 140, 248, 0.2);
+  color: #a5b4fc;
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.cgu-tag {
+  margin-left: auto;
+  font-size: 7.5px;
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.recruiter-status-pill {
+  margin-left: auto;
+  font-size: 7.5px;
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+/* Discord Ops Card */
+.discord-ops-card {
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.3), rgba(10, 22, 35, 0.85));
+}
+
+.discord-user-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.discord-avatar-ring {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
+}
+
+.discord-user-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.discord-tag-label {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  color: #a5b4fc;
+  letter-spacing: 0.6px;
+}
+
+.discord-username {
+  font-size: 15px;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.discord-subtext {
+  font-size: 8.5px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+.discord-actions-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.discord-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: #4f46e5;
+  color: #ffffff;
+  border: 1px solid #6366f1;
+  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.discord-copy-btn:hover {
+  background: #4338ca;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+.discord-copy-btn.copied {
+  background: #10b981;
+  border-color: #34d399;
+}
+
+.discord-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #c7d2fe;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.discord-link-btn:hover {
+  background: rgba(99, 102, 241, 0.25);
+  color: #ffffff;
+}
+
+/* Leadership Ops Card */
+.leadership-ops-card {
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  background: linear-gradient(135deg, rgba(45, 27, 8, 0.25), rgba(10, 22, 35, 0.85));
+}
+
+.leadership-title {
+  margin: 0;
+  font-size: 12.5px;
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+.leadership-org {
+  font-size: 9px;
+  color: #94a3b8;
+  margin-top: 1px;
+  margin-bottom: 6px;
+}
+
+.leadership-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.leadership-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 9px;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.lead-bullet {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fbbf24;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+/* Recruiter Ops Card */
+.recruiter-ops-card {
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  background: linear-gradient(135deg, rgba(6, 40, 20, 0.25), rgba(10, 22, 35, 0.85));
+}
+
+.recruiter-role-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.recruiter-spec-badge {
+  font-size: 8px;
+  background: rgba(74, 222, 128, 0.15);
+  color: #86efac;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.recruiter-details-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.recruiter-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.r-label {
+  font-family: var(--mono);
+  font-size: 7px;
+  color: #6ee7b7;
+  letter-spacing: 0.5px;
+}
+
+.r-value {
+  font-size: 9.5px;
+  color: #f0fdf4;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.recruiter-cta-row {
+  display: flex;
+  gap: 8px;
+}
+
+.recruiter-cta-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #10b981;
+  color: #022c22;
+  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.recruiter-cta-email:hover {
+  background: #34d399;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.operative-bottom-manifesto {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 8.5px;
+  color: #94a3b8;
+  line-height: 1.45;
+  padding: 8px 10px;
+  background: rgba(56, 189, 248, 0.05);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 6px;
+}
+
+
 
 
 

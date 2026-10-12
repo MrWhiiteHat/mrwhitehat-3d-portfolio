@@ -46,6 +46,7 @@ const NAV_STATIONS = [
   { id: 'about', label: 'About', icon: UserRound, num: '4' },
   { id: 'resume', label: 'Resume', icon: BriefcaseBusiness, num: '5' },
   { id: 'contact', label: 'Contact', icon: Mail, num: '6' },
+  { id: 'operator', label: 'MrWhiteHat', icon: Terminal, num: '7' },
 ];
 
 export default function App() {
@@ -126,12 +127,12 @@ export default function App() {
         handleCycleTheme();
         return;
       }
-      if (stationId === 'hologram_drone') {
+      if (stationId === 'hologram_drone' || stationId === 'operator') {
         playBreachFanfare();
         playWhooshSound();
-        setSection('about');
+        setSection('operator');
         setGameState('INSPECT_STATION');
-        setUnlockedStations((prev) => new Set([...prev, 'about']));
+        setUnlockedStations((prev) => new Set([...prev, 'operator']));
         return;
       }
       if (stationId === 'server_rack') {
@@ -242,7 +243,7 @@ export default function App() {
         } else if (gameState === 'EXPLORE') {
           handleResetToCustomize();
         }
-      } else if (e.key >= '1' && e.key <= '6') {
+      } else if (e.key >= '1' && e.key <= '7') {
         const target = NAV_STATIONS[parseInt(e.key, 10) - 1];
         if (target) {
           handleStationInteract(target.id);
@@ -312,7 +313,7 @@ export default function App() {
           activeProximity={activeProximity}
           onInteract={handleStationInteract}
           unlockedCount={unlockedStations.size}
-          totalStations={6}
+          totalStations={7}
           onCycleTheme={handleCycleTheme}
           currentThemeName={currentTheme.name}
           muted={muted}

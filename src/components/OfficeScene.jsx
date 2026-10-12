@@ -225,7 +225,7 @@ function SceneContents({
         <ConferenceStation onSelect={onSelect} onHover={onHover} />
         <ArchiveStation onSelect={onSelect} onHover={onHover} />
         <ServerRackStation />
-        <CyberSentinelDrone />
+        <CyberSentinelDrone onSelect={onSelect} onHover={onHover} />
         <LoungeStation onSelect={onSelect} onHover={onHover} />
         <PrinterStation onSelect={onSelect} onHover={onHover} />
         <CommsStation onSelect={onSelect} onHover={onHover} />

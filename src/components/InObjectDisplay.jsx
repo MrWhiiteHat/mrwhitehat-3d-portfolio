@@ -5,9 +5,11 @@ import {
   Award,
   BookOpen,
   BriefcaseBusiness,
+  Check,
   ChevronLeft,
   ChevronRight,
   Code2,
+  Copy,
   Cpu,
   Download,
   ExternalLink,
@@ -15,12 +17,15 @@ import {
   FolderGit2,
   Github,
   Globe,
+  GraduationCap,
   Layers,
   Lock,
   Mail,
+  MessageSquare,
   PhoneCall,
   RotateCcw,
   Send,
+  Shield,
   ShieldAlert,
   ShieldCheck,
   Sparkles,
@@ -39,7 +44,7 @@ import WaveformTunerHack from './hacking/WaveformTunerHack.jsx';
 import WireSpliceHack from './hacking/WireSpliceHack.jsx';
 import CipherDialHack from './hacking/CipherDialHack.jsx';
 
-export const STATION_ORDER = ['projects', 'skills', 'achievements', 'about', 'resume', 'contact'];
+export const STATION_ORDER = ['projects', 'skills', 'achievements', 'about', 'resume', 'contact', 'operator'];
 
 export const stationConfigs = {
   achievements: {
@@ -120,12 +125,35 @@ export const stationConfigs = {
     lightIntensity: 14,
     lightPos: [0, 0.1, 0.3],
   },
+  operator: {
+    // Cyber Sentinel Drone & Hologram Operator on Back-Left Wall
+    position: [-3.35, 1.60, -3.85],
+    rotation: [0, 0.65, 0],
+    camPos: [-1.75, 1.70, -2.35],
+    camTarget: [-3.35, 1.60, -3.85],
+    title: 'Operative Terminal // MrWhiteHat',
+    icon: Terminal,
+    distanceFactor: 0.70,
+    lightColor: '#38bdf8',
+    lightIntensity: 22,
+    lightPos: [0, 0, 0.45],
+  },
 };
 
 export default function InObjectDisplay({ activeSection, onClose, onNavigate }) {
   const [selectedProject, setSelectedProject] = useState(0);
   const [selectedSlide, setSelectedSlide] = useState(0);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState('All');
+  const [copiedDiscord, setCopiedDiscord] = useState(false);
+
+  const handleCopyDiscord = (e) => {
+    e?.stopPropagation?.();
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(profile.discord || 'mr.whitehat');
+      setCopiedDiscord(true);
+      setTimeout(() => setCopiedDiscord(false), 2000);
+    }
+  };
 
   // Track unlocked state per station
   const [unlockedStations, setUnlockedStations] = useState({
@@ -135,6 +163,7 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
     about: false,
     resume: false,
     contact: false,
+    operator: false,
   });
 
   // Track active breach transition animation
@@ -162,6 +191,7 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
           about: true,
           resume: true,
           contact: true,
+          operator: true,
         });
       };
       window.__RELOCK_ALL_HACKS__ = () => {
@@ -172,6 +202,7 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
           about: false,
           resume: false,
           contact: false,
+          operator: false,
         });
       };
       window.__UNLOCK_CURRENT__ = () => {
@@ -348,6 +379,12 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                 <WaveformTunerHack
                   onSolved={() => triggerUnlock('contact')}
                   onBypass={() => triggerUnlock('contact')}
+                />
+              )}
+              {activeSection === 'operator' && (
+                <TimingScannerHack
+                  onSolved={() => triggerUnlock('operator')}
+                  onBypass={() => triggerUnlock('operator')}
                 />
               )}
             </div>
@@ -643,7 +680,38 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                 ))}
               </div>
 
-              <div className="plaque-action-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {/* University Cyber Club Leadership & Mentorship */}
+              {profile.leadership && profile.leadership.length > 0 && (
+                <div className="plaque-edu-box" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: '6px', padding: '8px 10px', marginTop: '6px' }}>
+                  <span className="stat-label" style={{ marginBottom: '4px', color: '#38bdf8' }}>CAMPUS LEADERSHIP & STUDENT COORDINATION</span>
+                  {profile.leadership.map((lead) => (
+                    <div key={lead.organization} style={{ fontSize: '9.5px', color: '#cbd5e1' }}>
+                      <strong style={{ color: '#38bdf8' }}>{lead.role}</strong>
+                      <div style={{ color: '#94a3b8', fontSize: '8.5px', marginBottom: '3px' }}>{lead.organization} ({lead.period})</div>
+                      <div style={{ fontSize: '8.5px', color: '#cbd5e1', lineHeight: '1.4' }}>
+                        • Organized and led cybersecurity workshops for 200+ students covering Web AppSec (OWASP Top 10) & Linux hardening.
+                        <br />• Mentored student CTF teams in traffic packet forensics and vulnerability remediation.
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Recruiter Mobility & Opportunity Clearance */}
+              {profile.availability && (
+                <div style={{ background: 'rgba(34, 197, 94, 0.06)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '6px', padding: '7px 10px', marginTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                  <div>
+                    <span style={{ fontSize: '7.5px', letterSpacing: '0.8px', color: '#4ade80', fontWeight: 700, display: 'block' }}>RECRUITER STATUS // CAREER AVAILABILITY</span>
+                    <strong style={{ fontSize: '10px', color: '#f0fdf4' }}>{profile.availability.timeframes}</strong>
+                    <div style={{ fontSize: '8px', color: '#86efac' }}>{profile.availability.workPreferences}</div>
+                  </div>
+                  <span style={{ fontSize: '8px', background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(34, 197, 94, 0.4)', fontWeight: 600 }}>
+                    AppSec · PenTest · AI Security
+                  </span>
+                </div>
+              )}
+
+              <div className="plaque-action-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
                 <a
                   href={profile.github}
                   target="_blank"
@@ -832,6 +900,26 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                     </div>
                     <ExternalLink size={12} className="ch-arrow" />
                   </a>
+
+                  <div
+                    className="console-channel-btn console-channel-discord"
+                    onClick={handleCopyDiscord}
+                    style={{ cursor: 'pointer', border: '1px solid rgba(129, 140, 248, 0.4)', background: 'rgba(99, 102, 241, 0.08)' }}
+                    title="Click to copy Discord handle"
+                  >
+                    <div className="channel-icon-wrap" style={{ background: 'rgba(99, 102, 241, 0.25)', color: '#a5b4fc' }}>
+                      <MessageSquare size={16} />
+                    </div>
+                    <div className="channel-info">
+                      <span className="ch-tag" style={{ color: '#818cf8' }}>CHANNEL 05 · DISCORD OPS RELAY</span>
+                      <strong className="ch-val" style={{ color: '#e0e7ff' }}>@{profile.discord || 'mr.whitehat'}</strong>
+                    </div>
+                    {copiedDiscord ? (
+                      <span style={{ fontSize: '9px', color: '#4ade80', fontWeight: 800, padding: '2px 6px', background: 'rgba(74, 222, 128, 0.15)', borderRadius: '4px' }}>COPIED!</span>
+                    ) : (
+                      <Copy size={12} className="ch-arrow" style={{ color: '#818cf8' }} />
+                    )}
+                  </div>
                 </div>
 
                 <div className="console-numpad-side">
@@ -847,6 +935,148 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                     ))}
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* 7. MRWHITEHAT // OPERATIVE HOLOGRAPHIC DOSSIER */}
+          {activeSection === 'operator' && (
+            <div className="operative-dossier-terminal">
+              <div className="operative-hud-header">
+                <div className="operative-callsign-box">
+                  <div className="callsign-radar-blip" />
+                  <div>
+                    <span className="callsign-level">SEC-CLEARANCE LEVEL 5 // ACTIVE CYBER OPERATIVE</span>
+                    <h2 className="callsign-title">
+                      CALLSIGN: <span className="callsign-highlight">MrWhiteHat</span>
+                    </h2>
+                    <span className="callsign-legal">
+                      OPERATIVE: {profile.name} · {profile.location}
+                    </span>
+                  </div>
+                </div>
+                <div className="operative-badge-pill">
+                  <Terminal size={14} />
+                  <span>RED TEAM / APPSEC / AI SECURITY</span>
+                </div>
+              </div>
+
+              <div className="operative-grid-layout">
+                {/* A. DISCORD OPS CHANNEL CARD */}
+                <div className="operative-card discord-ops-card">
+                  <div className="card-top-tag">
+                    <MessageSquare size={13} style={{ color: '#818cf8' }} />
+                    <span style={{ color: '#818cf8' }}>CHANNEL // DISCORD FREQUENCY</span>
+                    <span className="live-status-pill">ACTIVE RELAY</span>
+                  </div>
+                  <div className="discord-user-display">
+                    <div className="discord-avatar-ring">
+                      <span className="discord-glyph">🎮</span>
+                    </div>
+                    <div className="discord-user-meta">
+                      <span className="discord-tag-label">VERIFIED DISCORD HANDLE</span>
+                      <strong className="discord-username">@{profile.discord || 'mr.whitehat'}</strong>
+                      <span className="discord-subtext">Direct messaging, technical collaboration & CTF coordination</span>
+                    </div>
+                  </div>
+                  <div className="discord-actions-group">
+                    <button
+                      type="button"
+                      className={`discord-copy-btn ${copiedDiscord ? 'copied' : ''}`}
+                      onClick={handleCopyDiscord}
+                      title="Copy Discord username"
+                    >
+                      {copiedDiscord ? <Check size={13} /> : <Copy size={13} />}
+                      <span>{copiedDiscord ? 'Handle Copied!' : 'Copy Discord Username'}</span>
+                    </button>
+                    <a
+                      href={profile.discordUrl || 'https://discord.com'}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="discord-link-btn"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span>Open Discord</span>
+                      <ArrowUpRight size={12} />
+                    </a>
+                  </div>
+                </div>
+
+                {/* B. UNIVERSITY CYBER CLUB LEADERSHIP CARD */}
+                <div className="operative-card leadership-ops-card">
+                  <div className="card-top-tag">
+                    <GraduationCap size={13} style={{ color: '#fbbf24' }} />
+                    <span style={{ color: '#fbbf24' }}>UNIVERSITY LEADERSHIP // STUDENT COORDINATOR</span>
+                    <span className="cgu-tag">CGU BHUBANESWAR</span>
+                  </div>
+                  <div className="leadership-content-block">
+                    <h3 className="leadership-title">
+                      Cyber Security Club Lead & Student Coordinator
+                    </h3>
+                    <div className="leadership-org">
+                      C.V. Raman Global University (CGU) · 2023 – Present
+                    </div>
+                    <ul className="leadership-points">
+                      <li>
+                        <span className="lead-bullet" />
+                        <span>Organized and led hands-on cybersecurity workshops for <strong>200+ students</strong> covering Web Application Penetration Testing (OWASP Top 10), Network Forensics, and Linux privilege escalation.</span>
+                      </li>
+                      <li>
+                        <span className="lead-bullet" />
+                        <span>Mentored student cohorts in CTF challenges, traffic packet forensics with Wireshark, secure coding practices, and vulnerability assessment.</span>
+                      </li>
+                      <li>
+                        <span className="lead-bullet" />
+                        <span>Spearheaded university participation in regional, state, and national cybersecurity competitions and defense simulations.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* C. RECRUITER CLEARANCE & CAREER AVAILABILITY CARD */}
+                <div className="operative-card recruiter-ops-card">
+                  <div className="card-top-tag">
+                    <BriefcaseBusiness size={13} style={{ color: '#4ade80' }} />
+                    <span style={{ color: '#4ade80' }}>RECRUITER BRIEFING // CAREER CLEARANCE</span>
+                    <span className="recruiter-status-pill">AVAILABLE FOR HIRE</span>
+                  </div>
+                  <div className="recruiter-content-block">
+                    <div className="recruiter-role-list">
+                      <span className="recruiter-spec-badge">AppSec Engineer</span>
+                      <span className="recruiter-spec-badge">Penetration Tester</span>
+                      <span className="recruiter-spec-badge">Security Software Dev</span>
+                      <span className="recruiter-spec-badge">AI Red Teaming</span>
+                    </div>
+                    <div className="recruiter-details-row">
+                      <div className="recruiter-item">
+                        <span className="r-label">AVAILABILITY TIMEFRAME</span>
+                        <strong className="r-value">Summer 2025 & 2026 Internships / Full-Time</strong>
+                      </div>
+                      <div className="recruiter-item">
+                        <span className="r-label">MOBILITY & WORK MODE</span>
+                        <strong className="r-value">Remote · Hybrid · On-site (India & Global)</strong>
+                      </div>
+                    </div>
+                    <div className="recruiter-cta-row">
+                      <a
+                        href={`mailto:${profile.email}?subject=Opportunity%20Inquiry%20for%20Sadashiba%20Sarangi`}
+                        className="recruiter-cta-email"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Mail size={13} />
+                        <span>Contact Directly ({profile.email})</span>
+                        <Send size={11} />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="operative-bottom-manifesto">
+                <Shield size={13} style={{ color: '#38bdf8' }} />
+                <span>
+                  <strong>OPERATIVE MISSION:</strong> Proactive defense through adversarial mindset. Engineering autonomous security pipelines, reverse-engineering mobile attack surfaces, and building privacy-preserving resilient architectures.
+                </span>
               </div>
             </div>
           )}

@@ -88,7 +88,7 @@ function createHologramTexture(imgSrc, onTextureReady) {
 /**
  * Autonomous Cyber Sentinel Recon Drone with True Hologram Projection in the Back of Studio
  */
-export default function CyberSentinelDrone() {
+export default function CyberSentinelDrone({ onSelect, onHover }) {
   const droneGroupRef = useRef();
   const rotorRefs = useRef([]);
   const laserRef = useRef();
@@ -151,6 +151,7 @@ export default function CyberSentinelDrone() {
     playBreachFanfare();
     setScanPulse(true);
     setTimeout(() => setScanPulse(false), 900);
+    onSelect?.({ section: 'operator', label: 'MrWhiteHat · Operative Hologram' });
   };
 
   return (
@@ -162,9 +163,11 @@ export default function CyberSentinelDrone() {
       onClick={handleDroneClick}
       onPointerOver={() => {
         document.body.style.cursor = 'pointer';
+        onHover?.('MrWhiteHat · Operative Hologram');
       }}
       onPointerOut={() => {
         document.body.style.cursor = 'auto';
+        onHover?.(null);
       }}
     >
       {/* ========================================================================= */}

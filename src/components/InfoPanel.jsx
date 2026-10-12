@@ -1,18 +1,24 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowUpRight,
   Award,
   BookOpen,
   BriefcaseBusiness,
+  Check,
   Code2,
+  Copy,
   Download,
   ExternalLink,
   Github,
+  GraduationCap,
   Mail,
+  MessageSquare,
   PhoneCall,
+  Shield,
   ShieldCheck,
   Sparkles,
+  Terminal,
   UserRound,
   X,
 } from 'lucide-react';
@@ -25,6 +31,7 @@ const icons = {
   achievements: Award,
   resume: BriefcaseBusiness,
   contact: Mail,
+  operator: Terminal,
 };
 
 const sectionTitles = {
@@ -34,9 +41,21 @@ const sectionTitles = {
   achievements: 'Honors & Awards',
   resume: 'Resume & Experience',
   contact: 'Get In Touch',
+  operator: 'Operative Dossier (MrWhiteHat)',
 };
 
 export default function InfoPanel({ section, objectLabel, onClose }) {
+  const [copiedDiscord, setCopiedDiscord] = useState(false);
+
+  const handleCopyDiscord = (e) => {
+    e?.stopPropagation?.();
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(profile.discord || 'mr.whitehat');
+      setCopiedDiscord(true);
+      setTimeout(() => setCopiedDiscord(false), 2000);
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
@@ -101,6 +120,30 @@ export default function InfoPanel({ section, objectLabel, onClose }) {
                     </div>
                   ))}
                 </div>
+
+                {profile.leadership && profile.leadership.length > 0 && (
+                  <div className="detail-card" style={{ marginTop: '10px', borderColor: 'rgba(56, 189, 248, 0.3)', background: 'rgba(56, 189, 248, 0.05)' }}>
+                    <span className="detail-label" style={{ color: '#38bdf8' }}>CAMPUS LEADERSHIP</span>
+                    {profile.leadership.map((lead) => (
+                      <div key={lead.organization} style={{ marginBottom: '6px' }}>
+                        <strong style={{ display: 'block', fontSize: '12px', color: '#38bdf8' }}>{lead.role}</strong>
+                        <span className="muted" style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>{lead.organization} ({lead.period})</span>
+                        <ul style={{ margin: '0 0 0 14px', padding: 0, fontSize: '11px', color: '#cbd5e1' }}>
+                          <li>Conducted hands-on Web AppSec & CTF workshops for 200+ students.</li>
+                          <li>Mentored student security cohorts in network forensics and system hardening.</li>
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {profile.availability && (
+                  <div className="detail-card" style={{ marginTop: '10px', borderColor: 'rgba(34, 197, 94, 0.3)', background: 'rgba(34, 197, 94, 0.05)' }}>
+                    <span className="detail-label" style={{ color: '#4ade80' }}>RECRUITER CLEARANCE // STATUS</span>
+                    <strong style={{ display: 'block', fontSize: '12px', color: '#f0fdf4' }}>{profile.availability.timeframes}</strong>
+                    <span className="muted" style={{ fontSize: '11px', color: '#86efac', display: 'block' }}>{profile.availability.workPreferences}</span>
+                  </div>
+                )}
 
                 <p className="body-copy">
                   {profile.bio}
@@ -282,6 +325,97 @@ export default function InfoPanel({ section, objectLabel, onClose }) {
                   </span>
                   <ExternalLink size={15} />
                 </a>
+
+                <div
+                  className="contact-row"
+                  onClick={handleCopyDiscord}
+                  style={{ cursor: 'pointer', border: '1px solid rgba(129, 140, 248, 0.3)', background: 'rgba(99, 102, 241, 0.06)' }}
+                  title="Click to copy Discord handle"
+                >
+                  <span className="contact-icon" style={{ background: 'rgba(99, 102, 241, 0.2)', color: '#818cf8' }}>
+                    <MessageSquare size={18} />
+                  </span>
+                  <span>
+                    <small style={{ color: '#818cf8' }}>DISCORD FREQUENCY</small>
+                    <strong style={{ color: '#e0e7ff' }}>@{profile.discord || 'mr.whitehat'}</strong>
+                  </span>
+                  {copiedDiscord ? (
+                    <span style={{ fontSize: '11px', color: '#4ade80', fontWeight: 700 }}>COPIED!</span>
+                  ) : (
+                    <Copy size={15} style={{ color: '#818cf8' }} />
+                  )}
+                </div>
+              </>
+            )}
+
+            {section === 'operator' && (
+              <>
+                <p className="eyebrow">TACTICAL IDENTITY</p>
+                <h2>MrWhiteHat Operative Dossier</h2>
+                <p className="panel-lead">
+                  Cybersecurity specialist, AI red-teaming engineer, and campus student coordinator.
+                </p>
+
+                {/* Discord Channel Card */}
+                <div className="detail-card" style={{ borderColor: 'rgba(129, 140, 248, 0.4)', background: 'rgba(99, 102, 241, 0.08)' }}>
+                  <span className="detail-label" style={{ color: '#818cf8' }}>DISCORD OPS CHANNEL</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                    <div>
+                      <strong style={{ fontSize: '14px', color: '#e0e7ff' }}>@{profile.discord || 'mr.whitehat'}</strong>
+                      <span className="muted" style={{ display: 'block', fontSize: '11px', color: '#a5b4fc' }}>Active for collaboration & security discussion</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="primary-link"
+                      onClick={handleCopyDiscord}
+                      style={{ padding: '6px 12px', fontSize: '11px', background: copiedDiscord ? '#10b981' : '#6366f1' }}
+                    >
+                      {copiedDiscord ? <Check size={13} /> : <Copy size={13} />}
+                      {copiedDiscord ? 'Copied!' : 'Copy Handle'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* University Leadership Card */}
+                {profile.leadership && profile.leadership.length > 0 && (
+                  <div className="detail-card" style={{ marginTop: '10px', borderColor: 'rgba(251, 191, 36, 0.35)', background: 'rgba(251, 191, 36, 0.05)' }}>
+                    <span className="detail-label" style={{ color: '#fbbf24' }}>CAMPUS CYBER SECURITY LEADERSHIP</span>
+                    {profile.leadership.map((lead) => (
+                      <div key={lead.organization}>
+                        <strong style={{ fontSize: '13px', color: '#fbbf24', display: 'block' }}>{lead.role}</strong>
+                        <span className="muted" style={{ fontSize: '11px', display: 'block', marginBottom: '6px' }}>{lead.organization} ({lead.period})</span>
+                        <ul style={{ margin: '0 0 0 16px', padding: 0, fontSize: '11.5px', color: '#cbd5e1', lineHeight: '1.5' }}>
+                          <li>Conducted hands-on workshops for <strong>200+ students</strong> on Web AppSec (OWASP Top 10) & Linux hardening.</li>
+                          <li>Mentored student CTF teams in traffic packet forensics and vulnerability remediation.</li>
+                          <li>Spearheaded university participation in regional, state, and national cyber defense competitions.</li>
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Recruiter Availability Card */}
+                {profile.availability && (
+                  <div className="detail-card" style={{ marginTop: '10px', borderColor: 'rgba(34, 197, 94, 0.4)', background: 'rgba(34, 197, 94, 0.06)' }}>
+                    <span className="detail-label" style={{ color: '#4ade80' }}>RECRUITER OPPORTUNITY & CLEARANCE</span>
+                    <strong style={{ fontSize: '13px', color: '#f0fdf4', display: 'block' }}>{profile.availability.timeframes}</strong>
+                    <span className="muted" style={{ fontSize: '11px', color: '#86efac', display: 'block', marginBottom: '6px' }}>{profile.availability.workPreferences}</span>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                      {profile.availability.targetRoles?.map((r) => (
+                        <span key={r} style={{ fontSize: '10px', background: 'rgba(34, 197, 94, 0.15)', color: '#86efac', padding: '2px 8px', borderRadius: '4px', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
+                          {r}
+                        </span>
+                      ))}
+                    </div>
+                    <a
+                      className="primary-link"
+                      href={`mailto:${profile.email}?subject=Opportunity%20Inquiry%20for%20Sadashiba%20Sarangi`}
+                      style={{ background: '#10b981', color: '#022c22', display: 'inline-flex', padding: '7px 14px' }}
+                    >
+                      <Mail size={13} /> Email Recruiter Direct
+                    </a>
+                  </div>
+                )}
               </>
             )}
           </div>

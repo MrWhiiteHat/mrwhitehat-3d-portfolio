@@ -11,10 +11,42 @@ export const profile = {
   email: 'kanhasarangi39@gmail.com',
   phone: '+91 8917512439',
   tel: '+918917512439',
+  discord: 'mr.whitehat',
+  discordUser: 'mr.whitehat',
+  discordUrl: 'https://discord.com/users/mr.whitehat',
   github: 'https://github.com/MrWhiiteHat',
   linkedin: 'https://www.linkedin.com/in/sadashiba-sarangi/',
   resume: './Sadashiba_Sarangi_Resume.pdf',
   resumeFilename: 'Sadashiba_Sarangi_Resume.pdf',
+  leadership: [
+    {
+      role: 'Cyber Security Club Lead & Student Coordinator',
+      organization: 'C.V. Raman Global University (CGU)',
+      location: 'Bhubaneswar, Odisha',
+      period: '2023 – Present',
+      badge: 'Campus Lead & Coordinator',
+      highlights: [
+        'Organized and spearheaded university-wide cybersecurity bootcamps and hands-on workshops for 200+ students covering Web Application Penetration Testing (OWASP Top 10), Network Forensics, and Linux privilege escalation.',
+        'Mentored junior student security teams in CTF competitions, packet analysis (Wireshark), secure code review, and vulnerability remediation.',
+        'Spearheaded university participation in regional, state, and national cybersecurity initiatives, hackathons, and defense simulations.',
+        'Fostered a collaborative campus security community bridging offensive red-teaming techniques with defensive SSDLC best practices.',
+      ],
+    },
+  ],
+  availability: {
+    status: 'Actively Available // Open to Roles',
+    badge: 'Immediate Availability',
+    targetRoles: [
+      'Application Security (AppSec) Engineer',
+      'Penetration Tester / Security Consultant',
+      'Security Software Developer',
+      'AI Red Teaming & LLM Security',
+    ],
+    timeframes: 'Summer 2025 / 2026 Internships & Full-Time Positions',
+    workPreferences: 'Remote · Hybrid · On-site (India & Global Mobility)',
+    contactEmail: 'kanhasarangi39@gmail.com',
+    discord: 'mr.whitehat',
+  },
   education: [
     {
       institution: 'C.V. Raman Global University (CGU)',
@@ -279,10 +311,11 @@ export const achievements = [
 ];
 
 export const objectMap = [
+  { match: /drone|hologram|sentinel|operator|whitehat/i, section: 'operator', label: 'MrWhiteHat · Operative Hologram' },
   { match: /monitor|screen|computer|keyboard|simple_desk|desk/i, section: 'projects', label: 'Workstation · Projects' },
   { match: /book|cabinet|shelf|wardrobe|box/i, section: 'skills', label: 'Bookshelf & Archives · Skills' },
   { match: /projector|meeting table|remote|clock/i, section: 'achievements', label: 'Presentation Area · Achievements' },
-  { match: /chair|armchair|couch|reception|drone/i, section: 'about', label: 'Office Lounge · About Me' },
+  { match: /chair|armchair|couch|reception/i, section: 'about', label: 'Office Lounge · About Me' },
   { match: /printer|paper/i, section: 'resume', label: 'Printer Station · Resume' },
   { match: /water|mug|phone|mobile|phonecall/i, section: 'contact', label: 'Refreshment & Phone · Contact' },
 ];
@@ -294,4 +327,5 @@ export const hotspots = [
   { id: 'about', label: 'About', position: [4.95, 2.8, 1.6], icon: '👤' },
   { id: 'resume', label: 'Resume', position: [-3.6, 1.45, 1.05], icon: '📄' },
   { id: 'contact', label: 'Contact', position: [-0.15, 1.15, 0.65], icon: '📞' },
+  { id: 'operator', label: 'MrWhiteHat', position: [-3.35, 1.85, -3.85], icon: '🛡️' },
 ];
