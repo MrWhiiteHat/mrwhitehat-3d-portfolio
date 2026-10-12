@@ -624,7 +624,7 @@ export default function FirstPersonController({
         target &&
         target.closest &&
         target.closest(
-          'button, input, a, .hud-top-bar, .hud-bottom-bar, .hud-wasd-widget, .hud-mobile-joystick-zone, .hud-mobile-interact-btn, .proximity-action-btn'
+          'button, input, a, .hud-top-bar, .hud-bottom-bar, .hud-wasd-widget, .hud-locomotion-widget, .hud-mobile-joystick-zone, .hud-mobile-interact-btn, .proximity-action-btn'
         )
       ) {
         return;
@@ -749,6 +749,7 @@ export default function FirstPersonController({
       const len = Math.hypot(inputForward, inputRight);
       const normFwd = inputForward / len;
       const normRight = inputRight / len;
+      const actualSpeed = targetSpeed * Math.min(1.0, len);
 
       const sinY = Math.sin(yaw.current);
       const cosY = Math.cos(yaw.current);
@@ -763,9 +764,10 @@ export default function FirstPersonController({
       const rightX = cosY;
       const rightZ = -sinY;
 
-      targetVelX = (normFwd * fwdX + normRight * rightX) * targetSpeed;
-      targetVelZ = (normFwd * fwdZ + normRight * rightZ) * targetSpeed;
+      targetVelX = (normFwd * fwdX + normRight * rightX) * actualSpeed;
+      targetVelZ = (normFwd * fwdZ + normRight * rightZ) * actualSpeed;
     }
+
 
     // Velocity momentum damping (smooth acceleration & coasting deceleration)
     const accelRate = isMoving ? 14.0 : 16.0;

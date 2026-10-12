@@ -1,0 +1,67 @@
+PROPRIETARY SOURCE CODE & ALL RIGHTS RESERVED LICENSE
+
+Copyright (c) 2026 Sadashiba Sarangi (MrWhiteHat). All Rights Reserved.
+
+==============================================================================
+TERMS AND CONDITIONS FOR ACCESS, USE, AND REPRODUCTION
+==============================================================================
+
+1. OWNERSHIP & INTELLECTUAL PROPERTY
+This repository and all original files, including but not limited to source code,
+scripts, custom 3D shaders, dynamic textures, user interface designs, audio
+synthesis routines, holographic assets, branding, and text contents (collectively,
+the "Software"), are the proprietary intellectual property and copyrighted works
+of Sadashiba Sarangi ("MrWhiteHat" / "Author").
+
+2. PERMITTED USE (READ-ONLY / EVALUATION)
+Permission is granted exclusively to view and inspect the source code as publicly
+hosted on GitHub for the sole purposes of:
+  a) Personal educational study and security architectural review;
+  b) Professional recruiter evaluation and technical assessment of the Author;
+  c) Submitting non-infringing issue reports or pull requests to this repository.
+
+3. STRICT PROHIBITIONS
+Unless explicitly authorized in advance through signed written permission from
+the Author, you are STRICTLY PROHIBITED from:
+  a) Commercial Use: Utilizing the Software, in whole or in part, for any commercial,
+     monetized, enterprise, or profitable endeavor.
+  b) Personal Portfolio / Template Cloning: Copying, rebranding, deploying, or
+     hosting this codebase (or any substantial derivative thereof) as your own
+     personal website, portfolio, template, or showcase.
+  c) Redistribution & Sublicensing: Publishing, mirroring, distributing, selling,
+     leasing, or sublicensing the Software or any portion thereof across any public
+     or private medium.
+  d) Identity & Asset Infringement: Using or displaying the Author's name, likeness,
+     avatar, hologram, resume, contact information, handle ("MrWhiteHat"), or
+     credentials.
+  e) Removal of Notices: Removing, altering, or obscuring any copyright, trademark,
+     or proprietary notices contained within the source code or associated assets.
+
+4. THIRD-PARTY ASSETS & DEPENDENCIES
+Third-party libraries (e.g., Three.js, React Three Fiber, Framer Motion) and 3D
+base models (such as the base isometric room model by Companion_Cube licensed under
+CC BY 4.0) remain subject to their respective open-source licenses. This proprietary
+license applies strictly to the Author's original works, custom logic, modifications,
+audio systems, styling, orchestration, and branding.
+
+5. VIOLATIONS AND ENFORCEMENT
+Any unauthorized reproduction, modification, distribution, or public deployment of
+this Software constitutes willful copyright infringement under international
+copyright treaties and the Digital Millennium Copyright Act (DMCA). The Author
+reserves the right to take immediate enforcement action, including DMCA takedown
+demands and seeking damages to the fullest extent permitted by law.
+
+6. DISCLAIMER OF WARRANTY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE
+LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OR
+INABILITY TO USE THE SOFTWARE.
+
+==============================================================================
+For permissions, licensing inquiries, or professional contact:
+Sadashiba Sarangi (MrWhiteHat)
+Email: kanhasarangi39@gmail.com
+LinkedIn: https://www.linkedin.com/in/sadashiba-sarangi/
+GitHub: https://github.com/MrWhiiteHat
+==============================================================================
