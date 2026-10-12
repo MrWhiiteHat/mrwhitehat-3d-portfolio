@@ -38,6 +38,7 @@ import {
   Unlock,
   UserCheck,
   UserRound,
+  Users,
   Wifi,
   Zap,
 } from 'lucide-react';
@@ -51,6 +52,7 @@ import CipherDialHack from './hacking/CipherDialHack.jsx';
 import MainframeFirewallHack from './hacking/MainframeFirewallHack.jsx';
 import HardwareArsenalHack from './hacking/HardwareArsenalHack.jsx';
 import PacketSnifferHack from './hacking/PacketSnifferHack.jsx';
+import VisitorLogDisplay from './studio/VisitorLogDisplay.jsx';
 
 export const STATION_ORDER = [
   'projects',
@@ -63,6 +65,7 @@ export const STATION_ORDER = [
   'server_rack',
   'hardware_arsenal',
   'wireshark_monitor',
+  'visitor_log',
 ];
 
 export const stationConfigs = {
@@ -196,9 +199,29 @@ export const stationConfigs = {
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
   },
+  visitor_log: {
+    // Visitor Count & Access Roster Terminal on Right Wall next to entrance
+    position: [4.94, 2.25, -0.75],
+    rotation: [0, -Math.PI / 2, 0],
+    camPos: [2.5, 2.25, -0.75],
+    camTarget: [4.94, 2.25, -0.75],
+    title: 'CTOS Security Visitor Access Terminal',
+    icon: Users,
+    distanceFactor: 0.75,
+    lightColor: '#34d399',
+    lightIntensity: 22,
+    lightPos: [0, 0, 0.45],
+  },
 };
 
-export default function InObjectDisplay({ activeSection, onClose, onNavigate }) {
+export default function InObjectDisplay({
+  activeSection,
+  onClose,
+  onNavigate,
+  visitorLogs = [],
+  visitorCount = 1488,
+  playerData = null,
+}) {
   const [selectedProject, setSelectedProject] = useState(0);
   const [selectedSlide, setSelectedSlide] = useState(0);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState('All');
@@ -225,6 +248,7 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
     server_rack: false,
     hardware_arsenal: false,
     wireshark_monitor: false,
+    visitor_log: true,
   });
 
   // Track active breach transition animation
@@ -1438,6 +1462,16 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                 </pre>
               </div>
             </div>
+          )}
+
+          {/* 11. CTOS SECURITY VISITOR MANIFEST & ACCESS ROSTER */}
+          {activeSection === 'visitor_log' && (
+            <VisitorLogDisplay
+              logs={visitorLogs}
+              visitorCount={visitorCount}
+              activeOperative={playerData}
+              onClose={onClose}
+            />
           )}
           </>
         )}

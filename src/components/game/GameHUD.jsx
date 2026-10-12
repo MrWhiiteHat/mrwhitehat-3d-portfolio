@@ -13,6 +13,7 @@ import {
   Lightbulb,
   Sparkles,
   Terminal,
+  Users,
   Volume2,
   VolumeX,
   Zap,
@@ -25,6 +26,7 @@ export default function GameHUD({
   onInteract,
   unlockedCount = 0,
   totalStations = 6,
+  visitorCount = 1488,
   onCycleTheme,
   currentThemeName,
   muted,
@@ -261,6 +263,26 @@ export default function GameHUD({
             {unlockedCount} / {totalStations}
           </strong>
         </div>
+
+        {/* Live Wall Visitor Count Pill */}
+        <button
+          type="button"
+          className="hud-visitor-pill"
+          onClick={() => {
+            playClickSound(1000);
+            onInteract?.('visitor_log');
+          }}
+          title="Open CTOS Office Security Visitor Roster & Telemetry Logs"
+        >
+          <Users size={13} style={{ color: playerData.accentColor || '#34d399' }} />
+          <span className="visitor-pill-label">VISITOR COUNT:</span>
+          <strong
+            className="visitor-pill-num"
+            style={{ color: playerData.accentColor || '#34d399' }}
+          >
+            #{visitorCount}
+          </strong>
+        </button>
 
         {/* Quick HUD Controls */}
         <div className="hud-right-actions">

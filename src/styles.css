@@ -4412,6 +4412,568 @@ button, a {
   transform: translateY(-2px);
 }
 
+.btn-launch-game.btn-launch-disabled {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #f87171 !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.config-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.badge-validated {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.badge-required {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  padding: 2px 8px;
+  border-radius: 12px;
+  animation: pulse 1.2s infinite alternate;
+}
+
+.security-notice-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #fca5a5;
+  line-height: 1.4;
+  margin-top: 6px;
+}
+
+.security-notice-box .notice-icon {
+  flex-shrink: 0;
+  color: #ef4444;
+  margin-top: 1px;
+}
+
+.input-error-pulse {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4) !important;
+}
+
+.division-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.division-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.division-chip:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.division-chip.active-division {
+  background: rgba(85, 246, 154, 0.14);
+}
+
+.division-chip .div-name {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.division-chip .div-badge {
+  font-family: var(--mono);
+  font-size: 7px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.badge-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.badge-div-pill {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  font-weight: 800;
+  color: #e2e8f0;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 1px 6px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* Live Wall Visitor Counter Pill in HUD Top Bar */
+.hud-visitor-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(9, 15, 12, 0.88);
+  border: 1px solid rgba(85, 246, 154, 0.3);
+  backdrop-filter: blur(16px);
+  padding: 6px 12px;
+  border-radius: 24px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.hud-visitor-pill:hover {
+  background: rgba(85, 246, 154, 0.15);
+  border-color: var(--green);
+  transform: translateY(-1px);
+  box-shadow: 0 0 16px rgba(85, 246, 154, 0.3);
+}
+
+.visitor-pill-label {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.visitor-pill-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+/* ======================================================== */
+/* 10.B CTOS SECURITY VISITOR MANIFEST & ROSTER TERMINAL    */
+/* ======================================================== */
+.visitor-log-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: rgba(8, 14, 11, 0.96);
+  border: 1.5px solid rgba(85, 246, 154, 0.35);
+  border-radius: 18px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 30px rgba(85, 246, 154, 0.12);
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.visitor-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(85, 246, 154, 0.18);
+}
+
+.visitor-title-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.visitor-icon-chip {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(85, 246, 154, 0.12);
+  border: 1px solid rgba(85, 246, 154, 0.45);
+  color: var(--green);
+  box-shadow: 0 0 16px rgba(85, 246, 154, 0.2);
+}
+
+.visitor-main-title {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  color: #f8fafc;
+  margin: 0;
+}
+
+.visitor-sub-title {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  margin: 2px 0 0;
+}
+
+.visitor-stat-counter-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(85, 246, 154, 0.25);
+  border-radius: 10px;
+  padding: 8px 14px;
+  min-width: 190px;
+}
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.6px;
+}
+
+.stat-count-num {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--green);
+  text-shadow: 0 0 12px rgba(85, 246, 154, 0.5);
+  line-height: 1.1;
+  margin: 2px 0;
+}
+
+.stat-live-badge {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.5px;
+}
+
+/* Filter and Search Bar */
+.visitor-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.visitor-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 12px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.visitor-search-box .search-icon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.visitor-search-input {
+  background: transparent;
+  border: none;
+  color: #f8fafc;
+  font-family: var(--mono);
+  font-size: 11px;
+  width: 100%;
+  outline: none;
+}
+
+.btn-clear-search {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+.visitor-filter-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.visitor-pill {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.visitor-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.visitor-pill.is-active {
+  background: rgba(85, 246, 154, 0.18);
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 12px rgba(85, 246, 154, 0.2);
+}
+
+/* Visitor Cards List */
+.visitor-logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.visitor-entry-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(12, 22, 17, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 3.5px solid var(--green);
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+}
+
+.visitor-entry-card:hover {
+  background: rgba(16, 28, 22, 0.9);
+  border-color: rgba(85, 246, 154, 0.3);
+  transform: translateX(3px);
+}
+
+.visitor-entry-card.entry-is-current {
+  background: rgba(14, 30, 22, 0.95);
+  border-color: rgba(85, 246, 154, 0.45);
+  box-shadow: 0 0 20px rgba(85, 246, 154, 0.12);
+}
+
+.visitor-avatar-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1.5px solid;
+  flex-shrink: 0;
+}
+
+.avatar-arch-label {
+  font-family: var(--mono);
+  font-size: 7px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.visitor-info-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.visitor-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.visitor-name {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.badge-you {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 800;
+  background: rgba(52, 211, 153, 0.2);
+  border: 1px solid #34d399;
+  color: #34d399;
+  padding: 1px 7px;
+  border-radius: 12px;
+  animation: pulse 1.4s infinite alternate;
+}
+
+.badge-division {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  font-weight: 800;
+  border: 1px solid;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.visitor-role-text {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.visitor-specs-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 3px;
+}
+
+.spec-chip {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: #94a3b8;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.spec-chip strong {
+  color: #e2e8f0;
+}
+
+.visitor-time-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #94a3b8;
+}
+
+.btn-copy-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(85, 246, 154, 0.25);
+  border-radius: 6px;
+  color: #cbd5e1;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-copy-stamp:hover {
+  background: rgba(85, 246, 154, 0.15);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.visitor-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #64748b;
+  font-family: var(--mono);
+  font-size: 11px;
+  gap: 10px;
+}
+
+.visitor-log-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(85, 246, 154, 0.18);
+  flex-wrap: wrap;
+}
+
+.footer-notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  color: #94a3b8;
+  max-width: 500px;
+}
+
+.btn-visitor-close {
+  background: rgba(85, 246, 154, 0.12);
+  border: 1px solid var(--green);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-visitor-close:hover {
+  background: var(--green);
+  color: #050d08;
+}
+
 /* ======================================================== */
 /* 10. IN-GAME FIRST PERSON HUD OVERLAY                     */
 /* ======================================================== */
@@ -5285,6 +5847,62 @@ html, body, .portfolio-container {
     width: 62px;
     height: 62px;
     font-size: 8.5px;
+  }
+
+  /* Live Visitor Counter Pill on Phones */
+  .hud-visitor-pill .visitor-pill-label {
+    display: none;
+  }
+
+  .hud-visitor-pill {
+    padding: 5px 8px;
+    gap: 4px;
+  }
+
+  .visitor-pill-num {
+    font-size: 9.5px;
+  }
+
+  /* Visitor Log Roster on Mobile */
+  .visitor-log-container {
+    padding: 14px;
+    max-height: 84vh;
+    overflow-y: auto;
+  }
+
+  .visitor-log-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .visitor-stat-counter-box {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .visitor-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .visitor-filter-pills {
+    overflow-x: auto;
+    width: 100%;
+    padding-bottom: 4px;
+  }
+
+  .visitor-entry-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .visitor-time-pane {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 
   /* Proximity Prompt on Mobile */

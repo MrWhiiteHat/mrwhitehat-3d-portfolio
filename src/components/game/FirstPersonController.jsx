@@ -247,6 +247,20 @@ const STATIONS = [
       ),
     ],
   },
+  // 18. Wall-Mounted CTOS Visitor Counter & Security Access Log Terminal
+  {
+    id: 'visitor_log',
+    title: 'CTOS Security Visitor Terminal',
+    action: 'INSPECT VISITOR ROSTER & LOGS (E)',
+    position: [4.7, 2.25, -0.75],
+    maxDist: 3.8,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(4.3, 1.4, -1.6),
+        new THREE.Vector3(5.02, 3.0, 0.1)
+      ),
+    ],
+  },
 ];
 
 // Room Obstacle Bounding Boxes for AABB Collision Response

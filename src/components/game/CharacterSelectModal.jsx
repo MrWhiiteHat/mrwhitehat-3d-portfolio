@@ -1,31 +1,23 @@
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
+  AlertTriangle,
+  CheckCircle2,
   Cpu,
   Eye,
   Flame,
+  Globe,
+  Lock,
   Radio,
-  RefreshCw,
   Shield,
+  ShieldAlert,
+  ShieldCheck,
   Sparkles,
   Terminal,
   UserCheck,
   Zap,
 } from 'lucide-react';
-import { playClickSound, playWhooshSound } from '../../utils/audio.js';
-
-const CODENAME_PRESETS = [
-  'MrWhiteHat',
-  'Sadashiba',
-  'Cipher_Zero',
-  'Ghost_Netrunner',
-  'Valkyrie_99',
-  'Neo_Spectre',
-  'Apex_Phantom',
-  'Zero_Day',
-  'Krypton_Hex',
-  'Byte_Reaper',
-];
+import { playClickSound, playHackingBeep, playWhooshSound } from '../../utils/audio.js';
 
 const ARCHETYPES = [
   {
@@ -33,7 +25,7 @@ const ARCHETYPES = [
     name: 'Operative Alpha',
     subtitle: 'Cyber Recon Specialist',
     icon: Shield,
-    desc: 'Heavy ICE penetration & firewall bypass expertise.',
+    desc: 'Heavy ICE penetration, perimeter defense & firewall bypass.',
   },
   {
     id: 'Beta',
@@ -49,28 +41,60 @@ const ARCHETYPES = [
     icon: Cpu,
     desc: 'Quantum algorithmic parsing & automated telemetry decoding.',
   },
+  {
+    id: 'Phantom',
+    name: 'Cyber Phantom',
+    subtitle: 'Stealth Red Team Ghost',
+    icon: Flame,
+    desc: 'Silent lateral movement, zero-day research & evasion tactics.',
+  },
+  {
+    id: 'Sentinel',
+    name: 'Sentinel Zero',
+    subtitle: 'Mainframe Defense Unit',
+    icon: ShieldCheck,
+    desc: 'Deep packet inspection, SIEM orchestration & cryptographic sealing.',
+  },
+  {
+    id: 'Netrunner',
+    name: 'Rogue Netrunner',
+    subtitle: 'Black-ICE Breaker',
+    icon: Terminal,
+    desc: 'Sub-GHz radio interception, firmware reverse-engineering & SDR.',
+  },
 ];
 
 const VISOR_STYLES = [
-  { id: 'mono', label: 'Tactical Mono-Lens', shape: 'mono' },
-  { id: 'dual', label: 'Dual Hex Visor', shape: 'dual' },
-  { id: 'crown', label: 'Neural Crown', shape: 'crown' },
-  { id: 'shades', label: 'Stealth Shades', shape: 'shades' },
+  { id: 'mono', label: 'Tactical Mono-Lens' },
+  { id: 'dual', label: 'Dual Hex Visor' },
+  { id: 'crown', label: 'Neural Crown' },
+  { id: 'shades', label: 'Stealth Shades' },
+  { id: 'filter', label: 'Respirator Filter' },
+  { id: 'reticle', label: 'Combat Reticle' },
 ];
 
 const NEON_PALETTES = [
-  { id: 'cybernoir', label: 'Neon Noir (Red & Cyan)', color: '#ff2244', themeKey: 'CYBER_NEON_NOIR' },
   { id: 'matrix', label: 'Matrix Green', color: '#34d399', themeKey: 'CYBER_MATRIX' },
   { id: 'cyan', label: 'Arctic Cyan', color: '#38bdf8', themeKey: 'STEALTH_ICE' },
-  { id: 'magenta', label: 'Synthwave Neon', color: '#ec4899', themeKey: 'SYNTHWAVE_NEON' },
+  { id: 'cybernoir', label: 'Neon Noir (Red)', color: '#ff2244', themeKey: 'CYBER_NEON_NOIR' },
+  { id: 'magenta', label: 'Synthwave Pink', color: '#ec4899', themeKey: 'SYNTHWAVE_NEON' },
   { id: 'amber', label: 'Warm Amber', color: '#fbbf24', themeKey: 'WARM_AMBER' },
+  { id: 'violet', label: 'Void Violet', color: '#a855f7', themeKey: 'CYBER_NEON_NOIR' },
+  { id: 'emerald', label: 'Electric Emerald', color: '#10b981', themeKey: 'CYBER_MATRIX' },
+];
+
+const DIVISIONS = [
+  { id: 'red', name: 'Red Team', badge: 'OFFENSIVE' },
+  { id: 'blue', name: 'Blue Team', badge: 'DEFENSIVE' },
+  { id: 'purple', name: 'Purple Team', badge: 'HYBRID' },
+  { id: 'guest', name: 'Executive Guest', badge: 'VISITOR' },
 ];
 
 function HolographicAvatarPreview({ archetype, visor, accentColor }) {
   return (
     <Canvas
       dpr={[1, 1.5]}
-      camera={{ position: [0, 0.2, 2.4], fov: 38 }}
+      camera={{ position: [0, 0.2, 2.3], fov: 38 }}
       style={{ width: '100%', height: '100%' }}
     >
       <ambientLight intensity={1.5} />
@@ -83,6 +107,29 @@ function HolographicAvatarPreview({ archetype, visor, accentColor }) {
           <boxGeometry args={[0.55, 0.65, 0.55]} />
           <meshStandardMaterial color="#0b1319" roughness={0.3} metalness={0.9} />
         </mesh>
+
+        {/* Archetype-specific antenna / ear armor */}
+        {(archetype === 'Android' || archetype === 'Sentinel') && (
+          <group>
+            <mesh position={[-0.32, 0.22, 0]}>
+              <boxGeometry args={[0.08, 0.28, 0.14]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.9} roughness={0.2} />
+            </mesh>
+            <mesh position={[-0.33, 0.22, 0]}>
+              <boxGeometry args={[0.02, 0.2, 0.08]} />
+              <meshBasicMaterial color={accentColor} />
+            </mesh>
+            <mesh position={[0.32, 0.22, 0]}>
+              <boxGeometry args={[0.08, 0.28, 0.14]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.9} roughness={0.2} />
+            </mesh>
+            <mesh position={[0.33, 0.22, 0]}>
+              <boxGeometry args={[0.02, 0.2, 0.08]} />
+              <meshBasicMaterial color={accentColor} />
+            </mesh>
+          </group>
+        )}
+
         {/* Jaw Guard Filter */}
         <mesh position={[0, -0.15, 0.22]}>
           <boxGeometry args={[0.42, 0.24, 0.2]} />
@@ -139,6 +186,38 @@ function HolographicAvatarPreview({ archetype, visor, accentColor }) {
             </mesh>
           </group>
         )}
+        {visor === 'filter' && (
+          <group position={[0, -0.05, 0.28]}>
+            <mesh position={[-0.16, -0.1, 0]}>
+              <cylinderGeometry args={[0.065, 0.065, 0.08, 16]} rotation={[Math.PI / 2, 0, 0]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.9} />
+            </mesh>
+            <mesh position={[0.16, -0.1, 0]}>
+              <cylinderGeometry args={[0.065, 0.065, 0.08, 16]} rotation={[Math.PI / 2, 0, 0]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.9} />
+            </mesh>
+            <mesh position={[0, 0.25, 0.01]}>
+              <boxGeometry args={[0.42, 0.08, 0.02]} />
+              <meshBasicMaterial color={accentColor} />
+            </mesh>
+          </group>
+        )}
+        {visor === 'reticle' && (
+          <group position={[0, 0.22, 0.3]}>
+            <mesh position={[0.12, 0, 0]}>
+              <ringGeometry args={[0.05, 0.065, 16]} />
+              <meshBasicMaterial color={accentColor} />
+            </mesh>
+            <mesh position={[0.12, 0, 0]}>
+              <circleGeometry args={[0.012, 8]} />
+              <meshBasicMaterial color="#ffffff" />
+            </mesh>
+            <mesh position={[-0.12, 0, 0]}>
+              <boxGeometry args={[0.16, 0.06, 0.02]} />
+              <meshStandardMaterial color="#111827" />
+            </mesh>
+          </group>
+        )}
 
         {/* Operative Cyber Collar */}
         <mesh position={[0, -0.42, 0]}>
@@ -156,16 +235,16 @@ function HolographicAvatarPreview({ archetype, visor, accentColor }) {
 }
 
 export default function CharacterSelectModal({ onStartGame, currentThemeKey, onSetTheme }) {
-  const [codename, setCodename] = useState('MrWhiteHat');
+  // Empty by default: user MUST enter their own name (no suggestions)
+  const [codename, setCodename] = useState('');
+  const [role, setRole] = useState('Cyber Security Researcher');
   const [selectedArchetype, setSelectedArchetype] = useState(ARCHETYPES[0]);
   const [selectedVisor, setSelectedVisor] = useState(VISOR_STYLES[0].id);
   const [selectedPalette, setSelectedPalette] = useState(NEON_PALETTES[0]);
+  const [selectedDivision, setSelectedDivision] = useState(DIVISIONS[0]);
+  const [showError, setShowError] = useState(false);
 
-  const handleRandomizeName = () => {
-    playClickSound(950);
-    const random = CODENAME_PRESETS[Math.floor(Math.random() * CODENAME_PRESETS.length)];
-    setCodename(random);
-  };
+  const isNameEntered = codename.trim().length >= 1;
 
   const handleSelectPalette = (palette) => {
     playClickSound(1050);
@@ -174,15 +253,24 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
   };
 
   const handleLaunch = () => {
+    if (!isNameEntered) {
+      playHackingBeep(600);
+      setShowError(true);
+      return;
+    }
     playWhooshSound();
     playClickSound(1200);
     onStartGame({
-      codename: codename.trim() || 'Operative_Zero',
+      name: codename.trim(),
+      codename: codename.trim(),
+      role: role.trim() || 'Cyber Security Specialist',
+      division: selectedDivision.name,
       archetype: selectedArchetype.id,
       archetypeName: selectedArchetype.name,
       visor: selectedVisor,
       accentColor: selectedPalette.color,
       themeKey: selectedPalette.themeKey,
+      clearanceLevel: `LEVEL 4 // ${selectedDivision.badge}`,
     });
   };
 
@@ -193,9 +281,9 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
         <div className="char-card-header">
           <div className="char-header-tag">
             <Terminal size={14} />
-            <span>CTOS // OPERATIVE RECON DEPLOYMENT</span>
+            <span>CTOS SECURITY // AIRLOCK CLEARANCE & VISITOR ENROLLMENT</span>
           </div>
-          <span className="char-version-chip">v4.0 · 3D EXPLORATION MODE</span>
+          <span className="char-version-chip">MANDATORY IDENTIFICATION GATE</span>
         </div>
 
         {/* Main Body Grid: 3D Hologram Preview (Left) & Configuration Form (Right) */}
@@ -212,46 +300,88 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
             </div>
 
             <div className="preview-badge-footer">
-              <span className="badge-agent-title">IDENTIFIED OPERATIVE</span>
-              <strong className="badge-agent-name" style={{ color: selectedPalette.color }}>
-                {codename || 'OPERATIVE'}
+              <span className="badge-agent-title">SECURITY CLEARANCE DOSSIER</span>
+              <strong
+                className="badge-agent-name"
+                style={{ color: isNameEntered ? selectedPalette.color : '#ef4444' }}
+              >
+                {codename.trim() || '⚠️ UNIDENTIFIED VISITOR'}
               </strong>
-              <span className="badge-role-tag">{selectedArchetype.subtitle}</span>
+              <div className="badge-sub-row">
+                <span className="badge-role-tag">{selectedArchetype.subtitle}</span>
+                <span className="badge-div-pill" style={{ borderColor: selectedPalette.color }}>
+                  {selectedDivision.name}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Right Column: Customizer Controls */}
+          {/* Right Column: Customizer Controls with Complete Freedom */}
           <div className="char-config-pane">
-            {/* 1. Codename Input */}
-            <div className="config-group">
-              <label className="config-label">
-                <span>OPERATIVE CODENAME</span>
-                <span className="config-hint">Visible on room telemetry HUD</span>
-              </label>
+            {/* 1. Mandatory Visitor Name Input */}
+            <div className={`config-group ${showError && !isNameEntered ? 'config-group-error' : ''}`}>
+              <div className="config-label-row">
+                <label className="config-label">
+                  <span>YOUR NAME / CALLSIGN *</span>
+                </label>
+                {isNameEntered ? (
+                  <span className="badge-validated">
+                    <CheckCircle2 size={12} />
+                    <span>IDENTITY VERIFIED</span>
+                  </span>
+                ) : (
+                  <span className="badge-required">
+                    <Lock size={12} />
+                    <span>REQUIRED TO ENTER</span>
+                  </span>
+                )}
+              </div>
+
               <div className="codename-input-row">
                 <input
                   type="text"
-                  maxLength={18}
-                  className="codename-input"
+                  maxLength={24}
+                  className={`codename-input ${!isNameEntered && showError ? 'input-error-pulse' : ''}`}
                   value={codename}
-                  onChange={(e) => setCodename(e.target.value)}
-                  placeholder="Enter Call-sign..."
+                  onChange={(e) => {
+                    setCodename(e.target.value);
+                    if (showError && e.target.value.trim()) setShowError(false);
+                  }}
+                  placeholder="Type your name to gain office clearance..."
+                  autoFocus
                 />
-                <button
-                  type="button"
-                  className="btn-random-name"
-                  onClick={handleRandomizeName}
-                  title="Randomize Codename"
-                >
-                  <RefreshCw size={14} />
-                </button>
               </div>
+
+              {!isNameEntered && (
+                <div className="security-notice-box">
+                  <ShieldAlert size={14} className="notice-icon" />
+                  <span>
+                    <strong>Strict Access Policy:</strong> You must enter your name. Your visit and character will be cryptographically registered in the Wall Security Log upon entering.
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* 2. Archetype / Body Type Selection */}
+            {/* 2. Custom Role / Title Designation */}
             <div className="config-group">
               <label className="config-label">
-                <span>OPERATIVE ARCHETYPE</span>
+                <span>OPERATIVE ROLE / DESIGNATION</span>
+                <span className="config-hint">Displayed on office visitor roster</span>
+              </label>
+              <input
+                type="text"
+                maxLength={36}
+                className="codename-input"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                placeholder="e.g. Cyber Security Researcher, Recruiter, Student..."
+              />
+            </div>
+
+            {/* 3. Archetype Selection (6 Cyber Character Models) */}
+            <div className="config-group">
+              <label className="config-label">
+                <span>CHARACTER ARCHETYPE ({ARCHETYPES.length} MODELS)</span>
               </label>
               <div className="archetype-list">
                 {ARCHETYPES.map((arch) => {
@@ -279,10 +409,37 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
               </div>
             </div>
 
-            {/* 3. Cyber Visor HUD Selection */}
+            {/* 4. Division / Team Clearance */}
             <div className="config-group">
               <label className="config-label">
-                <span>OPTICAL CYBER VISOR</span>
+                <span>SECURITY CLEARANCE DIVISION</span>
+              </label>
+              <div className="division-grid">
+                {DIVISIONS.map((div) => {
+                  const isDivActive = selectedDivision.id === div.id;
+                  return (
+                    <button
+                      key={div.id}
+                      type="button"
+                      className={`division-chip ${isDivActive ? 'active-division' : ''}`}
+                      onClick={() => {
+                        playClickSound(920);
+                        setSelectedDivision(div);
+                      }}
+                      style={isDivActive ? { borderColor: selectedPalette.color } : {}}
+                    >
+                      <span className="div-name">{div.name}</span>
+                      <span className="div-badge">{div.badge}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 5. Cyber Visor HUD Selection */}
+            <div className="config-group">
+              <label className="config-label">
+                <span>OPTICAL CYBER VISOR & MASK</span>
               </label>
               <div className="visor-grid">
                 {VISOR_STYLES.map((v) => {
@@ -306,7 +463,7 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
               </div>
             </div>
 
-            {/* 4. Neon Cyber Accent Color */}
+            {/* 6. Neon Cyber Accent Color */}
             <div className="config-group">
               <label className="config-label">
                 <span>SUIT NEON ACCENT // ATMOSPHERE</span>
@@ -339,20 +496,36 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
         <div className="char-card-footer">
           <div className="footer-brief">
             <span className="brief-bullet">●</span>
-            <span>WASD + Mouse-Look enabled upon airlock gate breach.</span>
+            {isNameEntered ? (
+              <span style={{ color: '#34d399' }}>
+                Clearance granted for Operative <strong>{codename.trim()}</strong>. Ready to breach airlock.
+              </span>
+            ) : (
+              <span style={{ color: '#f87171' }}>
+                Identity required. You cannot breach airlock or enter the office without providing your name.
+              </span>
+            )}
           </div>
 
           <button
             type="button"
-            className="btn-launch-game"
+            className={`btn-launch-game ${!isNameEntered ? 'btn-launch-disabled' : ''}`}
             onClick={handleLaunch}
+            disabled={!isNameEntered}
+            title={isNameEntered ? 'Breach Airlock Gate & Enter Office' : 'Name is mandatory to obtain security clearance'}
             style={{
-              borderColor: selectedPalette.color,
-              boxShadow: `0 0 25px ${selectedPalette.color}40`,
+              borderColor: isNameEntered ? selectedPalette.color : 'rgba(239, 68, 68, 0.5)',
+              boxShadow: isNameEntered ? `0 0 25px ${selectedPalette.color}40` : 'none',
+              cursor: isNameEntered ? 'pointer' : 'not-allowed',
+              opacity: isNameEntered ? 1.0 : 0.6,
             }}
           >
-            <Sparkles size={16} />
-            <span>BREACH AIRLOCK GATE & ENTER STUDIO</span>
+            {isNameEntered ? <Sparkles size={16} /> : <Lock size={16} />}
+            <span>
+              {isNameEntered
+                ? 'BREACH AIRLOCK GATE & ENTER OFFICE'
+                : 'ENTER NAME TO OBTAIN OFFICE CLEARANCE'}
+            </span>
           </button>
         </div>
       </div>

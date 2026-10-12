@@ -21,6 +21,7 @@ import {
   Terminal,
   UserCheck,
   UserRound,
+  Users,
   Volume2,
   VolumeX,
   Zap,
@@ -40,6 +41,11 @@ import {
   toggleMute,
 } from './utils/audio.js';
 import { THEME_KEYS, LIGHTING_THEMES } from './components/studio/CyberAtmosphere.jsx';
+import {
+  getVisitorCount,
+  getVisitorLogs,
+  registerNewVisitor,
+} from './utils/visitorLogService.js';
 
 const NAV_STATIONS = [
   { id: 'projects', label: 'Projects', icon: Code2, num: '1' },
@@ -52,6 +58,7 @@ const NAV_STATIONS = [
   { id: 'server_rack', label: 'Mainframe', icon: Server, num: '8' },
   { id: 'hardware_arsenal', label: 'Hardware', icon: Radio, num: '9' },
   { id: 'wireshark_monitor', label: 'Wireshark', icon: Activity, num: '0' },
+  { id: 'visitor_log', label: 'Visitor Logs', icon: Users, num: 'V' },
 ];
 
 export default function App() {
@@ -72,6 +79,10 @@ export default function App() {
   const [activeProximity, setActiveProximity] = useState(null);
   const [unlockedStations, setUnlockedStations] = useState(new Set());
   const [mobileInput, setMobileInput] = useState({ x: 0, y: 0 });
+
+  // Persistent Visitor Logs & Wall Counter Telemetry
+  const [visitorLogs, setVisitorLogs] = useState(() => getVisitorLogs());
+  const [visitorCount, setVisitorCount] = useState(() => getVisitorCount());
 
   // Station inspect & theme state
   const [section, setSection] = useState(null);
@@ -112,6 +123,14 @@ export default function App() {
     if (customPlayerData.themeKey) {
       setThemeKey(customPlayerData.themeKey);
     }
+
+    // Register visitor entry and update live wall counter
+    const result = registerNewVisitor(customPlayerData);
+    if (result) {
+      setVisitorLogs(result.logs);
+      setVisitorCount(result.count);
+    }
+
     playAirlockDoorSound();
     setIsGateOpen(true);
     setGameState('AIRLOCK_ENTRY');
@@ -184,6 +203,14 @@ export default function App() {
         setSection('wireshark_monitor');
         setGameState('INSPECT_STATION');
         setUnlockedStations((prev) => new Set([...prev, 'wireshark_monitor']));
+        return;
+      }
+      if (stationId === 'visitor_log') {
+        playHackingBeep(1300);
+        playWhooshSound();
+        setSection('visitor_log');
+        setGameState('INSPECT_STATION');
+        setUnlockedStations((prev) => new Set([...prev, 'visitor_log']));
         return;
       }
       playWhooshSound();
@@ -317,6 +344,9 @@ export default function App() {
         onProximityChange={setActiveProximity}
         onStationInteract={handleStationInteract}
         mobileInput={mobileInput}
+        visitorLogs={visitorLogs}
+        visitorCount={visitorCount}
+        playerData={playerData}
       />
 
       {/* 1. INITIAL: Character Customization & Deployment Modal */}
@@ -345,7 +375,8 @@ export default function App() {
           activeProximity={activeProximity}
           onInteract={handleStationInteract}
           unlockedCount={unlockedStations.size}
-          totalStations={10}
+          totalStations={11}
+          visitorCount={visitorCount}
           onCycleTheme={handleCycleTheme}
           currentThemeName={currentTheme.name}
           muted={muted}

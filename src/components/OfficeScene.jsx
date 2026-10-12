@@ -20,6 +20,7 @@ import DecorElements from './studio/DecorElements.jsx';
 import CyberAtmosphere from './studio/CyberAtmosphere.jsx';
 import StudioWallGraphicsAndCurtains from './studio/StudioWallGraphicsAndCurtains.jsx';
 import AirConditionerUnit from './studio/AirConditionerUnit.jsx';
+import VisitorWallCounter from './studio/VisitorWallCounter.jsx';
 import AirlockGate from './game/AirlockGate.jsx';
 import FirstPersonController from './game/FirstPersonController.jsx';
 
@@ -194,6 +195,9 @@ function SceneContents({
   onProximityChange,
   onStationInteract,
   mobileInput,
+  visitorLogs = [],
+  visitorCount = 1488,
+  playerData = null,
 }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -236,6 +240,15 @@ function SceneContents({
         <StudioWallGraphicsAndCurtains currentThemeKey={themeKey} />
         <AirConditionerUnit onSelect={onSelect} onHover={onHover} />
 
+        {/* 3D Wall-Mounted Visitor Counter & Roster Terminal */}
+        <VisitorWallCounter
+          visitorCount={visitorCount}
+          latestVisitor={visitorLogs[0] || null}
+          currentThemeKey={themeKey}
+          onSelect={onSelect}
+          onHover={onHover}
+        />
+
         {/* Animated Cyber Airlock Entrance Gate */}
         <AirlockGate isOpen={isGateOpen} />
 
@@ -260,6 +273,9 @@ function SceneContents({
             playWhooshSound();
             onSelect({ section: sec });
           }}
+          visitorLogs={visitorLogs}
+          visitorCount={visitorCount}
+          playerData={playerData}
         />
 
         {/* Studio Floor Contact Shadows - Baked once upon mount for 60fps performance */}
@@ -313,6 +329,9 @@ export default function OfficeScene({
   onProximityChange,
   onStationInteract,
   mobileInput,
+  visitorLogs = [],
+  visitorCount = 1488,
+  playerData = null,
 }) {
   const controlsRef = useRef(null);
   const [failed, setFailed] = useState(false);
@@ -367,6 +386,9 @@ export default function OfficeScene({
             onProximityChange={onProximityChange}
             onStationInteract={onStationInteract}
             mobileInput={mobileInput}
+            visitorLogs={visitorLogs}
+            visitorCount={visitorCount}
+            playerData={playerData}
           />
         </Suspense>
       </Canvas>
