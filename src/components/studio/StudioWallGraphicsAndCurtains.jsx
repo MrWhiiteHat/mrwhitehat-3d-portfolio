@@ -6,7 +6,6 @@ import {
   createWiresharkScreen,
   createMitreAttackScreen,
   createCyberPopArtScreen,
-  createAvatarMatrixScreen,
 } from '../../utils/cyberScreens.js';
 import { playClickSound, playHackingBeep } from '../../utils/audio.js';
 
@@ -26,7 +25,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
   const wiresharkScreen = useMemo(() => createWiresharkScreen(), []);
   const mitreScreen = useMemo(() => createMitreAttackScreen(), []);
   const popArtScreen = useMemo(() => createCyberPopArtScreen(), []);
-  const avatarScreen = useMemo(() => createAvatarMatrixScreen(), []);
   const screenTimer = useRef(0);
   const screenToggle = useRef(false);
 
@@ -894,37 +892,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
           <planeGeometry args={[1.12, 1.42]} />
           <meshBasicMaterial map={popArtScreen.texture} toneMapped={false} />
         </mesh>
-      </group>
-
-      {/* ======================================================== */}
-      {/* 9. BACK WALL: 8-TILE PIXEL AVATAR MATRIX DISPLAY (Image 1)*/}
-      {/* Location: X = 1.9, Y = 2.15, Z = -4.92                    */}
-      {/* ======================================================== */}
-      <group position={[1.9, 2.15, -4.92]}>
-        {/* Industrial Slim-Bezel Chassis */}
-        <mesh castShadow>
-          <boxGeometry args={[1.78, 0.98, 0.035]} />
-          <meshStandardMaterial color="#0b1016" metalness={0.88} roughness={0.2} />
-        </mesh>
-        {/* Inset Screen Border */}
-        <mesh position={[0, 0, 0.016]}>
-          <boxGeometry args={[1.74, 0.94, 0.008]} />
-          <meshStandardMaterial color="#020617" roughness={0.6} />
-        </mesh>
-
-        {/* Dynamic 8-Tile Pixel Avatar Grid Face */}
-        <mesh position={[0, 0, 0.022]}>
-          <planeGeometry args={[1.72, 0.92]} />
-          <meshBasicMaterial map={avatarScreen.texture} toneMapped={false} />
-        </mesh>
-
-        {/* Display Status Diagnostic LEDs along bottom */}
-        {[-0.75, -0.7, 0.7, 0.75].map((lx, idx) => (
-          <mesh key={`av-led-${idx}`} position={[lx, -0.46, 0.02]}>
-            <sphereGeometry args={[0.004, 8, 8]} />
-            <meshBasicMaterial color={idx % 2 === 0 ? '#00f5ff' : '#ff1744'} />
-          </mesh>
-        ))}
       </group>
     </group>
   );
