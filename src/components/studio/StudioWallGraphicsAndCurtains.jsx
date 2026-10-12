@@ -20,9 +20,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
   const trafficLane2Ref = useRef();
   const rooftopBeaconRef = useRef();
   const billboardGlowRef = useRef();
-  const pineappleLedRef = useRef();
-  const flipperGlowRef = useRef();
-  const hackrfScreenRef = useRef();
   const [activeTool, setActiveTool] = useState(null);
 
   // Dynamic Live Cyber Screens (Wireshark PCAP Stream & MITRE ATT&CK Threat Radar)
@@ -31,6 +28,7 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
   const popArtScreen = useMemo(() => createCyberPopArtScreen(), []);
   const avatarScreen = useMemo(() => createAvatarMatrixScreen(), []);
   const screenTimer = useRef(0);
+  const screenToggle = useRef(false);
 
   // Traffic vehicle positions for the skyway
   const skywayVehicles1 = useMemo(() => {
@@ -64,13 +62,15 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Live Cyber Screens (Throttled to smooth ~15 FPS for optimal GPU pacing)
+    // 0. Update Live Cyber Screens (Throttled to 8 FPS, Alternated 1-per-frame to prevent GPU spikes)
     screenTimer.current += delta;
-    if (screenTimer.current > 0.066) {
-      wiresharkScreen.update(screenTimer.current);
-      mitreScreen.update(screenTimer.current);
-      popArtScreen.update(screenTimer.current);
-      avatarScreen.update(screenTimer.current);
+    if (screenTimer.current > 0.125) {
+      if (screenToggle.current) {
+        wiresharkScreen.update(screenTimer.current);
+      } else {
+        mitreScreen.update(screenTimer.current);
+      }
+      screenToggle.current = !screenToggle.current;
       screenTimer.current = 0;
     }
 
@@ -100,17 +100,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
           mesh.position.x = 2.1 - ((time * v.speed + v.offset) % 4.2);
         }
       });
-    }
-
-    // 3. Hardware LEDs & RF Indicator Pulses
-    if (pineappleLedRef.current) {
-      pineappleLedRef.current.intensity = 1.6 + Math.sin(time * 8) * 0.8;
-    }
-    if (flipperGlowRef.current) {
-      flipperGlowRef.current.intensity = 1.4 + Math.sin(time * 3) * 0.3;
-    }
-    if (hackrfScreenRef.current) {
-      hackrfScreenRef.current.intensity = 1.2 + Math.sin(time * 5) * 0.4;
     }
 
     // 4. Rooftop Beacon & Billboard Glow
@@ -444,7 +433,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
               <meshBasicMaterial color={led.color} />
             </mesh>
           ))}
-          <pointLight ref={pineappleLedRef} position={[0.11, -0.06, 0.06]} color="#38bdf8" intensity={1.2} distance={0.8} />
 
           {/* Silk-screen Hak5 Logo Text */}
           <mesh position={[0, 0.02, 0.026]}>
@@ -487,7 +475,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
             <boxGeometry args={[0.11, 0.07, 0.005]} />
             <meshBasicMaterial color="#f97316" />
           </mesh>
-          <pointLight ref={flipperGlowRef} position={[-0.04, 0, 0.05]} color="#f97316" intensity={1.4} distance={0.6} />
 
           {/* Flipper LCD Dolphin Cyber Text Mock */}
           <mesh position={[-0.04, 0, 0.027]}>
@@ -579,7 +566,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
             <planeGeometry args={[0.12, 0.1]} />
             <meshBasicMaterial color="#38bdf8" transparent opacity={0.75} />
           </mesh>
-          <pointLight ref={hackrfScreenRef} position={[-0.03, 0.01, 0.05]} color="#0284c7" intensity={1.2} distance={0.6} />
 
           {/* Rotary Navigation Jog Dial Wheel */}
           <group position={[0.075, 0.01, 0.023]}>
@@ -740,9 +726,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
             })}
           </group>
         </group>
-
-        {/* Tactical Under-Shelf Ambient LED Channel */}
-        <pointLight position={[0, -0.6, 0.15]} color="#10b981" intensity={2.2} distance={2.5} />
       </group>
 
       {/* ======================================================== */}
@@ -766,9 +749,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
           <planeGeometry args={[1.42, 1.02]} />
           <meshBasicMaterial map={mitreScreen.texture} toneMapped={false} />
         </mesh>
-
-        {/* Ambient Display Glow */}
-        <pointLight position={[0, 0, 0.25]} color="#10b981" intensity={1.8} distance={2.8} />
       </group>
 
       {/* ======================================================== */}
@@ -819,9 +799,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
             <meshBasicMaterial color={led.color} />
           </mesh>
         ))}
-
-        {/* Ambient Screen Glow */}
-        <pointLight position={[0, 0, 0.35]} color="#38bdf8" intensity={2.0} distance={3.0} />
       </group>
 
       {/* ======================================================== */}
@@ -894,12 +871,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
           <boxGeometry args={[0.02, 0.015, 4.15]} />
           <meshBasicMaterial color={theme.accentColor} />
         </mesh>
-        <pointLight
-          position={[-0.15, -0.05, 0]}
-          color={theme.accentColor}
-          intensity={1.2}
-          distance={2.5}
-        />
       </group>
 
       {/* ======================================================== */}
@@ -923,9 +894,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
           <planeGeometry args={[1.12, 1.42]} />
           <meshBasicMaterial map={popArtScreen.texture} toneMapped={false} />
         </mesh>
-
-        {/* Ambient Backlight Glow from Poster Frame */}
-        <pointLight position={[0, 0, 0.2]} color="#ec4899" intensity={2.6} distance={2.4} />
       </group>
 
       {/* ======================================================== */}
@@ -957,9 +925,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
             <meshBasicMaterial color={idx % 2 === 0 ? '#00f5ff' : '#ff1744'} />
           </mesh>
         ))}
-
-        {/* Ambient Cyan Display Glow */}
-        <pointLight position={[0, 0, 0.25]} color="#00f5ff" intensity={2.2} distance={2.5} />
       </group>
     </group>
   );

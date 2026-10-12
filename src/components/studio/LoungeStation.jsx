@@ -29,9 +29,9 @@ export default function LoungeStation({ onSelect, onHover }) {
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Tablet Screen (Throttled to smooth ~15 FPS for optimal GPU pacing)
+    // 0. Update Tablet Screen (Throttled to smooth ~10 FPS for optimal GPU pacing)
     tabletTimer.current += delta;
-    if (tabletTimer.current > 0.066) {
+    if (tabletTimer.current > 0.1) {
       tabletScreen.update(tabletTimer.current);
       tabletTimer.current = 0;
     }

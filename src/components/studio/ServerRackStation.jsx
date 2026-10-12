@@ -25,9 +25,9 @@ export default function ServerRackStation() {
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Holographic Alert Screen
+    // 0. Update Holographic Alert Screen (Throttled to 5 FPS for zero GPU overhead)
     screenTimer.current += delta;
-    if (screenTimer.current > 0.066) {
+    if (screenTimer.current > 0.2) {
       holoScreen.update(screenTimer.current);
       screenTimer.current = 0;
     }
@@ -294,10 +294,9 @@ export default function ServerRackStation() {
         {/* Recessed Perforated Mesh Glass Panel */}
         <mesh>
           <planeGeometry args={[0.76, 2.65]} />
-          <meshPhysicalMaterial
+          <meshStandardMaterial
             color="#04120a"
-            transmission={0.65}
-            roughness={0.2}
+            roughness={0.25}
             metalness={0.4}
             transparent
             opacity={0.45}
@@ -331,14 +330,12 @@ export default function ServerRackStation() {
         {/* Holographic Translucent Cyan Glass Substrate */}
         <mesh>
           <boxGeometry args={[0.76, 0.46, 0.006]} />
-          <meshPhysicalMaterial
+          <meshStandardMaterial
             color="#00f5ff"
-            transmission={0.88}
-            roughness={0.1}
-            metalness={0.2}
+            roughness={0.15}
+            metalness={0.1}
             transparent
-            opacity={0.35}
-            ior={1.4}
+            opacity={0.32}
           />
         </mesh>
         {/* Glowing Cyan Wireframe Frame Outline */}
@@ -363,14 +360,12 @@ export default function ServerRackStation() {
       <group ref={holo2Ref} position={[-0.38, 1.65, 0.82]} scale={0.82}>
         <mesh>
           <boxGeometry args={[0.76, 0.46, 0.006]} />
-          <meshPhysicalMaterial
+          <meshStandardMaterial
             color="#00f5ff"
-            transmission={0.88}
-            roughness={0.1}
-            metalness={0.2}
+            roughness={0.15}
+            metalness={0.1}
             transparent
-            opacity={0.3}
-            ior={1.4}
+            opacity={0.28}
           />
         </mesh>
         <mesh>
@@ -393,14 +388,12 @@ export default function ServerRackStation() {
       <group ref={holo3Ref} position={[0.42, 1.35, 0.88]} scale={0.75}>
         <mesh>
           <boxGeometry args={[0.76, 0.46, 0.006]} />
-          <meshPhysicalMaterial
+          <meshStandardMaterial
             color="#00f5ff"
-            transmission={0.88}
-            roughness={0.1}
-            metalness={0.2}
+            roughness={0.15}
+            metalness={0.1}
             transparent
-            opacity={0.28}
-            ior={1.4}
+            opacity={0.25}
           />
         </mesh>
         <mesh>

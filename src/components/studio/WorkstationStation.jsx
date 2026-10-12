@@ -31,15 +31,20 @@ export default function WorkstationStation({ onSelect, onHover }) {
   const terminalScreen = useMemo(() => createTerminalScreen(), []);
   const radarScreen = useMemo(() => createRadarScreen(), []);
   const screenUpdateTimer = useRef(0);
+  const screenToggle = useRef(false);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Live PC Screens (Throttled to smooth ~15 FPS for optimal 60fps performance)
+    // 0. Update Live PC Screens (Throttled & Alternated for optimal 60fps pacing)
     screenUpdateTimer.current += delta;
-    if (screenUpdateTimer.current > 0.066) {
-      terminalScreen.update(screenUpdateTimer.current);
-      radarScreen.update(screenUpdateTimer.current);
+    if (screenUpdateTimer.current > 0.125) {
+      if (screenToggle.current) {
+        terminalScreen.update(screenUpdateTimer.current);
+      } else {
+        radarScreen.update(screenUpdateTimer.current);
+      }
+      screenToggle.current = !screenToggle.current;
       screenUpdateTimer.current = 0;
     }
 
@@ -278,13 +283,6 @@ export default function WorkstationStation({ onSelect, onHover }) {
             <planeGeometry args={[0.92, 0.5]} />
             <meshBasicMaterial map={terminalScreen.texture} toneMapped={false} />
           </mesh>
-          {/* Screen Ambient Glow */}
-          <pointLight
-            position={[0, 0, 0.15]}
-            color="#34d399"
-            intensity={hovered ? 4.5 : 3.0}
-            distance={1.6}
-          />
         </group>
 
         {/* Right Monitor (Functional Cyber Threat Radar & SOC Dashboard) - Angled slightly left */}
@@ -299,12 +297,6 @@ export default function WorkstationStation({ onSelect, onHover }) {
             <planeGeometry args={[0.92, 0.5]} />
             <meshBasicMaterial map={radarScreen.texture} toneMapped={false} />
           </mesh>
-          <pointLight
-            position={[0, 0, 0.15]}
-            color="#38bdf8"
-            intensity={hovered ? 4.5 : 3.0}
-            distance={1.6}
-          />
         </group>
 
         {/* ======================================================== */}
@@ -344,8 +336,6 @@ export default function WorkstationStation({ onSelect, onHover }) {
               <sphereGeometry args={[0.018, 16, 16]} />
               <meshStandardMaterial color="#0b0f14" roughness={0.2} metalness={0.8} />
             </mesh>
-            {/* Amber Driver Glow */}
-            <pointLight position={[0, 0, 0.08]} color="#f59e0b" intensity={0.9} distance={0.8} />
           </group>
           {/* 1-Inch Silk Soft Dome Tweeter */}
           <group position={[0, 0.085, 0.116]}>
@@ -399,7 +389,6 @@ export default function WorkstationStation({ onSelect, onHover }) {
               <sphereGeometry args={[0.018, 16, 16]} />
               <meshStandardMaterial color="#0b0f14" roughness={0.2} metalness={0.8} />
             </mesh>
-            <pointLight position={[0, 0, 0.08]} color="#f59e0b" intensity={0.9} distance={0.8} />
           </group>
           <group position={[0, 0.085, 0.116]}>
             <mesh>

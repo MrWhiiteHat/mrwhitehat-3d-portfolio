@@ -333,7 +333,7 @@ export default function OfficeScene({
       ) : null}
       <Canvas
         shadows
-        dpr={[1, 1.5]}
+        dpr={[1, 1.25]}
         gl={{
           powerPreference: 'high-performance',
           antialias: true,

@@ -11,7 +11,10 @@ import { createProjectorScreen } from '../../utils/cyberScreens.js';
 
 export default function ConferenceStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
-  const [trophySpins, setTrophySpins] = useState({ gold: 0, brics: 0, bronze: 0 });
+  const trophyGoldRef = useRef();
+  const trophyBricsGroupRef = useRef();
+  const trophyBronzeRef = useRef();
+  const trophySpinVel = useRef({ gold: 0, brics: 0, bronze: 0 });
   const bricsRingRef = useRef();
   const bricsStarRef = useRef();
   const beamRef = useRef();
@@ -22,16 +25,16 @@ export default function ConferenceStation({ onSelect, onHover }) {
   const chairLeather = useMemo(() => getPebbledLeatherTextures(2, 2, '#141f17'), []);
   const darkMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#181818'), []);
 
-  // Live Animated Global Cyber Attack Map Screen
+  // Live Animated Global Cyber Attack Map Screen (throttled to 10 FPS)
   const projectorScreen = useMemo(() => createProjectorScreen(), []);
   const screenTimer = useRef(0);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Projector Screen (Throttled to smooth ~15 FPS for optimal GPU pacing)
+    // 0. Update Projector Screen (Throttled to 10 FPS for optimal GPU pacing)
     screenTimer.current += delta;
-    if (screenTimer.current > 0.066) {
+    if (screenTimer.current > 0.1) {
       projectorScreen.update(screenTimer.current);
       screenTimer.current = 0;
     }
@@ -53,20 +56,25 @@ export default function ConferenceStation({ onSelect, onHover }) {
       beamRef.current.intensity = (hovered ? 5.5 : 4.0) + Math.sin(time * 2.8) * 0.5;
     }
 
-    // 4. Decay trophy spins after click
-    if (trophySpins.gold > 0 || trophySpins.brics > 0 || trophySpins.bronze > 0) {
-      setTrophySpins((prev) => ({
-        gold: Math.max(0, prev.gold - delta * 5),
-        brics: Math.max(0, prev.brics - delta * 5),
-        bronze: Math.max(0, prev.bronze - delta * 5),
-      }));
+    // 4. Smooth physics spin for trophies without React re-renders
+    if (trophyGoldRef.current && trophySpinVel.current.gold > 0.01) {
+      trophyGoldRef.current.rotation.y += trophySpinVel.current.gold * delta;
+      trophySpinVel.current.gold *= Math.max(0, 1 - delta * 3.5);
+    }
+    if (trophyBricsGroupRef.current && trophySpinVel.current.brics > 0.01) {
+      trophyBricsGroupRef.current.rotation.y += trophySpinVel.current.brics * delta;
+      trophySpinVel.current.brics *= Math.max(0, 1 - delta * 3.5);
+    }
+    if (trophyBronzeRef.current && trophySpinVel.current.bronze > 0.01) {
+      trophyBronzeRef.current.rotation.y += trophySpinVel.current.bronze * delta;
+      trophySpinVel.current.bronze *= Math.max(0, 1 - delta * 3.5);
     }
   });
 
   const handleTrophyClick = (type) => (e) => {
     e.stopPropagation();
     playClickSound(1200, 0.08);
-    setTrophySpins((prev) => ({ ...prev, [type]: prev[type] + Math.PI * 2 }));
+    trophySpinVel.current[type] += 12;
   };
 
   return (
@@ -135,8 +143,8 @@ export default function ConferenceStation({ onSelect, onHover }) {
 
         {/* Award Trophy 1: Gold Cyber Cup (Odisha Skills 2021) */}
         <group
+          ref={trophyGoldRef}
           position={[-0.8, 0.32, 0]}
-          rotation={[0, trophySpins.gold, 0]}
           onClick={handleTrophyClick('gold')}
           onPointerOver={() => {
             document.body.style.cursor = 'pointer';
@@ -161,8 +169,8 @@ export default function ConferenceStation({ onSelect, onHover }) {
 
         {/* Award Trophy 2: Crystal Diamond Star (BRICS Hi-Tech 2026) */}
         <group
+          ref={trophyBricsGroupRef}
           position={[0, 0.34, 0]}
-          rotation={[0, trophySpins.brics, 0]}
           onClick={handleTrophyClick('brics')}
           onPointerOver={() => {
             document.body.style.cursor = 'pointer';
@@ -178,13 +186,14 @@ export default function ConferenceStation({ onSelect, onHover }) {
           {/* Floating Octahedron Star */}
           <mesh ref={bricsStarRef} position={[0, 0.14, 0]} castShadow>
             <octahedronGeometry args={[0.09, 0]} />
-            <meshPhysicalMaterial
+            <meshStandardMaterial
               color="#38bdf8"
-              transmission={0.85}
-              roughness={0.1}
+              roughness={0.15}
               metalness={0.2}
+              transparent
+              opacity={0.75}
               emissive="#38bdf8"
-              emissiveIntensity={0.4}
+              emissiveIntensity={0.6}
             />
           </mesh>
           {/* Spinning Holographic Halo Ring */}
@@ -194,13 +203,12 @@ export default function ConferenceStation({ onSelect, onHover }) {
               <meshBasicMaterial color="#38bdf8" transparent opacity={0.7} />
             </mesh>
           </group>
-          <pointLight position={[0, 0.16, 0.1]} color="#38bdf8" intensity={1.8} distance={1.0} />
         </group>
 
         {/* Award Trophy 3: Bronze Medal Plaque (Odisha Skills 2025-2026) */}
         <group
+          ref={trophyBronzeRef}
           position={[0.8, 0.32, 0]}
-          rotation={[0, trophySpins.bronze, 0]}
           onClick={handleTrophyClick('bronze')}
           onPointerOver={() => {
             document.body.style.cursor = 'pointer';

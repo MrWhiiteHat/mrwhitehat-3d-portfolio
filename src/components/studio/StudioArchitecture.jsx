@@ -173,18 +173,15 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
             <meshStandardMaterial color="#0b100d" roughness={0.3} metalness={0.8} />
           </mesh>
 
-          {/* Window Glass Pane with Physical Optical Transmission */}
+          {/* Window Glass Pane */}
           <mesh position={[0, 0, 0.05]}>
             <boxGeometry args={[2.76, 3.45, 0.02]} />
-            <meshPhysicalMaterial
+            <meshStandardMaterial
               color="#93c5fd"
               transparent
-              opacity={0.28}
-              roughness={0.06}
-              metalness={0.1}
-              transmission={0.88}
-              ior={1.52}
-              thickness={0.06}
+              opacity={0.22}
+              roughness={0.08}
+              metalness={0.2}
             />
           </mesh>
 
@@ -346,18 +343,15 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
             <meshStandardMaterial color="#0b100d" roughness={0.3} metalness={0.8} />
           </mesh>
 
-          {/* Window Glass Pane with Optical Transmission */}
+          {/* Window Glass Pane */}
           <mesh position={[0, 0, -0.05]}>
             <boxGeometry args={[5.05, 3.45, 0.02]} />
-            <meshPhysicalMaterial
+            <meshStandardMaterial
               color="#93c5fd"
               transparent
-              opacity={0.28}
-              roughness={0.06}
-              metalness={0.1}
-              transmission={0.88}
-              ior={1.52}
-              thickness={0.06}
+              opacity={0.22}
+              roughness={0.08}
+              metalness={0.2}
             />
           </mesh>
 

@@ -644,13 +644,13 @@ export default function FirstPersonController({
     if (!isActive) return;
 
     const time = state.clock.getElapsedTime();
-    const clampedDelta = Math.min(delta, 0.05);
+    const clampedDelta = Math.min(delta, 0.033);
 
     // =========================================================================
-    // 1. SMOOTH MOUSE LOOK DAMPING (Eliminates jitter, butter-smooth camera)
+    // 1. SMOOTH MOUSE LOOK DAMPING (Instantaneous, silky-smooth 1:1 camera)
     // =========================================================================
-    yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 28, clampedDelta);
-    pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 28, clampedDelta);
+    yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 45, clampedDelta);
+    pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 45, clampedDelta);
 
     // =========================================================================
     // 2. DIRECTIONAL INPUT (W=Forward, S=Backward, A=Left, D=Right) & KINEMATICS

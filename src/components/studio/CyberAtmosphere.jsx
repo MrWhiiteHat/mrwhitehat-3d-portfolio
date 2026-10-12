@@ -162,26 +162,10 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
       holoOuterRingRef.current.rotation.y += delta * 0.8;
     }
 
-    // Cyber dust particles drift upward
+    // Cyber ambient motes drift smoothly via group motion (zero CPU buffer upload!)
     if (particlesRef.current) {
-      const posAttr = particlesRef.current.geometry.attributes.position;
-      const arr = posAttr.array;
-
-      for (let i = 0; i < particleData.count; i++) {
-        // Y rises slowly
-        arr[i * 3 + 1] += particleData.speeds[i] * delta;
-        // Sway on X and Z
-        arr[i * 3 + 0] += Math.sin(time + particleData.offsets[i]) * 0.003;
-        arr[i * 3 + 2] += Math.cos(time + particleData.offsets[i]) * 0.003;
-
-        // Reset if too high
-        if (arr[i * 3 + 1] > 4.3) {
-          arr[i * 3 + 1] = 0.3;
-          arr[i * 3 + 0] = (Math.random() - 0.5) * 9.5;
-          arr[i * 3 + 2] = (Math.random() - 0.5) * 9.5;
-        }
-      }
-      posAttr.needsUpdate = true;
+      particlesRef.current.rotation.y += delta * 0.03;
+      particlesRef.current.position.y = Math.sin(time * 0.2) * 0.1;
     }
   });
 
@@ -208,18 +192,6 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         position={[-8, 9, -8]}
         intensity={theme.windowIntensity}
         color={theme.windowColor}
-      />
-      <pointLight
-        position={[4, 5, 4]}
-        intensity={12}
-        color={theme.loungeFillColor}
-        distance={16}
-      />
-      <pointLight
-        position={[-2, 3.5, 0.5]}
-        intensity={theme.accentIntensity}
-        color={theme.accentColor}
-        distance={12}
       />
 
       {/* 2. Floating Cyber Ambient Particles */}
@@ -344,22 +316,20 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
           <cylinderGeometry args={[0.06, 0.06, 0.02, 24]} />
           <meshBasicMaterial color={theme.coreColor} />
         </mesh>
-        <pointLight position={[0, 0.95, 0]} color={theme.coreColor} intensity={2.5} distance={1.8} />
 
         {/* Floating Holographic Geometric Core */}
         <group ref={holoCoreRef} position={[0, 1.08, 0]}>
           {/* Inner Polyhedron */}
           <mesh>
             <octahedronGeometry args={[0.11, 0]} />
-            <meshPhysicalMaterial
+            <meshStandardMaterial
               color={theme.coreColor}
               emissive={theme.coreColor}
-              emissiveIntensity={0.6}
-              roughness={0.1}
+              emissiveIntensity={0.8}
+              roughness={0.2}
               metalness={0.2}
-              transmission={0.8}
               transparent
-              opacity={0.85}
+              opacity={0.7}
             />
           </mesh>
           {/* Wireframe Holographic Outer Shell */}
@@ -492,13 +462,11 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         {/* Amber Tinted Glass Edison Teardrop Bulb */}
         <mesh position={[0, 0.01, 0]}>
           <sphereGeometry args={[0.055, 16, 16]} />
-          <meshPhysicalMaterial
+          <meshStandardMaterial
             color="#f59e0b"
-            transmission={0.85}
             transparent
-            opacity={0.8}
-            roughness={0.1}
-            ior={1.5}
+            opacity={0.65}
+            roughness={0.2}
           />
         </mesh>
 
