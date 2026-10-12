@@ -1,31 +1,117 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 /**
- * Procedural Realistic Executive Foliage & Decor Elements
- * Replaces primitive spheres with botanical, architectural office plants:
- * 1. Tall Fiddle Leaf Fig (Ficus Lyrata) tree in Scandinavian wooden cross-stand ceramic pot.
- * 2. Architectural Variegated Snake Plant (Sansevieria) in ribbed fluted planter by conference room.
- * 3. Ceiling Track Lighting rails with focused downlights.
+ * Helper to compute asset URL based on Vite BASE_URL.
+ * Supports root, relative, and GitHub Pages paths.
+ */
+const getAssetUrl = (path) => {
+  const base = import.meta.env.BASE_URL || './';
+  const cleanBase = base.endsWith('/') ? base : base + '/';
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return cleanBase + cleanPath;
+};
+
+/**
+ * Photorealistic Architectural Foliage & Decor Elements
+ * Uses real CC0 PBR textures (AmbientCG & Poly Haven) for:
+ * 1. Ficus Lyrata (Fiddle Leaf Fig) tree: Real scanned leaf veins, leaf normal maps, bark PBR trunk, ceramic plaster pot, rosewood stand.
+ * 2. Sansevieria (Snake Plant): Variegated sword leaves with micro-ribbed normal maps and dark slate planter.
+ * 3. Ceiling Track Downlights with high-CRI spotlights.
  */
 export default function DecorElements() {
   const treeSwayRef = useRef();
   const snakePlantSwayRef = useRef();
+  const [textures, setTextures] = useState({});
 
   // ---------------------------------------------------------------------------
-  // 1. Procedural Ficus Lyrata (Fiddle Leaf Fig) Leaf Blade Geometry
+  // Load Real High-Resolution PBR Textures (Leaves, Bark, Wood, Ceramic)
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+
+    const loadTexture = (key, relativePath, setupFn) => {
+      loader.load(
+        getAssetUrl(relativePath),
+        (tex) => {
+          if (setupFn) setupFn(tex);
+          setTextures((prev) => ({ ...prev, [key]: tex }));
+        },
+        undefined,
+        (err) => {
+          console.warn(`Texture load failed for ${relativePath}:`, err);
+        }
+      );
+    };
+
+    // 1. Scanned Real Leaf PBR Textures (AmbientCG LeafSet024)
+    loadTexture('leafColor', 'textures/plant/LeafSet024_1K-JPG_Color.jpg', (t) => {
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.colorSpace = THREE.SRGBColorSpace;
+    });
+
+    loadTexture('leafNormal', 'textures/plant/LeafSet024_1K-JPG_NormalGL.jpg', (t) => {
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+    });
+
+    loadTexture('leafRoughness', 'textures/plant/LeafSet024_1K-JPG_Roughness.jpg', (t) => {
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+    });
+
+    // 2. Real Eucalyptus Tree Bark PBR (Poly Haven)
+    loadTexture('barkColor', 'textures/plant/bark_diff.jpg', (t) => {
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(1, 3.5);
+      t.colorSpace = THREE.SRGBColorSpace;
+    });
+
+    loadTexture('barkNormal', 'textures/plant/bark_nor.jpg', (t) => {
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(1, 3.5);
+    });
+
+    // 3. Rosewood Timber Grain (Poly Haven)
+    loadTexture('woodColor', 'textures/wood/wood_diff.jpg', (t) => {
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(1, 2);
+      t.colorSpace = THREE.SRGBColorSpace;
+    });
+
+    // 4. White Plaster Ceramic Pot PBR (Poly Haven)
+    loadTexture('potColor', 'textures/pot/pot_diff.jpg', (t) => {
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(2, 2);
+      t.colorSpace = THREE.SRGBColorSpace;
+    });
+
+    loadTexture('potNormal', 'textures/pot/pot_nor.jpg', (t) => {
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(2, 2);
+    });
+  }, []);
+
+  // ---------------------------------------------------------------------------
+  // Procedural Ficus Lyrata (Fiddle Leaf Fig) Leaf Blade Geometry
   // Features organic violin/paddle silhouette, central V-crease midrib, and natural gravity arch.
   // ---------------------------------------------------------------------------
   const fiddleLeafGeometry = useMemo(() => {
-    const geom = new THREE.PlaneGeometry(0.28, 0.58, 12, 16);
+    const geom = new THREE.PlaneGeometry(0.30, 0.60, 14, 18);
     const pos = geom.attributes.position;
 
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const y = pos.getY(i);
       // Normalized vertical factor from base (0) to tip (1)
-      const t = (y + 0.29) / 0.58;
+      const t = (y + 0.30) / 0.60;
 
       // Natural fiddle leaf contour: narrow petiole base -> broad middle lobe -> gentle waist -> rounded crest tip
       const baseWidth = Math.sin(Math.pow(t, 0.65) * Math.PI);
@@ -48,12 +134,12 @@ export default function DecorElements() {
 
     geom.computeVertexNormals();
     // Shift origin to the base of the leaf so it pivots at the petiole stem attachment
-    geom.translate(0, 0.29, 0);
+    geom.translate(0, 0.30, 0);
     return geom;
   }, []);
 
   // ---------------------------------------------------------------------------
-  // 2. Procedural Sansevieria (Snake Plant) Sword Leaf Geometry
+  // Procedural Sansevieria (Snake Plant) Sword Leaf Geometry
   // Tall, upright, gently cupped blade that tapers to an architectural pointed tip.
   // ---------------------------------------------------------------------------
   const snakeLeafGeometry = useMemo(() => {
@@ -172,17 +258,32 @@ export default function DecorElements() {
           ].map(([lx, lz], idx) => (
             <mesh key={`leg-${idx}`} position={[lx, 0.22, lz]} castShadow receiveShadow>
               <boxGeometry args={[0.032, 0.44, 0.032]} />
-              <meshStandardMaterial color="#2d1c13" roughness={0.75} metalness={0.05} />
+              <meshStandardMaterial
+                map={textures.woodColor || null}
+                color="#452c1e"
+                roughness={0.72}
+                metalness={0.05}
+              />
             </mesh>
           ))}
           {/* Cross Support Rails */}
           <mesh position={[0, 0.22, 0]} castShadow>
             <boxGeometry args={[0.51, 0.028, 0.032]} />
-            <meshStandardMaterial color="#2d1c13" roughness={0.75} metalness={0.05} />
+            <meshStandardMaterial
+              map={textures.woodColor || null}
+              color="#452c1e"
+              roughness={0.72}
+              metalness={0.05}
+            />
           </mesh>
           <mesh position={[0, 0.22, 0]} castShadow>
             <boxGeometry args={[0.032, 0.028, 0.51]} />
-            <meshStandardMaterial color="#2d1c13" roughness={0.75} metalness={0.05} />
+            <meshStandardMaterial
+              map={textures.woodColor || null}
+              color="#452c1e"
+              roughness={0.72}
+              metalness={0.05}
+            />
           </mesh>
         </group>
 
@@ -191,17 +292,24 @@ export default function DecorElements() {
           {/* Pot Main Cylindrical Shell */}
           <mesh position={[0, 0.28, 0]} castShadow receiveShadow>
             <cylinderGeometry args={[0.26, 0.22, 0.56, 32]} />
-            <meshStandardMaterial color="#f1f5f9" roughness={0.85} metalness={0.02} />
+            <meshStandardMaterial
+              map={textures.potColor || null}
+              normalMap={textures.potNormal || null}
+              normalScale={[0.5, 0.5]}
+              color="#f8fafc"
+              roughness={0.82}
+              metalness={0.03}
+            />
           </mesh>
           {/* Brass Lip Inset Ring */}
           <mesh position={[0, 0.565, 0]}>
             <cylinderGeometry args={[0.262, 0.262, 0.015, 32]} />
-            <meshStandardMaterial color="#d97706" metalness={0.88} roughness={0.22} />
+            <meshStandardMaterial color="#d97706" metalness={0.9} roughness={0.22} />
           </mesh>
           {/* Rich Dark Organic Potting Soil */}
           <mesh position={[0, 0.54, 0]} receiveShadow>
             <cylinderGeometry args={[0.245, 0.245, 0.04, 32]} />
-            <meshStandardMaterial color="#1c140e" roughness={0.96} />
+            <meshStandardMaterial color="#1a120c" roughness={0.96} />
           </mesh>
 
           {/* Decorative Natural White/Grey River Pebbles on Soil */}
@@ -225,34 +333,64 @@ export default function DecorElements() {
 
         {/* --- LIVING SWAYING BOTANICAL CANOPY --- */}
         <group ref={treeSwayRef} position={[0, 0.77, 0]}>
-          {/* Realistic Woody Tree Trunk & Branches */}
+          {/* Realistic Woody Tree Trunk & Branches with Eucalyptus Bark PBR */}
           {/* Lower Main Trunk */}
           <mesh position={[0, 0.28, 0]} castShadow>
             <cylinderGeometry args={[0.028, 0.038, 0.56, 12]} />
-            <meshStandardMaterial color="#423023" roughness={0.95} metalness={0.02} />
+            <meshStandardMaterial
+              map={textures.barkColor || null}
+              normalMap={textures.barkNormal || null}
+              normalScale={[1.0, 1.0]}
+              color="#543c2c"
+              roughness={0.92}
+            />
           </mesh>
           {/* Mid Trunk (slight organic tilt toward window light) */}
           <mesh position={[0.02, 0.74, -0.03]} rotation={[-0.08, 0.2, 0.06]} castShadow>
             <cylinderGeometry args={[0.022, 0.028, 0.45, 12]} />
-            <meshStandardMaterial color="#423023" roughness={0.95} metalness={0.02} />
+            <meshStandardMaterial
+              map={textures.barkColor || null}
+              normalMap={textures.barkNormal || null}
+              normalScale={[1.0, 1.0]}
+              color="#543c2c"
+              roughness={0.92}
+            />
           </mesh>
           {/* Left Branch Limb */}
           <mesh position={[-0.06, 1.05, 0.04]} rotation={[0.22, 0.4, -0.28]} castShadow>
             <cylinderGeometry args={[0.014, 0.020, 0.38, 10]} />
-            <meshStandardMaterial color="#473628" roughness={0.92} metalness={0.02} />
+            <meshStandardMaterial
+              map={textures.barkColor || null}
+              normalMap={textures.barkNormal || null}
+              normalScale={[0.9, 0.9]}
+              color="#543c2c"
+              roughness={0.92}
+            />
           </mesh>
           {/* Right Branch Limb */}
           <mesh position={[0.07, 1.15, -0.05]} rotation={[-0.25, -0.5, 0.32]} castShadow>
             <cylinderGeometry args={[0.012, 0.018, 0.42, 10]} />
-            <meshStandardMaterial color="#473628" roughness={0.92} metalness={0.02} />
+            <meshStandardMaterial
+              map={textures.barkColor || null}
+              normalMap={textures.barkNormal || null}
+              normalScale={[0.9, 0.9]}
+              color="#543c2c"
+              roughness={0.92}
+            />
           </mesh>
           {/* Upper Central Spire */}
           <mesh position={[0.01, 1.35, 0.01]} rotation={[0.05, 0.1, -0.04]} castShadow>
             <cylinderGeometry args={[0.009, 0.014, 0.46, 10]} />
-            <meshStandardMaterial color="#4c3b2d" roughness={0.92} metalness={0.02} />
+            <meshStandardMaterial
+              map={textures.barkColor || null}
+              normalMap={textures.barkNormal || null}
+              normalScale={[0.8, 0.8]}
+              color="#543c2c"
+              roughness={0.92}
+            />
           </mesh>
 
-          {/* 21 Detailed Fiddle Leaf Fig Blades with Petioles */}
+          {/* 21 Detailed Fiddle Leaf Fig Blades with Real PBR Leaf Texture */}
           {treeLeaves.map((leaf, idx) => (
             <group key={`ficus-leaf-${idx}`} position={leaf.pos} rotation={leaf.rot} scale={leaf.s}>
               {/* Petiole (Leaf Stem) connecting to branch */}
@@ -261,12 +399,16 @@ export default function DecorElements() {
                 <meshStandardMaterial color="#3a5832" roughness={0.7} />
               </mesh>
 
-              {/* Realistic Curved Fiddle Leaf Blade */}
+              {/* Realistic Curved Fiddle Leaf Blade with Real Leaf Scanned Map */}
               <mesh geometry={fiddleLeafGeometry} castShadow receiveShadow>
                 <meshStandardMaterial
-                  color={leaf.color}
-                  roughness={0.62}
-                  metalness={0.04}
+                  map={textures.leafColor || null}
+                  normalMap={textures.leafNormal || null}
+                  roughnessMap={textures.leafRoughness || null}
+                  normalScale={[0.8, 0.8]}
+                  color={textures.leafColor ? '#a3d9a5' : leaf.color}
+                  roughness={0.58}
+                  metalness={0.03}
                   side={THREE.DoubleSide}
                 />
               </mesh>
@@ -288,12 +430,19 @@ export default function DecorElements() {
         {/* Modern Fluted Matte Charcoal Planter Pot */}
         <mesh position={[0, 0.28, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[0.22, 0.17, 0.56, 28]} />
-          <meshStandardMaterial color="#0f172a" roughness={0.5} metalness={0.25} />
+          <meshStandardMaterial
+            map={textures.potColor || null}
+            normalMap={textures.potNormal || null}
+            normalScale={[0.5, 0.5]}
+            color="#1e293b"
+            roughness={0.55}
+            metalness={0.2}
+          />
         </mesh>
         {/* Bronze Potting Lip Collar */}
         <mesh position={[0, 0.565, 0]}>
           <cylinderGeometry args={[0.224, 0.224, 0.014, 28]} />
-          <meshStandardMaterial color="#b45309" metalness={0.85} roughness={0.2} />
+          <meshStandardMaterial color="#b45309" metalness={0.88} roughness={0.2} />
         </mesh>
         {/* Potting Soil Bed */}
         <mesh position={[0, 0.54, 0]} receiveShadow>
@@ -301,7 +450,7 @@ export default function DecorElements() {
           <meshStandardMaterial color="#1a120c" roughness={0.95} />
         </mesh>
 
-        {/* Dense Architectural Snake Plant Foliage Cluster */}
+        {/* Dense Architectural Snake Plant Foliage Cluster with PBR Leaf Micro-Detail */}
         <group ref={snakePlantSwayRef} position={[0, 0.55, 0]}>
           {snakeLeaves.map((lf, idx) => (
             <group
@@ -313,9 +462,13 @@ export default function DecorElements() {
               {/* Variegated Snake Plant Leaf Blade with Gold Edge Tone */}
               <mesh geometry={snakeLeafGeometry} castShadow receiveShadow>
                 <meshStandardMaterial
-                  color="#154d24"
-                  roughness={0.55}
-                  metalness={0.06}
+                  map={textures.leafColor || null}
+                  normalMap={textures.leafNormal || null}
+                  roughnessMap={textures.leafRoughness || null}
+                  normalScale={[0.7, 0.7]}
+                  color={textures.leafColor ? '#66b278' : '#154d24'}
+                  roughness={0.54}
+                  metalness={0.05}
                   side={THREE.DoubleSide}
                 />
               </mesh>

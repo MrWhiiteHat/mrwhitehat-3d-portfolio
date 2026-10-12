@@ -229,7 +229,9 @@ function SceneContents({
         <LoungeStation onSelect={onSelect} onHover={onHover} />
         <PrinterStation onSelect={onSelect} onHover={onHover} />
         <CommsStation onSelect={onSelect} onHover={onHover} />
-        <DecorElements />
+        <Suspense fallback={null}>
+          <DecorElements />
+        </Suspense>
         <StudioWallGraphicsAndCurtains currentThemeKey={themeKey} />
 
         {/* Animated Cyber Airlock Entrance Gate */}
