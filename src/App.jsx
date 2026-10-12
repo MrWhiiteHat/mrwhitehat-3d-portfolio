@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Activity,
   ArrowLeft,
   Award,
   BookOpen,
@@ -14,6 +15,7 @@ import {
   Plus,
   Radio,
   RotateCcw,
+  Server,
   ShieldCheck,
   Sparkles,
   Terminal,
@@ -47,6 +49,9 @@ const NAV_STATIONS = [
   { id: 'resume', label: 'Resume', icon: BriefcaseBusiness, num: '5' },
   { id: 'contact', label: 'Contact', icon: Mail, num: '6' },
   { id: 'operator', label: 'MrWhiteHat', icon: Terminal, num: '7' },
+  { id: 'server_rack', label: 'Mainframe', icon: Server, num: '8' },
+  { id: 'hardware_arsenal', label: 'Hardware', icon: Radio, num: '9' },
+  { id: 'wireshark_monitor', label: 'Wireshark', icon: Activity, num: '0' },
 ];
 
 export default function App() {
@@ -138,25 +143,25 @@ export default function App() {
       if (stationId === 'server_rack') {
         playHackingBeep(1800);
         playWhooshSound();
-        setSection('skills');
+        setSection('server_rack');
         setGameState('INSPECT_STATION');
-        setUnlockedStations((prev) => new Set([...prev, 'skills']));
+        setUnlockedStations((prev) => new Set([...prev, 'server_rack']));
         return;
       }
       if (stationId === 'hardware_arsenal') {
         playHackingBeep(1600);
         playWhooshSound();
-        setSection('skills');
+        setSection('hardware_arsenal');
         setGameState('INSPECT_STATION');
-        setUnlockedStations((prev) => new Set([...prev, 'skills']));
+        setUnlockedStations((prev) => new Set([...prev, 'hardware_arsenal']));
         return;
       }
       if (stationId === 'wireshark_monitor' || stationId === 'mitre_matrix') {
         playHackingBeep(1400);
         playWhooshSound();
-        setSection('projects');
+        setSection('wireshark_monitor');
         setGameState('INSPECT_STATION');
-        setUnlockedStations((prev) => new Set([...prev, 'projects']));
+        setUnlockedStations((prev) => new Set([...prev, 'wireshark_monitor']));
         return;
       }
       playWhooshSound();
@@ -237,14 +242,19 @@ export default function App() {
     const onKey = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-      if (e.key === 'Escape' || e.key === '0') {
+      if (e.key === 'Escape') {
         if (gameState === 'INSPECT_STATION') {
           handleClose();
         } else if (gameState === 'EXPLORE') {
           handleResetToCustomize();
         }
-      } else if (e.key >= '1' && e.key <= '7') {
+      } else if (e.key >= '1' && e.key <= '9') {
         const target = NAV_STATIONS[parseInt(e.key, 10) - 1];
+        if (target) {
+          handleStationInteract(target.id);
+        }
+      } else if (e.key === '0') {
+        const target = NAV_STATIONS[9];
         if (target) {
           handleStationInteract(target.id);
         }
@@ -313,7 +323,7 @@ export default function App() {
           activeProximity={activeProximity}
           onInteract={handleStationInteract}
           unlockedCount={unlockedStations.size}
-          totalStations={7}
+          totalStations={10}
           onCycleTheme={handleCycleTheme}
           currentThemeName={currentTheme.name}
           muted={muted}

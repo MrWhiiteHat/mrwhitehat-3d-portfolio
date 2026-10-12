@@ -111,7 +111,7 @@ const STATIONS = [
   {
     id: 'server_rack',
     title: '42U Mainframe Server Rack',
-    action: 'INSPECT NETWORK MAINFRAME // TELEMETRY',
+    action: 'HACK FIREWALL PORTS // MAINFRAME',
     position: [-2.3, 1.4, -4.2],
     maxDist: 3.5,
     boxes: [
@@ -139,7 +139,7 @@ const STATIONS = [
   {
     id: 'hardware_arsenal',
     title: 'Red Team Tactical Hardware Arsenal',
-    action: 'INSPECT PEN-TEST GADGETS // HAK5 & FLIPPER',
+    action: 'DEPLOY RF EXPLOIT // HARDWARE ARSENAL',
     position: [-4.6, 2.35, 1.25],
     maxDist: 3.5,
     boxes: [
@@ -153,7 +153,7 @@ const STATIONS = [
   {
     id: 'wireshark_monitor',
     title: 'Wireshark Live Packet Sniffer',
-    action: 'INSPECT PCAP TELEMETRY STREAM // ETH0',
+    action: 'DEEP PACKET INSPECTION // WIRESHARK',
     position: [-4.6, 3.45, 1.25],
     maxDist: 3.5,
     boxes: [

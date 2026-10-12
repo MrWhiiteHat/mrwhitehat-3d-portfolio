@@ -307,7 +307,22 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       {/* Authentic penetration testing & RF hardware tools mounted  */}
       {/* Location: X = -4.94, Y = 2.35, Z = 1.25                    */}
       {/* ======================================================== */}
-      <group position={[-4.94, 2.35, 1.25]} rotation={[0, Math.PI / 2, 0]}>
+      <group
+        position={[-4.94, 2.35, 1.25]}
+        rotation={[0, Math.PI / 2, 0]}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (typeof window !== 'undefined' && window.__SET_SECTION__) {
+            window.__SET_SECTION__('hardware_arsenal');
+          }
+        }}
+        onPointerOver={() => {
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'auto';
+        }}
+      >
         {/* CNC Perforated Matte Black Pegboard Backplate */}
         <mesh position={[0, 0, -0.01]} receiveShadow>
           <boxGeometry args={[1.5, 1.35, 0.02]} />
@@ -751,7 +766,22 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       {/* 5. LEFT WALL: WIRESHARK LIVE PCAP PACKET TELEMETRY MONITOR*/}
       {/* Location: X = -4.94, Y = 3.45, Z = 1.25                    */}
       {/* ======================================================== */}
-      <group position={[-4.94, 3.45, 1.25]} rotation={[0, Math.PI / 2, 0]}>
+      <group
+        position={[-4.94, 3.45, 1.25]}
+        rotation={[0, Math.PI / 2, 0]}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (typeof window !== 'undefined' && window.__SET_SECTION__) {
+            window.__SET_SECTION__('wireshark_monitor');
+          }
+        }}
+        onPointerOver={() => {
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'auto';
+        }}
+      >
         {/* Industrial Ultra-Widescreen Monitor Chassis */}
         <mesh position={[0, 0, 0]} castShadow>
           <boxGeometry args={[1.42, 0.68, 0.035]} />

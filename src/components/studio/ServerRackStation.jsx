@@ -39,6 +39,9 @@ export default function ServerRackStation() {
     e.stopPropagation();
     playHackingBeep(1800);
     setActiveBurst((prev) => !prev);
+    if (typeof window !== 'undefined' && window.__SET_SECTION__) {
+      window.__SET_SECTION__('server_rack');
+    }
   };
 
   return (

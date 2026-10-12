@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Html } from '@react-three/drei';
 import {
+  Activity,
   ArrowUpRight,
   Award,
   BookOpen,
@@ -18,13 +19,16 @@ import {
   Github,
   Globe,
   GraduationCap,
+  HardDrive,
   Layers,
   Lock,
   Mail,
   MessageSquare,
   PhoneCall,
+  Radio,
   RotateCcw,
   Send,
+  Server,
   Shield,
   ShieldAlert,
   ShieldCheck,
@@ -34,6 +38,7 @@ import {
   Unlock,
   UserCheck,
   UserRound,
+  Wifi,
   Zap,
 } from 'lucide-react';
 import { achievements, profile, projects, skills } from '../data.js';
@@ -43,8 +48,22 @@ import TimingScannerHack from './hacking/TimingScannerHack.jsx';
 import WaveformTunerHack from './hacking/WaveformTunerHack.jsx';
 import WireSpliceHack from './hacking/WireSpliceHack.jsx';
 import CipherDialHack from './hacking/CipherDialHack.jsx';
+import MainframeFirewallHack from './hacking/MainframeFirewallHack.jsx';
+import HardwareArsenalHack from './hacking/HardwareArsenalHack.jsx';
+import PacketSnifferHack from './hacking/PacketSnifferHack.jsx';
 
-export const STATION_ORDER = ['projects', 'skills', 'achievements', 'about', 'resume', 'contact', 'operator'];
+export const STATION_ORDER = [
+  'projects',
+  'skills',
+  'achievements',
+  'about',
+  'resume',
+  'contact',
+  'operator',
+  'server_rack',
+  'hardware_arsenal',
+  'wireshark_monitor',
+];
 
 export const stationConfigs = {
   achievements: {
@@ -138,6 +157,45 @@ export const stationConfigs = {
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
   },
+  server_rack: {
+    // 42U Mainframe Server Rack between Conference & Archive
+    position: [-2.3, 1.40, -4.20],
+    rotation: [0, 0, 0],
+    camPos: [-2.3, 1.55, -2.60],
+    camTarget: [-2.3, 1.40, -4.20],
+    title: '42U Mainframe Server Rack',
+    icon: Server,
+    distanceFactor: 0.70,
+    lightColor: '#ef4444',
+    lightIntensity: 22,
+    lightPos: [0, 0, 0.45],
+  },
+  hardware_arsenal: {
+    // Tactical Red Team Hardware Arsenal Pegboard on Left Wall
+    position: [-4.88, 2.35, 1.25],
+    rotation: [0, Math.PI / 2, 0],
+    camPos: [-2.85, 2.35, 1.25],
+    camTarget: [-4.88, 2.35, 1.25],
+    title: 'Tactical Red Team Hardware Arsenal',
+    icon: Radio,
+    distanceFactor: 0.70,
+    lightColor: '#f97316',
+    lightIntensity: 20,
+    lightPos: [0, 0, 0.45],
+  },
+  wireshark_monitor: {
+    // Wireshark Live PCAP Analyzer on Left Wall
+    position: [-4.88, 3.45, 1.25],
+    rotation: [0, Math.PI / 2, 0],
+    camPos: [-2.85, 3.45, 1.25],
+    camTarget: [-4.88, 3.45, 1.25],
+    title: 'Wireshark Monitor // Live PCAP Analyzer',
+    icon: Activity,
+    distanceFactor: 0.75,
+    lightColor: '#06b6d4',
+    lightIntensity: 22,
+    lightPos: [0, 0, 0.45],
+  },
 };
 
 export default function InObjectDisplay({ activeSection, onClose, onNavigate }) {
@@ -164,6 +222,9 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
     resume: false,
     contact: false,
     operator: false,
+    server_rack: false,
+    hardware_arsenal: false,
+    wireshark_monitor: false,
   });
 
   // Track active breach transition animation
@@ -192,6 +253,9 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
           resume: true,
           contact: true,
           operator: true,
+          server_rack: true,
+          hardware_arsenal: true,
+          wireshark_monitor: true,
         });
       };
       window.__RELOCK_ALL_HACKS__ = () => {
@@ -203,6 +267,9 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
           resume: false,
           contact: false,
           operator: false,
+          server_rack: false,
+          hardware_arsenal: false,
+          wireshark_monitor: false,
         });
       };
       window.__UNLOCK_CURRENT__ = () => {
@@ -385,6 +452,24 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                 <TimingScannerHack
                   onSolved={() => triggerUnlock('operator')}
                   onBypass={() => triggerUnlock('operator')}
+                />
+              )}
+              {activeSection === 'server_rack' && (
+                <MainframeFirewallHack
+                  onSolved={() => triggerUnlock('server_rack')}
+                  onBypass={() => triggerUnlock('server_rack')}
+                />
+              )}
+              {activeSection === 'hardware_arsenal' && (
+                <HardwareArsenalHack
+                  onSolved={() => triggerUnlock('hardware_arsenal')}
+                  onBypass={() => triggerUnlock('hardware_arsenal')}
+                />
+              )}
+              {activeSection === 'wireshark_monitor' && (
+                <PacketSnifferHack
+                  onSolved={() => triggerUnlock('wireshark_monitor')}
+                  onBypass={() => triggerUnlock('wireshark_monitor')}
                 />
               )}
             </div>
@@ -1077,6 +1162,280 @@ export default function InObjectDisplay({ activeSection, onClose, onNavigate }) 
                 <span>
                   <strong>OPERATIVE MISSION:</strong> Proactive defense through adversarial mindset. Engineering autonomous security pipelines, reverse-engineering mobile attack surfaces, and building privacy-preserving resilient architectures.
                 </span>
+              </div>
+            </div>
+          )}
+
+          {/* 8. 42U MAINFRAME SERVER RACK DOSSIER */}
+          {activeSection === 'server_rack' && (
+            <div className="mainframe-dossier-terminal">
+              <div className="operative-hud-header mainframe-hud-header">
+                <div className="operative-callsign-box">
+                  <div className="callsign-radar-blip blip-red" />
+                  <div>
+                    <span className="callsign-level">42U HARDENED BARE-METAL INFRASTRUCTURE // HIGH DENSITY</span>
+                    <h2 className="callsign-title">
+                      CLUSTER: <span className="callsign-highlight" style={{ color: '#f87171' }}>SENTINEL-NODE-01</span>
+                    </h2>
+                    <span className="callsign-legal">
+                      ORCHESTRATION: PROXMOX VE 8.1 · KUBERNETES · WAZUH SIEM · SURICATA IDS
+                    </span>
+                  </div>
+                </div>
+                <div className="operative-badge-pill" style={{ borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.1)' }}>
+                  <Server size={14} style={{ color: '#f87171' }} />
+                  <span style={{ color: '#fca5a5' }}>UPTIME: 412d 14h (99.98%)</span>
+                </div>
+              </div>
+
+              <div className="mainframe-metrics-row">
+                <div className="m-metric-chip">
+                  <span className="mm-lbl">CPU UTILIZATION</span>
+                  <strong className="mm-val" style={{ color: '#4ade80' }}>18.4% (32 CORES)</strong>
+                </div>
+                <div className="m-metric-chip">
+                  <span className="mm-lbl">ECC RAM POOL</span>
+                  <strong className="mm-val" style={{ color: '#38bdf8' }}>48.2 GB / 128 GB</strong>
+                </div>
+                <div className="m-metric-chip">
+                  <span className="mm-lbl">STORAGE ZFS RAID10</span>
+                  <strong className="mm-val" style={{ color: '#fbbf24' }}>3.8 TB / 16.0 TB</strong>
+                </div>
+                <div className="m-metric-chip">
+                  <span className="mm-lbl">SFP+ 10GbE UPLINK</span>
+                  <strong className="mm-val" style={{ color: '#f472b6' }}>4.8 Gbps TX / 1.2 Gbps RX</strong>
+                </div>
+              </div>
+
+              <div className="operative-grid-layout">
+                {/* 1. Proxmox & K8s Cluster */}
+                <div className="operative-card">
+                  <div className="card-top-tag">
+                    <Cpu size={13} style={{ color: '#38bdf8' }} />
+                    <span style={{ color: '#38bdf8' }}>VIRTUALIZATION & CONTAINERS // PROXMOX VE</span>
+                    <span className="live-status-pill">32 INSTANCES</span>
+                  </div>
+                  <div className="cluster-nodes-list">
+                    <div className="c-node-item">
+                      <span className="c-dot" />
+                      <div className="c-node-info">
+                        <strong>pve-node-alpha (Core Hypervisor)</strong>
+                        <span>Dual Xeon E5-2690 v4 · 64GB RAM · Debian Hardened Kernel 6.5</span>
+                      </div>
+                      <span className="c-node-badge">PROD</span>
+                    </div>
+                    <div className="c-node-item">
+                      <span className="c-dot" />
+                      <div className="c-node-info">
+                        <strong>k8s-cyber-grid (Worker Cluster)</strong>
+                        <span>Falco Kernel Runtime Security · Cilium eBPF Network Mesh</span>
+                      </div>
+                      <span className="c-node-badge">ACTIVE</span>
+                    </div>
+                    <div className="c-node-item">
+                      <span className="c-dot" />
+                      <div className="c-node-info">
+                        <strong>honeynet-dmz-sentinel (Deception Network)</strong>
+                        <span>Cowrie SSH Traps + Dionaea Malware Emulation sandbox</span>
+                      </div>
+                      <span className="c-node-badge">TRAP</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. SIEM & Threat Defense Services */}
+                <div className="operative-card">
+                  <div className="card-top-tag">
+                    <ShieldAlert size={13} style={{ color: '#f87171' }} />
+                    <span style={{ color: '#f87171' }}>SECURITY OPERATIONS // WAZUH SIEM & IDS</span>
+                    <span className="live-status-pill" style={{ background: 'rgba(239,68,68,0.2)', color: '#fca5a5' }}>SURICATA ACTIVE</span>
+                  </div>
+                  <div className="cluster-nodes-list">
+                    <div className="c-node-item">
+                      <span className="c-dot" style={{ background: '#f87171' }} />
+                      <div className="c-node-info">
+                        <strong>Wazuh SIEM Manager + OpenSearch</strong>
+                        <span>1.2M events/day · Real-time PCI-DSS / HIPAA rule matching</span>
+                      </div>
+                    </div>
+                    <div className="c-node-item">
+                      <span className="c-dot" style={{ background: '#f87171' }} />
+                      <div className="c-node-info">
+                        <strong>Suricata Deep Packet Inspection IDS/IPS</strong>
+                        <span>EmergingThreats rule signatures + automated IP null-routing</span>
+                      </div>
+                    </div>
+                    <div className="c-node-item">
+                      <span className="c-dot" style={{ background: '#f87171' }} />
+                      <div className="c-node-info">
+                        <strong>Vaultwarden KMS & Zero-Trust Mesh</strong>
+                        <span>WireGuard & Tailscale encrypted transit mesh between microservices</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 9. TACTICAL RED TEAM HARDWARE ARSENAL DOSSIER */}
+          {activeSection === 'hardware_arsenal' && (
+            <div className="arsenal-dossier-terminal">
+              <div className="operative-hud-header arsenal-hud-header">
+                <div className="operative-callsign-box">
+                  <div className="callsign-radar-blip blip-orange" />
+                  <div>
+                    <span className="callsign-level">PHYSICAL OFFENSIVE CYBER GEAR // TACTICAL FIELD ARSENAL</span>
+                    <h2 className="callsign-title">
+                      ARSENAL: <span className="callsign-highlight" style={{ color: '#fb923c' }}>HAK5 & RF PEN-TEST SUITE</span>
+                    </h2>
+                    <span className="callsign-legal">
+                      FIELD READINESS: SUB-GHZ · 802.11 DUAL-BAND · NFC/RFID · HARDWARE KEYLOGGING
+                    </span>
+                  </div>
+                </div>
+                <div className="operative-badge-pill" style={{ borderColor: 'rgba(249, 115, 22, 0.4)', background: 'rgba(249, 115, 22, 0.1)' }}>
+                  <Radio size={14} style={{ color: '#fb923c' }} />
+                  <span style={{ color: '#fdba74' }}>6 TOOLS ARMED & MOUNTED</span>
+                </div>
+              </div>
+
+              <div className="arsenal-tools-showcase">
+                {[
+                  {
+                    name: 'Hak5 WiFi Pineapple Mark VII',
+                    tag: '802.11ac / PineAP Suite',
+                    color: '#fb923c',
+                    desc: 'Rogue AP deployment, automated Karma attack, EAPOL handshake harvesting, and passive Wi-Fi reconnaissance across 2.4/5GHz spectrum.',
+                    specs: 'Dual Band · PineAP Engine · Enterprise WPA3 Recon · USB-C Tether',
+                    cmd: 'pineap --karma --deauth --handshakes-auto /loot/pcap',
+                  },
+                  {
+                    name: 'Flipper Zero + ESP32 Marauder',
+                    tag: 'Sub-GHz / BadUSB / NFC',
+                    color: '#38bdf8',
+                    desc: 'Multi-tool device for researching radio protocols, access control systems, hardware debugging, Sub-GHz replay (300-928 MHz), and BadUSB Ducky payloads.',
+                    specs: 'CC1101 Transceiver · 125kHz RFID · 13.56MHz NFC · BadUSB Emulation',
+                    cmd: 'flipper-cli subghz tx_raw --freq 433920000 /ext/gate_key.sub',
+                  },
+                  {
+                    name: 'Proxmark3 RDV4.01',
+                    tag: 'RFID / NFC Deep Research',
+                    color: '#a855f7',
+                    desc: 'The gold standard in RFID/NFC security auditing. Supports FPGA-driven high/low frequency sniffing, cloning, emulation, and cryptographic cracking of MIFARE & HID iCLASS.',
+                    specs: 'LF (125/134 kHz) · HF (13.56 MHz) · FPGA Signal Processing · Dual Antennas',
+                    cmd: 'hf mf autopwn --dump /root/loot/mifare_classic_dump.bin',
+                  },
+                  {
+                    name: 'Alfa AWUS036ACM 802.11ac Adapter',
+                    tag: 'Packet Injection Adapter',
+                    color: '#4ade80',
+                    desc: 'High-gain dual-band Wi-Fi network interface card with high TX power. Optimized for monitor mode, beacon frame injection, and aircrack-ng operations.',
+                    specs: 'MediaTek MT7612U · 2x RP-SMA 5dBi Antennas · Monitor Mode Verified',
+                    cmd: 'airmon-ng start wlan0 && airodump-ng wlan0mon --channel 6',
+                  },
+                  {
+                    name: 'USB Rubber Ducky (DuckyScript 3.0)',
+                    tag: 'HID Keystroke Injector',
+                    color: '#facc15',
+                    desc: 'Disguised USB flash drive operating as a 1000 WPM virtual human keyboard. Stages memory-only PowerShell payloads, circumvents UAC, and exfiltrates target credentials.',
+                    specs: 'Quad-Core 32-bit SoC · Arming Switch · MicroSD Loot Storage · OS Fingerprinting',
+                    cmd: 'STRING powershell -ep bypass -w hidden -c "IEX (New-Object Net.WebClient)..."',
+                  },
+                  {
+                    name: 'Great Scott Gadgets Ubertooth One',
+                    tag: '2.4 GHz Bluetooth Sniffer',
+                    color: '#f43f5e',
+                    desc: 'Open source 2.4 GHz wireless development platform suitable for Bluetooth experimentation. Sniffs BLE advertisements and hops through piconet frequency channels.',
+                    specs: 'LPC175x ARM Cortex-M3 · CC2591 RF Front End · Wireshark BLE Plugin',
+                    cmd: 'ubertooth-btle -f -c /tmp/ble_traffic_dump.pcap',
+                  },
+                ].map((tool, idx) => (
+                  <div key={idx} className="arsenal-tool-card">
+                    <div className="at-card-header">
+                      <span className="at-card-title">{tool.name}</span>
+                      <span className="at-card-tag" style={{ color: tool.color, borderColor: tool.color }}>{tool.tag}</span>
+                    </div>
+                    <p className="at-card-desc">{tool.desc}</p>
+                    <div className="at-card-specs">
+                      <span className="at-spec-label">SPECS:</span> {tool.specs}
+                    </div>
+                    <div className="at-card-cmd">
+                      <code>$ {tool.cmd}</code>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 10. INDUSTRIAL ULTRA-WIDESCREEN WIRESHARK MONITOR DOSSIER */}
+          {activeSection === 'wireshark_monitor' && (
+            <div className="pcap-dossier-terminal">
+              <div className="operative-hud-header pcap-hud-header">
+                <div className="operative-callsign-box">
+                  <div className="callsign-radar-blip blip-cyan" />
+                  <div>
+                    <span className="callsign-level">INDUSTRIAL ULTRA-WIDESCREEN TELEMETRY // REAL-TIME PCAP</span>
+                    <h2 className="callsign-title">
+                      INTERFACE: <span className="callsign-highlight" style={{ color: '#06b6d4' }}>eth0 // PROMISCUOUS_SNIFF</span>
+                    </h2>
+                    <span className="callsign-legal">
+                      DEEP PACKET INSPECTION · FLOW ANOMALY HEURISTICS · WIRESHARK 4.2 ENGINE
+                    </span>
+                  </div>
+                </div>
+                <div className="operative-badge-pill" style={{ borderColor: 'rgba(6, 182, 212, 0.4)', background: 'rgba(6, 182, 212, 0.1)' }}>
+                  <Activity size={14} style={{ color: '#06b6d4' }} />
+                  <span style={{ color: '#67e8f9' }}>PCAP STREAM: LIVE (0 DROPPED)</span>
+                </div>
+              </div>
+
+              <div className="pcap-live-stream-table">
+                <div className="pcap-table-header">
+                  <span className="col-time">TIME</span>
+                  <span className="col-proto">PROTO</span>
+                  <span className="col-src">SOURCE</span>
+                  <span className="col-dst">DESTINATION</span>
+                  <span className="col-len">LEN</span>
+                  <span className="col-info">INFO SUMMARY</span>
+                </div>
+                <div className="pcap-stream-body">
+                  {[
+                    { time: '0.000000', proto: 'TLSv1.3', src: '192.168.1.105', dst: '142.250.190.46:443', len: '517', info: 'Client Hello, SNI=api.github.com, Cipher=TLS_AES_256_GCM_SHA384' },
+                    { time: '0.001240', proto: 'DNS', src: '192.168.1.105', dst: '1.1.1.1:53', len: '78', info: 'Standard query 0x8a1b A auth.mrwhitehat.dev' },
+                    { time: '0.001890', proto: 'DNS', src: '1.1.1.1:53', dst: '192.168.1.105', len: '94', info: 'Standard query response 0x8a1b A 104.21.72.18' },
+                    { time: '0.004120', proto: 'SSHv2', src: '192.168.1.42', dst: '192.168.1.10:22', len: '108', info: 'Encrypted packet (len=76) [SSH_MSG_CHANNEL_DATA]' },
+                    { time: '0.008450', proto: 'HTTP/2', src: '192.168.1.105', dst: '172.217.16.206:443', len: '184', info: 'HEADERS frame: status=200 OK, path=/v1/security/telemetry' },
+                    { time: '0.012300', proto: 'TCP', src: '192.168.1.105:51240', dst: '10.0.0.1:443', len: '66', info: '51240 → 443 [ACK] Seq=1 Ack=1 Win=64240 Len=0' },
+                    { time: '0.015600', proto: 'ARP', src: 'Intel_4c:89:12', dst: 'Broadcast', len: '42', info: 'Who has 192.168.1.1? Tell 192.168.1.105' },
+                    { time: '0.019800', proto: 'ICMP', src: '192.168.1.105', dst: '8.8.8.8', len: '98', info: 'Echo (ping) request id=0x0001, seq=1/256, ttl=64' },
+                  ].map((pkt, i) => (
+                    <div key={i} className={`pcap-stream-row ${pkt.proto.toLowerCase().replace(/[^a-z0-9]/g, '')}`}>
+                      <span className="col-time">{pkt.time}</span>
+                      <span className={`col-proto proto-tag ${pkt.proto.toLowerCase().replace(/[^a-z0-9]/g, '')}`}>{pkt.proto}</span>
+                      <span className="col-src">{pkt.src}</span>
+                      <span className="col-dst">{pkt.dst}</span>
+                      <span className="col-len">{pkt.len}</span>
+                      <span className="col-info">{pkt.info}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pcap-hex-inspection-drawer">
+                <div className="hex-header">
+                  <Terminal size={12} style={{ color: '#06b6d4' }} />
+                  <span>SELECTED FRAME DUMP // PACKET #1 [TLS 1.3 CLIENT HELLO]</span>
+                </div>
+                <pre className="hex-dump-code">
+{`0000   00 50 56 c0 00 08 00 0c 29 3b 1a 4e 08 00 45 00   .PV.....);.N..E.
+0010   02 05 a1 2c 40 00 40 06 c3 89 c0 a8 01 69 8e fa   ...,@.@......i..
+0020   be 2e c8 28 01 bb 4c 19 82 e1 9f 74 12 a0 80 18   ...(..L....t....
+0030   01 f5 3d 7a 00 00 01 01 08 0a 41 db 8a 22 00 00   ..=z......A.."..
+0040   16 03 01 01 cd 01 00 01 c9 03 03 82 a7 df 91 1b   ................
+0050   68 e4 9f 53 2a 12 b4 89 2a 3f 8c 47 18 9b c3 40   h..S*...*?.G...@`}
+                </pre>
               </div>
             </div>
           )}
