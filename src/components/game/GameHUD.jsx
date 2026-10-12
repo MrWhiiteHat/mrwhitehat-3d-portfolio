@@ -32,9 +32,18 @@ export default function GameHUD({
   onResetView,
   onMobileMove,
 }) {
-  const [touchActive, setTouchActive] = useState(false);
+  // Locomotion Mode: 'joystick' on mobile/touch, 'wasd' on desktop (switchable anytime)
+  const [controlMode, setControlMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 1024 || 'ontouchstart' in window ? 'joystick' : 'wasd';
+    }
+    return 'wasd';
+  });
+
+  const joystickBaseRef = useRef(null);
+  const activeTouchId = useRef(null);
+  const isMouseDownRef = useRef(false);
   const [stickPos, setStickPos] = useState({ x: 0, y: 0 });
-  const touchStartRef = useRef({ x: 0, y: 0 });
 
   // Appliance state trackers
   const [acActive, setAcActive] = useState(true);
@@ -56,7 +65,7 @@ export default function GameHUD({
     setNeonActive((prev) => !prev);
   };
 
-  // Real-time key state for on-screen tactical WASD feedback
+  // Real-time key state for on-screen tactical WASD feedback (Physical keyboard always active!)
   const [pressedKeys, setPressedKeys] = useState({
     w: false,
     a: false,
@@ -126,37 +135,89 @@ export default function GameHUD({
     }
   };
 
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
-    setTouchActive(true);
-  };
-
-  const handleTouchMove = (e) => {
-    if (!touchActive) return;
-    const touch = e.touches[0];
-    const dx = touch.clientX - touchStartRef.current.x;
-    const dy = touch.clientY - touchStartRef.current.y;
-    const maxDist = 42;
+  // High-Precision Analog Joystick Calculations
+  const updateJoystick = (clientX, clientY) => {
+    if (!joystickBaseRef.current) return;
+    const rect = joystickBaseRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const dx = clientX - centerX;
+    const dy = clientY - centerY;
+    const maxRadius = rect.width / 2 - 12; // ~48px usable travel
     const dist = Math.hypot(dx, dy);
-    const clampedDist = Math.min(dist, maxDist);
-    const angle = Math.atan2(dy, dx);
+    const deadzone = 4;
 
-    const nx = (Math.cos(angle) * clampedDist) / maxDist;
-    const ny = (Math.sin(angle) * clampedDist) / maxDist;
+    if (dist < deadzone) {
+      setStickPos({ x: 0, y: 0 });
+      onMobileMove?.({ x: 0, y: 0 });
+      return;
+    }
 
-    setStickPos({ x: nx * 32, y: ny * 32 });
-    onMobileMove?.({ x: nx, y: ny });
+    const clampedDist = Math.min(dist, maxRadius);
+    const nx = dx / dist;
+    const ny = dy / dist;
+    const power = Math.min(1.0, clampedDist / maxRadius);
+
+    setStickPos({ x: nx * clampedDist, y: ny * clampedDist });
+    onMobileMove?.({ x: nx * power, y: ny * power });
   };
 
-  const handleTouchEnd = () => {
-    setTouchActive(false);
+  const handleJoystickTouchStart = (e) => {
+    e.stopPropagation();
+    const touch = e.changedTouches[0];
+    activeTouchId.current = touch.identifier;
+    updateJoystick(touch.clientX, touch.clientY);
+  };
+
+  const handleJoystickTouchMove = (e) => {
+    e.stopPropagation();
+    if (activeTouchId.current === null) return;
+    const touch = Array.from(e.changedTouches).find((t) => t.identifier === activeTouchId.current);
+    if (!touch) return;
+    updateJoystick(touch.clientX, touch.clientY);
+  };
+
+  const handleJoystickTouchEnd = (e) => {
+    e.stopPropagation();
+    if (activeTouchId.current === null) return;
+    const touch = Array.from(e.changedTouches).find((t) => t.identifier === activeTouchId.current);
+    if (!touch) return;
+    activeTouchId.current = null;
     setStickPos({ x: 0, y: 0 });
     onMobileMove?.({ x: 0, y: 0 });
   };
 
+  // Mouse interaction for testing on desktop
+  const handleJoystickMouseDown = (e) => {
+    e.stopPropagation();
+    isMouseDownRef.current = true;
+    updateJoystick(e.clientX, e.clientY);
+  };
+
+  useEffect(() => {
+    const onWindowMouseMove = (e) => {
+      if (isMouseDownRef.current) {
+        updateJoystick(e.clientX, e.clientY);
+      }
+    };
+    const onWindowMouseUp = () => {
+      if (isMouseDownRef.current) {
+        isMouseDownRef.current = false;
+        setStickPos({ x: 0, y: 0 });
+        onMobileMove?.({ x: 0, y: 0 });
+      }
+    };
+    window.addEventListener('mousemove', onWindowMouseMove);
+    window.addEventListener('mouseup', onWindowMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onWindowMouseMove);
+      window.removeEventListener('mouseup', onWindowMouseUp);
+    };
+  }, [onMobileMove]);
+
   return (
     <div className="game-hud-layer" pointerEvents="none">
+
       {/* 1. Top Operative Identity & Mission Telemetry */}
       <header className="hud-top-bar">
         <div className="hud-agent-card">
