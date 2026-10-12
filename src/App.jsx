@@ -25,11 +25,14 @@ import {
   Volume2,
   VolumeX,
   Zap,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import OfficeScene from './components/OfficeScene.jsx';
 import CharacterSelectModal from './components/game/CharacterSelectModal.jsx';
 import GameHUD from './components/game/GameHUD.jsx';
 import { profile } from './data.js';
+import { useFullscreen } from './utils/useFullscreen.js';
 import {
   isMuted,
   playAirlockDoorSound,
@@ -93,6 +96,9 @@ export default function App() {
   const [themeKey, setThemeKey] = useState('CYBER_NEON_NOIR');
   const [muted, setAudioMuted] = useState(false);
   const [droneActive, setDroneActive] = useState(false);
+
+  // Fullscreen management across PC & Phone
+  const { isFullscreen, toggleFullscreen, toastMessage } = useFullscreen();
 
   // 1. Theme Cycling
   const handleCycleTheme = useCallback(() => {
@@ -287,6 +293,7 @@ export default function App() {
       window.__CLOSE_SECTION__ = handleClose;
       window.__CYCLE_THEME__ = handleCycleTheme;
       window.__TOGGLE_MUTE__ = handleToggleMute;
+      window.__TOGGLE_FULLSCREEN__ = toggleFullscreen;
       window.__START_GAME__ = handleStartGame;
       window.__RESET_CUSTOMIZE__ = handleResetToCustomize;
     }
@@ -314,6 +321,8 @@ export default function App() {
         handleToggleMute();
       } else if (e.key === 't' || e.key === 'T') {
         handleCycleTheme();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
       }
     };
 
@@ -324,6 +333,7 @@ export default function App() {
     handleClose,
     handleCycleTheme,
     handleToggleMute,
+    toggleFullscreen,
     handleStartGame,
     handleResetToCustomize,
     handleStationInteract,
@@ -352,12 +362,22 @@ export default function App() {
         playerData={playerData}
       />
 
+      {/* Fullscreen Toast HUD Indicator */}
+      {toastMessage && (
+        <div className="fullscreen-hud-toast">
+          <Sparkles size={13} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* 1. INITIAL: Character Customization & Deployment Modal */}
       {gameState === 'CUSTOMIZE' && (
         <CharacterSelectModal
           onStartGame={handleStartGame}
           currentThemeKey={themeKey}
           onSetTheme={setThemeKey}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={toggleFullscreen}
         />
       )}
 
@@ -386,6 +406,8 @@ export default function App() {
           onToggleMute={handleToggleMute}
           onResetView={handleResetToCustomize}
           onMobileMove={handleMobileMove}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={toggleFullscreen}
         />
       )}
 
@@ -408,6 +430,14 @@ export default function App() {
           </div>
 
           <div className="station-quick-controls">
+            <button
+              className={`hud-action-btn ${isFullscreen ? 'active-appliance' : ''}`}
+              onClick={toggleFullscreen}
+              title={isFullscreen ? 'Exit Full Screen [F]' : 'Enter Full Screen [F]'}
+              aria-label="Toggle Fullscreen"
+            >
+              {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+            </button>
             <button
               className="hud-action-btn"
               onClick={handleCycleTheme}
@@ -440,6 +470,15 @@ export default function App() {
           </div>
 
           <div className="header-actions">
+            <button
+              className={`hud-action-btn ${isFullscreen ? 'active-appliance' : ''}`}
+              onClick={toggleFullscreen}
+              title={isFullscreen ? 'Exit Full Screen [F]' : 'Enter Full Screen [F]'}
+              aria-label="Toggle Fullscreen"
+            >
+              {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+            </button>
+
             <button
               className="hud-theme-pill"
               onClick={handleCycleTheme}

@@ -17,6 +17,8 @@ import {
   Volume2,
   VolumeX,
   Zap,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
 
@@ -33,6 +35,8 @@ export default function GameHUD({
   onToggleMute,
   onResetView,
   onMobileMove,
+  isFullscreen,
+  onToggleFullscreen,
 }) {
   // Locomotion Mode: 'joystick' on mobile/touch, 'wasd' on desktop (switchable anytime)
   const [controlMode, setControlMode] = useState(() => {
@@ -349,8 +353,30 @@ export default function GameHUD({
           >
             <RotateCcw size={15} />
           </button>
+
+          {/* Fullscreen Option for PC & Mobile */}
+          <button
+            type="button"
+            className={`hud-action-btn ${isFullscreen ? 'active-appliance' : ''}`}
+            onClick={onToggleFullscreen}
+            title={isFullscreen ? 'Exit Full Screen [F]' : 'Enter Full Screen [F]'}
+            aria-label={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+          >
+            {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+          </button>
         </div>
       </header>
+
+      {/* Dedicated Floating Fullscreen Pill for Mobile Touchscreens */}
+      <button
+        type="button"
+        className={`hud-mobile-fullscreen-pill ${isFullscreen ? 'is-active' : ''}`}
+        onClick={onToggleFullscreen}
+        aria-label={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+      >
+        {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+        <span>{isFullscreen ? 'WINDOWED' : 'FULLSCREEN'}</span>
+      </button>
 
       {/* 2. Center Dynamic Crosshair / Reticle */}
       <div className={`hud-crosshair-wrap ${activeProximity ? 'crosshair-targeted' : ''}`}>
@@ -421,8 +447,7 @@ export default function GameHUD({
               className={`locomotion-tab-btn ${controlMode === 'joystick' ? 'is-active' : ''}`}
               onClick={() => {
                 setControlMode('joystick');
-                setStickPos({ x: 0, y: 0 });
-                onMobileMove?.({ x: 0, y: 0 });
+                resetJoystick();
               }}
               title="Virtual Analog Joystick (Touch/Mobile)"
             >
@@ -433,8 +458,7 @@ export default function GameHUD({
               className={`locomotion-tab-btn ${controlMode === 'wasd' ? 'is-active' : ''}`}
               onClick={() => {
                 setControlMode('wasd');
-                setStickPos({ x: 0, y: 0 });
-                onMobileMove?.({ x: 0, y: 0 });
+                resetJoystick();
               }}
               title="WASD Directional Keypad"
             >
@@ -592,6 +616,9 @@ export default function GameHUD({
           <span className="guide-sep">·</span>
           <span className="guide-chip">SHIFT</span>
           <span>Sprint</span>
+          <span className="guide-sep">·</span>
+          <span className="guide-chip">F</span>
+          <span>Fullscreen</span>
           <span className="guide-sep">·</span>
           <span className="guide-chip">ESC</span>
           <span>Menu</span>

@@ -5685,6 +5685,8 @@ html, body, .portfolio-container {
   .hud-top-bar {
     padding: 8px 10px;
     gap: 6px;
+    flex-wrap: wrap;
+    max-width: 100vw;
   }
 
   .hud-agent-card {
@@ -6335,6 +6337,140 @@ html, body, .portfolio-container {
   border: 1px solid rgba(56, 189, 248, 0.2);
   border-radius: 6px;
 }
+
+/* ========================================================================= */
+/* UNIVERSAL FULLSCREEN OPTION (PC & MOBILE)                                 */
+/* ========================================================================= */
+
+/* Pseudo-fullscreen for mobile iOS Safari & non-native environments */
+body.is-pseudo-fullscreen,
+html.is-pseudo-fullscreen {
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+  height: 100dvh !important;
+  overflow: hidden !important;
+  inset: 0 !important;
+}
+
+body.is-pseudo-fullscreen .portfolio-container {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  z-index: 999999 !important;
+}
+
+/* Character Selection Modal Header Right Actions */
+.char-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.char-fullscreen-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(85, 246, 154, 0.08);
+  border: 1px solid rgba(85, 246, 154, 0.3);
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.char-fullscreen-toggle-btn:hover {
+  background: rgba(85, 246, 154, 0.22);
+  border-color: var(--green);
+  box-shadow: 0 0 12px rgba(85, 246, 154, 0.35);
+}
+
+.char-fullscreen-toggle-btn.is-active {
+  background: rgba(85, 246, 154, 0.25);
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(85, 246, 154, 0.3);
+}
+
+/* Dedicated Floating Fullscreen Pill for Mobile Phones */
+.hud-mobile-fullscreen-pill {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hud-mobile-fullscreen-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    position: fixed;
+    top: 58px;
+    right: 10px;
+    z-index: 95;
+    background: rgba(9, 15, 12, 0.92);
+    border: 1px solid rgba(85, 246, 154, 0.4);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 10px rgba(85, 246, 154, 0.2);
+    backdrop-filter: blur(14px);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 6px 11px;
+    border-radius: 20px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.2s ease;
+  }
+
+  .hud-mobile-fullscreen-pill:active,
+  .hud-mobile-fullscreen-pill.is-active {
+    background: rgba(85, 246, 154, 0.25);
+    border-color: var(--green);
+    box-shadow: 0 0 14px rgba(85, 246, 154, 0.4);
+  }
+}
+
+/* Fullscreen Toast HUD Indicator */
+.fullscreen-hud-toast {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(9, 15, 12, 0.95);
+  border: 1px solid rgba(85, 246, 154, 0.45);
+  box-shadow: 0 0 24px rgba(85, 246, 154, 0.3), 0 10px 30px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(16px);
+  color: #55f69a;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 8px 18px;
+  border-radius: 24px;
+  z-index: 10000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fsToastFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fsToastFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 
 
 

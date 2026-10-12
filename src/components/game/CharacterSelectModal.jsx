@@ -8,6 +8,8 @@ import {
   Sparkles,
   Terminal,
   Zap,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { playClickSound, playHackingBeep, playWhooshSound } from '../../utils/audio.js';
 
@@ -143,7 +145,13 @@ function HolographicAvatarPreview({ characterId, accentColor }) {
   );
 }
 
-export default function CharacterSelectModal({ onStartGame, currentThemeKey, onSetTheme }) {
+export default function CharacterSelectModal({
+  onStartGame,
+  currentThemeKey,
+  onSetTheme,
+  isFullscreen,
+  onToggleFullscreen,
+}) {
   // Empty by default: user must enter their name (no presets/suggestions)
   const [name, setName] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState(CHARACTERS[0]);
@@ -186,7 +194,19 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
             <Terminal size={14} />
             <span>ENTER OFFICE // VISITOR CLEARANCE</span>
           </div>
-          <span className="char-version-chip">3D WORKSPACE</span>
+          <div className="char-header-right">
+            <button
+              type="button"
+              className={`char-fullscreen-toggle-btn ${isFullscreen ? 'is-active' : ''}`}
+              onClick={onToggleFullscreen}
+              title={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+              aria-label={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+            >
+              {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+              <span>{isFullscreen ? 'EXIT FULLSCREEN' : 'FULLSCREEN'}</span>
+            </button>
+            <span className="char-version-chip">3D WORKSPACE</span>
+          </div>
         </div>
 
         {/* Main Body */}
