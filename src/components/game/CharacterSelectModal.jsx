@@ -59,6 +59,7 @@ const VISOR_STYLES = [
 ];
 
 const NEON_PALETTES = [
+  { id: 'cybernoir', label: 'Neon Noir (Red & Cyan)', color: '#ff2244', themeKey: 'CYBER_NEON_NOIR' },
   { id: 'matrix', label: 'Matrix Green', color: '#34d399', themeKey: 'CYBER_MATRIX' },
   { id: 'cyan', label: 'Arctic Cyan', color: '#38bdf8', themeKey: 'STEALTH_ICE' },
   { id: 'magenta', label: 'Synthwave Neon', color: '#ec4899', themeKey: 'SYNTHWAVE_NEON' },

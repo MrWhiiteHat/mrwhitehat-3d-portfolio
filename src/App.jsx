@@ -64,8 +64,8 @@ export default function App() {
     archetype: 'Alpha',
     archetypeName: 'Operative Alpha',
     visor: 'mono',
-    accentColor: '#34d399',
-    themeKey: 'CYBER_MATRIX',
+    accentColor: '#ff2244',
+    themeKey: 'CYBER_NEON_NOIR',
   });
 
   const [isGateOpen, setIsGateOpen] = useState(false);
@@ -76,7 +76,7 @@ export default function App() {
   // Station inspect & theme state
   const [section, setSection] = useState(null);
   const [hovered, setHovered] = useState(null);
-  const [themeKey, setThemeKey] = useState('CYBER_MATRIX');
+  const [themeKey, setThemeKey] = useState('CYBER_NEON_NOIR');
   const [muted, setAudioMuted] = useState(false);
   const [droneActive, setDroneActive] = useState(false);
 

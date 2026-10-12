@@ -891,3 +891,500 @@ export function createMitreAttackScreen() {
 
   return { texture, update };
 }
+
+/**
+ * 6. CYBERPUNK POP-ART NEON POSTER (Marilyn Monroe Pop-Art Style from Image 1)
+ * High-contrast screenprint neon aesthetic in Magenta, Cyan, Gold & Deep Indigo.
+ */
+export function createCyberPopArtScreen() {
+  const width = 512;
+  const height = 640;
+  const canvas = createScreenCanvas(width, height);
+  if (!canvas) return { texture: null, update: () => {} };
+
+  const ctx = canvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  let animTimer = 0;
+
+  function update(delta) {
+    animTimer += delta;
+
+    // 1. Synthwave Dark Indigo Gradient Base
+    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+    bgGrad.addColorStop(0, '#0a0618');
+    bgGrad.addColorStop(0.5, '#160829');
+    bgGrad.addColorStop(1, '#0d041a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. Halftone Dot Pop-Art Background Matrix
+    ctx.fillStyle = 'rgba(236, 72, 153, 0.18)';
+    const dotSpacing = 20;
+    for (let x = 15; x < width; x += dotSpacing) {
+      for (let y = 15; y < height; y += dotSpacing) {
+        const dotSize = 1.5 + Math.sin(x * 0.02 + y * 0.02) * 1.0;
+        ctx.beginPath();
+        ctx.arc(x, y, dotSize, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // 3. Neon Duotone Color Washes (Cyan Left, Hot Pink Right)
+    const cyanWash = ctx.createRadialGradient(140, 260, 40, 140, 260, 220);
+    cyanWash.addColorStop(0, 'rgba(0, 245, 255, 0.45)');
+    cyanWash.addColorStop(1, 'rgba(0, 245, 255, 0)');
+    ctx.fillStyle = cyanWash;
+    ctx.fillRect(0, 0, width, height);
+
+    const pinkWash = ctx.createRadialGradient(370, 280, 50, 370, 280, 240);
+    pinkWash.addColorStop(0, 'rgba(255, 0, 128, 0.5)');
+    pinkWash.addColorStop(1, 'rgba(255, 0, 128, 0)');
+    ctx.fillStyle = pinkWash;
+    ctx.fillRect(0, 0, width, height);
+
+    // 4. Stylized Pop-Art Marilyn Portrait Silhouette
+    ctx.save();
+    // Hair Volume (Iconic Platinum / Neon Cyan-Yellow Hair Curls)
+    ctx.fillStyle = '#ffde59';
+    ctx.beginPath();
+    ctx.arc(256, 230, 140, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Additional hair curl puffs
+    [
+      [145, 190, 70],
+      [367, 190, 70],
+      [125, 265, 65],
+      [387, 265, 65],
+      [160, 130, 60],
+      [352, 130, 60],
+      [256, 110, 70],
+    ].forEach(([hx, hy, hr]) => {
+      ctx.beginPath();
+      ctx.arc(hx, hy, hr, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Face Oval
+    ctx.fillStyle = '#ffe0bd';
+    ctx.beginPath();
+    ctx.ellipse(256, 290, 85, 115, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // High Cheekbone Shadow & Neon Noir Contour
+    ctx.fillStyle = 'rgba(236, 72, 153, 0.55)';
+    ctx.beginPath();
+    ctx.ellipse(200, 310, 30, 60, -0.2, 0, Math.PI * 2);
+    ctx.ellipse(312, 310, 30, 60, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyebrows (Arched high)
+    ctx.strokeStyle = '#1e1124';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(220, 245, 26, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(292, 245, 26, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.stroke();
+
+    // Stylized Cyber Sunglasses / Visor (Iconic Neon Reflection)
+    ctx.fillStyle = '#0f051d';
+    ctx.beginPath();
+    ctx.roundRect(190, 255, 62, 36, [4, 4, 18, 18]);
+    ctx.roundRect(260, 255, 62, 36, [4, 4, 18, 18]);
+    ctx.fill();
+
+    // Visor Bridge
+    ctx.fillStyle = '#00f5ff';
+    ctx.fillRect(250, 266, 12, 5);
+
+    // Visor Neon Reflections
+    ctx.fillStyle = '#00f5ff';
+    ctx.beginPath();
+    ctx.moveTo(196, 260);
+    ctx.lineTo(244, 260);
+    ctx.lineTo(228, 282);
+    ctx.lineTo(196, 282);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#ff007f';
+    ctx.beginPath();
+    ctx.moveTo(268, 260);
+    ctx.lineTo(314, 260);
+    ctx.lineTo(298, 282);
+    ctx.lineTo(268, 282);
+    ctx.closePath();
+    ctx.fill();
+
+    // Nose Line
+    ctx.strokeStyle = 'rgba(236, 72, 153, 0.7)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(254, 285);
+    ctx.lineTo(252, 325);
+    ctx.lineTo(259, 328);
+    ctx.stroke();
+
+    // Iconic Beauty Mark (Mole)
+    ctx.fillStyle = '#1e1124';
+    ctx.beginPath();
+    ctx.arc(290, 335, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Famous Parted Ruby Red Lips
+    ctx.fillStyle = '#ff1744';
+    ctx.beginPath();
+    ctx.moveTo(230, 355);
+    ctx.quadraticCurveTo(256, 340, 282, 355);
+    ctx.quadraticCurveTo(256, 385, 230, 355);
+    ctx.fill();
+
+    // Pearly Teeth Glint
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(256, 358, 14, 4.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Neck & Collarbone
+    ctx.fillStyle = '#f7d3ad';
+    ctx.beginPath();
+    ctx.moveTo(215, 395);
+    ctx.lineTo(210, 480);
+    ctx.lineTo(302, 480);
+    ctx.lineTo(297, 395);
+    ctx.closePath();
+    ctx.fill();
+
+    // Shoulder Contour
+    ctx.fillStyle = '#140c24';
+    ctx.beginPath();
+    ctx.moveTo(110, 520);
+    ctx.quadraticCurveTo(210, 460, 256, 475);
+    ctx.quadraticCurveTo(302, 460, 402, 520);
+    ctx.lineTo(402, 640);
+    ctx.lineTo(110, 640);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // 5. High-Impact Typography & Neon Badging
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 24px monospace';
+    ctx.letterSpacing = '4px';
+    ctx.textAlign = 'center';
+    ctx.fillText('NEO // MARILYN', width / 2, 545);
+
+    ctx.fillStyle = '#00f5ff';
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('CYBERPUNK POP-ART ARCHIVE · EDITION 01/99', width / 2, 570);
+
+    ctx.fillStyle = '#ec4899';
+    ctx.font = '9px monospace';
+    ctx.fillText('HIGH-VOLTAGE NEON NOIR · NIGHT CITY', width / 2, 592);
+    ctx.textAlign = 'left';
+
+    // 6. Neon Outer Frame Edge
+    ctx.strokeStyle = '#00f5ff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(12, 12, width - 24, height - 24);
+
+    ctx.strokeStyle = '#ec4899';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(18, 18, width - 36, height - 36);
+
+    texture.needsUpdate = true;
+  }
+
+  update(0);
+  return { texture, update };
+}
+
+/**
+ * 7. 8-TILE PIXEL AVATAR HACKER MATRIX (From Image 1 Top Right Display)
+ * 8 distinct cyberpunk hacker/netrunner avatars with status telemetry.
+ */
+export function createAvatarMatrixScreen() {
+  const width = 512;
+  const height = 256;
+  const canvas = createScreenCanvas(width, height);
+  if (!canvas) return { texture: null, update: () => {} };
+
+  const ctx = canvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  const avatars = [
+    { name: 'GHOST', role: 'STEALTH', color: '#ff2244', bg: '#200812', hair: '#ffffff' },
+    { name: 'CIPHER', role: 'CRYPTO', color: '#00f5ff', bg: '#061a24', hair: '#00f5ff' },
+    { name: 'VALK_9', role: 'EXPLOIT', color: '#a855f7', bg: '#170a26', hair: '#ec4899' },
+    { name: 'APEX', role: 'AI-CORE', color: '#34d399', bg: '#081c13', hair: '#22c55e' },
+    { name: 'ZERO', role: 'HARDWARE', color: '#f59e0b', bg: '#221506', hair: '#fbbf24' },
+    { name: 'SHADOW', role: 'ROOT-OPS', color: '#38bdf8', bg: '#091522', hair: '#94a3b8' },
+    { name: 'BLADE', role: 'RECON', color: '#f43f5e', bg: '#200914', hair: '#f43f5e' },
+    { name: 'KRYPTON', role: 'NETRUN', color: '#10b981', bg: '#061e16', hair: '#6ee7b7' },
+  ];
+
+  let pulseTimer = 0;
+
+  function update(delta) {
+    pulseTimer += delta;
+
+    // Dark chassis background
+    ctx.fillStyle = '#060a12';
+    ctx.fillRect(0, 0, width, height);
+
+    // Top Header Bar
+    ctx.fillStyle = '#0b1422';
+    ctx.fillRect(0, 0, width, 24);
+    ctx.fillStyle = '#00f5ff';
+    ctx.font = 'bold 9.5px monospace';
+    ctx.fillText('⚡ SYNDICATE NETRUNNER MATRIX // ACTIVE AGENTS (8/8 ONLINE)', 12, 16);
+
+    ctx.fillStyle = '#ef4444';
+    ctx.fillText('DEFCON 1 · ENCRYPTED', width - 150, 16);
+
+    // Draw 8 Avatar Cards (2 rows of 4)
+    const cols = 4;
+    const rows = 2;
+    const cardW = 116;
+    const cardH = 104;
+    const startX = 14;
+    const startY = 32;
+    const gapX = 8;
+    const gapY = 8;
+
+    avatars.forEach((av, idx) => {
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+      const cx = startX + col * (cardW + gapX);
+      const cy = startY + row * (cardH + gapY);
+
+      // Card Background
+      ctx.fillStyle = av.bg;
+      ctx.fillRect(cx, cy, cardW, cardH);
+
+      // Card Border with Neon Accent
+      ctx.strokeStyle = av.color;
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(cx, cy, cardW, cardH);
+
+      // Avatar Portrait Pixel Box
+      const portraitX = cx + 8;
+      const portraitY = cy + 8;
+      const portSize = 56;
+
+      ctx.fillStyle = '#03060a';
+      ctx.fillRect(portraitX, portraitY, portSize, portSize);
+
+      // Stylized 8-Bit Pixel Character Head
+      // Shoulders
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(portraitX + 10, portraitY + 42, 36, 14);
+
+      // Neck
+      ctx.fillStyle = '#fcd34d';
+      ctx.fillRect(portraitX + 22, portraitY + 36, 12, 8);
+
+      // Face
+      ctx.fillStyle = '#fde68a';
+      ctx.fillRect(portraitX + 16, portraitY + 18, 24, 22);
+
+      // Hair / Hood
+      ctx.fillStyle = av.hair;
+      ctx.fillRect(portraitX + 14, portraitY + 10, 28, 12);
+      ctx.fillRect(portraitX + 12, portraitY + 16, 6, 18);
+      ctx.fillRect(portraitX + 38, portraitY + 16, 6, 18);
+
+      // Cyber Visor / Eyes (Glowing Neon Line)
+      ctx.fillStyle = av.color;
+      ctx.fillRect(portraitX + 18, portraitY + 24, 20, 6);
+
+      // Status indicator LED
+      const isBlink = Math.sin(pulseTimer * 4 + idx) > -0.2;
+      ctx.fillStyle = isBlink ? av.color : '#334155';
+      ctx.beginPath();
+      ctx.arc(cx + cardW - 12, cy + 12, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Agent Info Right of Portrait
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(av.name, cx + 68, cy + 22);
+
+      ctx.fillStyle = av.color;
+      ctx.font = '8px monospace';
+      ctx.fillText(av.role, cx + 68, cy + 34);
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '7.5px monospace';
+      ctx.fillText(`ID: #${1042 + idx * 37}`, cx + 68, cy + 46);
+      ctx.fillText('SIG: OK', cx + 68, cy + 57);
+
+      // Bottom Status Telemetry Bar
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.fillRect(cx + 6, cy + 72, cardW - 12, 24);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '7px monospace';
+      ctx.fillText(`BUFFER: [${Math.floor(85 + ((idx * 7 + pulseTimer * 5) % 15))}%]`, cx + 10, cy + 84);
+      ctx.fillText(`TELEMETRY: SYNCHRONIZED`, cx + 10, cy + 93);
+    });
+
+    texture.needsUpdate = true;
+  }
+
+  update(0);
+  return { texture, update };
+}
+
+/**
+ * 8. SYSTEM HACKED // BREACH DETECTED HOLOGRAPHIC HUD (Directly from Image 2)
+ * Glowing translucent HUD alert cards with hazard triangle and security warnings.
+ */
+export function createSystemHackedHoloScreen() {
+  const width = 512;
+  const height = 300;
+  const canvas = createScreenCanvas(width, height);
+  if (!canvas) return { texture: null, update: () => {} };
+
+  const ctx = canvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  let strobeTimer = 0;
+
+  function update(delta) {
+    strobeTimer += delta;
+
+    // Clear with translucent holographic cyan-dark background
+    ctx.clearRect(0, 0, width, height);
+
+    ctx.fillStyle = 'rgba(6, 18, 30, 0.78)';
+    ctx.fillRect(0, 0, width, height);
+
+    // Subtle holographic cyan matrix grid
+    ctx.strokeStyle = 'rgba(0, 245, 255, 0.12)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < width; x += 24) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < height; y += 24) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+
+    // Outer Holographic Chamfered Cyber Frame
+    ctx.strokeStyle = '#00f5ff';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(10, 10, width - 20, height - 20);
+
+    // Chamfered Corner Accents
+    const cornerSize = 16;
+    [
+      [10, 10, 1, 1],
+      [width - 10, 10, -1, 1],
+      [10, height - 10, 1, -1],
+      [width - 10, height - 10, -1, -1],
+    ].forEach(([cx, cy, dx, dy]) => {
+      ctx.fillStyle = '#00f5ff';
+      ctx.fillRect(cx - (dx < 0 ? cornerSize : 0), cy - (dy < 0 ? 3 : 0), cornerSize, 3);
+      ctx.fillRect(cx - (dx < 0 ? 3 : 0), cy - (dy < 0 ? cornerSize : 0), 3, cornerSize);
+    });
+
+    // Top Header Warning Strip (Hazard Stripes)
+    const stripeW = 16;
+    for (let x = 14; x < width - 14; x += stripeW * 2) {
+      ctx.fillStyle = 'rgba(255, 23, 68, 0.45)';
+      ctx.beginPath();
+      ctx.moveTo(x, 14);
+      ctx.lineTo(x + stripeW, 14);
+      ctx.lineTo(x + stripeW - 8, 34);
+      ctx.lineTo(x - 8, 34);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Top Alert Category Label
+    ctx.fillStyle = '#00f5ff';
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('SYSTEM ADMINISTRATOR // HIGH PRIORITY EVENT', 20, 52);
+
+    ctx.fillStyle = '#ff1744';
+    ctx.fillText('CODE: RED-0x99', width - 130, 52);
+
+    // Center Warning Hazard Triangle [ ! ]
+    const triX = 90;
+    const triY = 150;
+    const triR = 52;
+
+    const flash = Math.sin(strobeTimer * 6) > 0;
+    ctx.fillStyle = flash ? '#ff1744' : '#b91c1c';
+    ctx.beginPath();
+    ctx.moveTo(triX, triY - triR);
+    ctx.lineTo(triX + triR * 0.95, triY + triR * 0.7);
+    ctx.lineTo(triX - triR * 0.95, triY + triR * 0.7);
+    ctx.closePath();
+    ctx.fill();
+
+    // Triangle Inner Border
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Exclamation Mark [ ! ] inside triangle
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 36px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('!', triX, triY + 28);
+    ctx.textAlign = 'left';
+
+    // Massive Glowing Header: SYSTEM HACKED
+    ctx.fillStyle = '#ff1744';
+    ctx.font = '900 32px monospace';
+    ctx.letterSpacing = '2px';
+    ctx.shadowColor = '#ff1744';
+    ctx.shadowBlur = 18;
+    ctx.fillText('SYSTEM HACKED', 165, 125);
+
+    // Reset shadow
+    ctx.shadowBlur = 0;
+
+    // Subtitle & Status Details
+    ctx.fillStyle = '#00f5ff';
+    ctx.font = 'bold 13px monospace';
+    ctx.fillText('BREACH DETECTED // UNAUTHORIZED OVERRIDE', 165, 150);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '10px monospace';
+    ctx.fillText('• CORE FIREWALL: BYPASSED (TCP 443 -> ROOT)', 165, 175);
+    ctx.fillText('• KERNEL MEMORY: ARBITRARY WRITE EXPLOITED', 165, 192);
+    ctx.fillText('• EXFILTRATION: 10.0.4.1 -> ENCRYPTED PROXY', 165, 209);
+
+    // Bottom Warning Banner
+    ctx.fillStyle = flash ? 'rgba(255, 23, 68, 0.85)' : 'rgba(185, 28, 28, 0.75)';
+    ctx.fillRect(14, height - 52, width - 28, 38);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('⚠ CRITICAL SECURITY INCIDENT · ALL ACCESS REVOKED ⚠', width / 2, height - 28);
+    ctx.textAlign = 'left';
+
+    texture.needsUpdate = true;
+  }
+
+  update(0);
+  return { texture, update };
+}

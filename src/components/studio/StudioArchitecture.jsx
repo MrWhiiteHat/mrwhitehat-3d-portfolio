@@ -8,8 +8,10 @@ import {
   getCeilingTileTextures,
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
+import { LIGHTING_THEMES } from './CyberAtmosphere.jsx';
 
-export default function StudioArchitecture() {
+export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR' }) {
+  const theme = LIGHTING_THEMES[currentThemeKey] || LIGHTING_THEMES.CYBER_NEON_NOIR;
   const parquetFloor = useMemo(() => getParquetFloorTextures(8, 8), []);
   const plasterWall = useMemo(() => getPlasterWallTextures(3, 2), []);
   const walnutWood = useMemo(() => getWalnutWoodTextures(1, 4), []);
@@ -45,10 +47,10 @@ export default function StudioArchitecture() {
       {/* ========================================================================= */}
       {/* 1. FLOOR & CARPETS                                                        */}
       {/* ========================================================================= */}
-      {/* Main Parquet Hardwood Floor with Realistic Grain, Bump & Roughness */}
+      {/* Main Parquet Hardwood Floor with High-End Reflective Gloss (Mirroring Red & Cyan Neon) */}
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[10.3, 0.1, 10.3]} />
-        <meshStandardMaterial {...parquetFloor} />
+        <meshStandardMaterial {...parquetFloor} roughness={0.22} metalness={0.25} />
       </mesh>
 
       {/* Floor Border Brass / Dark Walnut Trim */}
@@ -261,9 +263,9 @@ export default function StudioArchitecture() {
         {/* Sleek Vertical Ambient LED Channel along Right Wall */}
         <mesh position={[-0.11, 0.1, 4.3]}>
           <boxGeometry args={[0.015, 3.8, 0.04]} />
-          <meshBasicMaterial color="#34d399" />
+          <meshBasicMaterial color={theme.accentColor || '#00f0ff'} />
         </mesh>
-        <pointLight position={[-0.25, 0.2, 4.3]} color="#34d399" intensity={0.8} distance={2.5} />
+        <pointLight position={[-0.25, 0.2, 4.3]} color={theme.accentColor || '#00f0ff'} intensity={1.2} distance={2.8} />
 
         {/* Executive Cyber Security Wall Plaque beside Entrance */}
         <group position={[-0.11, 0.1, -1.4]}>
@@ -428,26 +430,32 @@ export default function StudioArchitecture() {
 
         {/* Ambient Recessed LED Light Trough Lines inside ceiling coffers */}
         {[-1.6, 1.6].map((cx, i) =>
-          [-1.6, 1.6].map((cz, j) => (
-            <group key={`coffer-glow-${i}-${j}`} position={[cx, -0.03, cz]}>
-              <mesh position={[0, 0, -1.35]}>
-                <boxGeometry args={[2.7, 0.015, 0.02]} />
-                <meshBasicMaterial color="#34d399" />
-              </mesh>
-              <mesh position={[0, 0, 1.35]}>
-                <boxGeometry args={[2.7, 0.015, 0.02]} />
-                <meshBasicMaterial color="#34d399" />
-              </mesh>
-              <mesh position={[-1.35, 0, 0]}>
-                <boxGeometry args={[0.02, 0.015, 2.7]} />
-                <meshBasicMaterial color="#34d399" />
-              </mesh>
-              <mesh position={[1.35, 0, 0]}>
-                <boxGeometry args={[0.02, 0.015, 2.7]} />
-                <meshBasicMaterial color="#34d399" />
-              </mesh>
-            </group>
-          ))
+          [-1.6, 1.6].map((cz, j) => {
+            const cofferColor =
+              (i + j) % 2 === 0
+                ? theme.crimsonColor || '#ff1744'
+                : theme.accentColor || '#00f0ff';
+            return (
+              <group key={`coffer-glow-${i}-${j}`} position={[cx, -0.03, cz]}>
+                <mesh position={[0, 0, -1.35]}>
+                  <boxGeometry args={[2.7, 0.015, 0.02]} />
+                  <meshBasicMaterial color={cofferColor} />
+                </mesh>
+                <mesh position={[0, 0, 1.35]}>
+                  <boxGeometry args={[2.7, 0.015, 0.02]} />
+                  <meshBasicMaterial color={cofferColor} />
+                </mesh>
+                <mesh position={[-1.35, 0, 0]}>
+                  <boxGeometry args={[0.02, 0.015, 2.7]} />
+                  <meshBasicMaterial color={cofferColor} />
+                </mesh>
+                <mesh position={[1.35, 0, 0]}>
+                  <boxGeometry args={[0.02, 0.015, 2.7]} />
+                  <meshBasicMaterial color={cofferColor} />
+                </mesh>
+              </group>
+            );
+          })
         )}
 
         {/* Center Fan Mounting Medallion */}

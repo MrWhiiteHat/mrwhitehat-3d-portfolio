@@ -306,6 +306,120 @@ export default function WorkstationStation({ onSelect, onHover }) {
             distance={1.6}
           />
         </group>
+
+        {/* ======================================================== */}
+        {/* NEAR-FIELD AUDIO STUDIO MONITORS (Directly from Image 1) */}
+        {/* Sleek black acoustic monitors with glowing amber drivers */}
+        {/* ======================================================== */}
+        {/* Left Studio Monitor */}
+        <group position={[-1.24, 0.22, 0.06]} rotation={[0, 0.3, 0]}>
+          {/* Acoustic Foam Decoupling Stand */}
+          <mesh position={[0, -0.15, 0]}>
+            <boxGeometry args={[0.2, 0.02, 0.24]} />
+            <meshStandardMaterial color="#1e1e1e" roughness={0.9} />
+          </mesh>
+          {/* Matte Black Acoustic Cabinet */}
+          <mesh castShadow>
+            <boxGeometry args={[0.18, 0.32, 0.22]} />
+            <meshStandardMaterial color="#090d0b" roughness={0.35} metalness={0.7} />
+          </mesh>
+          {/* Front Baffle Chamfer Plate */}
+          <mesh position={[0, 0, 0.112]}>
+            <boxGeometry args={[0.17, 0.31, 0.006]} />
+            <meshStandardMaterial color="#111827" roughness={0.25} />
+          </mesh>
+          {/* 5-Inch Amber/Orange Woven Kevlar Woofer Cone */}
+          <group position={[0, -0.04, 0.116]}>
+            <mesh rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.055, 0.055, 0.012, 24]} />
+              <meshStandardMaterial
+                color="#f59e0b"
+                emissive="#f59e0b"
+                emissiveIntensity={0.8}
+                roughness={0.3}
+              />
+            </mesh>
+            {/* Center Dust Cap */}
+            <mesh position={[0, 0, 0.008]}>
+              <sphereGeometry args={[0.018, 16, 16]} />
+              <meshStandardMaterial color="#0b0f14" roughness={0.2} metalness={0.8} />
+            </mesh>
+            {/* Amber Driver Glow */}
+            <pointLight position={[0, 0, 0.08]} color="#f59e0b" intensity={0.9} distance={0.8} />
+          </group>
+          {/* 1-Inch Silk Soft Dome Tweeter */}
+          <group position={[0, 0.085, 0.116]}>
+            <mesh>
+              <sphereGeometry args={[0.018, 16, 16]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.2} metalness={0.9} />
+            </mesh>
+            {/* Tweeter Waveguide Horn Ring */}
+            <mesh position={[0, 0, -0.002]}>
+              <torusGeometry args={[0.026, 0.004, 8, 24]} />
+              <meshStandardMaterial color="#334155" metalness={0.8} />
+            </mesh>
+          </group>
+          {/* Front Tuned Bass Reflex Port */}
+          <mesh position={[0, -0.12, 0.116]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.016, 0.016, 0.01, 16]} />
+            <meshBasicMaterial color="#000000" />
+          </mesh>
+          {/* Amber Power Status LED */}
+          <mesh position={[0.065, -0.13, 0.118]}>
+            <sphereGeometry args={[0.0025, 8, 8]} />
+            <meshBasicMaterial color="#f59e0b" />
+          </mesh>
+        </group>
+
+        {/* Right Studio Monitor */}
+        <group position={[1.24, 0.22, 0.06]} rotation={[0, -0.3, 0]}>
+          <mesh position={[0, -0.15, 0]}>
+            <boxGeometry args={[0.2, 0.02, 0.24]} />
+            <meshStandardMaterial color="#1e1e1e" roughness={0.9} />
+          </mesh>
+          <mesh castShadow>
+            <boxGeometry args={[0.18, 0.32, 0.22]} />
+            <meshStandardMaterial color="#090d0b" roughness={0.35} metalness={0.7} />
+          </mesh>
+          <mesh position={[0, 0, 0.112]}>
+            <boxGeometry args={[0.17, 0.31, 0.006]} />
+            <meshStandardMaterial color="#111827" roughness={0.25} />
+          </mesh>
+          <group position={[0, -0.04, 0.116]}>
+            <mesh rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.055, 0.055, 0.012, 24]} />
+              <meshStandardMaterial
+                color="#f59e0b"
+                emissive="#f59e0b"
+                emissiveIntensity={0.8}
+                roughness={0.3}
+              />
+            </mesh>
+            <mesh position={[0, 0, 0.008]}>
+              <sphereGeometry args={[0.018, 16, 16]} />
+              <meshStandardMaterial color="#0b0f14" roughness={0.2} metalness={0.8} />
+            </mesh>
+            <pointLight position={[0, 0, 0.08]} color="#f59e0b" intensity={0.9} distance={0.8} />
+          </group>
+          <group position={[0, 0.085, 0.116]}>
+            <mesh>
+              <sphereGeometry args={[0.018, 16, 16]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.2} metalness={0.9} />
+            </mesh>
+            <mesh position={[0, 0, -0.002]}>
+              <torusGeometry args={[0.026, 0.004, 8, 24]} />
+              <meshStandardMaterial color="#334155" metalness={0.8} />
+            </mesh>
+          </group>
+          <mesh position={[0, -0.12, 0.116]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.016, 0.016, 0.01, 16]} />
+            <meshBasicMaterial color="#000000" />
+          </mesh>
+          <mesh position={[-0.065, -0.13, 0.118]}>
+            <sphereGeometry args={[0.0025, 8, 8]} />
+            <meshBasicMaterial color="#f59e0b" />
+          </mesh>
+        </group>
       </group>
 
       {/* 4. High-Performance Liquid-Cooled PC Tower (Under desk right) */}

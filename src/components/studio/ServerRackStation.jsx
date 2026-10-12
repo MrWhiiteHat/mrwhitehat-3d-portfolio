@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playHackingBeep } from '../../utils/audio.js';
+import { createSystemHackedHoloScreen } from '../../utils/cyberScreens.js';
 
 /**
  * 42U High-Density Enterprise Cyber Server Rack
@@ -12,9 +13,24 @@ export default function ServerRackStation() {
   const fanRef = useRef();
   const kvmGlowRef = useRef();
   const ledGroupRef = useRef();
+  const breachAlarmRef = useRef();
+  const holo1Ref = useRef();
+  const holo2Ref = useRef();
+  const holo3Ref = useRef();
+
+  // Floating Holographic "SYSTEM HACKED" HUD Screen (from Image 2)
+  const holoScreen = useMemo(() => createSystemHackedHoloScreen(), []);
+  const screenTimer = useRef(0);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
+
+    // 0. Update Holographic Alert Screen
+    screenTimer.current += delta;
+    if (screenTimer.current > 0.066) {
+      holoScreen.update(screenTimer.current);
+      screenTimer.current = 0;
+    }
 
     // 1. Spinning Rack Exhaust Fans at top
     if (fanRef.current) {
@@ -32,6 +48,25 @@ export default function ServerRackStation() {
         const rate = activeBurst ? 28 : 10;
         child.visible = Math.sin(time * rate + i * 1.7) > -0.1;
       });
+    }
+
+    // 4. Breach Alarm Strobe
+    if (breachAlarmRef.current) {
+      breachAlarmRef.current.intensity = (activeBurst ? 4.2 : 2.4) + Math.sin(time * 7) * 1.6;
+    }
+
+    // 5. Floating Holographic HUD Hover Sine Waves
+    if (holo1Ref.current) {
+      holo1Ref.current.position.y = 2.2 + Math.sin(time * 2.2) * 0.035;
+      holo1Ref.current.rotation.y = 0.12 + Math.sin(time * 1.4) * 0.02;
+    }
+    if (holo2Ref.current) {
+      holo2Ref.current.position.y = 1.65 + Math.sin(time * 2.6 + 1.2) * 0.03;
+      holo2Ref.current.rotation.y = -0.16 + Math.cos(time * 1.8) * 0.02;
+    }
+    if (holo3Ref.current) {
+      holo3Ref.current.position.y = 1.35 + Math.sin(time * 2.0 + 2.4) * 0.025;
+      holo3Ref.current.rotation.y = 0.2 + Math.sin(time * 1.6) * 0.02;
     }
   });
 
@@ -273,7 +308,125 @@ export default function ServerRackStation() {
           <boxGeometry args={[0.03, 0.16, 0.02]} />
           <meshStandardMaterial color="#cbd5e1" metalness={0.95} roughness={0.1} />
         </mesh>
+
+        {/* Repeating Horizontal Hazard Warning Ribbon across Glass (from Image 2) */}
+        <group position={[0, 0.35, 0.015]}>
+          <mesh>
+            <planeGeometry args={[0.88, 0.08]} />
+            <meshBasicMaterial color="#ff1744" transparent opacity={0.85} />
+          </mesh>
+          <mesh position={[0, 0, 0.002]}>
+            <planeGeometry args={[0.86, 0.06]} />
+            <meshBasicMaterial color="#99001a" />
+          </mesh>
+        </group>
       </group>
+
+      {/* ========================================================================= */}
+      {/* 4. FLOATING TRANSLUCENT HOLOGRAPHIC HUD ALERTS (Directly from Image 2)    */}
+      {/* Floating HUD windows with glowing red [!] hazard badge & breach alerts    */}
+      {/* ========================================================================= */}
+      {/* Holographic Alert Panel 1 (Primary Center Card) */}
+      <group ref={holo1Ref} position={[0.08, 2.2, 0.72]}>
+        {/* Holographic Translucent Cyan Glass Substrate */}
+        <mesh>
+          <boxGeometry args={[0.76, 0.46, 0.006]} />
+          <meshPhysicalMaterial
+            color="#00f5ff"
+            transmission={0.88}
+            roughness={0.1}
+            metalness={0.2}
+            transparent
+            opacity={0.35}
+            ior={1.4}
+          />
+        </mesh>
+        {/* Glowing Cyan Wireframe Frame Outline */}
+        <mesh>
+          <boxGeometry args={[0.765, 0.465, 0.008]} />
+          <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.7} />
+        </mesh>
+        {/* Live Dynamic Holographic Display Screen */}
+        <mesh position={[0, 0, 0.005]}>
+          <planeGeometry args={[0.74, 0.44]} />
+          <meshBasicMaterial
+            map={holoScreen.texture}
+            transparent
+            opacity={0.92}
+            toneMapped={false}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      </group>
+
+      {/* Holographic Alert Panel 2 (Left Angled Staggered Card) */}
+      <group ref={holo2Ref} position={[-0.38, 1.65, 0.82]} scale={0.82}>
+        <mesh>
+          <boxGeometry args={[0.76, 0.46, 0.006]} />
+          <meshPhysicalMaterial
+            color="#00f5ff"
+            transmission={0.88}
+            roughness={0.1}
+            metalness={0.2}
+            transparent
+            opacity={0.3}
+            ior={1.4}
+          />
+        </mesh>
+        <mesh>
+          <boxGeometry args={[0.765, 0.465, 0.008]} />
+          <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.6} />
+        </mesh>
+        <mesh position={[0, 0, 0.005]}>
+          <planeGeometry args={[0.74, 0.44]} />
+          <meshBasicMaterial
+            map={holoScreen.texture}
+            transparent
+            opacity={0.85}
+            toneMapped={false}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      </group>
+
+      {/* Holographic Alert Panel 3 (Right Angled Staggered Card) */}
+      <group ref={holo3Ref} position={[0.42, 1.35, 0.88]} scale={0.75}>
+        <mesh>
+          <boxGeometry args={[0.76, 0.46, 0.006]} />
+          <meshPhysicalMaterial
+            color="#00f5ff"
+            transmission={0.88}
+            roughness={0.1}
+            metalness={0.2}
+            transparent
+            opacity={0.28}
+            ior={1.4}
+          />
+        </mesh>
+        <mesh>
+          <boxGeometry args={[0.765, 0.465, 0.008]} />
+          <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.55} />
+        </mesh>
+        <mesh position={[0, 0, 0.005]}>
+          <planeGeometry args={[0.74, 0.44]} />
+          <meshBasicMaterial
+            map={holoScreen.texture}
+            transparent
+            opacity={0.8}
+            toneMapped={false}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      </group>
+
+      {/* Flashing Red Breach Alarm Strobe Point Light */}
+      <pointLight
+        ref={breachAlarmRef}
+        position={[0, 2.1, 0.8]}
+        color="#ff1744"
+        intensity={2.6}
+        distance={3.2}
+      />
     </group>
   );
 }

@@ -5,6 +5,22 @@ import { playClickSound, playHackingBeep } from '../../utils/audio.js';
 
 // Lighting atmosphere presets
 export const LIGHTING_THEMES = {
+  CYBER_NEON_NOIR: {
+    id: 'CYBER_NEON_NOIR',
+    name: 'Cyber Neon Noir (Red & Cyan)',
+    ambient: '#040714',
+    ambientIntensity: 0.9,
+    dirColor: '#ff2244',
+    dirIntensity: 2.6,
+    windowColor: '#00f0ff',
+    windowIntensity: 2.8,
+    accentColor: '#00f0ff',
+    accentIntensity: 22,
+    crimsonColor: '#ff1744',
+    crimsonIntensity: 24,
+    loungeFillColor: '#f59e0b',
+    coreColor: '#ff2244',
+  },
   CYBER_MATRIX: {
     id: 'CYBER_MATRIX',
     name: 'Cyber Command (Matrix Green)',
@@ -16,6 +32,8 @@ export const LIGHTING_THEMES = {
     windowIntensity: 1.5,
     accentColor: '#34d399',
     accentIntensity: 14,
+    crimsonColor: '#34d399',
+    crimsonIntensity: 14,
     loungeFillColor: '#fbbf24',
     coreColor: '#55f69a',
   },
@@ -30,6 +48,8 @@ export const LIGHTING_THEMES = {
     windowIntensity: 2.2,
     accentColor: '#ec4899',
     accentIntensity: 18,
+    crimsonColor: '#f43f5e',
+    crimsonIntensity: 18,
     loungeFillColor: '#a855f7',
     coreColor: '#f43f5e',
   },
@@ -44,6 +64,8 @@ export const LIGHTING_THEMES = {
     windowIntensity: 2.5,
     accentColor: '#06b6d4',
     accentIntensity: 16,
+    crimsonColor: '#38bdf8',
+    crimsonIntensity: 16,
     loungeFillColor: '#60a5fa',
     coreColor: '#38bdf8',
   },
@@ -58,6 +80,8 @@ export const LIGHTING_THEMES = {
     windowIntensity: 1.2,
     accentColor: '#f59e0b',
     accentIntensity: 15,
+    crimsonColor: '#f59e0b',
+    crimsonIntensity: 15,
     loungeFillColor: '#d97706',
     coreColor: '#fbbf24',
   },
@@ -65,7 +89,7 @@ export const LIGHTING_THEMES = {
 
 export const THEME_KEYS = Object.keys(LIGHTING_THEMES);
 
-export default function CyberAtmosphere({ currentThemeKey = 'CYBER_MATRIX', onCycleTheme }) {
+export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', onCycleTheme }) {
   const fanRef = useRef();
   const secondHandRef = useRef();
   const minuteHandRef = useRef();
@@ -352,6 +376,190 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_MATRIX', onCy
             <meshBasicMaterial color={theme.coreColor} transparent opacity={0.5} />
           </mesh>
         </group>
+      </group>
+
+      {/* ========================================================================= */}
+      {/* 6. OVERHEAD HORIZONTAL CRIMSON NEON FIXTURE (Directly from Image 1)       */}
+      {/* Industrial high-output neon light bar above workstation casting red glow  */}
+      {/* ========================================================================= */}
+      <group position={[-1.2, 3.75, 0.2]}>
+        {/* Ceiling Suspension Rods / Brackets dropping from 4.45m down to 3.75m */}
+        {[-0.85, 0.85].map((sx, idx) => (
+          <group key={`neon-hang-${idx}`} position={[sx, 0.35, 0]}>
+            <mesh>
+              <cylinderGeometry args={[0.012, 0.012, 0.7, 12]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.9} roughness={0.2} />
+            </mesh>
+            {/* Ceiling Flange Anchor Plate */}
+            <mesh position={[0, 0.34, 0]}>
+              <cylinderGeometry args={[0.045, 0.045, 0.02, 16]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.8} />
+            </mesh>
+          </group>
+        ))}
+
+        {/* Heavy Industrial Dark Housing Casing */}
+        <mesh position={[0, 0.04, 0]} castShadow>
+          <boxGeometry args={[2.2, 0.12, 0.24]} />
+          <meshStandardMaterial color="#0b1016" metalness={0.92} roughness={0.25} />
+        </mesh>
+        {/* Top Channel Heat-Sink Fins */}
+        <mesh position={[0, 0.105, 0]}>
+          <boxGeometry args={[2.1, 0.02, 0.18]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.85} roughness={0.3} />
+        </mesh>
+
+        {/* Interior Mirror Reflector Hood */}
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[2.16, 0.06, 0.22]} />
+          <meshStandardMaterial color="#2d0a12" metalness={0.7} roughness={0.3} />
+        </mesh>
+
+        {/* 3 Parallel Glowing Crimson Neon Tubes */}
+        {[-0.065, 0, 0.065].map((tz, i) => (
+          <group key={`crimson-tube-${i}`} position={[0, -0.03, tz]}>
+            {/* Tubular Glass Rod */}
+            <mesh rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.02, 0.02, 2.08, 16]} />
+              <meshStandardMaterial
+                color={theme.crimsonColor || '#ff1744'}
+                emissive={theme.crimsonColor || '#ff1744'}
+                emissiveIntensity={3.6}
+                roughness={0.1}
+                toneMapped={false}
+              />
+            </mesh>
+            {/* End Socket Caps (Left and Right) */}
+            <mesh position={[-1.05, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.026, 0.026, 0.04, 16]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.9} />
+            </mesh>
+            <mesh position={[1.05, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.026, 0.026, 0.04, 16]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.9} />
+            </mesh>
+          </group>
+        ))}
+
+        {/* Dedicated Downward High-Intensity Crimson Wash Light */}
+        <pointLight
+          position={[0, -0.3, 0]}
+          color={theme.crimsonColor || '#ff1744'}
+          intensity={theme.crimsonIntensity || 24}
+          distance={8.5}
+          decay={2}
+        />
+      </group>
+
+      {/* ========================================================================= */}
+      {/* 7. VINTAGE SUSPENDED EDISON PENDANT LAMP (Directly from Image 1)          */}
+      {/* Hanging industrial dome shade with warm amber glowing Edison filament     */}
+      {/* ========================================================================= */}
+      <group position={[-0.2, 2.75, 0.6]}>
+        {/* Slender Black Braided Suspension Cord from Ceiling (4.45m down to 2.95m) */}
+        <mesh position={[0, 0.95, 0]}>
+          <cylinderGeometry args={[0.005, 0.005, 1.5, 8]} />
+          <meshStandardMaterial color="#0a0a0a" roughness={0.8} />
+        </mesh>
+        {/* Ceiling Rosette Canopy */}
+        <mesh position={[0, 1.7, 0]}>
+          <cylinderGeometry args={[0.045, 0.055, 0.02, 16]} />
+          <meshStandardMaterial color="#1c1917" metalness={0.8} />
+        </mesh>
+
+        {/* Antique Brass Fixture Socket */}
+        <mesh position={[0, 0.18, 0]}>
+          <cylinderGeometry args={[0.038, 0.042, 0.08, 16]} />
+          <meshStandardMaterial color="#b48324" metalness={0.92} roughness={0.2} />
+        </mesh>
+        {/* Brass Cord Grip Knurled Nut */}
+        <mesh position={[0, 0.23, 0]}>
+          <cylinderGeometry args={[0.02, 0.02, 0.03, 16]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.15} />
+        </mesh>
+
+        {/* Industrial Dark Metal Flared Cone Reflector Shade */}
+        <mesh position={[0, 0.1, 0]}>
+          <cylinderGeometry args={[0.07, 0.26, 0.14, 24, 1, true]} />
+          <meshStandardMaterial color="#1a202c" metalness={0.85} roughness={0.35} side={THREE.DoubleSide} />
+        </mesh>
+        {/* Shade Brass Rim Accent */}
+        <mesh position={[0, 0.03, 0]}>
+          <torusGeometry args={[0.26, 0.006, 8, 24]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.15} />
+        </mesh>
+
+        {/* Amber Tinted Glass Edison Teardrop Bulb */}
+        <mesh position={[0, 0.01, 0]}>
+          <sphereGeometry args={[0.055, 16, 16]} />
+          <meshPhysicalMaterial
+            color="#f59e0b"
+            transmission={0.85}
+            transparent
+            opacity={0.8}
+            roughness={0.1}
+            ior={1.5}
+          />
+        </mesh>
+
+        {/* Glowing Incandescent Zig-Zag Filament Mesh */}
+        <mesh position={[0, 0.01, 0]}>
+          <torusGeometry args={[0.022, 0.004, 8, 16]} />
+          <meshBasicMaterial color="#ffbe3b" toneMapped={false} />
+        </mesh>
+
+        {/* Warm Amber Downward Pool of Light */}
+        <pointLight
+          position={[0, -0.15, 0]}
+          color={theme.loungeFillColor || '#f59e0b'}
+          intensity={8.5}
+          distance={5.2}
+          decay={2}
+        />
+      </group>
+
+      {/* ========================================================================= */}
+      {/* 8. HORIZONTAL ELECTRIC CYAN LED STRIP BARS (Directly from Image 1)        */}
+      {/* Mounted on the wall/shelves casting crisp electric cyan rim glow          */}
+      {/* ========================================================================= */}
+      <group position={[1.9, 3.3, -4.92]}>
+        {/* Dual Horizontal Neon Runner Strips */}
+        {[-0.18, 0.18].map((sy, idx) => (
+          <group key={`cyan-strip-${idx}`} position={[0, sy, 0]}>
+            {/* Sleek Aluminum Mounting Track Bar */}
+            <mesh>
+              <boxGeometry args={[2.8, 0.04, 0.025]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.9} roughness={0.2} />
+            </mesh>
+            {/* Diffused Neon Cyan Strip Lens */}
+            <mesh position={[0, 0, 0.014]}>
+              <boxGeometry args={[2.76, 0.024, 0.008]} />
+              <meshStandardMaterial
+                color={theme.accentColor || '#00f0ff'}
+                emissive={theme.accentColor || '#00f0ff'}
+                emissiveIntensity={3.2}
+                roughness={0.15}
+                toneMapped={false}
+              />
+            </mesh>
+            {/* Aluminum End Caps */}
+            {[-1.4, 1.4].map((ex, ci) => (
+              <mesh key={`cap-${ci}`} position={[ex, 0, 0.005]}>
+                <boxGeometry args={[0.02, 0.046, 0.03]} />
+                <meshStandardMaterial color="#334155" metalness={0.9} />
+              </mesh>
+            ))}
+          </group>
+        ))}
+
+        {/* Crisp Electric Cyan Wash Point Light */}
+        <pointLight
+          position={[0, 0, 0.25]}
+          color={theme.accentColor || '#00f0ff'}
+          intensity={14}
+          distance={6.5}
+          decay={2}
+        />
       </group>
     </group>
   );

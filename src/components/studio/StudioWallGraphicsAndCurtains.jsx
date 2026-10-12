@@ -2,11 +2,16 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { LIGHTING_THEMES } from './CyberAtmosphere.jsx';
-import { createWiresharkScreen, createMitreAttackScreen } from '../../utils/cyberScreens.js';
+import {
+  createWiresharkScreen,
+  createMitreAttackScreen,
+  createCyberPopArtScreen,
+  createAvatarMatrixScreen,
+} from '../../utils/cyberScreens.js';
 import { playClickSound, playHackingBeep } from '../../utils/audio.js';
 
-export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER_MATRIX' }) {
-  const theme = LIGHTING_THEMES[currentThemeKey] || LIGHTING_THEMES.CYBER_MATRIX;
+export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER_NEON_NOIR' }) {
+  const theme = LIGHTING_THEMES[currentThemeKey] || LIGHTING_THEMES.CYBER_NEON_NOIR;
 
   // Refs for animated elements
   const leftCurtainRef = useRef();
@@ -23,6 +28,8 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
   // Dynamic Live Cyber Screens (Wireshark PCAP Stream & MITRE ATT&CK Threat Radar)
   const wiresharkScreen = useMemo(() => createWiresharkScreen(), []);
   const mitreScreen = useMemo(() => createMitreAttackScreen(), []);
+  const popArtScreen = useMemo(() => createCyberPopArtScreen(), []);
+  const avatarScreen = useMemo(() => createAvatarMatrixScreen(), []);
   const screenTimer = useRef(0);
 
   // Traffic vehicle positions for the skyway
@@ -62,6 +69,8 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
     if (screenTimer.current > 0.066) {
       wiresharkScreen.update(screenTimer.current);
       mitreScreen.update(screenTimer.current);
+      popArtScreen.update(screenTimer.current);
+      avatarScreen.update(screenTimer.current);
       screenTimer.current = 0;
     }
 
@@ -891,6 +900,66 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
           intensity={1.2}
           distance={2.5}
         />
+      </group>
+
+      {/* ======================================================== */}
+      {/* 8. BACK WALL: CYBERPUNK POP-ART POSTER FRAME (Image 1)   */}
+      {/* Location: X = 0.3, Y = 2.75, Z = -4.92                    */}
+      {/* ======================================================== */}
+      <group position={[0.3, 2.75, -4.92]}>
+        {/* Gallery Anodized Black Metal Frame */}
+        <mesh castShadow>
+          <boxGeometry args={[1.18, 1.48, 0.04]} />
+          <meshStandardMaterial color="#0b1016" metalness={0.9} roughness={0.2} />
+        </mesh>
+        {/* Frame Inner Neon Pink Bevel Liner */}
+        <mesh position={[0, 0, 0.018]}>
+          <boxGeometry args={[1.14, 1.44, 0.01]} />
+          <meshBasicMaterial color="#ec4899" />
+        </mesh>
+
+        {/* Dynamic Pop-Art Marilyn Canvas */}
+        <mesh position={[0, 0, 0.024]}>
+          <planeGeometry args={[1.12, 1.42]} />
+          <meshBasicMaterial map={popArtScreen.texture} toneMapped={false} />
+        </mesh>
+
+        {/* Ambient Backlight Glow from Poster Frame */}
+        <pointLight position={[0, 0, 0.2]} color="#ec4899" intensity={2.6} distance={2.4} />
+      </group>
+
+      {/* ======================================================== */}
+      {/* 9. BACK WALL: 8-TILE PIXEL AVATAR MATRIX DISPLAY (Image 1)*/}
+      {/* Location: X = 1.9, Y = 2.15, Z = -4.92                    */}
+      {/* ======================================================== */}
+      <group position={[1.9, 2.15, -4.92]}>
+        {/* Industrial Slim-Bezel Chassis */}
+        <mesh castShadow>
+          <boxGeometry args={[1.78, 0.98, 0.035]} />
+          <meshStandardMaterial color="#0b1016" metalness={0.88} roughness={0.2} />
+        </mesh>
+        {/* Inset Screen Border */}
+        <mesh position={[0, 0, 0.016]}>
+          <boxGeometry args={[1.74, 0.94, 0.008]} />
+          <meshStandardMaterial color="#020617" roughness={0.6} />
+        </mesh>
+
+        {/* Dynamic 8-Tile Pixel Avatar Grid Face */}
+        <mesh position={[0, 0, 0.022]}>
+          <planeGeometry args={[1.72, 0.92]} />
+          <meshBasicMaterial map={avatarScreen.texture} toneMapped={false} />
+        </mesh>
+
+        {/* Display Status Diagnostic LEDs along bottom */}
+        {[-0.75, -0.7, 0.7, 0.75].map((lx, idx) => (
+          <mesh key={`av-led-${idx}`} position={[lx, -0.46, 0.02]}>
+            <sphereGeometry args={[0.004, 8, 8]} />
+            <meshBasicMaterial color={idx % 2 === 0 ? '#00f5ff' : '#ff1744'} />
+          </mesh>
+        ))}
+
+        {/* Ambient Cyan Display Glow */}
+        <pointLight position={[0, 0, 0.25]} color="#00f5ff" intensity={2.2} distance={2.5} />
       </group>
     </group>
   );

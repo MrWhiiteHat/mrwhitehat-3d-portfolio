@@ -220,7 +220,7 @@ function SceneContents({
 
       {/* Handcrafted 3D Studio Architecture & Stations */}
       <group name="CyberCommandStudio">
-        <StudioArchitecture />
+        <StudioArchitecture currentThemeKey={themeKey} />
         <WorkstationStation onSelect={onSelect} onHover={onHover} />
         <ConferenceStation onSelect={onSelect} onHover={onHover} />
         <ArchiveStation onSelect={onSelect} onHover={onHover} />
