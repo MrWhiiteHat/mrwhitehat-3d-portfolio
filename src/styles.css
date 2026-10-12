@@ -4457,90 +4457,23 @@ button, a {
   animation: pulse 1.2s infinite alternate;
 }
 
-.security-notice-box {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-family: var(--mono);
-  font-size: 9px;
-  color: #fca5a5;
-  line-height: 1.4;
-  margin-top: 6px;
+.simple-card {
+  max-width: 680px;
 }
 
-.security-notice-box .notice-icon {
-  flex-shrink: 0;
-  color: #ef4444;
-  margin-top: 1px;
-}
-
-.input-error-pulse {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4) !important;
-}
-
-.division-grid {
+.simple-palette-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr) !important;
   gap: 6px;
 }
 
-.division-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 4px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
+.simple-visitor-container {
+  max-width: 560px;
+  padding: 18px 22px;
 }
 
-.division-chip:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.division-chip.active-division {
-  background: rgba(85, 246, 154, 0.14);
-}
-
-.division-chip .div-name {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  color: #f8fafc;
-}
-
-.division-chip .div-badge {
-  font-family: var(--mono);
-  font-size: 7px;
-  font-weight: 800;
-  color: #94a3b8;
-  letter-spacing: 0.5px;
-}
-
-.badge-sub-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.badge-div-pill {
-  font-family: var(--mono);
-  font-size: 7.5px;
-  font-weight: 800;
-  color: #e2e8f0;
-  border: 1px solid;
-  border-radius: 10px;
-  padding: 1px 6px;
-  background: rgba(0, 0, 0, 0.45);
+.simple-logs-list {
+  max-height: 360px;
 }
 
 /* Live Wall Visitor Counter Pill in HUD Top Bar */

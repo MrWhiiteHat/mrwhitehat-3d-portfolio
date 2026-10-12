@@ -1,96 +1,49 @@
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
-  AlertTriangle,
   CheckCircle2,
   Cpu,
-  Eye,
-  Flame,
-  Globe,
   Lock,
-  Radio,
   Shield,
-  ShieldAlert,
-  ShieldCheck,
   Sparkles,
   Terminal,
-  UserCheck,
   Zap,
 } from 'lucide-react';
 import { playClickSound, playHackingBeep, playWhooshSound } from '../../utils/audio.js';
 
-const ARCHETYPES = [
+const CHARACTERS = [
   {
     id: 'Alpha',
     name: 'Operative Alpha',
-    subtitle: 'Cyber Recon Specialist',
+    subtitle: 'Recon Specialist',
     icon: Shield,
-    desc: 'Heavy ICE penetration, perimeter defense & firewall bypass.',
+    visor: 'mono',
   },
   {
     id: 'Beta',
     name: 'Operative Beta',
-    subtitle: 'High-Speed Infiltrator',
+    subtitle: 'Infiltrator',
     icon: Zap,
-    desc: 'Rapid buffer injection & hardware signal interception.',
+    visor: 'dual',
   },
   {
     id: 'Android',
     name: 'Autonomous Android',
-    subtitle: 'Synthetic Security Unit',
+    subtitle: 'Security Unit',
     icon: Cpu,
-    desc: 'Quantum algorithmic parsing & automated telemetry decoding.',
-  },
-  {
-    id: 'Phantom',
-    name: 'Cyber Phantom',
-    subtitle: 'Stealth Red Team Ghost',
-    icon: Flame,
-    desc: 'Silent lateral movement, zero-day research & evasion tactics.',
-  },
-  {
-    id: 'Sentinel',
-    name: 'Sentinel Zero',
-    subtitle: 'Mainframe Defense Unit',
-    icon: ShieldCheck,
-    desc: 'Deep packet inspection, SIEM orchestration & cryptographic sealing.',
-  },
-  {
-    id: 'Netrunner',
-    name: 'Rogue Netrunner',
-    subtitle: 'Black-ICE Breaker',
-    icon: Terminal,
-    desc: 'Sub-GHz radio interception, firmware reverse-engineering & SDR.',
+    visor: 'crown',
   },
 ];
 
-const VISOR_STYLES = [
-  { id: 'mono', label: 'Tactical Mono-Lens' },
-  { id: 'dual', label: 'Dual Hex Visor' },
-  { id: 'crown', label: 'Neural Crown' },
-  { id: 'shades', label: 'Stealth Shades' },
-  { id: 'filter', label: 'Respirator Filter' },
-  { id: 'reticle', label: 'Combat Reticle' },
+const COLORS = [
+  { id: 'matrix', label: 'Green', color: '#34d399', themeKey: 'CYBER_MATRIX' },
+  { id: 'cyan', label: 'Cyan', color: '#38bdf8', themeKey: 'STEALTH_ICE' },
+  { id: 'red', label: 'Red', color: '#ff2244', themeKey: 'CYBER_NEON_NOIR' },
+  { id: 'pink', label: 'Pink', color: '#ec4899', themeKey: 'SYNTHWAVE_NEON' },
+  { id: 'amber', label: 'Amber', color: '#fbbf24', themeKey: 'WARM_AMBER' },
 ];
 
-const NEON_PALETTES = [
-  { id: 'matrix', label: 'Matrix Green', color: '#34d399', themeKey: 'CYBER_MATRIX' },
-  { id: 'cyan', label: 'Arctic Cyan', color: '#38bdf8', themeKey: 'STEALTH_ICE' },
-  { id: 'cybernoir', label: 'Neon Noir (Red)', color: '#ff2244', themeKey: 'CYBER_NEON_NOIR' },
-  { id: 'magenta', label: 'Synthwave Pink', color: '#ec4899', themeKey: 'SYNTHWAVE_NEON' },
-  { id: 'amber', label: 'Warm Amber', color: '#fbbf24', themeKey: 'WARM_AMBER' },
-  { id: 'violet', label: 'Void Violet', color: '#a855f7', themeKey: 'CYBER_NEON_NOIR' },
-  { id: 'emerald', label: 'Electric Emerald', color: '#10b981', themeKey: 'CYBER_MATRIX' },
-];
-
-const DIVISIONS = [
-  { id: 'red', name: 'Red Team', badge: 'OFFENSIVE' },
-  { id: 'blue', name: 'Blue Team', badge: 'DEFENSIVE' },
-  { id: 'purple', name: 'Purple Team', badge: 'HYBRID' },
-  { id: 'guest', name: 'Executive Guest', badge: 'VISITOR' },
-];
-
-function HolographicAvatarPreview({ archetype, visor, accentColor }) {
+function HolographicAvatarPreview({ characterId, accentColor }) {
   return (
     <Canvas
       dpr={[1, 1.5]}
@@ -102,14 +55,14 @@ function HolographicAvatarPreview({ archetype, visor, accentColor }) {
       <pointLight position={[0, 0.4, 1.2]} color={accentColor} intensity={8} distance={3} />
 
       <group rotation={[0.08, 0, 0]}>
-        {/* Stylized Cyberpunk Operative Head / Mask */}
+        {/* Cyberpunk Operative Head / Helmet */}
         <mesh position={[0, 0.15, 0]}>
           <boxGeometry args={[0.55, 0.65, 0.55]} />
           <meshStandardMaterial color="#0b1319" roughness={0.3} metalness={0.9} />
         </mesh>
 
-        {/* Archetype-specific antenna / ear armor */}
-        {(archetype === 'Android' || archetype === 'Sentinel') && (
+        {/* Android Ear Comm Armor */}
+        {characterId === 'Android' && (
           <group>
             <mesh position={[-0.32, 0.22, 0]}>
               <boxGeometry args={[0.08, 0.28, 0.14]} />
@@ -130,25 +83,26 @@ function HolographicAvatarPreview({ archetype, visor, accentColor }) {
           </group>
         )}
 
-        {/* Jaw Guard Filter */}
+        {/* Jaw Guard */}
         <mesh position={[0, -0.15, 0.22]}>
           <boxGeometry args={[0.42, 0.24, 0.2]} />
           <meshStandardMaterial color="#030712" roughness={0.5} metalness={0.8} />
         </mesh>
+
         {/* Respirator Neon Grill */}
         <mesh position={[0, -0.18, 0.33]}>
           <boxGeometry args={[0.24, 0.04, 0.02]} />
           <meshBasicMaterial color={accentColor} />
         </mesh>
 
-        {/* Selected Visor Hologram */}
-        {visor === 'mono' && (
+        {/* Character Visor Optics */}
+        {characterId === 'Alpha' && (
           <mesh position={[0, 0.22, 0.29]}>
             <boxGeometry args={[0.46, 0.12, 0.04]} />
             <meshBasicMaterial color={accentColor} />
           </mesh>
         )}
-        {visor === 'dual' && (
+        {characterId === 'Beta' && (
           <group position={[0, 0.22, 0.29]}>
             <mesh position={[-0.14, 0, 0]}>
               <cylinderGeometry args={[0.08, 0.08, 0.04, 6]} />
@@ -160,7 +114,7 @@ function HolographicAvatarPreview({ archetype, visor, accentColor }) {
             </mesh>
           </group>
         )}
-        {visor === 'crown' && (
+        {characterId === 'Android' && (
           <group position={[0, 0.5, 0]}>
             <mesh rotation={[Math.PI / 2, 0, 0]}>
               <torusGeometry args={[0.32, 0.018, 8, 24]} />
@@ -174,57 +128,12 @@ function HolographicAvatarPreview({ archetype, visor, accentColor }) {
             ))}
           </group>
         )}
-        {visor === 'shades' && (
-          <group position={[0, 0.22, 0.29]}>
-            <mesh position={[-0.13, 0, 0]}>
-              <boxGeometry args={[0.19, 0.09, 0.04]} />
-              <meshBasicMaterial color={accentColor} />
-            </mesh>
-            <mesh position={[0.13, 0, 0]}>
-              <boxGeometry args={[0.19, 0.09, 0.04]} />
-              <meshBasicMaterial color={accentColor} />
-            </mesh>
-          </group>
-        )}
-        {visor === 'filter' && (
-          <group position={[0, -0.05, 0.28]}>
-            <mesh position={[-0.16, -0.1, 0]}>
-              <cylinderGeometry args={[0.065, 0.065, 0.08, 16]} rotation={[Math.PI / 2, 0, 0]} />
-              <meshStandardMaterial color="#1e293b" metalness={0.9} />
-            </mesh>
-            <mesh position={[0.16, -0.1, 0]}>
-              <cylinderGeometry args={[0.065, 0.065, 0.08, 16]} rotation={[Math.PI / 2, 0, 0]} />
-              <meshStandardMaterial color="#1e293b" metalness={0.9} />
-            </mesh>
-            <mesh position={[0, 0.25, 0.01]}>
-              <boxGeometry args={[0.42, 0.08, 0.02]} />
-              <meshBasicMaterial color={accentColor} />
-            </mesh>
-          </group>
-        )}
-        {visor === 'reticle' && (
-          <group position={[0, 0.22, 0.3]}>
-            <mesh position={[0.12, 0, 0]}>
-              <ringGeometry args={[0.05, 0.065, 16]} />
-              <meshBasicMaterial color={accentColor} />
-            </mesh>
-            <mesh position={[0.12, 0, 0]}>
-              <circleGeometry args={[0.012, 8]} />
-              <meshBasicMaterial color="#ffffff" />
-            </mesh>
-            <mesh position={[-0.12, 0, 0]}>
-              <boxGeometry args={[0.16, 0.06, 0.02]} />
-              <meshStandardMaterial color="#111827" />
-            </mesh>
-          </group>
-        )}
 
-        {/* Operative Cyber Collar */}
+        {/* Collar & Accent */}
         <mesh position={[0, -0.42, 0]}>
           <cylinderGeometry args={[0.38, 0.44, 0.35, 16]} />
           <meshStandardMaterial color="#0f172a" roughness={0.4} metalness={0.7} />
         </mesh>
-        {/* Collar Neon Accent Strip */}
         <mesh position={[0, -0.32, 0]}>
           <cylinderGeometry args={[0.385, 0.395, 0.02, 16]} />
           <meshBasicMaterial color={accentColor} />
@@ -235,21 +144,18 @@ function HolographicAvatarPreview({ archetype, visor, accentColor }) {
 }
 
 export default function CharacterSelectModal({ onStartGame, currentThemeKey, onSetTheme }) {
-  // Empty by default: user MUST enter their own name (no suggestions)
-  const [codename, setCodename] = useState('');
-  const [role, setRole] = useState('Cyber Security Researcher');
-  const [selectedArchetype, setSelectedArchetype] = useState(ARCHETYPES[0]);
-  const [selectedVisor, setSelectedVisor] = useState(VISOR_STYLES[0].id);
-  const [selectedPalette, setSelectedPalette] = useState(NEON_PALETTES[0]);
-  const [selectedDivision, setSelectedDivision] = useState(DIVISIONS[0]);
+  // Empty by default: user must enter their name (no presets/suggestions)
+  const [name, setName] = useState('');
+  const [selectedCharacter, setSelectedCharacter] = useState(CHARACTERS[0]);
+  const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [showError, setShowError] = useState(false);
 
-  const isNameEntered = codename.trim().length >= 1;
+  const isNameEntered = name.trim().length >= 1;
 
-  const handleSelectPalette = (palette) => {
+  const handleSelectColor = (col) => {
     playClickSound(1050);
-    setSelectedPalette(palette);
-    onSetTheme(palette.themeKey);
+    setSelectedColor(col);
+    onSetTheme(col.themeKey);
   };
 
   const handleLaunch = () => {
@@ -261,73 +167,64 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
     playWhooshSound();
     playClickSound(1200);
     onStartGame({
-      name: codename.trim(),
-      codename: codename.trim(),
-      role: role.trim() || 'Cyber Security Specialist',
-      division: selectedDivision.name,
-      archetype: selectedArchetype.id,
-      archetypeName: selectedArchetype.name,
-      visor: selectedVisor,
-      accentColor: selectedPalette.color,
-      themeKey: selectedPalette.themeKey,
-      clearanceLevel: `LEVEL 4 // ${selectedDivision.badge}`,
+      name: name.trim(),
+      codename: name.trim(),
+      archetype: selectedCharacter.id,
+      archetypeName: selectedCharacter.name,
+      visor: selectedCharacter.visor,
+      accentColor: selectedColor.color,
+      themeKey: selectedColor.themeKey,
     });
   };
 
   return (
     <div className="char-select-overlay">
-      <div className="char-select-card">
-        {/* Top Terminal Header */}
+      <div className="char-select-card simple-card">
+        {/* Clean Header */}
         <div className="char-card-header">
           <div className="char-header-tag">
             <Terminal size={14} />
-            <span>CTOS SECURITY // AIRLOCK CLEARANCE & VISITOR ENROLLMENT</span>
+            <span>ENTER OFFICE // VISITOR CLEARANCE</span>
           </div>
-          <span className="char-version-chip">MANDATORY IDENTIFICATION GATE</span>
+          <span className="char-version-chip">3D WORKSPACE</span>
         </div>
 
-        {/* Main Body Grid: 3D Hologram Preview (Left) & Configuration Form (Right) */}
+        {/* Main Body */}
         <div className="char-body-grid">
-          {/* Left Column: 3D Hologram Avatar Preview */}
+          {/* Left Column: 3D Character Preview */}
           <div className="char-preview-pane">
             <div className="preview-canvas-box">
               <HolographicAvatarPreview
-                archetype={selectedArchetype.id}
-                visor={selectedVisor}
-                accentColor={selectedPalette.color}
+                characterId={selectedCharacter.id}
+                accentColor={selectedColor.color}
               />
               <div className="preview-holo-scanline" />
             </div>
 
             <div className="preview-badge-footer">
-              <span className="badge-agent-title">SECURITY CLEARANCE DOSSIER</span>
+              <span className="badge-agent-title">IDENTIFIED OPERATIVE</span>
               <strong
                 className="badge-agent-name"
-                style={{ color: isNameEntered ? selectedPalette.color : '#ef4444' }}
+                style={{ color: isNameEntered ? selectedColor.color : '#ef4444' }}
               >
-                {codename.trim() || '⚠️ UNIDENTIFIED VISITOR'}
+                {name.trim() || 'NAME REQUIRED'}
               </strong>
-              <div className="badge-sub-row">
-                <span className="badge-role-tag">{selectedArchetype.subtitle}</span>
-                <span className="badge-div-pill" style={{ borderColor: selectedPalette.color }}>
-                  {selectedDivision.name}
-                </span>
-              </div>
+              <span className="badge-role-tag">{selectedCharacter.subtitle}</span>
             </div>
           </div>
 
-          {/* Right Column: Customizer Controls with Complete Freedom */}
+          {/* Right Column: Clean Simple Controls */}
           <div className="char-config-pane">
-            {/* 1. Mandatory Visitor Name Input */}
-            <div className={`config-group ${showError && !isNameEntered ? 'config-group-error' : ''}`}>
+            {/* 1. Name Input (Mandatory, No Suggestions) */}
+            <div className="config-group">
               <div className="config-label-row">
                 <label className="config-label">
-                  <span>YOUR NAME / CALLSIGN *</span>
+                  <span>YOUR NAME *</span>
                 </label>
                 {isNameEntered ? (
                   <span className="badge-validated">
                     <CheckCircle2 size={12} />
-                    <span>IDENTITY VERIFIED</span>
+                    <span>READY</span>
                   </span>
                 ) : (
                   <span className="badge-required">
@@ -337,71 +234,44 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
                 )}
               </div>
 
-              <div className="codename-input-row">
-                <input
-                  type="text"
-                  maxLength={24}
-                  className={`codename-input ${!isNameEntered && showError ? 'input-error-pulse' : ''}`}
-                  value={codename}
-                  onChange={(e) => {
-                    setCodename(e.target.value);
-                    if (showError && e.target.value.trim()) setShowError(false);
-                  }}
-                  placeholder="Type your name to gain office clearance..."
-                  autoFocus
-                />
-              </div>
-
-              {!isNameEntered && (
-                <div className="security-notice-box">
-                  <ShieldAlert size={14} className="notice-icon" />
-                  <span>
-                    <strong>Strict Access Policy:</strong> You must enter your name. Your visit and character will be cryptographically registered in the Wall Security Log upon entering.
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* 2. Custom Role / Title Designation */}
-            <div className="config-group">
-              <label className="config-label">
-                <span>OPERATIVE ROLE / DESIGNATION</span>
-                <span className="config-hint">Displayed on office visitor roster</span>
-              </label>
               <input
                 type="text"
-                maxLength={36}
-                className="codename-input"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                placeholder="e.g. Cyber Security Researcher, Recruiter, Student..."
+                maxLength={20}
+                className={`codename-input ${!isNameEntered && showError ? 'input-error-pulse' : ''}`}
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (showError && e.target.value.trim()) setShowError(false);
+                }}
+                placeholder="Enter your name..."
+                autoFocus
               />
             </div>
 
-            {/* 3. Archetype Selection (6 Cyber Character Models) */}
+            {/* 2. Choose Character (3 Simple Cards) */}
             <div className="config-group">
               <label className="config-label">
-                <span>CHARACTER ARCHETYPE ({ARCHETYPES.length} MODELS)</span>
+                <span>CHOOSE CHARACTER</span>
               </label>
               <div className="archetype-list">
-                {ARCHETYPES.map((arch) => {
-                  const Icon = arch.icon;
-                  const isActive = selectedArchetype.id === arch.id;
+                {CHARACTERS.map((char) => {
+                  const Icon = char.icon;
+                  const isActive = selectedCharacter.id === char.id;
                   return (
                     <button
-                      key={arch.id}
+                      key={char.id}
                       type="button"
                       className={`archetype-chip ${isActive ? 'active-archetype' : ''}`}
                       onClick={() => {
                         playClickSound(850);
-                        setSelectedArchetype(arch);
+                        setSelectedCharacter(char);
                       }}
-                      style={isActive ? { borderColor: selectedPalette.color } : {}}
+                      style={isActive ? { borderColor: selectedColor.color } : {}}
                     >
                       <Icon size={16} className="arch-icon" />
                       <div className="arch-details">
-                        <strong className="arch-name">{arch.name}</strong>
-                        <span className="arch-sub">{arch.subtitle}</span>
+                        <strong className="arch-name">{char.name}</strong>
+                        <span className="arch-sub">{char.subtitle}</span>
                       </div>
                     </button>
                   );
@@ -409,81 +279,27 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
               </div>
             </div>
 
-            {/* 4. Division / Team Clearance */}
+            {/* 3. Choose Accent Color */}
             <div className="config-group">
               <label className="config-label">
-                <span>SECURITY CLEARANCE DIVISION</span>
+                <span>SUIT COLOR</span>
               </label>
-              <div className="division-grid">
-                {DIVISIONS.map((div) => {
-                  const isDivActive = selectedDivision.id === div.id;
+              <div className="palette-row simple-palette-row">
+                {COLORS.map((col) => {
+                  const isActive = selectedColor.id === col.id;
                   return (
                     <button
-                      key={div.id}
+                      key={col.id}
                       type="button"
-                      className={`division-chip ${isDivActive ? 'active-division' : ''}`}
-                      onClick={() => {
-                        playClickSound(920);
-                        setSelectedDivision(div);
-                      }}
-                      style={isDivActive ? { borderColor: selectedPalette.color } : {}}
-                    >
-                      <span className="div-name">{div.name}</span>
-                      <span className="div-badge">{div.badge}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 5. Cyber Visor HUD Selection */}
-            <div className="config-group">
-              <label className="config-label">
-                <span>OPTICAL CYBER VISOR & MASK</span>
-              </label>
-              <div className="visor-grid">
-                {VISOR_STYLES.map((v) => {
-                  const isVisorActive = selectedVisor === v.id;
-                  return (
-                    <button
-                      key={v.id}
-                      type="button"
-                      className={`visor-pill ${isVisorActive ? 'active-visor' : ''}`}
-                      onClick={() => {
-                        playClickSound(900);
-                        setSelectedVisor(v.id);
-                      }}
-                      style={isVisorActive ? { borderColor: selectedPalette.color } : {}}
-                    >
-                      <Eye size={12} />
-                      <span>{v.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 6. Neon Cyber Accent Color */}
-            <div className="config-group">
-              <label className="config-label">
-                <span>SUIT NEON ACCENT // ATMOSPHERE</span>
-              </label>
-              <div className="palette-row">
-                {NEON_PALETTES.map((p) => {
-                  const isPalActive = selectedPalette.id === p.id;
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      className={`palette-swatch ${isPalActive ? 'active-swatch' : ''}`}
-                      onClick={() => handleSelectPalette(p)}
+                      className={`palette-swatch ${isActive ? 'active-swatch' : ''}`}
+                      onClick={() => handleSelectColor(col)}
                       style={{
-                        borderColor: isPalActive ? p.color : 'rgba(255, 255, 255, 0.15)',
-                        boxShadow: isPalActive ? `0 0 14px ${p.color}` : 'none',
+                        borderColor: isActive ? col.color : 'rgba(255, 255, 255, 0.15)',
+                        boxShadow: isActive ? `0 0 14px ${col.color}` : 'none',
                       }}
                     >
-                      <span className="swatch-dot" style={{ backgroundColor: p.color }} />
-                      <span className="swatch-label">{p.label}</span>
+                      <span className="swatch-dot" style={{ backgroundColor: col.color }} />
+                      <span className="swatch-label">{col.label}</span>
                     </button>
                   );
                 })}
@@ -492,17 +308,17 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
           </div>
         </div>
 
-        {/* Footer Actions */}
+        {/* Clean Simple Footer */}
         <div className="char-card-footer">
           <div className="footer-brief">
             <span className="brief-bullet">●</span>
             {isNameEntered ? (
               <span style={{ color: '#34d399' }}>
-                Clearance granted for Operative <strong>{codename.trim()}</strong>. Ready to breach airlock.
+                Welcome, <strong>{name.trim()}</strong>! Ready to explore.
               </span>
             ) : (
-              <span style={{ color: '#f87171' }}>
-                Identity required. You cannot breach airlock or enter the office without providing your name.
+              <span style={{ color: '#94a3b8' }}>
+                Please enter your name above to enter the office.
               </span>
             )}
           </div>
@@ -512,20 +328,14 @@ export default function CharacterSelectModal({ onStartGame, currentThemeKey, onS
             className={`btn-launch-game ${!isNameEntered ? 'btn-launch-disabled' : ''}`}
             onClick={handleLaunch}
             disabled={!isNameEntered}
-            title={isNameEntered ? 'Breach Airlock Gate & Enter Office' : 'Name is mandatory to obtain security clearance'}
             style={{
-              borderColor: isNameEntered ? selectedPalette.color : 'rgba(239, 68, 68, 0.5)',
-              boxShadow: isNameEntered ? `0 0 25px ${selectedPalette.color}40` : 'none',
+              borderColor: isNameEntered ? selectedColor.color : 'rgba(255, 255, 255, 0.2)',
+              boxShadow: isNameEntered ? `0 0 25px ${selectedColor.color}40` : 'none',
               cursor: isNameEntered ? 'pointer' : 'not-allowed',
-              opacity: isNameEntered ? 1.0 : 0.6,
             }}
           >
             {isNameEntered ? <Sparkles size={16} /> : <Lock size={16} />}
-            <span>
-              {isNameEntered
-                ? 'BREACH AIRLOCK GATE & ENTER OFFICE'
-                : 'ENTER NAME TO OBTAIN OFFICE CLEARANCE'}
-            </span>
+            <span>{isNameEntered ? 'ENTER OFFICE' : 'ENTER NAME TO CONTINUE'}</span>
           </button>
         </div>
       </div>

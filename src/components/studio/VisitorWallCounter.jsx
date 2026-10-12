@@ -45,73 +45,61 @@ export default function VisitorWallCounter({
 
       // Top Header Bar
       ctx.fillStyle = '#0d1a14';
-      ctx.fillRect(20, 20, 984, 64);
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(20, 20, 984, 64);
+      ctx.fillRect(20, 20, 984, 56);
+      ctx.strokeStyle = '#34d399';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(20, 20, 984, 56);
 
       ctx.fillStyle = '#34d399';
-      ctx.font = 'bold 22px monospace';
-      ctx.fillText('CTOS AIRLOCK // SECURITY VISITOR TELEMETRY & ROSTER', 40, 58);
-
-      ctx.fillStyle = '#10b981';
-      ctx.font = 'bold 16px monospace';
-      ctx.fillText('● SYSTEM ACTIVE', 820, 58);
-
-      // Large Central Visitor Count Box
-      ctx.fillStyle = '#0a1410';
-      ctx.fillRect(20, 104, 984, 240);
-      ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(20, 104, 984, 240);
-
-      ctx.fillStyle = '#6ee7b7';
-      ctx.font = 'bold 18px monospace';
-      ctx.fillText('TOTAL VERIFIED OFFICE OPERATIVES & VISITORS', 50, 146);
-
-      // Giant Glowing Numbers
-      const formattedNum = String(count).padStart(6, '0');
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 88px monospace';
-      ctx.shadowColor = '#34d399';
-      ctx.shadowBlur = 18;
-      ctx.fillText(`# ${formattedNum}`, 50, 250);
-      ctx.shadowBlur = 0;
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '15px monospace';
-      ctx.fillText('ALL ACCESS RECON EVENTS CRYPTOGRAPHICALLY LOGGED VIA SHAH-256', 50, 310);
-
-      // Bottom Visitor Identity Panel
-      ctx.fillStyle = '#0c1712';
-      ctx.fillRect(20, 364, 984, 180);
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(20, 364, 984, 180);
-
-      const visitorName = visitor?.name || 'Authorized Operative';
-      const visitorRole = visitor?.role || 'Cyber Recon Specialist';
-      const visitorTime = visitor?.timestamp || 'CURRENT SESSION';
+      ctx.font = 'bold 20px monospace';
+      ctx.fillText('OFFICE VISITOR COUNTER', 40, 56);
 
       ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 16px monospace';
-      ctx.fillText('LATEST AUTHORIZED CLEARANCE GRANTED:', 50, 404);
+      ctx.fillText('● LIVE LOGS', 860, 56);
+
+      // Large Count Box
+      ctx.fillStyle = '#0a1410';
+      ctx.fillRect(20, 96, 984, 250);
+      ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(20, 96, 984, 250);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 18px monospace';
+      ctx.fillText('TOTAL VERIFIED VISITORS', 50, 142);
+
+      const formattedNum = String(count).padStart(6, '0');
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 96px monospace';
+      ctx.shadowColor = '#34d399';
+      ctx.shadowBlur = 20;
+      ctx.fillText(`# ${formattedNum}`, 50, 260);
+      ctx.shadowBlur = 0;
+
+      // Latest Visitor Box
+      ctx.fillStyle = '#0c1712';
+      ctx.fillRect(20, 366, 984, 160);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(20, 366, 984, 160);
+
+      const visitorName = visitor?.name || 'Visitor';
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 16px monospace';
+      ctx.fillText('LATEST VISITOR:', 50, 410);
 
       ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 36px monospace';
-      ctx.fillText(`OPERATIVE: ${visitorName.toUpperCase()}`, 50, 456);
-
-      ctx.fillStyle = '#a7f3d0';
-      ctx.font = '18px monospace';
-      ctx.fillText(`DESIGNATION: ${visitorRole}  |  TIMESTAMP: ${visitorTime}`, 50, 498);
+      ctx.font = 'bold 42px monospace';
+      ctx.fillText(visitorName.toUpperCase(), 50, 475);
 
       // Bottom Action Callout
-      ctx.fillStyle = '#10b981';
-      ctx.fillRect(20, 564, 984, 56);
+      ctx.fillStyle = '#34d399';
+      ctx.fillRect(20, 546, 984, 64);
       ctx.fillStyle = '#05130b';
-      ctx.font = '900 20px monospace';
+      ctx.font = '900 22px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('CLICK OR PRESS [E] TO INSPECT FULL VISITOR ROSTER LOGS', 512, 600);
+      ctx.fillText('CLICK OR PRESS [E] TO VIEW VISITOR LOG', 512, 586);
       ctx.textAlign = 'left';
     };
 
