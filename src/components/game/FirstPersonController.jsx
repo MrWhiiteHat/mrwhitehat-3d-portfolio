@@ -135,6 +135,48 @@ const STATIONS = [
       ),
     ],
   },
+  // 10. Tactical Red Team Hardware Arsenal & Field Tools (Hak5 & SDR)
+  {
+    id: 'hardware_arsenal',
+    title: 'Red Team Tactical Hardware Arsenal',
+    action: 'INSPECT PEN-TEST GADGETS // HAK5 & FLIPPER',
+    position: [-4.6, 2.35, 1.25],
+    maxDist: 3.5,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-4.95, 1.6, 0.45),
+        new THREE.Vector3(-4.4, 3.1, 2.05)
+      ),
+    ],
+  },
+  // 11. Wireshark PCAP Packet Telemetry Monitor
+  {
+    id: 'wireshark_monitor',
+    title: 'Wireshark Live Packet Sniffer',
+    action: 'INSPECT PCAP TELEMETRY STREAM // ETH0',
+    position: [-4.6, 3.45, 1.25],
+    maxDist: 3.5,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-4.95, 3.1, 0.45),
+        new THREE.Vector3(-4.4, 3.85, 2.05)
+      ),
+    ],
+  },
+  // 12. MITRE ATT&CK Matrix & CVE Threat Radar Screen
+  {
+    id: 'mitre_matrix',
+    title: 'MITRE ATT&CK Threat Radar',
+    action: 'SURVEY KILL-CHAIN VECTORS // CVE FEED',
+    position: [-4.6, 2.35, 3.25],
+    maxDist: 3.5,
+    boxes: [
+      new THREE.Box3(
+        new THREE.Vector3(-4.95, 1.7, 2.45),
+        new THREE.Vector3(-4.4, 3.0, 4.05)
+      ),
+    ],
+  },
 ];
 
 // Room Obstacle Bounding Boxes for AABB Collision Response

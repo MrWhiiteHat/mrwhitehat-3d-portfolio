@@ -580,3 +580,314 @@ export function createTabletScreen() {
 
   return { texture, update };
 }
+
+/**
+ * 5. DYNAMIC WIRESHARK / PCAP NETWORK PACKET STREAM SCREEN
+ * Renders authentic color-coded network packet captures (TCP, HTTP, DNS, TLS, ARP, OWASP alerts)
+ * with live scrolling packet table and network telemetry.
+ */
+export function createWiresharkScreen() {
+  const width = 512;
+  const height = 256;
+  const canvas = createScreenCanvas(width, height);
+  if (!canvas) return { texture: null, update: () => {} };
+
+  const ctx = canvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  const packetPool = [
+    { no: 1042, time: '14.021', src: '192.168.1.104', dst: '10.0.4.1', proto: 'TCP', len: '74', info: '52418 → 443 [SYN] Seq=0 Win=64240', bg: '#081c2e', fg: '#93c5fd' },
+    { no: 1043, time: '14.023', src: '10.0.4.1', dst: '192.168.1.104', proto: 'TCP', len: '74', info: '443 → 52418 [SYN, ACK] Seq=0 Ack=1 Win=65160', bg: '#081c2e', fg: '#93c5fd' },
+    { no: 1044, time: '14.024', src: '192.168.1.104', dst: '10.0.4.1', proto: 'TLSv1.3', len: '517', info: 'Client Hello, Cipher: TLS_AES_256_GCM_SHA384', bg: '#0a233b', fg: '#38bdf8' },
+    { no: 1045, time: '14.028', src: '10.0.4.1', dst: '192.168.1.104', proto: 'TLSv1.3', len: '1420', info: 'Server Hello, Change Cipher Spec, Encrypted Extensions', bg: '#0a233b', fg: '#38bdf8' },
+    { no: 1046, time: '14.032', src: '192.168.1.104', dst: '8.8.8.8', proto: 'DNS', len: '82', info: 'Standard query 0x4a12 A mrwhiitehat.github.io', bg: '#1e1438', fg: '#c084fc' },
+    { no: 1047, time: '14.035', src: '8.8.8.8', dst: '192.168.1.104', proto: 'DNS', len: '98', info: 'Standard query response 0x4a12 A 185.199.108.153', bg: '#1e1438', fg: '#c084fc' },
+    { no: 1048, time: '14.041', src: '10.0.4.15', dst: '10.0.4.1', proto: 'HTTP/2', len: '482', info: 'GET /api/v2/telemetry/nodes HTTP/2 200 OK', bg: '#05291b', fg: '#34d399' },
+    { no: 1049, time: '14.045', src: '192.168.1.1', dst: '192.168.1.104', proto: 'ARP', len: '42', info: 'Who has 192.168.1.104? Tell 192.168.1.1', bg: '#2b1704', fg: '#fb923c' },
+    { no: 1050, time: '14.048', src: '192.168.1.104', dst: '192.168.1.1', proto: 'ARP', len: '42', info: '192.168.1.104 is at b4:2e:99:a1:04:12', bg: '#2b1704', fg: '#fb923c' },
+    { no: 1051, time: '14.052', src: '10.0.4.250', dst: '10.0.4.1', proto: 'TCP', len: '66', info: '[ALERT] Port Scan Detected: Nmap FIN Scan on :80,443', bg: '#36090c', fg: '#f87171' },
+    { no: 1052, time: '14.058', src: '192.168.1.104', dst: '10.0.4.1', proto: 'ICMP', len: '98', info: 'Echo (ping) request id=0x0001 seq=42/10752 ttl=64', bg: '#260f26', fg: '#f472b6' },
+    { no: 1053, time: '14.062', src: '10.0.4.1', dst: '192.168.1.104', proto: 'ICMP', len: '98', info: 'Echo (ping) reply id=0x0001 seq=42/10752 ttl=64 (1.2 ms)', bg: '#260f26', fg: '#f472b6' },
+  ];
+
+  let scrollOffset = 0;
+  let timer = 0;
+  let packetCounter = 24890;
+
+  function update(delta) {
+    timer += delta;
+    if (timer > 0.45) {
+      timer = 0;
+      scrollOffset = (scrollOffset + 1) % packetPool.length;
+      packetCounter += Math.floor(Math.random() * 8) + 1;
+    }
+
+    // 1. Dark Theme Background
+    ctx.fillStyle = '#060a0f';
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. Wireshark Top Ribbon Menu / Filter Bar
+    ctx.fillStyle = '#0b1622';
+    ctx.fillRect(0, 0, width, 24);
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText('● WIRESHARK v4.2.5 // LIVE PCAP TELEMETRY [eth0 : PROMISCUOUS]', 10, 16);
+    ctx.fillStyle = '#4ade80';
+    ctx.fillText(`${packetCounter.toLocaleString()} PKTS`, width - 90, 16);
+
+    // Filter Bar Input Box
+    ctx.fillStyle = '#020617';
+    ctx.fillRect(8, 28, width - 16, 18);
+    ctx.strokeStyle = '#22c55e';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(8, 28, width - 16, 18);
+
+    ctx.fillStyle = '#22c55e';
+    ctx.font = '9px monospace';
+    ctx.fillText('FILTER: ip.addr == 10.0.4.0/24 and not broadcast and not arp [VALID]', 16, 41);
+
+    // Column Headers
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 50, width, 18);
+    ctx.strokeStyle = '#1e293b';
+    ctx.beginPath();
+    ctx.moveTo(0, 68);
+    ctx.lineTo(width, 68);
+    ctx.stroke();
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = 'bold 8.5px monospace';
+    ctx.fillText('No.', 10, 62);
+    ctx.fillText('Time', 48, 62);
+    ctx.fillText('Source', 105, 62);
+    ctx.fillText('Destination', 205, 62);
+    ctx.fillText('Proto', 305, 62);
+    ctx.fillText('Len', 355, 62);
+    ctx.fillText('Info', 390, 62);
+
+    // 3. Render 8 packet rows
+    const visibleCount = 8;
+    for (let r = 0; r < visibleCount; r++) {
+      const idx = (scrollOffset + r) % packetPool.length;
+      const pkt = packetPool[idx];
+      const rowY = 70 + r * 20;
+
+      // Row background
+      ctx.fillStyle = pkt.bg;
+      ctx.fillRect(0, rowY, width, 19);
+
+      // Packet data
+      ctx.fillStyle = pkt.fg;
+      ctx.font = '8px monospace';
+      ctx.fillText(String(pkt.no + r * 2), 10, rowY + 13);
+      ctx.fillText(pkt.time, 48, rowY + 13);
+      ctx.fillText(pkt.src, 105, rowY + 13);
+      ctx.fillText(pkt.dst, 205, rowY + 13);
+
+      // Protocol tag badge
+      ctx.fillText(pkt.proto, 305, rowY + 13);
+      ctx.fillText(pkt.len, 355, rowY + 13);
+
+      // Truncate info string if long
+      const maxInfoLen = 22;
+      const infoStr = pkt.info.length > maxInfoLen ? pkt.info.substring(0, maxInfoLen) + '…' : pkt.info;
+      ctx.fillText(infoStr, 390, rowY + 13);
+    }
+
+    // 4. Bottom Telemetry Bar
+    ctx.fillStyle = '#0b1622';
+    ctx.fillRect(0, height - 20, width, 20);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '8px monospace';
+    ctx.fillText('Captured: 100% | Dropped: 0 | Buffer: 64MB | Rate: 4.8 MB/s', 10, height - 7);
+    ctx.fillStyle = '#10b981';
+    ctx.fillText('● SNIFFER ARMED', width - 110, height - 7);
+
+    texture.needsUpdate = true;
+  }
+
+  return { texture, update };
+}
+
+/**
+ * 6. DYNAMIC MITRE ATT&CK FRAMEWORK MATRIX & CVE THREAT RADAR SCREEN
+ * Renders authentic cyber kill-chain tactics, technique codes, threat heatmaps,
+ * scanning radar sweeps, and live CVE intelligence tickers.
+ */
+export function createMitreAttackScreen() {
+  const width = 512;
+  const height = 384;
+  const canvas = createScreenCanvas(width, height);
+  if (!canvas) return { texture: null, update: () => {} };
+
+  const ctx = canvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  const tactics = [
+    { name: 'RECON', id: 'TA0043', tech: 'T1595 Active Scan', score: 'HIGH', color: '#ef4444' },
+    { name: 'INIT ACCESS', id: 'TA0001', tech: 'T1190 Exploit App', score: 'CRIT', color: '#dc2626' },
+    { name: 'EXECUTION', id: 'TA0002', tech: 'T1059 Command Intrp', score: 'MED', color: '#f59e0b' },
+    { name: 'PERSISTENCE', id: 'TA0003', tech: 'T1543 Create Svc', score: 'HIGH', color: '#ef4444' },
+    { name: 'PRIV ESC', id: 'TA0004', tech: 'T1068 Exploit Vuln', score: 'CRIT', color: '#dc2626' },
+    { name: 'DEF EVASION', id: 'TA0005', tech: 'T1027 Obfuscation', score: 'MED', color: '#f59e0b' },
+    { name: 'CRED ACCESS', id: 'TA0006', tech: 'T1003 OS Cred Dump', score: 'CRIT', color: '#dc2626' },
+    { name: 'DISCOVERY', id: 'TA0007', tech: 'T1046 Net Svc Scan', score: 'LOW', color: '#10b981' },
+    { name: 'LAT MOVEMENT', id: 'TA0008', tech: 'T1021 Remote Svcs', score: 'HIGH', color: '#ef4444' },
+    { name: 'EXFILTRATION', id: 'TA0010', tech: 'T1048 Alt Protocol', score: 'HIGH', color: '#ef4444' },
+  ];
+
+  let sweepProgress = 0;
+  let cveTickerOffset = 0;
+
+  const cveList = [
+    '● CVE-2024-38077 (RDL Remote Code Execution) [CRITICAL 9.8]',
+    '● CVE-2024-21413 (Microsoft Outlook Moniker Link RCE) [CRITICAL 9.8]',
+    '● CVE-2024-6387 (regreSSHion OpenSSH Signal Handler Race) [HIGH 8.1]',
+    '● OWASP Mobile Top 10 (2024) M1: Improper Credential Usage',
+    '● OWASP API Top 10 (2023) API1: Broken Object Level Authorization (BOLA)',
+    '● Frida Gadget Injected: com.target.app Hooking Java.use()',
+  ];
+
+  function update(delta) {
+    sweepProgress = (sweepProgress + delta * 0.4) % 1;
+    cveTickerOffset += delta * 38;
+
+    // 1. Dark CRT Grid Background
+    ctx.fillStyle = '#040b0e';
+    ctx.fillRect(0, 0, width, height);
+
+    // Subtle Grid lines
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.08)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < width; x += 32) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < height; y += 32) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+
+    // 2. Top Banner Header
+    ctx.fillStyle = '#061a15';
+    ctx.fillRect(0, 0, width, 32);
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(0, 0, width, 32);
+
+    ctx.fillStyle = '#10b981';
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('🛡️ MITRE ATT&CK® ENTERPRISE MATRIX // THREAT RADAR v14.1', 12, 20);
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText('STATUS: SURVEILLANCE ARMED', width - 185, 20);
+
+    // 3. Matrix Cards Layout (2 rows of 5 tactics)
+    const cardW = 92;
+    const cardH = 115;
+    const gapX = 8;
+    const gapY = 12;
+    const startX = 10;
+    const startY = 44;
+
+    tactics.forEach((t, i) => {
+      const col = i % 5;
+      const row = Math.floor(i / 5);
+      const cx = startX + col * (cardW + gapX);
+      const cy = startY + row * (cardH + gapY);
+
+      // Card Background
+      ctx.fillStyle = '#081414';
+      ctx.fillRect(cx, cy, cardW, cardH);
+      ctx.strokeStyle = t.color;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cx, cy, cardW, cardH);
+
+      // Card Header
+      ctx.fillStyle = '#0d221e';
+      ctx.fillRect(cx, cy, cardW, 22);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = 'bold 8.5px monospace';
+      ctx.fillText(t.name, cx + 4, cy + 14);
+
+      // Tactic ID
+      ctx.fillStyle = '#64748b';
+      ctx.font = '7.5px monospace';
+      ctx.fillText(t.id, cx + 5, cy + 34);
+
+      // Technique Box
+      ctx.fillStyle = '#051817';
+      ctx.fillRect(cx + 4, cy + 40, cardW - 8, 38);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.strokeRect(cx + 4, cy + 40, cardW - 8, 38);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '8px monospace';
+      const parts = t.tech.split(' ');
+      ctx.fillText(parts[0], cx + 7, cy + 54);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText(parts.slice(1).join(' '), cx + 7, cy + 68);
+
+      // Threat Severity Pill
+      ctx.fillStyle = t.color;
+      ctx.fillRect(cx + 5, cy + 88, cardW - 10, 16);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8.5px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`RISK: ${t.score}`, cx + cardW / 2, cy + 100);
+      ctx.textAlign = 'left';
+    });
+
+    // 4. Scanning Radar Sweep Line across Matrix
+    const sweepY = startY + sweepProgress * (cardH * 2 + gapY);
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(10, sweepY);
+    ctx.lineTo(width - 10, sweepY);
+    ctx.stroke();
+
+    // Radar beam gradient trail
+    const grad = ctx.createLinearGradient(0, sweepY - 24, 0, sweepY);
+    grad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+    grad.addColorStop(1, 'rgba(56, 189, 248, 0.18)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(10, sweepY - 24, width - 20, 24);
+
+    // 5. Bottom Live Threat Ticker
+    ctx.fillStyle = '#020b08';
+    ctx.fillRect(0, height - 32, width, 32);
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, height - 32, width, 32);
+
+    ctx.fillStyle = '#ef4444';
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText('LIVE CVE THREAT FEED:', 10, height - 12);
+
+    // Scrolling CVE text
+    const fullTicker = cveList.join('   ───   ');
+    ctx.save();
+    ctx.rect(160, height - 32, width - 170, 32);
+    ctx.clip();
+    ctx.fillStyle = '#f87171';
+    ctx.font = '8.5px monospace';
+    const textWidth = ctx.measureText(fullTicker).width;
+    const tickerX = 160 - (cveTickerOffset % (textWidth + 100));
+    ctx.fillText(fullTicker, tickerX, height - 12);
+    ctx.fillText(fullTicker, tickerX + textWidth + 100, height - 12);
+    ctx.restore();
+
+    texture.needsUpdate = true;
+  }
+
+  return { texture, update };
+}

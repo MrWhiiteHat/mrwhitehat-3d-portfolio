@@ -142,6 +142,22 @@ export default function App() {
         setUnlockedStations((prev) => new Set([...prev, 'skills']));
         return;
       }
+      if (stationId === 'hardware_arsenal') {
+        playHackingBeep(1600);
+        playWhooshSound();
+        setSection('skills');
+        setGameState('INSPECT_STATION');
+        setUnlockedStations((prev) => new Set([...prev, 'skills']));
+        return;
+      }
+      if (stationId === 'wireshark_monitor' || stationId === 'mitre_matrix') {
+        playHackingBeep(1400);
+        playWhooshSound();
+        setSection('projects');
+        setGameState('INSPECT_STATION');
+        setUnlockedStations((prev) => new Set([...prev, 'projects']));
+        return;
+      }
       playWhooshSound();
       setSection(stationId);
       setGameState('INSPECT_STATION');

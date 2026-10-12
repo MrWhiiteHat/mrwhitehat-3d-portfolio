@@ -1,7 +1,9 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { LIGHTING_THEMES } from './CyberAtmosphere.jsx';
+import { createWiresharkScreen, createMitreAttackScreen } from '../../utils/cyberScreens.js';
+import { playClickSound, playHackingBeep } from '../../utils/audio.js';
 
 export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER_MATRIX' }) {
   const theme = LIGHTING_THEMES[currentThemeKey] || LIGHTING_THEMES.CYBER_MATRIX;
@@ -11,11 +13,17 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
   const rightCurtainRef = useRef();
   const trafficLane1Ref = useRef();
   const trafficLane2Ref = useRef();
-  const eqBarsRef = useRef([]);
-  const hexPanelsRef = useRef([]);
-  const packetDotRef = useRef();
   const rooftopBeaconRef = useRef();
   const billboardGlowRef = useRef();
+  const pineappleLedRef = useRef();
+  const flipperGlowRef = useRef();
+  const hackrfScreenRef = useRef();
+  const [activeTool, setActiveTool] = useState(null);
+
+  // Dynamic Live Cyber Screens (Wireshark PCAP Stream & MITRE ATT&CK Threat Radar)
+  const wiresharkScreen = useMemo(() => createWiresharkScreen(), []);
+  const mitreScreen = useMemo(() => createMitreAttackScreen(), []);
+  const screenTimer = useRef(0);
 
   // Traffic vehicle positions for the skyway
   const skywayVehicles1 = useMemo(() => {
@@ -35,30 +43,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
     ];
   }, []);
 
-  // Equalizer frequencies (10 bars)
-  const eqData = useMemo(() => {
-    return Array.from({ length: 10 }).map((_, i) => ({
-      freq: 2.0 + i * 0.8,
-      baseH: 0.15 + (Math.sin(i * 0.7) + 1) * 0.12,
-    }));
-  }, []);
-
-  // Hexagonal LED panel cluster layout (7 hexagons)
-  const hexPanels = useMemo(() => {
-    const s = 0.22; // Hex radius
-    const dx = s * 1.5;
-    const dy = s * Math.sqrt(3) * 0.5;
-    return [
-      { z: 0, y: 0, delay: 0 },
-      { z: dx, y: dy, delay: 0.4 },
-      { z: dx, y: -dy, delay: 0.8 },
-      { z: -dx, y: dy, delay: 1.2 },
-      { z: -dx, y: -dy, delay: 1.6 },
-      { z: 0, y: dy * 2, delay: 2.0 },
-      { z: 0, y: -dy * 2, delay: 2.4 },
-    ];
-  }, []);
-
   // Skyscraper building data
   const skylineBuildings = useMemo(() => {
     return [
@@ -72,6 +56,14 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
+
+    // 0. Update Live Cyber Screens (Throttled to smooth ~15 FPS for optimal GPU pacing)
+    screenTimer.current += delta;
+    if (screenTimer.current > 0.066) {
+      wiresharkScreen.update(screenTimer.current);
+      mitreScreen.update(screenTimer.current);
+      screenTimer.current = 0;
+    }
 
     // 1. Curtains Gentle Breeze Flutter
     if (leftCurtainRef.current) {
@@ -101,31 +93,18 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       });
     }
 
-    // 3. Audio Equalizer LED Bars Animation
-    eqBarsRef.current.forEach((bar, i) => {
-      if (bar) {
-        const d = eqData[i];
-        const h = d.baseH + (Math.sin(time * d.freq) * 0.5 + 0.5) * 0.28;
-        bar.scale.y = h;
-      }
-    });
-
-    // 4. Hexagonal Sound Reactive LED Panels (Breathing wave)
-    hexPanelsRef.current.forEach((panel, i) => {
-      if (panel && panel.material) {
-        const glow = 0.35 + (Math.sin(time * 2.4 + hexPanels[i].delay) * 0.5 + 0.5) * 0.65;
-        panel.material.opacity = glow;
-      }
-    });
-
-    // 5. Network Circuit Packet Pulse along blueprint
-    if (packetDotRef.current) {
-      const cycle = (time * 0.8) % 1;
-      packetDotRef.current.position.y = -0.35 + cycle * 0.7;
-      packetDotRef.current.position.z = Math.sin(cycle * Math.PI * 4) * 0.25;
+    // 3. Hardware LEDs & RF Indicator Pulses
+    if (pineappleLedRef.current) {
+      pineappleLedRef.current.intensity = 1.6 + Math.sin(time * 8) * 0.8;
+    }
+    if (flipperGlowRef.current) {
+      flipperGlowRef.current.intensity = 1.4 + Math.sin(time * 3) * 0.3;
+    }
+    if (hackrfScreenRef.current) {
+      hackrfScreenRef.current.intensity = 1.2 + Math.sin(time * 5) * 0.4;
     }
 
-    // 6. Rooftop Beacon & Billboard Glow
+    // 4. Rooftop Beacon & Billboard Glow
     if (rooftopBeaconRef.current) {
       rooftopBeaconRef.current.intensity = 1.0 + Math.sin(time * 6) * 0.8;
     }
@@ -324,133 +303,486 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       </group>
 
       {/* ======================================================== */}
-      {/* 3. LEFT WALL: HEXAGONAL SOUND-REACTIVE LED PANELS CLUSTER */}
-      {/* Location: X = -4.95, Y = 2.4, Z = 1.25                     */}
+      {/* 3. LEFT WALL: TACTICAL RED TEAM HARDWARE ARSENAL          */}
+      {/* Authentic penetration testing & RF hardware tools mounted  */}
+      {/* Location: X = -4.94, Y = 2.35, Z = 1.25                    */}
       {/* ======================================================== */}
       <group position={[-4.94, 2.35, 1.25]} rotation={[0, Math.PI / 2, 0]}>
-        {/* Mounting Backplate Panel */}
-        <mesh position={[0, 0, -0.01]}>
-          <boxGeometry args={[1.2, 1.2, 0.015]} />
-          <meshStandardMaterial color="#0b110e" roughness={0.6} />
+        {/* CNC Perforated Matte Black Pegboard Backplate */}
+        <mesh position={[0, 0, -0.01]} receiveShadow>
+          <boxGeometry args={[1.5, 1.35, 0.02]} />
+          <meshStandardMaterial color="#0c1116" roughness={0.7} metalness={0.6} />
         </mesh>
-
-        {/* 7 Hexagonal Diffuser Plates */}
-        {hexPanels.map((hex, idx) => (
-          <group key={`hex-${idx}`} position={[hex.z, hex.y, 0.01]}>
-            {/* Outer Hexagon Frame */}
-            <mesh rotation={[0, 0, Math.PI / 6]}>
-              <cylinderGeometry args={[0.2, 0.2, 0.018, 6]} />
-              <meshStandardMaterial color="#14211a" roughness={0.3} metalness={0.7} />
-            </mesh>
-            {/* Glowing Frosted Core Plate */}
-            <mesh
-              ref={(el) => (hexPanelsRef.current[idx] = el)}
-              position={[0, 0, 0.01]}
-              rotation={[0, 0, Math.PI / 6]}
-            >
-              <cylinderGeometry args={[0.17, 0.17, 0.015, 6]} />
-              <meshBasicMaterial color={theme.coreColor} transparent opacity={0.65} />
-            </mesh>
-          </group>
+        {/* Industrial Standoff Mounting Frame */}
+        <mesh position={[0, 0, -0.015]}>
+          <boxGeometry args={[1.54, 1.39, 0.01]} />
+          <meshStandardMaterial color="#1f2937" metalness={0.9} roughness={0.2} />
+        </mesh>
+        {/* Pegboard Corner Anodized Standoff Bolts */}
+        {[
+          [-0.7, -0.62],
+          [0.7, -0.62],
+          [-0.7, 0.62],
+          [0.7, 0.62],
+        ].map(([bx, by], idx) => (
+          <mesh key={`standoff-${idx}`} position={[bx, by, 0.005]}>
+            <cylinderGeometry args={[0.018, 0.018, 0.025, 6]} />
+            <meshStandardMaterial color="#94a3b8" metalness={0.95} roughness={0.15} />
+          </mesh>
         ))}
 
-        {/* Hex Cluster Ambient Point Glow */}
-        <pointLight position={[0, 0, 0.2]} color={theme.coreColor} intensity={2.2} distance={3.0} />
+        {/* Pegboard Header Stencil Label */}
+        <mesh position={[0, 0.61, 0.005]}>
+          <planeGeometry args={[1.35, 0.045]} />
+          <meshBasicMaterial color="#091e17" />
+        </mesh>
+
+        {/* ======================================================== */}
+        {/* TOOL A: HAK5 WIFI PINEAPPLE MARK VII                     */}
+        {/* Dual-band Rogue AP, PineAP Engine & Multi-Antenna Array   */}
+        {/* ======================================================== */}
+        <group
+          position={[0.36, 0.22, 0.03]}
+          onClick={(e) => {
+            e.stopPropagation();
+            playHackingBeep(1600);
+            setActiveTool('pineapple');
+          }}
+          onPointerOver={() => {
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = 'auto';
+          }}
+        >
+          {/* Main Pineapple Enclosure */}
+          <mesh castShadow>
+            <boxGeometry args={[0.34, 0.19, 0.045]} />
+            <meshStandardMaterial color="#111822" roughness={0.4} metalness={0.7} />
+          </mesh>
+          {/* Front Bevel Accent */}
+          <mesh position={[0, 0, 0.024]}>
+            <boxGeometry args={[0.32, 0.17, 0.004]} />
+            <meshStandardMaterial color="#0b1016" roughness={0.3} />
+          </mesh>
+
+          {/* 4 Gold SMA Antenna Connectors along top edge */}
+          {[-0.12, -0.04, 0.04, 0.12].map((ax, i) => (
+            <mesh key={`sma-${i}`} position={[ax, 0.105, 0]}>
+              <cylinderGeometry args={[0.012, 0.012, 0.025, 12]} />
+              <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.15} />
+            </mesh>
+          ))}
+
+          {/* 4 Articulated High-Gain Rubber Duck Antennas (Tactical Splayed Angles) */}
+          {[
+            { x: -0.12, rot: 0.45 },
+            { x: -0.04, rot: 0.15 },
+            { x: 0.04, rot: -0.15 },
+            { x: 0.12, rot: -0.45 },
+          ].map((ant, i) => (
+            <group key={`ant-${i}`} position={[ant.x, 0.12, 0]} rotation={[0, 0, ant.rot]}>
+              <mesh position={[0, 0.11, 0]} castShadow>
+                <cylinderGeometry args={[0.007, 0.009, 0.22, 12]} />
+                <meshStandardMaterial color="#1c2430" roughness={0.5} metalness={0.4} />
+              </mesh>
+              {/* Antenna Gold Base Ring */}
+              <mesh position={[0, 0.015, 0]}>
+                <cylinderGeometry args={[0.01, 0.01, 0.01, 12]} />
+                <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.2} />
+              </mesh>
+            </group>
+          ))}
+
+          {/* Dual RJ45 Gigabit Ethernet Ports at bottom edge */}
+          {[-0.08, -0.01].map((rx, i) => (
+            <group key={`rj45-${i}`} position={[rx, -0.1, 0]}>
+              <mesh>
+                <boxGeometry args={[0.045, 0.025, 0.03]} />
+                <meshStandardMaterial color="#334155" metalness={0.8} />
+              </mesh>
+              {/* Internal Copper Pins */}
+              <mesh position={[0, 0, 0.012]}>
+                <boxGeometry args={[0.035, 0.015, 0.008]} />
+                <meshStandardMaterial color="#d97706" metalness={0.9} />
+              </mesh>
+            </group>
+          ))}
+
+          {/* Status Diagnostic LEDs */}
+          {[
+            { x: 0.08, color: '#22c55e', label: 'PWR' },
+            { x: 0.11, color: '#38bdf8', label: '2.4G' },
+            { x: 0.14, color: '#a855f7', label: '5G' },
+          ].map((led, i) => (
+            <mesh key={`led-${i}`} position={[led.x, -0.06, 0.026]}>
+              <sphereGeometry args={[0.005, 8, 8]} />
+              <meshBasicMaterial color={led.color} />
+            </mesh>
+          ))}
+          <pointLight ref={pineappleLedRef} position={[0.11, -0.06, 0.06]} color="#38bdf8" intensity={1.2} distance={0.8} />
+
+          {/* Silk-screen Hak5 Logo Text */}
+          <mesh position={[0, 0.02, 0.026]}>
+            <planeGeometry args={[0.16, 0.035]} />
+            <meshBasicMaterial color="#ffffff" transparent opacity={0.85} />
+          </mesh>
+        </group>
+
+        {/* ======================================================== */}
+        {/* TOOL B: FLIPPER ZERO WITH WI-FI DEVBOARD (ESP32-S2)       */}
+        {/* Multi-tool device for Sub-GHz, RFID, NFC, BadUSB, GPIO    */}
+        {/* ======================================================== */}
+        <group
+          position={[-0.38, 0.22, 0.03]}
+          onClick={(e) => {
+            e.stopPropagation();
+            playClickSound(1400);
+            setActiveTool('flipper');
+          }}
+          onPointerOver={() => {
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = 'auto';
+          }}
+        >
+          {/* Main Flipper Ergonomic White Body */}
+          <mesh castShadow>
+            <boxGeometry args={[0.26, 0.12, 0.042]} />
+            <meshStandardMaterial color="#f8fafc" roughness={0.35} metalness={0.1} />
+          </mesh>
+          {/* Flipper Signature Orange Silicone Bumper Shell */}
+          <mesh position={[0, 0, -0.002]}>
+            <boxGeometry args={[0.27, 0.128, 0.044]} />
+            <meshStandardMaterial color="#ea580c" roughness={0.6} />
+          </mesh>
+
+          {/* Orange Backlit Monochrome LCD Display */}
+          <mesh position={[-0.04, 0, 0.023]}>
+            <boxGeometry args={[0.11, 0.07, 0.005]} />
+            <meshBasicMaterial color="#f97316" />
+          </mesh>
+          <pointLight ref={flipperGlowRef} position={[-0.04, 0, 0.05]} color="#f97316" intensity={1.4} distance={0.6} />
+
+          {/* Flipper LCD Dolphin Cyber Text Mock */}
+          <mesh position={[-0.04, 0, 0.027]}>
+            <planeGeometry args={[0.095, 0.055]} />
+            <meshBasicMaterial color="#7c2d12" transparent opacity={0.85} />
+          </mesh>
+
+          {/* 5-Way Directional D-Pad Wheel (Right side) */}
+          <group position={[0.075, 0, 0.024]}>
+            <mesh>
+              <cylinderGeometry args={[0.028, 0.028, 0.006, 24]} />
+              <meshStandardMaterial color="#1e293b" roughness={0.4} metalness={0.3} />
+            </mesh>
+            {/* Center OK Button */}
+            <mesh position={[0, 0.003, 0]}>
+              <cylinderGeometry args={[0.012, 0.012, 0.006, 16]} />
+              <meshStandardMaterial color="#ea580c" roughness={0.4} />
+            </mesh>
+          </group>
+
+          {/* Back Button */}
+          <mesh position={[0.075, -0.04, 0.023]}>
+            <circleGeometry args={[0.009, 12]} />
+            <meshStandardMaterial color="#334155" roughness={0.5} />
+          </mesh>
+
+          {/* Top GPIO Header Strip (18-pin slot) */}
+          <mesh position={[-0.02, 0.065, 0]}>
+            <boxGeometry args={[0.14, 0.012, 0.02]} />
+            <meshStandardMaterial color="#0f172a" metalness={0.9} />
+          </mesh>
+
+          {/* Mounted Green ESP32 Wi-Fi Multiboard Daughterboard */}
+          <group position={[-0.02, 0.11, 0]}>
+            {/* Devboard Green PCB */}
+            <mesh castShadow>
+              <boxGeometry args={[0.12, 0.075, 0.008]} />
+              <meshStandardMaterial color="#15803d" roughness={0.4} metalness={0.2} />
+            </mesh>
+            {/* ESP32-S2 Shielding Can */}
+            <mesh position={[-0.02, 0.01, 0.007]}>
+              <boxGeometry args={[0.04, 0.04, 0.006]} />
+              <meshStandardMaterial color="#cbd5e1" metalness={0.95} roughness={0.15} />
+            </mesh>
+            {/* Gold SMA Antenna Jack */}
+            <mesh position={[0.04, 0.04, 0]}>
+              <cylinderGeometry args={[0.008, 0.008, 0.015, 12]} />
+              <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.15} />
+            </mesh>
+            {/* Wi-Fi Stubby Antenna */}
+            <mesh position={[0.04, 0.09, 0]} castShadow>
+              <cylinderGeometry args={[0.006, 0.007, 0.09, 12]} />
+              <meshStandardMaterial color="#1e293b" roughness={0.5} />
+            </mesh>
+          </group>
+        </group>
+
+        {/* ======================================================== */}
+        {/* TOOL C: HACKRF ONE SDR WITH PORTAPACK H2                  */}
+        {/* 1MHz - 6GHz Software-Defined Radio Transceiver & Spectrum */}
+        {/* ======================================================== */}
+        <group
+          position={[-0.38, -0.32, 0.03]}
+          onClick={(e) => {
+            e.stopPropagation();
+            playHackingBeep(1200);
+            setActiveTool('hackrf');
+          }}
+          onPointerOver={() => {
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = 'auto';
+          }}
+        >
+          {/* PortaPack Aluminum Casing */}
+          <mesh castShadow>
+            <boxGeometry args={[0.26, 0.16, 0.04]} />
+            <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.8} />
+          </mesh>
+
+          {/* Color LCD Screen: Live RF Waterfall Spectrum */}
+          <mesh position={[-0.03, 0.01, 0.022]}>
+            <boxGeometry args={[0.13, 0.11, 0.004]} />
+            <meshBasicMaterial color="#0284c7" />
+          </mesh>
+          {/* RF Spectrum Waterfall Ripple Lines */}
+          <mesh position={[-0.03, 0.01, 0.025]}>
+            <planeGeometry args={[0.12, 0.1]} />
+            <meshBasicMaterial color="#38bdf8" transparent opacity={0.75} />
+          </mesh>
+          <pointLight ref={hackrfScreenRef} position={[-0.03, 0.01, 0.05]} color="#0284c7" intensity={1.2} distance={0.6} />
+
+          {/* Rotary Navigation Jog Dial Wheel */}
+          <group position={[0.075, 0.01, 0.023]}>
+            <mesh>
+              <cylinderGeometry args={[0.026, 0.026, 0.012, 24]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.2} metalness={0.9} />
+            </mesh>
+          </group>
+
+          {/* Gold SMA Antenna Mount */}
+          <mesh position={[0.08, 0.09, 0]}>
+            <cylinderGeometry args={[0.01, 0.01, 0.02, 12]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.15} />
+          </mesh>
+
+          {/* Chrome Telescopic Extendable Antenna */}
+          <group position={[0.08, 0.1, 0]}>
+            <mesh position={[0, 0.18, 0]} castShadow>
+              <cylinderGeometry args={[0.005, 0.008, 0.36, 12]} />
+              <meshStandardMaterial color="#e2e8f0" metalness={0.95} roughness={0.1} />
+            </mesh>
+            {/* Chrome Ball Tip */}
+            <mesh position={[0, 0.365, 0]}>
+              <sphereGeometry args={[0.009, 12, 12]} />
+              <meshStandardMaterial color="#ffffff" metalness={0.95} roughness={0.1} />
+            </mesh>
+          </group>
+        </group>
+
+        {/* ======================================================== */}
+        {/* TOOL D: HAK5 USB RUBBER DUCKY & BASH BUNNY                */}
+        {/* Keystroke Injection & Multi-Vector Attack Drives          */}
+        {/* ======================================================== */}
+        <group position={[0.36, -0.22, 0.03]}>
+          {/* Precision CNC Mounting Clip Bracket */}
+          <mesh position={[0, 0, -0.005]}>
+            <boxGeometry args={[0.32, 0.12, 0.012]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.8} />
+          </mesh>
+
+          {/* 1. USB Rubber Ducky (Translucent Smoke Casing + Gold Plug) */}
+          <group
+            position={[-0.08, 0.01, 0.01]}
+            onClick={(e) => {
+              e.stopPropagation();
+              playClickSound(1800);
+              setActiveTool('ducky');
+            }}
+          >
+            {/* Smoke Translucent Body */}
+            <mesh castShadow>
+              <boxGeometry args={[0.095, 0.032, 0.018]} />
+              <meshStandardMaterial color="#334155" roughness={0.2} transparent opacity={0.85} />
+            </mesh>
+            {/* Gold USB Type-A Plug */}
+            <mesh position={[0.055, 0, 0]}>
+              <boxGeometry args={[0.024, 0.022, 0.01]} />
+              <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.15} />
+            </mesh>
+            {/* Payload Injection Activity LED */}
+            <mesh position={[-0.025, 0, 0.01]}>
+              <sphereGeometry args={[0.0035, 8, 8]} />
+              <meshBasicMaterial color="#22c55e" />
+            </mesh>
+          </group>
+
+          {/* 2. Hak5 Bash Bunny (Matte Black with Payload Switch) */}
+          <group
+            position={[0.08, 0.01, 0.01]}
+            onClick={(e) => {
+              e.stopPropagation();
+              playClickSound(1500);
+              setActiveTool('bunny');
+            }}
+          >
+            {/* Matte Black Casing */}
+            <mesh castShadow>
+              <boxGeometry args={[0.11, 0.035, 0.02]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.4} metalness={0.6} />
+            </mesh>
+            {/* Gold USB Plug */}
+            <mesh position={[0.062, 0, 0]}>
+              <boxGeometry args={[0.024, 0.022, 0.01]} />
+              <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.15} />
+            </mesh>
+            {/* 3-Position Mode Switch */}
+            <mesh position={[0.01, 0.018, 0]}>
+              <boxGeometry args={[0.015, 0.006, 0.008]} />
+              <meshStandardMaterial color="#94a3b8" metalness={0.9} />
+            </mesh>
+            {/* RGB Armed Status LED */}
+            <mesh position={[-0.03, 0, 0.011]}>
+              <sphereGeometry args={[0.004, 8, 8]} />
+              <meshBasicMaterial color="#10b981" />
+            </mesh>
+          </group>
+        </group>
+
+        {/* ======================================================== */}
+        {/* TOOL E: PROXMARK3 RDV4 & SALEAE LOGIC ANALYZER            */}
+        {/* RFID/NFC Dual-Frequency Cloner & 8-Channel Bus Probes     */}
+        {/* ======================================================== */}
+        <group position={[-0.02, -0.42, 0.03]}>
+          {/* Proxmark3 RDV4 Modular RFID Analysis Board */}
+          <group
+            position={[-0.22, 0, 0]}
+            onClick={(e) => {
+              e.stopPropagation();
+              playClickSound(950);
+              setActiveTool('proxmark');
+            }}
+          >
+            {/* Black PCB */}
+            <mesh castShadow>
+              <boxGeometry args={[0.15, 0.1, 0.012]} />
+              <meshStandardMaterial color="#020617" roughness={0.4} />
+            </mesh>
+            {/* Circular Copper Antenna Coil Trace (LF 125kHz / HF 13.56MHz) */}
+            <mesh position={[0, 0, 0.007]}>
+              <ringGeometry args={[0.026, 0.038, 24]} />
+              <meshStandardMaterial color="#d97706" metalness={0.95} roughness={0.1} />
+            </mesh>
+            {/* Field Detection LEDs */}
+            <mesh position={[0.045, 0.03, 0.008]}>
+              <sphereGeometry args={[0.003, 8, 8]} />
+              <meshBasicMaterial color="#ef4444" />
+            </mesh>
+          </group>
+
+          {/* Saleae Logic 8 Anodized Red USB Logic Analyzer */}
+          <group
+            position={[0.22, 0, 0]}
+            onClick={(e) => {
+              e.stopPropagation();
+              playClickSound(1100);
+              setActiveTool('saleae');
+            }}
+          >
+            {/* Anodized CNC Aluminum Red Housing */}
+            <mesh castShadow>
+              <boxGeometry args={[0.12, 0.08, 0.024]} />
+              <meshStandardMaterial color="#b91c1c" metalness={0.85} roughness={0.25} />
+            </mesh>
+            {/* 8-Channel Pin Header */}
+            <mesh position={[-0.065, 0, 0]}>
+              <boxGeometry args={[0.012, 0.05, 0.014]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.9} />
+            </mesh>
+            {/* 8 Rainbow Multi-Color Fly-wire Probes hanging in harness */}
+            {[-0.02, -0.014, -0.008, -0.002, 0.004, 0.01, 0.016, 0.022].map((py, idx) => {
+              const probeColors = ['#000000', '#ef4444', '#3b82f6', '#22c55e', '#eab308', '#f97316', '#a855f7', '#ffffff'];
+              return (
+                <mesh key={`probe-${idx}`} position={[-0.09, py, 0]}>
+                  <boxGeometry args={[0.035, 0.0025, 0.0025]} />
+                  <meshBasicMaterial color={probeColors[idx]} />
+                </mesh>
+              );
+            })}
+          </group>
+        </group>
+
+        {/* Tactical Under-Shelf Ambient LED Channel */}
+        <pointLight position={[0, -0.6, 0.15]} color="#10b981" intensity={2.2} distance={2.5} />
       </group>
 
       {/* ======================================================== */}
-      {/* 4. LEFT WALL: ILLUMINATED ZERO-TRUST NETWORK BLUEPRINT    */}
+      {/* 4. LEFT WALL: MITRE ATT&CK FRAMEWORK MATRIX & CVE RADAR   */}
       {/* Location: X = -4.94, Y = 2.35, Z = 3.25                    */}
       {/* ======================================================== */}
       <group position={[-4.94, 2.35, 3.25]} rotation={[0, Math.PI / 2, 0]}>
-        {/* Heavy Brushed Aluminum Frame */}
-        <mesh>
-          <boxGeometry args={[1.5, 1.1, 0.04]} />
-          <meshStandardMaterial color="#111827" metalness={0.8} roughness={0.25} />
+        {/* Heavy Brushed Titanium Frame Housing */}
+        <mesh castShadow>
+          <boxGeometry args={[1.5, 1.1, 0.045]} />
+          <meshStandardMaterial color="#0f172a" metalness={0.88} roughness={0.2} />
+        </mesh>
+        {/* Frame Outer Chamfered Trim */}
+        <mesh position={[0, 0, 0.02]}>
+          <boxGeometry args={[1.46, 1.06, 0.01]} />
+          <meshStandardMaterial color="#020617" roughness={0.6} />
         </mesh>
 
-        {/* Dark Back-lit Acrylic Panel */}
-        <mesh position={[0, 0, 0.022]}>
-          <planeGeometry args={[1.4, 1.0]} />
-          <meshBasicMaterial color="#050e09" />
+        {/* Dynamic MITRE ATT&CK & CVE Threat Screen */}
+        <mesh position={[0, 0, 0.026]}>
+          <planeGeometry args={[1.42, 1.02]} />
+          <meshBasicMaterial map={mitreScreen.texture} toneMapped={false} />
         </mesh>
 
-        {/* Circuit Schematic Grid Lines */}
-        {[-0.35, -0.15, 0.05, 0.25].map((gy, i) => (
-          <mesh key={`grid-h-${i}`} position={[0, gy, 0.025]}>
-            <planeGeometry args={[1.25, 0.005]} />
-            <meshBasicMaterial color="#10b981" transparent opacity={0.3} />
-          </mesh>
-        ))}
-        {[-0.45, -0.15, 0.15, 0.45].map((gx, i) => (
-          <mesh key={`grid-v-${i}`} position={[gx, 0, 0.025]}>
-            <planeGeometry args={[0.005, 0.85]} />
-            <meshBasicMaterial color="#10b981" transparent opacity={0.3} />
-          </mesh>
-        ))}
-
-        {/* Schematic Architecture Core Nodes */}
-        {[
-          { x: -0.35, y: 0.15, label: 'FIREWALL' },
-          { x: 0, y: 0.15, label: 'ROUTER' },
-          { x: 0.35, y: 0.15, label: 'DATABASE' },
-          { x: 0, y: -0.2, label: 'CTOS_KERNEL' },
-        ].map((node, i) => (
-          <group key={`node-${i}`} position={[node.x, node.y, 0.026]}>
-            <mesh>
-              <circleGeometry args={[0.055, 16]} />
-              <meshBasicMaterial color={theme.accentColor} />
-            </mesh>
-            <mesh position={[0, 0, 0.002]}>
-              <ringGeometry args={[0.07, 0.08, 16]} />
-              <meshBasicMaterial color="#ffffff" transparent opacity={0.6} />
-            </mesh>
-          </group>
-        ))}
-
-        {/* Animated Moving Data Packet Dot on Circuit */}
-        <mesh ref={packetDotRef} position={[0, 0, 0.028]}>
-          <circleGeometry args={[0.025, 12]} />
-          <meshBasicMaterial color="#ffffff" />
-        </mesh>
-
-        {/* Blueprint Title Header Label */}
-        <mesh position={[0, 0.42, 0.025]}>
-          <planeGeometry args={[0.9, 0.06]} />
-          <meshBasicMaterial color="#064e3b" />
-        </mesh>
+        {/* Ambient Display Glow */}
+        <pointLight position={[0, 0, 0.25]} color="#10b981" intensity={1.8} distance={2.8} />
       </group>
 
       {/* ======================================================== */}
-      {/* 5. LEFT WALL: LIVE AUDIO SPECTRUM EQUALIZER LED BARS      */}
+      {/* 5. LEFT WALL: WIRESHARK LIVE PCAP PACKET TELEMETRY MONITOR*/}
       {/* Location: X = -4.94, Y = 3.45, Z = 1.25                    */}
       {/* ======================================================== */}
       <group position={[-4.94, 3.45, 1.25]} rotation={[0, Math.PI / 2, 0]}>
-        {/* Equalizer Chassis Housing */}
-        <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[1.0, 0.45, 0.025]} />
-          <meshStandardMaterial color="#0d1410" metalness={0.8} roughness={0.3} />
+        {/* Industrial Ultra-Widescreen Monitor Chassis */}
+        <mesh position={[0, 0, 0]} castShadow>
+          <boxGeometry args={[1.42, 0.68, 0.035]} />
+          <meshStandardMaterial color="#0b1016" metalness={0.85} roughness={0.25} />
+        </mesh>
+        {/* Screen Bezel Inset */}
+        <mesh position={[0, 0, 0.016]}>
+          <boxGeometry args={[1.38, 0.64, 0.008]} />
+          <meshStandardMaterial color="#020617" roughness={0.8} />
         </mesh>
 
-        {/* 10 Animated Frequency Columns */}
-        {eqData.map((_, i) => {
-          const xPos = -0.4 + i * 0.088;
-          return (
-            <group key={`eq-col-${i}`} position={[xPos, -0.15, 0.015]}>
-              <mesh
-                ref={(el) => (eqBarsRef.current[i] = el)}
-                position={[0, 0.15, 0]}
-              >
-                <planeGeometry args={[0.05, 0.3]} />
-                <meshBasicMaterial
-                  color={i > 7 ? '#f43f5e' : i > 5 ? '#f59e0b' : theme.coreColor}
-                  transparent
-                  opacity={0.85}
-                />
-              </mesh>
-            </group>
-          );
-        })}
+        {/* Live Functional Wireshark PCAP Packet Telemetry Screen */}
+        <mesh position={[0, 0, 0.022]}>
+          <planeGeometry args={[1.36, 0.62]} />
+          <meshBasicMaterial map={wiresharkScreen.texture} toneMapped={false} />
+        </mesh>
+
+        {/* Monitor Status Diagnostic LEDs */}
+        {[
+          { x: 0.58, color: '#10b981', label: 'LINK' },
+          { x: 0.61, color: '#38bdf8', label: 'ACT' },
+          { x: 0.64, color: '#ef4444', label: 'ALERT' },
+        ].map((led, i) => (
+          <mesh key={`mon-led-${i}`} position={[led.x, -0.31, 0.02]}>
+            <sphereGeometry args={[0.004, 8, 8]} />
+            <meshBasicMaterial color={led.color} />
+          </mesh>
+        ))}
+
+        {/* Ambient Screen Glow */}
+        <pointLight position={[0, 0, 0.35]} color="#38bdf8" intensity={2.0} distance={3.0} />
       </group>
 
       {/* ======================================================== */}
