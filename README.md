@@ -1,4 +1,4 @@
-# MrWhiteHat — Interactive 3D Portfolio
+# MrWhiteHat Interactive 3D Portfolio
 
 🌐 **Live 24/7 Deployment:** [https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/](https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/)
 
