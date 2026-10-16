@@ -141,43 +141,60 @@ export default function GameHUD({
     }
   };
 
-  // High-Precision Analog Joystick Calculations (Zero React re-renders for buttery 120 FPS performance)
+  const cachedCenterRef = useRef(null);
+
+  // High-Precision Analog Joystick Calculations (Zero React re-renders & 0 DOM layout reflows on move)
+  const cacheJoystickCenter = () => {
+    if (!joystickBaseRef.current) return null;
+    const rect = joystickBaseRef.current.getBoundingClientRect();
+    const center = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      maxRadius: Math.max(28, rect.width / 2 - 12), // ~48px usable travel
+    };
+    cachedCenterRef.current = center;
+    return center;
+  };
+
   const resetJoystick = () => {
+    cachedCenterRef.current = null;
     if (stickKnobRef.current) {
-      stickKnobRef.current.style.transform = 'translate(0px, 0px)';
+      stickKnobRef.current.style.transform = 'translate3d(0px, 0px, 0px)';
     }
     onMobileMove?.({ x: 0, y: 0 });
   };
 
   const updateJoystick = (clientX, clientY) => {
-    if (!joystickBaseRef.current) return;
-    const rect = joystickBaseRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const dx = clientX - centerX;
-    const dy = clientY - centerY;
-    const maxRadius = rect.width / 2 - 12; // ~48px usable travel
+    const center = cachedCenterRef.current || cacheJoystickCenter();
+    if (!center) return;
+
+    const dx = clientX - center.x;
+    const dy = clientY - center.y;
     const dist = Math.hypot(dx, dy);
     const deadzone = 4;
 
     if (dist < deadzone) {
-      resetJoystick();
+      if (stickKnobRef.current) {
+        stickKnobRef.current.style.transform = 'translate3d(0px, 0px, 0px)';
+      }
+      onMobileMove?.({ x: 0, y: 0 });
       return;
     }
 
-    const clampedDist = Math.min(dist, maxRadius);
+    const clampedDist = Math.min(dist, center.maxRadius);
     const nx = dx / dist;
     const ny = dy / dist;
-    const power = Math.min(1.0, clampedDist / maxRadius);
+    const power = clampedDist / center.maxRadius;
 
     if (stickKnobRef.current) {
-      stickKnobRef.current.style.transform = `translate(${nx * clampedDist}px, ${ny * clampedDist}px)`;
+      stickKnobRef.current.style.transform = `translate3d(${nx * clampedDist}px, ${ny * clampedDist}px, 0px)`;
     }
     onMobileMove?.({ x: nx * power, y: ny * power });
   };
 
   const handleJoystickTouchStart = (e) => {
     e.stopPropagation();
+    cacheJoystickCenter();
     const touch = e.changedTouches[0];
     activeTouchId.current = touch.identifier;
     updateJoystick(touch.clientX, touch.clientY);
@@ -186,16 +203,19 @@ export default function GameHUD({
   const handleJoystickTouchMove = (e) => {
     e.stopPropagation();
     if (activeTouchId.current === null) return;
-    const touch = Array.from(e.changedTouches).find((t) => t.identifier === activeTouchId.current);
+    let touch = null;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === activeTouchId.current) {
+        touch = e.changedTouches[i];
+        break;
+      }
+    }
     if (!touch) return;
     updateJoystick(touch.clientX, touch.clientY);
   };
 
   const handleJoystickTouchEnd = (e) => {
     e.stopPropagation();
-    if (activeTouchId.current === null) return;
-    const touch = Array.from(e.changedTouches).find((t) => t.identifier === activeTouchId.current);
-    if (!touch) return;
     activeTouchId.current = null;
     resetJoystick();
   };
@@ -203,6 +223,7 @@ export default function GameHUD({
   // Mouse interaction for testing on desktop
   const handleJoystickMouseDown = (e) => {
     e.stopPropagation();
+    cacheJoystickCenter();
     isMouseDownRef.current = true;
     updateJoystick(e.clientX, e.clientY);
   };

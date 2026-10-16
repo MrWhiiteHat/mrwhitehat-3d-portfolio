@@ -5047,6 +5047,7 @@ button, a {
   width: 24px;
   height: 24px;
   pointer-events: none;
+  will-change: transform;
 }
 
 .hud-crosshair-center {
@@ -5352,7 +5353,7 @@ button, a {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  transition: transform 0.04s ease-out;
+  will-change: transform;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
 }
 

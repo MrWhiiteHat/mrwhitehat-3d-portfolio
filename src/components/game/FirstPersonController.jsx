@@ -659,15 +659,22 @@ export default function FirstPersonController({
 
     const onTouchMove = (e) => {
       if (touchLookId === null) return;
-      const touch = Array.from(e.changedTouches).find((t) => t.identifier === touchLookId);
+      let touch = null;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === touchLookId) {
+          touch = e.changedTouches[i];
+          break;
+        }
+      }
       if (!touch) return;
+      if (e.cancelable) e.preventDefault();
 
       const dx = touch.clientX - touchLastX;
       const dy = touch.clientY - touchLastY;
       touchLastX = touch.clientX;
       touchLastY = touch.clientY;
 
-      const touchSensitivity = 0.0036;
+      const touchSensitivity = 0.0032;
       targetYaw.current -= dx * touchSensitivity;
       targetPitch.current -= dy * touchSensitivity;
       targetPitch.current = Math.max(-1.3, Math.min(1.3, targetPitch.current));
@@ -675,7 +682,13 @@ export default function FirstPersonController({
 
     const onTouchEnd = (e) => {
       if (touchLookId === null) return;
-      const touch = Array.from(e.changedTouches).find((t) => t.identifier === touchLookId);
+      let touch = null;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === touchLookId) {
+          touch = e.changedTouches[i];
+          break;
+        }
+      }
       if (!touch) return;
 
       const elapsed = Date.now() - touchStartTime;
@@ -683,7 +696,7 @@ export default function FirstPersonController({
       touchLookId = null;
 
       // Quick tap without dragging on a targeted station triggers interaction
-      if (elapsed < 300 && dist < 12 && activeTargetRef.current) {
+      if (elapsed < 300 && dist < 14 && activeTargetRef.current) {
         playClickSound(1100);
         onInteract(activeTargetRef.current.id);
       }
@@ -699,7 +712,7 @@ export default function FirstPersonController({
     window.addEventListener('mouseup', onMouseUp);
 
     window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('touchend', onTouchEnd, { passive: true });
     window.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
@@ -733,14 +746,14 @@ export default function FirstPersonController({
     const clampedDelta = Math.min(delta, 0.033);
 
     // =========================================================================
-    // 1. RESPONSIVE MOUSE LOOK (1:1 instant response when pointer locked, smooth damp when dragging)
+    // 1. RESPONSIVE SILKY-SMOOTH AIM (Sub-pixel mouse look & fluid touch dragging)
     // =========================================================================
     if (isPointerLocked.current) {
-      yaw.current = targetYaw.current;
-      pitch.current = targetPitch.current;
+      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 75, clampedDelta);
+      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 75, clampedDelta);
     } else {
-      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 65, clampedDelta);
-      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 65, clampedDelta);
+      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 45, clampedDelta);
+      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 45, clampedDelta);
     }
 
     // =========================================================================
@@ -754,11 +767,15 @@ export default function FirstPersonController({
     if (keys.current.right) inputRight += 1;
     if (keys.current.left) inputRight -= 1;
 
-    // Mobile Virtual Touch Joystick support (zero React re-renders)
+    // Mobile Virtual Touch Joystick with exponential response curve
     const mInput = mobileInputRef?.current || mobileInput;
-    if (mInput && (Math.abs(mInput.x) > 0.04 || Math.abs(mInput.y) > 0.04)) {
-      inputRight += mInput.x;
-      inputForward += -mInput.y;
+    if (mInput && (Math.abs(mInput.x) > 0.02 || Math.abs(mInput.y) > 0.02)) {
+      const mag = Math.hypot(mInput.x, mInput.y);
+      if (mag > 0.02) {
+        const curvedMag = Math.pow(Math.min(1.0, mag), 1.25);
+        inputRight += (mInput.x / mag) * curvedMag;
+        inputForward += (-mInput.y / mag) * curvedMag;
+      }
     }
 
     const isMoving = Math.abs(inputForward) > 0.01 || Math.abs(inputRight) > 0.01;
@@ -786,8 +803,8 @@ export default function FirstPersonController({
       targetVelZ = (normFwd * fwdZ + normRight * rightZ) * actualSpeed;
     }
 
-    // Velocity momentum damping (crisp acceleration & immediate stopping)
-    const accelRate = isMoving ? 26.0 : 22.0;
+    // Velocity momentum damping (smooth natural deceleration with zero sliding jank)
+    const accelRate = isMoving ? 24.0 : 18.0;
     velocity.current.x = THREE.MathUtils.damp(velocity.current.x, targetVelX, accelRate, clampedDelta);
     velocity.current.z = THREE.MathUtils.damp(velocity.current.z, targetVelZ, accelRate, clampedDelta);
 
@@ -851,10 +868,10 @@ export default function FirstPersonController({
     camera.rotation.z = rollZ.current;
 
     // =========================================================================
-    // 5. TRUE 3D CROSSHAIR RAYCAST TARGETING (Paced to 20Hz for zero per-frame CPU drain)
+    // 5. TRUE 3D CROSSHAIR RAYCAST TARGETING (Paced to 25Hz with Distance-Culling)
     // =========================================================================
     raycastTimer.current += clampedDelta;
-    if (raycastTimer.current > 0.048) {
+    if (raycastTimer.current > 0.040) {
       raycastTimer.current = 0;
       camera.getWorldDirection(_tempCamDir);
       _tempRay.origin.copy(camera.position);
@@ -862,9 +879,16 @@ export default function FirstPersonController({
 
       let bestTarget = null;
       let minHitDist = Infinity;
+      const camX = camera.position.x;
+      const camZ = camera.position.z;
 
       for (const st of STATIONS) {
         if (!st.boxes) continue;
+        const dx = camX - st.position[0];
+        const dz = camZ - st.position[2];
+        const maxReach = st.maxDist + 1.2;
+        if (dx * dx + dz * dz > maxReach * maxReach) continue;
+
         for (const box of st.boxes) {
           const hit = _tempRay.intersectBox(box, _tempHitPoint);
           if (hit !== null) {

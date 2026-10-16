@@ -374,12 +374,20 @@ export default function OfficeScene({
       ) : null}
       <Canvas
         shadows
-        dpr={[1, typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 1.35) : 1.25]}
+        frameloop="always"
+        dpr={[
+          1,
+          typeof window !== 'undefined'
+            ? Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.5)
+            : 1.25,
+        ]}
         gl={{
           powerPreference: 'high-performance',
           antialias: true,
           stencil: false,
           depth: true,
+          alpha: false,
+          precision: 'highp',
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.15,
         }}
