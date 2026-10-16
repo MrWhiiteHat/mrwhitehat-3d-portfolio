@@ -15,129 +15,182 @@ const getAssetUrl = (path) => {
 };
 
 // =============================================================================
-// PROCEDURAL HIGH-RESOLUTION TEXTURE GENERATORS (Generated once & cached)
+// 1. PROCEDURAL 3D GEOMETRIC FACETED WALLPAPER GEOMETRY GENERATOR
+// Merged single BufferGeometry with 96 pyramidal facets (384 triangles, 1 draw call)
+// All facet normal vectors tilt outward towards -Z into the room to catch dynamic lighting
 // =============================================================================
 
-function createSkyscraperTexture() {
-  if (typeof document === 'undefined') return { map: null, emissive: null };
+function createFacetedWallpaperGeometry(width, height, cols, rows, depth) {
+  const positions = [];
+  const uvs = [];
+  const cellW = width / cols;
+  const cellH = height / rows;
+  const startX = -width / 2;
+  const startY = -height / 2;
+  const zBase = 0;
+  const zApex = -depth;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const x0 = startX + c * cellW;
+      const x1 = x0 + cellW;
+      const y0 = startY + r * cellH;
+      const y1 = y0 + cellH;
+      const cx = (x0 + x1) / 2;
+      const cy = (y0 + y1) / 2;
+
+      // Bottom triangle face (tilts downwards & into room)
+      positions.push(
+        x0, y0, zBase,
+        cx, cy, zApex,
+        x1, y0, zBase
+      );
+      uvs.push(0, 0,  0.5, 0.5,  1, 0);
+
+      // Right triangle face (tilts right & into room)
+      positions.push(
+        x1, y0, zBase,
+        cx, cy, zApex,
+        x1, y1, zBase
+      );
+      uvs.push(1, 0,  0.5, 0.5,  1, 1);
+
+      // Top triangle face (tilts upwards & into room)
+      positions.push(
+        x1, y1, zBase,
+        cx, cy, zApex,
+        x0, y1, zBase
+      );
+      uvs.push(1, 1,  0.5, 0.5,  0, 1);
+
+      // Left triangle face (tilts left & into room)
+      positions.push(
+        x0, y1, zBase,
+        cx, cy, zApex,
+        x0, y0, zBase
+      );
+      uvs.push(0, 1,  0.5, 0.5,  0, 0);
+    }
+  }
+
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geom.computeVertexNormals();
+  return geom;
+}
+
+// =============================================================================
+// 2. PROCEDURAL HIGH-RESOLUTION TEXTURE GENERATORS
+// =============================================================================
+
+function createEmblemTexture() {
+  if (typeof document === 'undefined') return null;
   const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
+  const cx = size / 2;
+  const cy = size / 2;
 
-  const emissiveCanvas = document.createElement('canvas');
-  emissiveCanvas.width = size;
-  emissiveCanvas.height = size;
-  const emCtx = emissiveCanvas.getContext('2d');
+  // Background dark obsidian brushed radial gradient
+  const bgGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 250);
+  bgGrad.addColorStop(0, '#131b2e');
+  bgGrad.addColorStop(0.7, '#0a0f1d');
+  bgGrad.addColorStop(1, '#040711');
+  ctx.fillStyle = bgGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 250, 0, Math.PI * 2);
+  ctx.fill();
 
-  // Dark architectural facade
-  ctx.fillStyle = '#080d1a';
-  ctx.fillRect(0, 0, size, size);
-  emCtx.fillStyle = '#000000';
-  emCtx.fillRect(0, 0, size, size);
+  // Outer gold & cyan concentric rings
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 235, 0, Math.PI * 2);
+  ctx.stroke();
 
-  const cols = 24;
-  const rows = 32;
-  const colW = size / cols;
-  const rowH = size / rows;
-  const winW = colW * 0.72;
-  const winH = rowH * 0.62;
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 222, 0, Math.PI * 2);
+  ctx.stroke();
 
-  // Window color palette (Warm office lights, cool tech white, cyber cyan, amber)
-  const windowPalette = ['#fef08a', '#fde047', '#f8fafc', '#e2e8f0', '#38bdf8', '#67e8f9'];
-
-  // Seeded deterministic window layout
-  let seed = 42;
-  const pseudoRandom = () => {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed / 233280;
-  };
-
-  for (let r = 0; r < rows; r++) {
-    // Floor structural slab band
-    ctx.fillStyle = '#050811';
-    ctx.fillRect(0, r * rowH, size, 2);
-
-    for (let c = 0; c < cols; c++) {
-      const isLit = pseudoRandom() > 0.32;
-      const x = c * colW + (colW - winW) / 2;
-      const y = r * rowH + (rowH - winH) / 2;
-
-      if (isLit) {
-        const colorIdx = Math.floor(pseudoRandom() * windowPalette.length);
-        const winColor = windowPalette[colorIdx];
-        const brightness = 0.65 + pseudoRandom() * 0.35;
-
-        ctx.fillStyle = winColor;
-        ctx.globalAlpha = brightness;
-        ctx.fillRect(x, y, winW, winH);
-
-        emCtx.fillStyle = winColor;
-        emCtx.globalAlpha = brightness * 0.9;
-        emCtx.fillRect(x, y, winW, winH);
-      } else {
-        // Dark reflective interior window
-        ctx.fillStyle = '#0f172a';
-        ctx.globalAlpha = 0.85;
-        ctx.fillRect(x, y, winW, winH);
-      }
-    }
-  }
-
-  ctx.globalAlpha = 1.0;
-  emCtx.globalAlpha = 1.0;
-
-  const map = new THREE.CanvasTexture(canvas);
-  map.wrapS = THREE.RepeatWrapping;
-  map.wrapT = THREE.RepeatWrapping;
-  map.repeat.set(2, 4);
-  map.colorSpace = THREE.SRGBColorSpace;
-
-  const emissive = new THREE.CanvasTexture(emissiveCanvas);
-  emissive.wrapS = THREE.RepeatWrapping;
-  emissive.wrapT = THREE.RepeatWrapping;
-  emissive.repeat.set(2, 4);
-
-  return { map, emissive };
-}
-
-function createNightSkyTexture() {
-  if (typeof document === 'undefined') return null;
-  const w = 1024;
-  const h = 512;
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-
-  // Midnight vertical atmospheric sky gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0.0, '#020409');
-  grad.addColorStop(0.5, '#070f1e');
-  grad.addColorStop(0.85, '#0c1b33');
-  grad.addColorStop(1.0, '#16284a'); // City light pollution horizon glow
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-
-  // Distant stars & constellations
-  let seed = 1337;
-  const rnd = () => {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed / 233280;
-  };
-
-  ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 280; i++) {
-    const sx = rnd() * w;
-    const sy = rnd() * (h * 0.72);
-    const r = rnd() > 0.92 ? 1.4 : 0.8;
-    ctx.globalAlpha = 0.35 + rnd() * 0.65;
+  // Compass tick marks around ring
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i < 72; i++) {
+    const angle = (i * Math.PI * 2) / 72;
+    const len = i % 6 === 0 ? 12 : 5;
+    const r1 = 222;
+    const r2 = r1 - len;
     ctx.beginPath();
-    ctx.arc(sx, sy, r, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.moveTo(cx + Math.cos(angle) * r1, cy + Math.sin(angle) * r1);
+    ctx.lineTo(cx + Math.cos(angle) * r2, cy + Math.sin(angle) * r2);
+    ctx.stroke();
   }
-  ctx.globalAlpha = 1.0;
+
+  // Inner geometric hex grid
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
+  ctx.lineWidth = 1;
+  for (let r = 55; r <= 180; r += 45) {
+    ctx.beginPath();
+    for (let a = 0; a < 6; a++) {
+      const rad = (a * Math.PI) / 3;
+      const x = cx + r * Math.cos(rad);
+      const y = cy + r * Math.sin(rad);
+      if (a === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  // Tactical Crosshair Lines
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - 150, cy); ctx.lineTo(cx - 75, cy);
+  ctx.moveTo(cx + 75, cy); ctx.lineTo(cx + 150, cy);
+  ctx.moveTo(cx, cy - 150); ctx.lineTo(cx, cy - 75);
+  ctx.moveTo(cx, cy + 75); ctx.lineTo(cx, cy + 150);
+  ctx.stroke();
+
+  // Center Shield / Crest Icon
+  ctx.fillStyle = '#0f172a';
+  ctx.strokeStyle = '#facc15';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - 55);
+  ctx.lineTo(cx + 42, cy - 35);
+  ctx.lineTo(cx + 36, cy + 18);
+  ctx.lineTo(cx, cy + 55);
+  ctx.lineTo(cx - 36, cy + 18);
+  ctx.lineTo(cx - 42, cy - 35);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // White Hat / Terminal Symbol inside Shield
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = 'bold 30px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('>_', cx, cy - 5);
+
+  // High-End Typography
+  ctx.fillStyle = '#f8fafc';
+  ctx.font = 'bold 15px -apple-system, sans-serif';
+  ctx.fillText('MR. WHITEHAT', cx, cy + 110);
+
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = 'bold 9px monospace';
+  ctx.fillText('OFFENSIVE SECURITY // VULN RESEARCH', cx, cy + 130);
+
+  ctx.fillStyle = '#22c55e';
+  ctx.font = 'bold 8px monospace';
+  ctx.fillText('NODE 0x7F // OPERATIONAL', cx, cy + 148);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -333,135 +386,51 @@ function ConsolePlant({ position = [4.15, 0.88, 4.9], scale = 0.52 }) {
 }
 
 // =============================================================================
-// MAIN COMPONENT: FRONT WALL OPERATIVE & SKYLINE FEATURE
+// MAIN COMPONENT: FRONT WALL 3D WALLPAPER FEATURE & OPERATIVE INSTALLATION
 // =============================================================================
 
 export default function FrontWallPanoramicFeature({ currentThemeKey = 'CYBER_NEON_NOIR' }) {
   const theme = LIGHTING_THEMES[currentThemeKey] || LIGHTING_THEMES.CYBER_NEON_NOIR;
 
-  // Curtains sway refs
-  const curtainLeftRef = useRef();
-  const curtainRightRef = useRef();
-
-  // Traffic lanes
-  const trafficLane1Ref = useRef();
-  const trafficLane2Ref = useRef();
-
-  // Aviation warning beacons
-  const beaconLightRef = useRef();
-
   // World Clocks second hands refs
   const clockRefs = [useRef(), useRef(), useRef(), useRef()];
   const [digitalTimes, setDigitalTimes] = useState(['--:--:--', '--:--:--', '--:--:--', '--:--:--']);
 
-  // Skyscraper textures & Night sky
-  const { map: bldgMap, emissive: bldgEmissive } = useMemo(() => createSkyscraperTexture(), []);
-  const nightSkyTexture = useMemo(() => createNightSkyTexture(), []);
+  // Procedural 3D Faceted Wallpaper Geometry (5.2m wide, 3.6m high, 12x8 grid, 0.055m depth)
+  const facetedGeometry = useMemo(() => {
+    return createFacetedWallpaperGeometry(5.2, 3.6, 12, 8, 0.055);
+  }, []);
 
-  // Framed Plaque textures
+  // Textures
+  const emblemTex = useMemo(() => createEmblemTexture(), []);
   const defconTex = useMemo(() => createPlaqueTexture('defcon'), []);
   const oscpTex = useMemo(() => createPlaqueTexture('oscp'), []);
   const bountyTex = useMemo(() => createPlaqueTexture('bounty'), []);
 
-  // Shared Materials
-  const skyscraperMaterial = useMemo(() => {
+  // Wallpaper Facet Material (Tactical deep midnight satin finish, catching specular highlights)
+  const wallpaperMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      map: bldgMap,
-      emissiveMap: bldgEmissive,
-      emissive: new THREE.Color('#ffffff'),
-      emissiveIntensity: 0.95,
+      color: '#131c2c',
+      roughness: 0.38,
+      metalness: 0.65,
+    });
+  }, []);
+
+  // Border Frame Material (Brushed titanium/obsidian trim)
+  const frameMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: '#1e293b',
       roughness: 0.25,
-      metalness: 0.75,
-      color: '#0d1527',
-    });
-  }, [bldgMap, bldgEmissive]);
-
-  const glassMaterial = useMemo(() => {
-    return new THREE.MeshPhysicalMaterial({
-      color: '#93c5fd',
-      transparent: true,
-      opacity: 0.18,
-      roughness: 0.06,
-      metalness: 0.1,
-      transmission: 0.85,
-      ior: 1.52,
+      metalness: 0.88,
     });
   }, []);
 
-  // 10 Detailed Skyscraper Building Configurations visible through 5.2m Window
-  const skyscrapers = useMemo(() => {
-    return [
-      // Foreground Layer (Z = 6.0 to 6.8) - Prominent office towers
-      { x: -1.75, z: 6.2, w: 0.95, d: 0.85, h: 5.8, hasBeacon: true, beaconColor: '#ef4444' },
-      { x: -0.85, z: 6.6, w: 0.85, d: 0.8, h: 6.8, hasSpire: true, spireH: 1.2, hasBeacon: true },
-      { x: 0.05, z: 5.9, w: 1.05, d: 0.9, h: 5.2, hasHelipad: true },
-      { x: 0.95, z: 6.7, w: 0.9, d: 0.85, h: 7.2, hasSpire: true, spireH: 1.5, hasBeacon: true },
-      { x: 1.85, z: 6.1, w: 1.0, d: 0.9, h: 5.5, hasCrown: true },
-      { x: 2.75, z: 6.5, w: 0.9, d: 0.8, h: 6.1, hasBeacon: true },
-
-      // Midground & Background Layer (Z = 7.8 to 9.2) - Dense urban skyline depth
-      { x: -2.3, z: 8.2, w: 1.1, d: 0.9, h: 6.0 },
-      { x: -1.25, z: 8.8, w: 1.2, d: 1.0, h: 7.5, hasBeacon: true },
-      { x: -0.35, z: 8.0, w: 1.0, d: 0.9, h: 5.6 },
-      { x: 0.55, z: 9.0, w: 1.3, d: 1.0, h: 7.8, hasBeacon: true },
-      { x: 1.45, z: 8.3, w: 1.1, d: 0.9, h: 6.4 },
-      { x: 2.35, z: 8.9, w: 1.2, d: 1.0, h: 6.9, hasBeacon: true },
-      { x: 3.25, z: 8.4, w: 1.0, d: 0.85, h: 5.7 },
-    ];
-  }, []);
-
-  // Moving hover vehicles in aerial skyway
-  const vehicles1 = useMemo(() => [
-    { offset: 0.0, speed: 0.95, color: '#38bdf8' },
-    { offset: 2.2, speed: 0.85, color: '#67e8f9' },
-    { offset: 4.5, speed: 1.05, color: '#a5f3fc' },
-  ], []);
-
-  const vehicles2 = useMemo(() => [
-    { offset: 1.0, speed: 0.75, color: '#f43f5e' },
-    { offset: 3.5, speed: 0.88, color: '#fb923c' },
-  ], []);
-
-  // Real-time Clock Hands & World Timezone Math
-  // Clocks: [UTC (0), SFO (-7), LON (+1), TYO (+9)]
+  // World Timezone Math: [UTC (0), SFO (-7), LON (+1), TYO (+9)]
   const timezoneOffsets = [0, -7, 1, 9];
   const timezoneLabels = ['UTC / ZULU', 'SFO (PST)', 'LON (GMT)', 'TYO (JST)'];
 
-  useFrame((state, delta) => {
-    const time = state.clock.getElapsedTime();
-
-    // 1. Blinking Aviation Beacons on Skyscraper Pinnacles
-    if (beaconLightRef.current) {
-      beaconLightRef.current.intensity = Math.sin(time * 3.5) > 0.2 ? 2.5 : 0.2;
-    }
-
-    // 2. Curtains Soft Breeze Sway
-    if (curtainLeftRef.current) {
-      curtainLeftRef.current.rotation.z = Math.sin(time * 1.4) * 0.015;
-    }
-    if (curtainRightRef.current) {
-      curtainRightRef.current.rotation.z = Math.sin(time * 1.4 + 0.8) * 0.015;
-    }
-
-    // 3. Aerial Hover Traffic Motion
-    if (trafficLane1Ref.current) {
-      trafficLane1Ref.current.children.forEach((mesh, i) => {
-        const v = vehicles1[i];
-        if (v) {
-          mesh.position.x = ((time * v.speed + v.offset) % 7.4) - 3.7;
-        }
-      });
-    }
-    if (trafficLane2Ref.current) {
-      trafficLane2Ref.current.children.forEach((mesh, i) => {
-        const v = vehicles2[i];
-        if (v) {
-          mesh.position.x = 3.7 - ((time * v.speed + v.offset) % 7.4);
-        }
-      });
-    }
-
-    // 4. Update Live Clock Second Hands
+  useFrame(() => {
+    // Update Live Clock Second Hands
     const now = new Date();
     const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
 
@@ -493,158 +462,114 @@ export default function FrontWallPanoramicFeature({ currentThemeKey = 'CYBER_NEO
   }, []);
 
   return (
-    <group name="FrontWallPanoramicFeature" position={[0, 0, 5.05]}>
+    <group name="FrontWallFeature" position={[0, 0, 5.05]}>
       {/* ========================================================================= */}
-      {/* 1. PHOTOREALISTIC ILLUMINATED NIGHT METROPOLIS (Outside the Window)      */}
+      {/* 1. LUXURY 3D GEOMETRIC FACETED WALLPAPER FEATURE WALL (Center 5.2m x 3.6m)*/}
+      {/* Centered at X = 0.6, Y = 2.25. Facets project out into the room.          */}
       {/* ========================================================================= */}
-      <group position={[0, 0, 0.4]}>
-        {/* Deep Atmospheric Starry Sky Backdrop */}
-        <mesh position={[0.6, 2.8, 11.5]}>
-          <planeGeometry args={[26, 14]} />
-          <meshBasicMaterial map={nightSkyTexture} />
+      <group position={[0.6, 2.25, -0.105]}>
+        {/* Recessed Backing Panel Base */}
+        <mesh position={[0, 0, 0.005]} receiveShadow>
+          <boxGeometry args={[5.24, 3.64, 0.01]} />
+          <meshStandardMaterial color="#080c14" roughness={0.8} />
         </mesh>
 
-        {/* City Horizon Atmospheric Light Glow Plane */}
-        <mesh position={[0.6, 0.8, 10.0]}>
-          <planeGeometry args={[22, 5]} />
-          <meshBasicMaterial
-            color="#1e3a8a"
-            transparent
-            opacity={0.35}
-            blending={THREE.AdditiveBlending}
-          />
-        </mesh>
-
-        {/* Pulsing Aviation Warning Light System on Skyscraper Towers */}
-        <pointLight
-          ref={beaconLightRef}
-          position={[0.95, 5.7, 6.7]}
-          color="#ff1744"
-          intensity={2.0}
-          distance={10}
+        {/* Physical 3D Faceted Wallpaper Mesh (12 x 8 Interlocking Diamond Pyramids) */}
+        <mesh
+          geometry={facetedGeometry}
+          material={wallpaperMaterial}
+          castShadow
+          receiveShadow
         />
 
-        {/* 13 Multi-Tier Skyscraper Towers with Real Lit Window Grids */}
-        {skyscrapers.map((b, i) => (
-          <group key={`sky-tower-${i}`} position={[b.x, b.h * 0.5 - 1.2, b.z]}>
-            {/* Main Skyscraper Monolith */}
-            <mesh material={skyscraperMaterial} castShadow={false} receiveShadow={false}>
-              <boxGeometry args={[b.w, b.h, b.d]} />
-            </mesh>
-
-            {/* Architectural Penthouse Crown Setback */}
-            {b.hasCrown && (
-              <mesh position={[0, b.h * 0.5 + 0.35, 0]}>
-                <boxGeometry args={[b.w * 0.72, 0.7, b.d * 0.72]} />
-                <meshStandardMaterial
-                  color="#1e293b"
-                  emissive="#38bdf8"
-                  emissiveIntensity={0.6}
-                  metalness={0.9}
-                />
-              </mesh>
-            )}
-
-            {/* Communications Antenna Spire */}
-            {b.hasSpire && (
-              <group position={[0, b.h * 0.5, 0]}>
-                <mesh position={[0, (b.spireH || 1.2) * 0.5, 0]}>
-                  <cylinderGeometry args={[0.015, 0.04, b.spireH || 1.2, 8]} />
-                  <meshStandardMaterial color="#64748b" metalness={0.9} />
-                </mesh>
-                {/* Red Glowing Beacon Bulb on tip */}
-                <mesh position={[0, b.spireH || 1.2, 0]}>
-                  <sphereGeometry args={[0.045, 8, 8]} />
-                  <meshBasicMaterial color="#ef4444" />
-                </mesh>
-              </group>
-            )}
-
-            {/* Rooftop Helipad with Glowing Perimeter Ring */}
-            {b.hasHelipad && (
-              <group position={[0, b.h * 0.5 + 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                <mesh>
-                  <circleGeometry args={[0.34, 24]} />
-                  <meshStandardMaterial color="#1e293b" metalness={0.8} />
-                </mesh>
-                {/* Glowing Yellow Helipad Perimeter */}
-                <mesh position={[0, 0, 0.005]}>
-                  <ringGeometry args={[0.31, 0.34, 24]} />
-                  <meshBasicMaterial color="#facc15" />
-                </mesh>
-              </group>
-            )}
-
-            {/* Glowing Rooftop Obstruction Beacons */}
-            {b.hasBeacon && !b.hasSpire && (
-              <mesh position={[0, b.h * 0.5 + 0.06, 0]}>
-                <sphereGeometry args={[0.035, 8, 8]} />
-                <meshBasicMaterial color={b.beaconColor || '#ef4444'} />
-              </mesh>
-            )}
-          </group>
-        ))}
-
-        {/* Aerial Skyway Transit Hover Traffic (Forward Lane) */}
-        <group ref={trafficLane1Ref} position={[0.6, 2.5, 5.4]}>
-          {vehicles1.map((v, i) => (
-            <mesh key={`traffic-1-${i}`} position={[0, 0, 0]}>
-              <boxGeometry args={[0.18, 0.04, 0.06]} />
-              <meshBasicMaterial color={v.color} />
-            </mesh>
-          ))}
-        </group>
-
-        {/* Aerial Skyway Transit Hover Traffic (Reverse Lane) */}
-        <group ref={trafficLane2Ref} position={[0.6, 3.2, 5.6]}>
-          {vehicles2.map((v, i) => (
-            <mesh key={`traffic-2-${i}`} position={[0, 0, 0]}>
-              <boxGeometry args={[0.18, 0.04, 0.06]} />
-              <meshBasicMaterial color={v.color} />
-            </mesh>
-          ))}
-        </group>
-      </group>
-
-      {/* ========================================================================= */}
-      {/* 2. ARCHITECTURAL MOTORIZED DRAPERY & WINDOW COVE LIGHTING                */}
-      {/* ========================================================================= */}
-      <group position={[0.6, 2.25, 0]}>
-        {/* Recessed Architectural Curtain Pelmet / Valance Box along ceiling */}
-        <mesh position={[0, 2.12, -0.1]}>
-          <boxGeometry args={[5.35, 0.16, 0.18]} />
-          <meshStandardMaterial color="#0f172a" roughness={0.5} metalness={0.4} />
+        {/* Outer Architectural Perimeter Metal Trim */}
+        {/* Top Border */}
+        <mesh position={[0, 1.83, -0.03]}>
+          <boxGeometry args={[5.32, 0.06, 0.07]} />
+          <primitive object={frameMaterial} attach="material" />
+        </mesh>
+        {/* Bottom Border */}
+        <mesh position={[0, -1.83, -0.03]}>
+          <boxGeometry args={[5.32, 0.06, 0.07]} />
+          <primitive object={frameMaterial} attach="material" />
+        </mesh>
+        {/* Left Border */}
+        <mesh position={[-2.63, 0, -0.03]}>
+          <boxGeometry args={[0.06, 3.72, 0.07]} />
+          <primitive object={frameMaterial} attach="material" />
+        </mesh>
+        {/* Right Border */}
+        <mesh position={[2.63, 0, -0.03]}>
+          <boxGeometry args={[0.06, 3.72, 0.07]} />
+          <primitive object={frameMaterial} attach="material" />
         </mesh>
 
-        {/* Concealed Ambient LED Trough Lighting washing down over window */}
-        <mesh position={[0, 2.03, -0.08]}>
-          <boxGeometry args={[5.1, 0.015, 0.02]} />
+        {/* Concealed Top Architectural LED Cove Lighting washing down over facets */}
+        <mesh position={[0, 1.78, -0.035]}>
+          <boxGeometry args={[5.16, 0.015, 0.02]} />
           <meshBasicMaterial color={theme.accentColor || '#38bdf8'} />
         </mesh>
+        <pointLight
+          position={[0, 1.6, -0.22]}
+          color={theme.accentColor || '#38bdf8'}
+          intensity={1.8}
+          distance={3.6}
+        />
 
-        {/* Left Drapery (High-End Pleated Dark Slate Fabric) */}
-        <group ref={curtainLeftRef} position={[-2.42, 0, -0.06]}>
-          {[-0.14, -0.07, 0.0, 0.07, 0.14].map((px, i) => (
-            <mesh key={`curt-l-${i}`} position={[px, 0, (i % 2) * 0.018]}>
-              <boxGeometry args={[0.08, 4.0, 0.035]} />
-              <meshStandardMaterial color="#0f1623" roughness={0.88} metalness={0.05} />
-            </mesh>
-          ))}
-        </group>
+        {/* Concealed Bottom Architectural LED Cove Lighting washing up over facets */}
+        <mesh position={[0, -1.78, -0.035]}>
+          <boxGeometry args={[5.16, 0.015, 0.02]} />
+          <meshBasicMaterial color={theme.accentColor || '#38bdf8'} />
+        </mesh>
+        <pointLight
+          position={[0, -1.6, -0.22]}
+          color={theme.accentColor || '#38bdf8'}
+          intensity={1.2}
+          distance={3.2}
+        />
 
-        {/* Right Drapery (High-End Pleated Dark Slate Fabric) */}
-        <group ref={curtainRightRef} position={[2.42, 0, -0.06]}>
-          {[-0.14, -0.07, 0.0, 0.07, 0.14].map((px, i) => (
-            <mesh key={`curt-r-${i}`} position={[px, 0, (i % 2) * 0.018]}>
-              <boxGeometry args={[0.08, 4.0, 0.035]} />
-              <meshStandardMaterial color="#0f1623" roughness={0.88} metalness={0.05} />
-            </mesh>
-          ))}
+        {/* --- FLOATING EXECUTIVE CYBER COMMAND EMBLEM MEDALLION --- */}
+        <group position={[0, 0, -0.075]}>
+          {/* Backlit Halo Glow Casting on 3D Facets */}
+          <pointLight
+            position={[0, 0, -0.05]}
+            color={theme.accentColor || '#00f0ff'}
+            intensity={1.4}
+            distance={2.0}
+          />
+
+          {/* Stepped Brushed Obsidian Mount Base */}
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.68, 0.72, 0.03, 64]} />
+            <meshStandardMaterial color="#0b101d" metalness={0.85} roughness={0.2} />
+          </mesh>
+
+          {/* Brushed Brass Outer Bezel Torus Ring */}
+          <mesh position={[0, 0, -0.018]}>
+            <torusGeometry args={[0.67, 0.024, 16, 64]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.92} roughness={0.22} />
+          </mesh>
+
+          {/* Inner Accent Glowing Ring */}
+          <mesh position={[0, 0, -0.02]}>
+            <ringGeometry args={[0.635, 0.648, 64]} />
+            <meshBasicMaterial color={theme.accentColor || '#38bdf8'} />
+          </mesh>
+
+          {/* High-Resolution Emblem Face Disc */}
+          <mesh position={[0, 0, -0.022]} rotation={[0, 0, 0]}>
+            <circleGeometry args={[0.63, 64]} />
+            <meshStandardMaterial
+              map={emblemTex}
+              roughness={0.18}
+              metalness={0.5}
+            />
+          </mesh>
         </group>
       </group>
 
       {/* ========================================================================= */}
-      {/* 3. LEFT WALL: SOC GLOBAL OPERATIONS WORLD CLOCKS & HALL OF FAME           */}
+      {/* 2. LEFT WALL: SOC GLOBAL OPERATIONS WORLD CLOCKS & HALL OF FAME           */}
       {/* Centered at X = -3.525, Y = 2.25, Z = 0 (Against front wall, facing room) */}
       {/* ========================================================================= */}
       <group position={[-3.525, 2.25, -0.08]}>
@@ -790,7 +715,7 @@ export default function FrontWallPanoramicFeature({ currentThemeKey = 'CYBER_NEO
       </group>
 
       {/* ========================================================================= */}
-      {/* 4. RIGHT WALL: LOUNGE CONSOLE, PHOTOREALISTIC PLANT & SOUND ART          */}
+      {/* 3. RIGHT WALL: LOUNGE CONSOLE, PHOTOREALISTIC PLANT & SOUND ART          */}
       {/* Centered at X = 4.125, Y = 2.25, Z = 0 (Under the golden pendant lamp)    */}
       {/* ========================================================================= */}
       <group position={[4.125, 0, -0.08]}>

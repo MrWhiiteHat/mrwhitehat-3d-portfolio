@@ -285,92 +285,24 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
       </group>
 
       {/* ========================================================================= */}
-      {/* 5. FRONT WALL (Z = +5.05, FULL HEIGHT 4.5M - PREVIOUSLY COMPLETELY MISSING) */}
+      {/* 5. FRONT WALL (Z = +5.05, FULL CONTINUOUS ARCHITECTURAL WALL 10.3M WIDE)  */}
       {/* ========================================================================= */}
       <group position={[0, 2.25, 5.05]}>
-        {/* Left Section (Solid architectural wall, X from -5.05 to -2.0) */}
-        <mesh position={[-3.525, 0, 0]} receiveShadow>
-          <boxGeometry args={[3.05, 4.5, 0.2]} />
+        {/* Continuous Solid Wall (No window cutout / no mullion bars) */}
+        <mesh receiveShadow>
+          <boxGeometry args={[10.3, 4.5, 0.2]} />
           <meshStandardMaterial {...plasterWall} />
         </mesh>
-        <mesh position={[-3.525, -2.15, -0.105]}>
-          <boxGeometry args={[3.05, 0.2, 0.03]} />
+        {/* Continuous Bottom Architectural Baseboard */}
+        <mesh position={[0, -2.15, -0.105]}>
+          <boxGeometry args={[10.3, 0.2, 0.03]} />
           <meshStandardMaterial {...brushedMetal} />
         </mesh>
-        <mesh position={[-3.525, 2.18, -0.105]}>
-          <boxGeometry args={[3.05, 0.14, 0.04]} />
+        {/* Continuous Top Architectural Cornice Molding */}
+        <mesh position={[0, 2.18, -0.105]}>
+          <boxGeometry args={[10.3, 0.14, 0.04]} />
           <meshStandardMaterial {...brushedMetal} />
         </mesh>
-
-        {/* Right Section (Solid architectural corner wall, X from +3.2 to +5.05) */}
-        <mesh position={[4.125, 0, 0]} receiveShadow>
-          <boxGeometry args={[1.85, 4.5, 0.2]} />
-          <meshStandardMaterial {...plasterWall} />
-        </mesh>
-        <mesh position={[4.125, -2.15, -0.105]}>
-          <boxGeometry args={[1.85, 0.2, 0.03]} />
-          <meshStandardMaterial {...brushedMetal} />
-        </mesh>
-        <mesh position={[4.125, 2.18, -0.105]}>
-          <boxGeometry args={[1.85, 0.14, 0.04]} />
-          <meshStandardMaterial {...brushedMetal} />
-        </mesh>
-
-        {/* Center: Large Panoramic Skyline Window (X from -2.0 to +3.2, Width 5.2m) */}
-        <group position={[0.6, 0, 0]}>
-          {/* Wall Cutout Header & Sill */}
-          <mesh position={[0, 2.05, 0]}>
-            <boxGeometry args={[5.2, 0.4, 0.2]} />
-            <meshStandardMaterial {...plasterWall} />
-          </mesh>
-          <mesh position={[0, -2.05, 0]}>
-            <boxGeometry args={[5.2, 0.4, 0.2]} />
-            <meshStandardMaterial {...plasterWall} />
-          </mesh>
-
-          {/* Window Outer Perimeter Metal Frame */}
-          <mesh position={[0, 1.76, -0.05]}>
-            <boxGeometry args={[5.15, 0.08, 0.1]} />
-            <meshStandardMaterial color="#0b100d" roughness={0.3} metalness={0.8} />
-          </mesh>
-          <mesh position={[0, -1.76, -0.05]}>
-            <boxGeometry args={[5.15, 0.08, 0.1]} />
-            <meshStandardMaterial color="#0b100d" roughness={0.3} metalness={0.8} />
-          </mesh>
-          <mesh position={[-2.54, 0, -0.05]}>
-            <boxGeometry args={[0.08, 3.6, 0.1]} />
-            <meshStandardMaterial color="#0b100d" roughness={0.3} metalness={0.8} />
-          </mesh>
-          <mesh position={[2.54, 0, -0.05]}>
-            <boxGeometry args={[0.08, 3.6, 0.1]} />
-            <meshStandardMaterial color="#0b100d" roughness={0.3} metalness={0.8} />
-          </mesh>
-
-          {/* Window Glass Pane */}
-          <mesh position={[0, 0, -0.05]}>
-            <boxGeometry args={[5.05, 3.45, 0.02]} />
-            <meshStandardMaterial
-              color="#93c5fd"
-              transparent
-              opacity={0.22}
-              roughness={0.08}
-              metalness={0.2}
-            />
-          </mesh>
-
-          {/* Vertical Mullions */}
-          {[-1.6, -0.5, 0.6, 1.7].map((mx, idx) => (
-            <mesh key={`front-mullion-${idx}`} position={[mx, 0, -0.07]}>
-              <boxGeometry args={[0.04, 3.45, 0.04]} />
-              <meshStandardMaterial color="#0b100d" metalness={0.8} />
-            </mesh>
-          ))}
-          {/* Horizontal Transom Bar */}
-          <mesh position={[0, 0.8, -0.07]}>
-            <boxGeometry args={[5.05, 0.04, 0.04]} />
-            <meshStandardMaterial color="#0b100d" metalness={0.8} />
-          </mesh>
-        </group>
       </group>
 
       {/* ========================================================================= */}
