@@ -749,11 +749,11 @@ export default function FirstPersonController({
     // 1. RESPONSIVE SILKY-SMOOTH AIM (Sub-pixel mouse look & fluid touch dragging)
     // =========================================================================
     if (isPointerLocked.current) {
-      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 75, clampedDelta);
-      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 75, clampedDelta);
+      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 95, clampedDelta);
+      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 95, clampedDelta);
     } else {
-      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 45, clampedDelta);
-      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 45, clampedDelta);
+      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 55, clampedDelta);
+      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 55, clampedDelta);
     }
 
     // =========================================================================
