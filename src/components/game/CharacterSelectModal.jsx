@@ -4,6 +4,8 @@ import {
   CheckCircle2,
   Cpu,
   Lock,
+  Play,
+  HelpCircle,
   Shield,
   Sparkles,
   Terminal,
@@ -12,6 +14,7 @@ import {
   Minimize2,
 } from 'lucide-react';
 import { playClickSound, playHackingBeep, playWhooshSound } from '../../utils/audio.js';
+import UserGuideModal from './UserGuideModal.jsx';
 
 const CHARACTERS = [
   {
@@ -157,6 +160,7 @@ export default function CharacterSelectModal({
   const [selectedCharacter, setSelectedCharacter] = useState(CHARACTERS[0]);
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [showError, setShowError] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   const isNameEntered = name.trim().length >= 1;
 
@@ -195,6 +199,18 @@ export default function CharacterSelectModal({
             <span>ENTER OFFICE // VISITOR CLEARANCE</span>
           </div>
           <div className="char-header-right">
+            <button
+              type="button"
+              className="char-guide-toggle-btn"
+              onClick={() => {
+                playClickSound(900);
+                setShowGuide(true);
+              }}
+              title="Watch User Guide & Controls Tutorial"
+            >
+              <Play size={12} fill="currentColor" />
+              <span>HOW TO PLAY</span>
+            </button>
             <button
               type="button"
               className={`char-fullscreen-toggle-btn ${isFullscreen ? 'is-active' : ''}`}
@@ -325,6 +341,29 @@ export default function CharacterSelectModal({
                 })}
               </div>
             </div>
+
+            {/* Interactive User Guide Callout Banner */}
+            <div
+              className="char-guide-callout-strip"
+              onClick={() => {
+                playClickSound(900);
+                setShowGuide(true);
+              }}
+              role="button"
+              tabIndex={0}
+              title="Click to watch interactive operational guide & controls video"
+            >
+              <div className="callout-left">
+                <div className="callout-icon-pulse">
+                  <Play size={12} fill="#55f69a" color="#55f69a" />
+                </div>
+                <div className="callout-texts">
+                  <strong className="callout-title">NEW TO THE 3D STUDIO?</strong>
+                  <span className="callout-subtitle">Watch interactive operational guide & controls briefing</span>
+                </div>
+              </div>
+              <span className="callout-action-pill">WATCH GUIDE ▶</span>
+            </div>
           </div>
         </div>
 
@@ -359,6 +398,12 @@ export default function CharacterSelectModal({
           </button>
         </div>
       </div>
+
+      {/* Interactive Video-Style User Guide Modal */}
+      <UserGuideModal
+        isOpen={showGuide}
+        onClose={() => setShowGuide(false)}
+      />
     </div>
   );
 }
