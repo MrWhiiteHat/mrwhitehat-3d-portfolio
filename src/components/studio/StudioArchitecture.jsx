@@ -31,17 +31,6 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
     ];
   }, []);
 
-  const buildingsFront = useMemo(() => {
-    return [
-      { x: -1.8, h: 2.8, w: 0.6, d: 0.3, color: '#0c1322' },
-      { x: -1.0, h: 3.6, w: 0.5, d: 0.3, color: '#090f1a' },
-      { x: -0.3, h: 2.4, w: 0.45, d: 0.3, color: '#141d30' },
-      { x: 0.6, h: 3.8, w: 0.7, d: 0.3, color: '#0a111e' },
-      { x: 1.6, h: 2.7, w: 0.5, d: 0.3, color: '#10192b' },
-      { x: 2.4, h: 3.2, w: 0.55, d: 0.3, color: '#0b1220' },
-    ];
-  }, []);
-
   // Shared BoxGeometries for 48 acoustic wall slats (zero redundant allocations)
   const leftSlatGeom = useMemo(() => new THREE.BoxGeometry(0.02, 3.9, 0.12), []);
   const backSlatGeom = useMemo(() => new THREE.BoxGeometry(0.11, 3.9, 0.02), []);
@@ -381,16 +370,6 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
             <boxGeometry args={[5.05, 0.04, 0.04]} />
             <meshStandardMaterial color="#0b100d" metalness={0.8} />
           </mesh>
-        </group>
-
-        {/* Skyline Exterior City Buildings behind Front Window */}
-        <group position={[0, 0, 0.8]}>
-          {buildingsFront.map((b, i) => (
-            <mesh key={`front-building-${i}`} position={[b.x, b.h * 0.5 - 2.0, 0]}>
-              <boxGeometry args={[b.w, b.h, b.d]} />
-              <meshBasicMaterial color={b.color} />
-            </mesh>
-          ))}
         </group>
       </group>
 
