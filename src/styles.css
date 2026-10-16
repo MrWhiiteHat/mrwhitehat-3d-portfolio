@@ -7657,10 +7657,41 @@ body.is-pseudo-fullscreen .portfolio-container {
   }
 }
 
+/* =============================================================================
+   HIGH-PERFORMANCE HARDWARE ACCELERATION & SMOOTH 60-120 FPS RENDERING RULES
+   ============================================================================= */
+.portfolio-container,
+.canvas-wrap,
+.hud-action-btn,
+.hud-top-bar,
+.hud-bottom-bar,
+.station-inspect-header,
+.quick-nav-dock,
+.brand-badge,
+.character-select-overlay,
+.user-guide-backdrop,
+.hotspot-pin,
+.fullscreen-hud-toast {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
 
+/* Fluid responsive scrolling on touch screens */
+.character-select-modal,
+.user-guide-modal,
+.modal-body,
+.pcap-stream-body,
+.arsenal-tools-grid {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
 
-
-
-
-
-
+/* Silky interactive feedback */
+.hud-action-btn,
+.dock-pill,
+.ug-tab-btn,
+.customizer-start-btn,
+.proximity-action-btn {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}

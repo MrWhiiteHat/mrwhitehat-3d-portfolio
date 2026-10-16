@@ -606,7 +606,7 @@ export default function FirstPersonController({
     // 3. Mouse Movement: Pointer Lock + Drag fallback
     const onMouseMove = (e) => {
       if (isPointerLocked.current) {
-        const sensitivity = 0.0022;
+        const sensitivity = 0.0020;
         targetYaw.current -= e.movementX * sensitivity;
         targetPitch.current -= e.movementY * sensitivity;
         targetPitch.current = Math.max(-1.3, Math.min(1.3, targetPitch.current));
@@ -615,7 +615,7 @@ export default function FirstPersonController({
         const dy = e.clientY - lastMousePos.current.y;
         lastMousePos.current = { x: e.clientX, y: e.clientY };
 
-        const sensitivity = 0.003;
+        const sensitivity = 0.0025;
         targetYaw.current -= dx * sensitivity;
         targetPitch.current -= dy * sensitivity;
         targetPitch.current = Math.max(-1.3, Math.min(1.3, targetPitch.current));
@@ -674,7 +674,7 @@ export default function FirstPersonController({
       touchLastX = touch.clientX;
       touchLastY = touch.clientY;
 
-      const touchSensitivity = 0.0032;
+      const touchSensitivity = 0.0028;
       targetYaw.current -= dx * touchSensitivity;
       targetPitch.current -= dy * touchSensitivity;
       targetPitch.current = Math.max(-1.3, Math.min(1.3, targetPitch.current));
@@ -749,11 +749,11 @@ export default function FirstPersonController({
     // 1. RESPONSIVE SILKY-SMOOTH AIM (Sub-pixel mouse look & fluid touch dragging)
     // =========================================================================
     if (isPointerLocked.current) {
-      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 95, clampedDelta);
-      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 95, clampedDelta);
+      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 72, clampedDelta);
+      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 72, clampedDelta);
     } else {
-      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 55, clampedDelta);
-      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 55, clampedDelta);
+      yaw.current = THREE.MathUtils.damp(yaw.current, targetYaw.current, 45, clampedDelta);
+      pitch.current = THREE.MathUtils.damp(pitch.current, targetPitch.current, 45, clampedDelta);
     }
 
     // =========================================================================

@@ -71,8 +71,9 @@ function HotspotPins({ onSelect, activeSection }) {
   );
 }
 
-// Hoisted temporary vector for 60fps zero-allocation camera lerping
+// Hoisted temporary vectors for 60fps zero-allocation camera lerping
 const _tempTarget = new THREE.Vector3();
+const _tempCamDir = new THREE.Vector3();
 
 function CameraDirector({
   gameState,
@@ -84,6 +85,7 @@ function CameraDirector({
   const desired = useRef(null);
   const isAnimating = useRef(false);
   const airlockStarted = useRef(false);
+  const currentGazeTarget = useRef(new THREE.Vector3(0, 1.1, 0));
 
   const defaultCam = useMemo(() => new THREE.Vector3(10.2, 8.2, 10.2), []);
   const defaultTarget = useMemo(() => new THREE.Vector3(0, 1.1, 0), []);
@@ -94,6 +96,7 @@ function CameraDirector({
       // Position camera inside the enclosed airlock vestibule looking at the entrance doors
       camera.position.set(5.75, 1.68, -2.8);
       camera.lookAt(-0.5, 1.6, -0.6);
+      currentGazeTarget.current.set(-0.5, 1.6, -0.6);
 
       desired.current = {
         startCamera: new THREE.Vector3(5.75, 1.68, -2.8),
@@ -106,6 +109,10 @@ function CameraDirector({
       airlockStarted.current = true;
     } else if (gameState === 'INSPECT_STATION' && activeSection && stationConfigs[activeSection]) {
       const config = stationConfigs[activeSection];
+      // Compute where camera is currently gazing so rotation interpolates continuously
+      camera.getWorldDirection(_tempCamDir);
+      currentGazeTarget.current.copy(camera.position).addScaledVector(_tempCamDir, 3.0);
+
       desired.current = {
         camera: new THREE.Vector3(...config.camPos),
         target: new THREE.Vector3(...config.camTarget),
@@ -115,6 +122,8 @@ function CameraDirector({
       isAnimating.current = false;
       desired.current = null;
     } else {
+      camera.getWorldDirection(_tempCamDir);
+      currentGazeTarget.current.copy(camera.position).addScaledVector(_tempCamDir, 4.0);
       desired.current = { camera: defaultCam.clone(), target: defaultTarget.clone() };
       isAnimating.current = true;
     }
@@ -122,16 +131,17 @@ function CameraDirector({
 
   useFrame((state, delta) => {
     if (gameState === 'EXPLORE') return;
+    const clampedDelta = Math.min(delta, 0.033);
 
     // 1. Cinematic Airlock Walk-in Sequence
     if (gameState === 'AIRLOCK_ENTRY' && desired.current?.startCamera) {
-      airlockProgress.current += delta / 2.8;
+      airlockProgress.current += clampedDelta / 2.6;
       const t = Math.min(1.0, airlockProgress.current);
       // Smoothstep easing (accelerates smoothly, glides in, decelerates to walk position)
       const ease = t * t * (3 - 2 * t);
 
       camera.position.lerpVectors(desired.current.startCamera, desired.current.endCamera, ease);
-      camera.position.y = 1.68 + Math.sin(t * Math.PI * 4) * 0.022;
+      camera.position.y = 1.68 + Math.sin(t * Math.PI * 4) * 0.02;
 
       _tempTarget.lerpVectors(
         desired.current.startTarget,
@@ -150,31 +160,33 @@ function CameraDirector({
       return;
     }
 
-    // 2. Station Zoom or Overview lerp
+    // 2. Station Zoom or Overview lerp with continuous simultaneous gaze interpolation
     if (isAnimating.current && desired.current?.camera) {
-      const speedFactor = -4.8;
-      const alpha = 1 - Math.exp(speedFactor * delta);
+      const speedFactor = -5.5;
+      const alpha = 1 - Math.exp(speedFactor * clampedDelta);
       camera.position.lerp(desired.current.camera, alpha);
 
       if (gameState === 'CUSTOMIZE' && controlsRef.current) {
         controlsRef.current.target.lerp(desired.current.target, alpha);
         controlsRef.current.update();
       } else if (desired.current.target) {
-        camera.lookAt(desired.current.target);
+        currentGazeTarget.current.lerp(desired.current.target, alpha);
+        camera.lookAt(currentGazeTarget.current);
       }
 
       const distCam = camera.position.distanceTo(desired.current.camera);
-      if (distCam < 0.04) {
+      if (distCam < 0.025) {
         camera.position.copy(desired.current.camera);
         if (gameState === 'CUSTOMIZE' && controlsRef.current) {
           controlsRef.current.target.copy(desired.current.target);
           controlsRef.current.update();
+        } else if (desired.current.target) {
+          currentGazeTarget.current.copy(desired.current.target);
+          camera.lookAt(desired.current.target);
         }
         isAnimating.current = false;
       }
-    } else if (gameState === 'CUSTOMIZE') {
-      const time = state.clock.getElapsedTime();
-      camera.position.y += Math.sin(time * 0.6) * 0.0006;
+    } else if (gameState === 'CUSTOMIZE' && !isAnimating.current) {
       if (controlsRef.current) controlsRef.current.update();
     }
   });
@@ -182,8 +194,8 @@ function CameraDirector({
   return null;
 }
 
-// Smart Shadow Controller: Updates static shadows only when theme changes, saving ~35% GPU cycles
-function ShadowController({ themeKey }) {
+// Smart Shadow Controller: Updates static shadows only when theme or scene state changes, saving ~35% GPU cycles
+function ShadowController({ themeKey, isGateOpen, gameState }) {
   const { gl } = useThree();
   useEffect(() => {
     if (gl?.shadowMap) {
@@ -191,10 +203,10 @@ function ShadowController({ themeKey }) {
       gl.shadowMap.needsUpdate = true;
       const timer = setTimeout(() => {
         if (gl?.shadowMap) gl.shadowMap.needsUpdate = true;
-      }, 120);
+      }, 100);
       return () => clearTimeout(timer);
     }
-  }, [gl, themeKey]);
+  }, [gl, themeKey, isGateOpen, gameState]);
   return null;
 }
 
@@ -237,7 +249,7 @@ function SceneContents({
   return (
     <>
       <color attach="background" args={['#070a08']} />
-      <ShadowController themeKey={themeKey} />
+      <ShadowController themeKey={themeKey} isGateOpen={isGateOpen} gameState={gameState} />
 
       {/* Dynamic Cyber Atmosphere: Lights, Motes, Ceiling Fan, Clock, Hologram Core */}
       <CyberAtmosphere currentThemeKey={themeKey} onCycleTheme={onCycleTheme} />
@@ -379,6 +391,7 @@ export default function OfficeScene({
       <Canvas
         shadows
         frameloop="always"
+        performance={{ min: 0.5 }}
         dpr={[
           1,
           typeof window !== 'undefined'
@@ -401,6 +414,7 @@ export default function OfficeScene({
           gl.shadowMap.needsUpdate = true;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = 1.15;
+          gl.outputColorSpace = THREE.SRGBColorSpace;
         }}
         camera={{ position: [10.2, 8.2, 10.2], fov: 34, near: 0.1, far: 100 }}
         onError={() => setFailed(true)}
