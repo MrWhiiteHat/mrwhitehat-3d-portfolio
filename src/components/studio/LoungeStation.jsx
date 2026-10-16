@@ -13,8 +13,6 @@ import mrWhiteHatImg from '../../assets/mrwhitehat-hologram.jpg';
 export default function LoungeStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
   const [lampOn, setLampOn] = useState(true);
-  const lampLightRef = useRef();
-  const tabletGlowRef = useRef();
   const plaqueGlowRef = useRef();
   const cipherRingRef = useRef();
 
@@ -58,11 +56,6 @@ export default function LoungeStation({ onSelect, onHover }) {
     if (cipherRingRef.current) {
       cipherRingRef.current.children[0].rotation.z += delta * 1.6;
       cipherRingRef.current.children[1].rotation.z -= delta * 2.4;
-    }
-
-    // Tablet pulse
-    if (tabletGlowRef.current) {
-      tabletGlowRef.current.intensity = 1.0 + Math.sin(time * 3) * 0.3;
     }
 
     // Wall Plaque Gold Rim Glow
@@ -155,13 +148,6 @@ export default function LoungeStation({ onSelect, onHover }) {
             <planeGeometry args={[0.2, 0.13]} />
             <meshBasicMaterial map={tabletScreen.texture} toneMapped={false} />
           </mesh>
-          <pointLight
-            ref={tabletGlowRef}
-            position={[0, 0, 0.06]}
-            color="#38bdf8"
-            intensity={1.8}
-            distance={0.9}
-          />
         </group>
       </group>
 
@@ -196,16 +182,13 @@ export default function LoungeStation({ onSelect, onHover }) {
           <sphereGeometry args={[0.04, 16, 16]} />
           <meshBasicMaterial color={lampOn ? '#fbbf24' : '#453a25'} />
         </mesh>
-        {/* Warm Ambient Lamp Light */}
-        {lampOn && (
-          <pointLight
-            ref={lampLightRef}
-            position={[-0.2, 2.15, -0.2]}
-            color="#fbbf24"
-            intensity={4.8}
-            distance={4.0}
-          />
-        )}
+        {/* Warm Ambient Lamp Light (dimmed rather than unmounted so the scene's light count never changes) */}
+        <pointLight
+          position={[-0.2, 2.15, -0.2]}
+          color="#fbbf24"
+          intensity={lampOn ? 4.8 : 0}
+          distance={4.0}
+        />
       </group>
 
       {/* 4. Executive Cyber Security Dossier Plaque (ABOUT ME HOTSPOT) */}

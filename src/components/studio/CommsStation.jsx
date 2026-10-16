@@ -5,18 +5,12 @@ import { playTelephoneTone, playWhooshSound } from '../../utils/audio.js';
 
 export default function CommsStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
-  const screenLightRef = useRef();
   const antennaRef = useRef();
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
 
-    // 1. Screen Frequency Pulse
-    if (screenLightRef.current) {
-      screenLightRef.current.intensity = (hovered ? 2.5 : 1.5) + Math.sin(time * 3.5) * 0.3;
-    }
-
-    // 2. Antenna gentle breeze oscillation
+    // Antenna gentle breeze oscillation
     if (antennaRef.current) {
       antennaRef.current.rotation.z = -0.15 + Math.sin(time * 2.2) * 0.04;
     }
@@ -64,14 +58,6 @@ export default function CommsStation({ onSelect, onHover }) {
           <planeGeometry args={[0.18, 0.09]} />
           <meshBasicMaterial color={hovered ? '#0a2e18' : '#051a0d'} />
         </mesh>
-        {/* Active Frequency LED Beam */}
-        <pointLight
-          ref={screenLightRef}
-          position={[-0.05, 0.06, 0.08]}
-          color="#22c55e"
-          intensity={1.5}
-          distance={0.8}
-        />
 
         {/* Interactive Tactile Keypad Matrix Grid */}
         <group position={[-0.05, -0.06, 0.035]}>

@@ -11,7 +11,6 @@ export default function PrinterStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
   const [paperOffset, setPaperOffset] = useState(0);
   const paperRef = useRef();
-  const ledRef = useRef();
 
   // High-End Procedural PBR Textures
   const cabinetWood = useMemo(() => getWalnutWoodTextures(2, 2), []);
@@ -19,20 +18,14 @@ export default function PrinterStation({ onSelect, onHover }) {
   const darkMetal = useMemo(() => getBrushedMetalTextures(1, 1, '#1a1a1a'), []);
 
   useFrame((state, delta) => {
-    const time = state.clock.getElapsedTime();
-
-    // 1. Status LED pulse
-    if (ledRef.current) {
-      ledRef.current.intensity = (hovered ? 3.0 : 1.5) + Math.sin(time * 4) * 0.4;
-    }
-
-    // 2. Paper slide animation
+    // Paper slide animation (frame-rate independent easing)
     if (paperRef.current) {
       const targetY = 0.21 + (hovered ? 0.05 : 0) + paperOffset;
-      paperRef.current.position.y = THREE.MathUtils.lerp(
+      paperRef.current.position.y = THREE.MathUtils.damp(
         paperRef.current.position.y,
         targetY,
-        0.1
+        6,
+        delta
       );
     }
   });
@@ -123,13 +116,6 @@ export default function PrinterStation({ onSelect, onHover }) {
           <sphereGeometry args={[0.014, 12, 12]} />
           <meshBasicMaterial color="#10b981" />
         </mesh>
-        <pointLight
-          ref={ledRef}
-          position={[0.2, 0.25, 0.28]}
-          color="#10b981"
-          intensity={1.5}
-          distance={0.8}
-        />
 
         {/* Paper Output Slot Tray */}
         <mesh position={[0, 0.16, 0.22]} rotation={[-0.25, 0, 0]} castShadow>

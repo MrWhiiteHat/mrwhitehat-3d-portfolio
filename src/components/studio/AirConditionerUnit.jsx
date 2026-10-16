@@ -298,16 +298,14 @@ export default function AirConditionerUnit({ onSelect, onHover }) {
         </points>
       )}
 
-      {/* 11. Soft Frost Cyan Downward Wash Light (illuminates studio below when active) */}
-      {isOn && (
-        <pointLight
-          position={[0, -0.35, 0.35]}
-          color="#38bdf8"
-          intensity={1.8}
-          distance={3.8}
-          decay={2}
-        />
-      )}
+      {/* 11. Soft Frost Cyan Downward Wash Light (dimmed rather than unmounted so the scene's light count never changes) */}
+      <pointLight
+        position={[0, -0.35, 0.35]}
+        color="#38bdf8"
+        intensity={isOn ? 1.8 : 0}
+        distance={3.8}
+        decay={2}
+      />
     </group>
   );
 }

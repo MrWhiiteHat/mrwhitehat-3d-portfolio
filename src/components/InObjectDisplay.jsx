@@ -302,9 +302,10 @@ export default function InObjectDisplay({
     }
   }, [activeSection]);
 
-  if (!activeSection) return null;
-  const config = stationConfigs[activeSection];
-  if (!config) return null;
+  const config = activeSection ? stationConfigs[activeSection] : null;
+  // Keep a station light mounted even when no station is open: adding or removing a light
+  // changes the scene's light count, which recompiles every lit material (a visible freeze).
+  if (!config) return <pointLight intensity={0} distance={2.8} />;
 
   const isUnlocked = !!unlockedStations[activeSection];
   const isBreaching = breachingSection === activeSection;

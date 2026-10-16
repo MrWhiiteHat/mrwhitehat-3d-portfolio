@@ -9,30 +9,18 @@ import { playClickSound, playHackingBeep } from '../../utils/audio.js';
  */
 export default function HackerDeskGadgets() {
   const [flipperActive, setFlipperActive] = useState(false);
-  const flipperGlowRef = useRef();
   const pineappleLed1Ref = useRef();
   const pineappleLed2Ref = useRef();
-  const rpiLedRef = useRef();
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     const time = state.clock.getElapsedTime();
 
-    // 1. Flipper Zero Sub-GHz Transmission Pulse
-    if (flipperGlowRef.current) {
-      flipperGlowRef.current.intensity = (flipperActive ? 3.5 : 1.2) + Math.sin(time * 6) * 0.4;
-    }
-
-    // 2. Wi-Fi Pineapple Packet Activity LEDs
+    // Wi-Fi Pineapple Packet Activity LEDs
     if (pineappleLed1Ref.current) {
       pineappleLed1Ref.current.visible = Math.sin(time * 16) > 0;
     }
     if (pineappleLed2Ref.current) {
       pineappleLed2Ref.current.visible = Math.cos(time * 22) > -0.2;
-    }
-
-    // 3. Raspberry Pi Activity LED
-    if (rpiLedRef.current) {
-      rpiLedRef.current.intensity = 0.8 + Math.sin(time * 8) * 0.4;
     }
   });
 
@@ -75,13 +63,6 @@ export default function HackerDeskGadgets() {
           <planeGeometry args={[0.046, 0.052]} />
           <meshBasicMaterial color={flipperActive ? '#ff8c00' : '#ea580c'} />
         </mesh>
-        <pointLight
-          ref={flipperGlowRef}
-          position={[-0.005, 0.03, -0.02]}
-          color="#ff8c00"
-          intensity={1.2}
-          distance={0.5}
-        />
 
         {/* Flipper Dolphin Silhouette on LCD Screen */}
         <mesh position={[-0.005, 0.0145, -0.02]}>
@@ -233,13 +214,6 @@ export default function HackerDeskGadgets() {
             <sphereGeometry args={[0.004, 12, 12]} />
             <meshBasicMaterial color="#34d399" />
           </mesh>
-          <pointLight
-            ref={rpiLedRef}
-            position={[0.015, 0.02, 0]}
-            color="#34d399"
-            intensity={0.8}
-            distance={0.3}
-          />
 
           {/* Jumper Wires connecting RPi to Breadboard (Arched colored tubes) */}
           {[
