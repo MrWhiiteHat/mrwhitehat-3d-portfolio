@@ -31,6 +31,7 @@ import {
 import OfficeScene from './components/OfficeScene.jsx';
 import CharacterSelectModal from './components/game/CharacterSelectModal.jsx';
 import GameHUD from './components/game/GameHUD.jsx';
+import CyberLoadingScreen from './components/common/CyberLoadingScreen.jsx';
 import { profile } from './data.js';
 import { useFullscreen } from './utils/useFullscreen.js';
 import {
@@ -66,6 +67,10 @@ const NAV_STATIONS = [
 ];
 
 export default function App() {
+  // Loading & Pre-warming State
+  const [isSceneReady, setIsSceneReady] = useState(false);
+  const [isLoadingFinished, setIsLoadingFinished] = useState(false);
+
   // Game State Machine: 'CUSTOMIZE' | 'AIRLOCK_ENTRY' | 'EXPLORE' | 'INSPECT_STATION'
   const [gameState, setGameState] = useState('CUSTOMIZE');
 
@@ -366,6 +371,7 @@ export default function App() {
         onDeselect={handleClose}
         activeSection={section}
         onHover={setHovered}
+        onReady={() => setIsSceneReady(true)}
         themeKey={themeKey}
         onCycleTheme={handleCycleTheme}
         isGateOpen={isGateOpen}
@@ -378,6 +384,14 @@ export default function App() {
         playerData={playerData}
       />
 
+      {/* 0. HIGH-TECH CYBER PRELOADER LOADING SCREEN (Pre-loads 3D models & pre-warms shaders) */}
+      {!isLoadingFinished && (
+        <CyberLoadingScreen
+          isSceneReady={isSceneReady}
+          onFinish={() => setIsLoadingFinished(true)}
+        />
+      )}
+
       {/* Fullscreen Toast HUD Indicator */}
       {toastMessage && (
         <div className="fullscreen-hud-toast">
@@ -386,8 +400,8 @@ export default function App() {
         </div>
       )}
 
-      {/* 1. INITIAL: Character Customization & Deployment Modal */}
-      {gameState === 'CUSTOMIZE' && (
+      {/* 1. INITIAL: Character Customization & Deployment Modal (Reveals only after assets & shaders are 100% ready) */}
+      {gameState === 'CUSTOMIZE' && isLoadingFinished && (
         <CharacterSelectModal
           onStartGame={handleStartGame}
           currentThemeKey={themeKey}
@@ -473,7 +487,7 @@ export default function App() {
       )}
 
       {/* 5. Minimal Top Header (Shown during CUSTOMIZE mode overview) */}
-      {gameState === 'CUSTOMIZE' && (
+      {gameState === 'CUSTOMIZE' && isLoadingFinished && (
         <header className="minimal-header">
           <div className="brand-badge">
             <span className="brand-icon">

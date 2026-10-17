@@ -51,9 +51,11 @@ const COLORS = [
 function HolographicAvatarPreview({ characterId, accentColor }) {
   return (
     <Canvas
-      dpr={[1, 1.5]}
+      frameloop="demand"
+      dpr={[1, typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 1.25) : 1]}
       camera={{ position: [0, 0.2, 2.3], fov: 38 }}
       style={{ width: '100%', height: '100%' }}
+      gl={{ powerPreference: 'low-power', antialias: true, alpha: true, stencil: false }}
     >
       <ambientLight intensity={1.5} />
       <directionalLight position={[2, 3, 2]} intensity={2.0} color="#ffffff" />

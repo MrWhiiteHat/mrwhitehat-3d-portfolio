@@ -30,9 +30,17 @@ export default function DecorElements() {
   // Batched to trigger only a single component re-render when assets are loaded.
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    const manager = new THREE.LoadingManager();
-    const loader = new THREE.TextureLoader(manager);
+    const loader = new THREE.TextureLoader(THREE.DefaultLoadingManager);
     const loaded = {};
+    let loadedCount = 0;
+    const totalCount = 5;
+
+    const checkAllLoaded = () => {
+      loadedCount++;
+      if (loadedCount >= totalCount) {
+        setTextures({ ...loaded });
+      }
+    };
 
     const loadTexture = (key, relativePath, setupFn) => {
       loader.load(
@@ -40,10 +48,12 @@ export default function DecorElements() {
         (tex) => {
           if (setupFn) setupFn(tex);
           loaded[key] = tex;
+          checkAllLoaded();
         },
         undefined,
         (err) => {
           console.warn(`Texture load failed for ${relativePath}:`, err);
+          checkAllLoaded();
         }
       );
     };
@@ -78,10 +88,6 @@ export default function DecorElements() {
       t.wrapT = THREE.RepeatWrapping;
       t.repeat.set(2, 2);
     });
-
-    manager.onLoad = () => {
-      setTextures({ ...loaded });
-    };
   }, []);
 
   // Shared High-Performance Materials for Snake Plant (Eliminates redundant allocations)

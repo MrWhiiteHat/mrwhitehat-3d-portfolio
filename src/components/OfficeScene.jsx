@@ -210,6 +210,22 @@ function ShadowController({ themeKey, isGateOpen, gameState }) {
   return null;
 }
 
+// Pre-compiles all scene shaders into GPU VRAM to eliminate first-interaction stutter
+function ScenePrewarmer({ onSceneReady }) {
+  const { gl, scene, camera } = useThree();
+  useEffect(() => {
+    if (gl && scene && camera) {
+      try {
+        gl.compile(scene, camera);
+      } catch (err) {
+        console.warn('Shader prewarm notice:', err);
+      }
+      onSceneReady?.();
+    }
+  }, [gl, scene, camera, onSceneReady]);
+  return null;
+}
+
 function SceneContents({
   gameState = 'EXPLORE',
   onSelect,
@@ -228,6 +244,7 @@ function SceneContents({
   visitorLogs = [],
   visitorCount = 1,
   playerData = null,
+  onReady = null,
 }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -250,6 +267,7 @@ function SceneContents({
     <>
       <color attach="background" args={['#070a08']} />
       <ShadowController themeKey={themeKey} isGateOpen={isGateOpen} gameState={gameState} />
+      <ScenePrewarmer onSceneReady={onReady} />
 
       {/* Dynamic Cyber Atmosphere: Lights, Motes, Ceiling Fan, Clock, Hologram Core */}
       <CyberAtmosphere currentThemeKey={themeKey} onCycleTheme={onCycleTheme} />
@@ -438,6 +456,7 @@ export default function OfficeScene({
             visitorLogs={visitorLogs}
             visitorCount={visitorCount}
             playerData={playerData}
+            onReady={onReady}
           />
         </Suspense>
       </Canvas>
