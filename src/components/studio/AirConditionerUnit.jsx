@@ -302,8 +302,8 @@ export default function AirConditionerUnit({ onSelect, onHover }) {
       <pointLight
         position={[0, -0.35, 0.35]}
         color="#38bdf8"
-        intensity={isOn ? 1.8 : 0}
-        distance={3.8}
+        intensity={isOn ? 0.35 : 0}
+        distance={1.8}
         decay={2}
       />
     </group>

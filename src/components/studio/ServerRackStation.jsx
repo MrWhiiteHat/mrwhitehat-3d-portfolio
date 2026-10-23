@@ -302,7 +302,7 @@ export default function ServerRackStation() {
             ior={1.52}
             reflectivity={0.9}
             transparent
-            opacity={0.7}
+            opacity={0.35}
           />
         </mesh>
         {/* Chrome Door Key Handle */}
@@ -338,13 +338,13 @@ export default function ServerRackStation() {
             roughness={0.15}
             metalness={0.1}
             transparent
-            opacity={0.32}
+            opacity={0.16}
           />
         </mesh>
         {/* Glowing Cyan Wireframe Frame Outline */}
         <mesh>
           <boxGeometry args={[0.765, 0.465, 0.008]} />
-          <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.7} />
+          <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.35} />
         </mesh>
         {/* Live Dynamic Holographic Display Screen */}
         <mesh position={[0, 0, 0.005]}>

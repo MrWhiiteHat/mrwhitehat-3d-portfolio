@@ -110,12 +110,12 @@ export default function ArchiveStation({ onSelect, onHover }) {
               <boxGeometry args={[2.36, 0.05, 0.46]} />
               <meshStandardMaterial {...shelfWood} roughness={0.36} metalness={0.1} />
             </mesh>
-            {/* Shelf Under-Glow Warm LED Strip */}
+            {/* Shelf Under-Glow Warm Gallery Light (Soft Tungsten, no harsh green) */}
             <pointLight
               position={[0, -0.08, 0.1]}
-              color="#34d399"
-              intensity={hovered ? 1.4 : 0.8}
-              distance={1.4}
+              color="#fed7aa"
+              intensity={hovered ? 0.4 : 0.22}
+              distance={0.9}
             />
           </group>
         ))}
