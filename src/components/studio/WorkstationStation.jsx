@@ -13,6 +13,7 @@ import {
 import { createTerminalScreen, createRadarScreen } from '../../utils/cyberScreens.js';
 import HackerDeskGadgets from './HackerDeskGadgets.jsx';
 import DeskLampModel from './DeskLampModel.jsx';
+import Model3DBoundary from '../common/Model3DBoundary.jsx';
 
 export default function WorkstationStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -247,7 +248,11 @@ export default function WorkstationStation({ onSelect, onHover }) {
       <HackerDeskGadgets />
 
         {/* Photorealistic Scanned Articulated Desk Lamp & Task Spotlight */}
-        <DeskLampModel position={[-1.15, 0.785, -0.22]} rotation={[0, 0.45, 0]} scale={0.38} />
+        <Model3DBoundary>
+          <Suspense fallback={null}>
+            <DeskLampModel position={[-1.15, 0.785, -0.22]} rotation={[0, 0.45, 0]} scale={0.38} />
+          </Suspense>
+        </Model3DBoundary>
 
       {/* 3. Dual Curved Workstation Monitors (CLICKABLE HOTSPOT FOR PROJECTS) */}
       <group

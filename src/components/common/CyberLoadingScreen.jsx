@@ -81,6 +81,22 @@ export default function CyberLoadingScreen({ isSceneReady = false, onFinish }) {
     }
   }, [displayProgress, isSceneReady, onFinish]);
 
+  // Fail-safe watchdog: Ensure loading screen never hangs on network jitter or slow device hydration
+  useEffect(() => {
+    const watchdogTimer = setTimeout(() => {
+      if (!finishTriggered.current) {
+        finishTriggered.current = true;
+        setDisplayProgress(100);
+        setIsFading(true);
+        setTimeout(() => {
+          onFinish?.();
+        }, 600);
+      }
+    }, 4500);
+
+    return () => clearTimeout(watchdogTimer);
+  }, [onFinish]);
+
   // Format current asset filename for the ticker
   const currentAsset = item
     ? item.split('/').pop().split('?')[0]

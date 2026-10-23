@@ -30,8 +30,7 @@ function loadPbrMap(path, repeatX = 1, repeatY = 1, isColor = false) {
  * Photorealistic Scanned PBR Hardwood Parquet Flooring (1K Scanned Albedo, NormalGL, Roughness, AO)
  */
 export function getRealParquetFloorTextures(repeatX = 6, repeatY = 6) {
-  const cacheKey = 
-eal_parquet__;
+  const cacheKey = `real_parquet_${repeatX}_${repeatY}`;
   if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
 
   const map = loadPbrMap('textures/floor/parquet_diff.jpg', repeatX, repeatY, true);
@@ -57,8 +56,7 @@ eal_parquet__;
  * Photorealistic Scanned PBR Architectural Dark-Paneled Wood Wall (1K Scanned Albedo, NormalGL, Roughness, AO)
  */
 export function getRealWallWoodTextures(repeatX = 2.5, repeatY = 1.8) {
-  const cacheKey = 
-eal_wall__;
+  const cacheKey = `real_wall_${repeatX}_${repeatY}`;
   if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
 
   const map = loadPbrMap('textures/wall/wall_diff.jpg', repeatX, repeatY, true);
@@ -84,8 +82,7 @@ eal_wall__;
  * Photorealistic Scanned PBR Dark Walnut Wood for Desks & Tables (1K Scanned Albedo, NormalGL, Roughness, AO)
  */
 export function getRealDeskWoodTextures(repeatX = 2, repeatY = 1) {
-  const cacheKey = 
-eal_desk__;
+  const cacheKey = `real_desk_${repeatX}_${repeatY}`;
   if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
 
   const map = loadPbrMap('textures/desk/desk_diff.jpg', repeatX, repeatY, true);
@@ -111,8 +108,7 @@ eal_desk__;
  * Photorealistic Scanned PBR Pebbled Leather for Chairs, Sofas & Headsets (1K Scanned Albedo, NormalGL, Roughness, AO)
  */
 export function getRealLeatherTextures(repeatX = 2, repeatY = 2, tintColor = null) {
-  const cacheKey = 
-eal_leather___;
+  const cacheKey = `real_leather_${repeatX}_${repeatY}_${tintColor || ""}`;
   if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
 
   const map = loadPbrMap('textures/leather/leather_diff.jpg', repeatX, repeatY, true);

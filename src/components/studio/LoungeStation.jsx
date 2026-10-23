@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { Suspense, useMemo, useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
@@ -9,6 +9,7 @@ import {
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
 import ModernArmchairModel from './ModernArmchairModel.jsx';
+import Model3DBoundary from '../common/Model3DBoundary.jsx';
 import { createTabletScreen, createAboutDossierScreen } from '../../utils/cyberScreens.js';
 import mrWhiteHatImg from '../../assets/mrwhitehat-hologram.jpg';
 
@@ -154,7 +155,11 @@ export default function LoungeStation({ onSelect, onHover }) {
       </group>
 
       {/* 2.5 Photorealistic 3D Scanned Modern Executive Armchair (CC0 Scanned) */}
-      <ModernArmchairModel position={[-1.35, 0, 0.2]} rotation={[0, Math.PI / 3.4, 0]} scale={0.92} />
+      <Model3DBoundary>
+        <Suspense fallback={null}>
+          <ModernArmchairModel position={[-1.35, 0, 0.2]} rotation={[0, Math.PI / 3.4, 0]} scale={0.92} />
+        </Suspense>
+      </Model3DBoundary>
 
       {/* 3. Interactive Modern Arched Brass Floor Lamp */}
       <group
