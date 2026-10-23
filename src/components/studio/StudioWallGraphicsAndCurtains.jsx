@@ -299,8 +299,8 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       </group>
 
       {/* ======================================================== */}
-      {/* 3. LEFT WALL: TACTICAL RED TEAM HARDWARE ARSENAL          */}
-      {/* Authentic penetration testing & RF hardware tools mounted  */}
+      {/* 3. LEFT WALL: TACTICAL RED TEAM HARDWARE ARSENAL LAB     */}
+      {/* Authentic penetration testing, RF & physical security lab */}
       {/* Location: X = -4.94, Y = 2.35, Z = 1.25                    */}
       {/* ======================================================== */}
       <group
@@ -324,11 +324,19 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
           <boxGeometry args={[1.5, 1.35, 0.02]} />
           <meshStandardMaterial color="#0c1116" roughness={0.7} metalness={0.6} />
         </mesh>
+
         {/* Industrial Standoff Mounting Frame */}
         <mesh position={[0, 0, -0.015]}>
           <boxGeometry args={[1.54, 1.39, 0.01]} />
           <meshStandardMaterial color="#1f2937" metalness={0.9} roughness={0.2} />
         </mesh>
+
+        {/* Glowing Edge-Lit Cyan Acrylic Perimeter Trim */}
+        <mesh position={[0, 0, -0.018]}>
+          <boxGeometry args={[1.56, 1.41, 0.008]} />
+          <meshBasicMaterial color={theme.accentColor || '#00f0ff'} />
+        </mesh>
+
         {/* Pegboard Corner Anodized Standoff Bolts */}
         {[
           [-0.7, -0.62],
@@ -342,13 +350,172 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
           </mesh>
         ))}
 
-        {/* Pegboard Header Stencil Label */}
-        <mesh position={[0, 0.61, 0.005]}>
-          <planeGeometry args={[1.35, 0.045]} />
-          <meshBasicMaterial color="#091e17" />
-        </mesh>
+        {/* Pegboard Header Stencil Plate with Illuminated Telemetry Badge */}
+        <group position={[0, 0.72, 0.008]}>
+          <mesh>
+            <boxGeometry args={[1.54, 0.08, 0.018]} />
+            <meshStandardMaterial color="#0b1016" metalness={0.9} roughness={0.2} />
+          </mesh>
+          <mesh position={[0, 0, 0.01]}>
+            <planeGeometry args={[1.48, 0.06]} />
+            <meshBasicMaterial color="#03201b" />
+          </mesh>
+          {/* Header Status LEDs */}
+          {[
+            { x: -0.66, color: '#22c55e', label: 'ARMED' },
+            { x: -0.60, color: '#38bdf8', label: 'RF_SCAN' },
+            { x: -0.54, color: '#f59e0b', label: 'PAYLOAD' },
+          ].map((led, i) => (
+            <mesh key={`hdr-led-${i}`} position={[led.x, 0, 0.012]}>
+              <sphereGeometry args={[0.006, 8, 8]} />
+              <meshBasicMaterial color={led.color} />
+            </mesh>
+          ))}
+        </group>
 
-        {/* ======================================================== */}
+        {/* Overhead High-CRI LED Task Light Fixture (Crisp Downward Illumination) */}
+        <group position={[0, 0.82, 0.22]}>
+          {/* Extruded Matte Black Lamp Housing */}
+          <mesh>
+            <boxGeometry args={[1.52, 0.035, 0.08]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.9} roughness={0.2} />
+          </mesh>
+          {/* Downward Opal Diffuser Strip */}
+          <mesh position={[0, -0.018, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[1.48, 0.065]} />
+            <meshBasicMaterial color="#ffffff" />
+          </mesh>
+          {/* Cantilever Support Arms anchored back to pegboard */}
+          {[-0.6, 0.6].map((sx, idx) => (
+            <mesh key={`task-arm-${idx}`} position={[sx, -0.01, -0.11]}>
+              <boxGeometry args={[0.02, 0.02, 0.22]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.9} />
+            </mesh>
+          ))}
+          {/* Focused downward task light illuminating tools & workbench */}
+          <pointLight
+            position={[0, -0.15, 0]}
+            color="#f8fafc"
+            intensity={2.2}
+            distance={2.6}
+            decay={2}
+          />
+        </group>
+
+        {/* Dedicated Floating Hardware Technician Workbench / Lab Shelf */}
+        <group position={[0, -0.87, 0.22]}>
+          {/* Heavy Dark Walnut & Steel Lab Surface */}
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[1.54, 0.04, 0.44]} />
+            <meshStandardMaterial color="#181310" roughness={0.35} metalness={0.3} />
+          </mesh>
+          {/* Front Anodized Gunmetal Chamfer Trim */}
+          <mesh position={[0, 0, 0.222]}>
+            <boxGeometry args={[1.54, 0.04, 0.005]} />
+            <meshStandardMaterial color="#334155" metalness={0.9} roughness={0.15} />
+          </mesh>
+          {/* Heavy-Duty Welded Triangular Cantilever Brackets underneath */}
+          {[-0.55, 0.55].map((bx, idx) => (
+            <mesh key={`bench-bracket-${idx}`} position={[bx, -0.12, -0.08]}>
+              <boxGeometry args={[0.03, 0.22, 0.26]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.9} roughness={0.3} />
+            </mesh>
+          ))}
+
+          {/* 1. Blue Anti-Static ESD Workstation Mat */}
+          <mesh position={[0, 0.022, 0]}>
+            <boxGeometry args={[1.44, 0.004, 0.38]} />
+            <meshStandardMaterial color="#0284c7" roughness={0.6} />
+          </mesh>
+          {/* ESD Mat Gold Grounding Snap Stud */}
+          <mesh position={[-0.68, 0.025, 0.16]}>
+            <cylinderGeometry args={[0.008, 0.008, 0.005, 12]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.1} />
+          </mesh>
+
+          {/* 2. Digital Soldering / Rework Station */}
+          <group position={[0.48, 0.07, 0]}>
+            {/* Station Main Housing */}
+            <mesh castShadow>
+              <boxGeometry args={[0.16, 0.09, 0.18]} />
+              <meshStandardMaterial color="#1e293b" roughness={0.4} metalness={0.7} />
+            </mesh>
+            {/* Glowing Orange 7-Segment Temperature Display (350 C) */}
+            <mesh position={[0, 0.02, 0.091]}>
+              <planeGeometry args={[0.07, 0.03]} />
+              <meshBasicMaterial color="#ea580c" />
+            </mesh>
+            {/* Rotary Temp Control Knob */}
+            <mesh position={[-0.04, -0.02, 0.092]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.012, 0.012, 0.01, 16]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.9} />
+            </mesh>
+            {/* Soldering Iron Stand with Brass Sponge & Pen Wand */}
+            <mesh position={[-0.14, 0, 0]}>
+              <cylinderGeometry args={[0.03, 0.035, 0.06, 16]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.8} />
+            </mesh>
+            {/* Iron Pen Wand Resting in Collar */}
+            <mesh position={[-0.14, 0.05, 0.02]} rotation={[0.4, 0, 0.2]}>
+              <cylinderGeometry args={[0.005, 0.008, 0.16, 12]} />
+              <meshStandardMaterial color="#0284c7" roughness={0.5} />
+            </mesh>
+          </group>
+
+          {/* 3. Benchtop Digital Storage Oscilloscope / Spectrum Analyzer */}
+          <group position={[-0.45, 0.08, 0]}>
+            {/* Scope Main Frame */}
+            <mesh castShadow>
+              <boxGeometry args={[0.22, 0.12, 0.18]} />
+              <meshStandardMaterial color="#cbd5e1" roughness={0.3} metalness={0.5} />
+            </mesh>
+            {/* Color LCD Screen showing live signal waveform */}
+            <mesh position={[0.02, 0.01, 0.091]}>
+              <planeGeometry args={[0.13, 0.08]} />
+              <meshBasicMaterial color="#022c22" />
+            </mesh>
+            {/* Waveform Trace */}
+            <mesh position={[0.02, 0.01, 0.092]}>
+              <planeGeometry args={[0.11, 0.04]} />
+              <meshBasicMaterial color="#22c55e" transparent opacity={0.9} />
+            </mesh>
+            {/* Channel Control Rotary Knobs */}
+            {[-0.07, -0.07].map((kx, i) => (
+              <mesh key={`scope-knob-${i}`} position={[kx, i === 0 ? 0.02 : -0.02, 0.092]} rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.009, 0.009, 0.008, 16]} />
+                <meshStandardMaterial color="#334155" metalness={0.8} />
+              </mesh>
+            ))}
+            {/* Dual BNC Probe Terminals */}
+            {[-0.03, 0.04].map((bx, i) => (
+              <mesh key={`bnc-${i}`} position={[bx, -0.04, 0.093]} rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.008, 0.008, 0.012, 12]} />
+                <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.1} />
+              </mesh>
+            ))}
+          </group>
+
+          {/* 4. Small Component Organizer Bin & Jumper Leads */}
+          <group position={[0.04, 0.04, -0.05]}>
+            <mesh>
+              <boxGeometry args={[0.2, 0.04, 0.12]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.6} roughness={0.4} />
+            </mesh>
+            {/* Spare Antennas inside bin */}
+            {[-0.05, 0, 0.05].map((ax, i) => (
+              <mesh key={`bin-ant-${i}`} position={[ax, 0.02, 0]} rotation={[0.3 * i, 0, 0.5]}>
+                <cylinderGeometry args={[0.004, 0.005, 0.1, 8]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.5} />
+              </mesh>
+            ))}
+          </group>
+
+          {/* 5. Bench ID Stencil Nameplate */}
+          <mesh position={[0, -0.01, 0.223]}>
+            <planeGeometry args={[0.55, 0.025]} />
+            <meshBasicMaterial color="#0f172a" />
+          </mesh>
+        </group>
         {/* TOOL A: HAK5 WIFI PINEAPPLE MARK VII                     */}
         {/* Dual-band Rogue AP, PineAP Engine & Multi-Antenna Array   */}
         {/* ======================================================== */}
@@ -799,6 +966,283 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
         ))}
       </group>
 
+
+      {/* ======================================================== */}
+      {/* 4. LEFT WALL: MITRE ATT&CK FRAMEWORK MATRIX & CVE RADAR   */}
+      {/* Location: X = -4.94, Y = 2.35, Z = 3.25                    */}
+      {/* ======================================================== */}
+      <group
+        position={[-4.94, 2.35, 3.25]}
+        rotation={[0, Math.PI / 2, 0]}
+        onClick={(e) => {
+          e.stopPropagation();
+          playHackingBeep(1500);
+          if (typeof window !== 'undefined' && window.__SET_SECTION__) {
+            window.__SET_SECTION__('wireshark_monitor');
+          }
+        }}
+        onPointerOver={() => {
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'auto';
+        }}
+      >
+        {/* Scissor Articulating Heavy Steel Wall Mount Bracket */}
+        <group position={[0, 0, -0.035]}>
+          {/* Wall Mounting Anchor Plate */}
+          <mesh>
+            <boxGeometry args={[0.65, 0.5, 0.02]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.9} roughness={0.2} />
+          </mesh>
+          {/* Dual Articulating Steel Scissor Arms */}
+          {[-0.22, 0.22].map((armX, i) => (
+            <mesh key={`mitre-arm-${i}`} position={[armX, 0, 0.018]}>
+              <boxGeometry args={[0.04, 0.28, 0.035]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.9} />
+            </mesh>
+          ))}
+        </group>
+
+        {/* Soft Ambient Bias Backlight Halo (Eliminates pitch-black void) */}
+        <pointLight
+          position={[0, 0, -0.03]}
+          color={theme.coreColor || '#10b981'}
+          intensity={1.8}
+          distance={2.4}
+          decay={2}
+        />
+
+        {/* Heavy Brushed Titanium Frame Housing */}
+        <mesh castShadow>
+          <boxGeometry args={[1.5, 1.1, 0.045]} />
+          <meshStandardMaterial color="#0f172a" metalness={0.88} roughness={0.2} />
+        </mesh>
+        {/* Frame Outer Chamfered Trim */}
+        <mesh position={[0, 0, 0.02]}>
+          <boxGeometry args={[1.46, 1.06, 0.01]} />
+          <meshStandardMaterial color="#020617" roughness={0.6} />
+        </mesh>
+
+        {/* Dynamic MITRE ATT&CK & CVE Threat Screen */}
+        <mesh position={[0, 0, 0.026]}>
+          <planeGeometry args={[1.42, 1.02]} />
+          <meshBasicMaterial map={mitreScreen.texture} toneMapped={false} />
+        </mesh>
+
+        {/* Overhead Tactical Header Banner */}
+        <group position={[0, 0.65, 0.01]}>
+          <mesh>
+            <boxGeometry args={[1.5, 0.12, 0.035]} />
+            <meshStandardMaterial color="#0b1016" metalness={0.9} roughness={0.2} />
+          </mesh>
+          <mesh position={[0, 0, 0.019]}>
+            <planeGeometry args={[1.44, 0.08]} />
+            <meshBasicMaterial color="#022c22" />
+          </mesh>
+          {/* Header Telemetry Status Dots */}
+          {[-0.65, -0.6, -0.55, 0.55, 0.6, 0.65].map((dx, i) => (
+            <mesh key={`th-dot-${i}`} position={[dx, 0, 0.02]}>
+              <circleGeometry args={[0.009, 8]} />
+              <meshBasicMaterial color={i < 3 ? '#10b981' : (i === 3 ? '#f59e0b' : '#38bdf8')} />
+            </mesh>
+          ))}
+        </group>
+
+        {/* Lower 2U Cyber Defense Bay & Fiber Patch Panel */}
+        <group position={[0, -0.78, 0.12]}>
+          {/* Wall-Mounted 19-inch Open Equipment Bracket */}
+          <mesh>
+            <boxGeometry args={[1.5, 0.22, 0.28]} />
+            <meshStandardMaterial color="#0b1016" metalness={0.9} roughness={0.2} />
+          </mesh>
+          {/* Front 19-inch Black Anodized Rack Rails */}
+          {[-0.72, 0.72].map((rx, idx) => (
+            <mesh key={`rack-rail-${idx}`} position={[rx, 0, 0.14]}>
+              <boxGeometry args={[0.03, 0.22, 0.02]} />
+              <meshStandardMaterial color="#334155" metalness={0.95} />
+            </mesh>
+          ))}
+
+          {/* 1U Cyber Threat Defense Appliance (Top Unit) */}
+          <group position={[0, 0.05, 0.02]}>
+            {/* Chassis */}
+            <mesh>
+              <boxGeometry args={[1.38, 0.08, 0.24]} />
+              <meshStandardMaterial color="#1e293b" roughness={0.4} metalness={0.7} />
+            </mesh>
+            {/* Dual Honeycomb Cooling Fan Vents */}
+            {[-0.5, -0.32].map((vx, i) => (
+              <mesh key={`fan-vent-${i}`} position={[vx, 0, 0.122]}>
+                <circleGeometry args={[0.028, 16]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.9} />
+              </mesh>
+            ))}
+            {/* Status OLED Display */}
+            <mesh position={[0, 0.01, 0.122]}>
+              <planeGeometry args={[0.22, 0.04]} />
+              <meshBasicMaterial color="#0284c7" />
+            </mesh>
+            {/* 8-Port Gigabit Ethernet Switch Array with Blinking LEDs */}
+            {Array.from({ length: 8 }).map((_, i) => (
+              <group key={`eth-port-${i}`} position={[0.22 + i * 0.045, 0, 0.122]}>
+                <mesh>
+                  <boxGeometry args={[0.025, 0.025, 0.005]} />
+                  <meshStandardMaterial color="#0f172a" />
+                </mesh>
+                <mesh position={[0, 0.016, 0.002]}>
+                  <sphereGeometry args={[0.003, 6, 6]} />
+                  <meshBasicMaterial color={i % 2 === 0 ? '#22c55e' : '#f59e0b'} />
+                </mesh>
+              </group>
+            ))}
+          </group>
+
+          {/* 1U High-Density Fiber Optic Patch Panel (Bottom Unit) */}
+          <group position={[0, -0.05, 0.02]}>
+            <mesh>
+              <boxGeometry args={[1.38, 0.08, 0.24]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.8} />
+            </mesh>
+            {/* Array of 10 LC Duplex Fiber Couplers with Colorful Fiber Jumpers */}
+            {Array.from({ length: 10 }).map((_, i) => {
+              const fiberColors = ['#06b6d4', '#eab308', '#f97316', '#22c55e'];
+              return (
+                <group key={`fiber-coupler-${i}`} position={[-0.5 + i * 0.11, 0, 0.122]}>
+                  <mesh>
+                    <boxGeometry args={[0.035, 0.025, 0.008]} />
+                    <meshStandardMaterial color="#475569" metalness={0.9} />
+                  </mesh>
+                  {/* Looping Fiber Patch Cord */}
+                  <mesh position={[0, -0.03, 0.02]} rotation={[0.4, 0, 0]}>
+                    <cylinderGeometry args={[0.003, 0.003, 0.06, 8]} />
+                    <meshBasicMaterial color={fiberColors[i % 4]} />
+                  </mesh>
+                </group>
+              );
+            })}
+          </group>
+        </group>
+      </group>
+
+      {/* ======================================================== */}
+      {/* 5. LEFT WALL: WIRESHARK LIVE PCAP PACKET TELEMETRY MONITOR*/}
+      {/* Location: X = -4.94, Y = 3.45, Z = 1.25                    */}
+      {/* ======================================================== */}
+      <group
+        position={[-4.94, 3.45, 1.25]}
+        rotation={[0.08, Math.PI / 2, 0]}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (typeof window !== 'undefined' && window.__SET_SECTION__) {
+            window.__SET_SECTION__('wireshark_monitor');
+          }
+        }}
+        onPointerOver={() => {
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'auto';
+        }}
+      >
+        {/* Industrial Articulating Steel Wall Mount Bracket */}
+        <group position={[0, 0, -0.03]}>
+          <mesh>
+            <boxGeometry args={[0.5, 0.35, 0.02]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.9} roughness={0.2} />
+          </mesh>
+          {[-0.15, 0.15].map((mx, idx) => (
+            <mesh key={`wire-bracket-${idx}`} position={[mx, 0, 0.015]}>
+              <boxGeometry args={[0.035, 0.2, 0.03]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.9} />
+            </mesh>
+          ))}
+        </group>
+
+        {/* Ambient Cyan Bias Backlight Glow Strip */}
+        <pointLight
+          position={[0, 0, -0.02]}
+          color="#0284c7"
+          intensity={1.4}
+          distance={2.0}
+          decay={2}
+        />
+
+        {/* Industrial Ultra-Widescreen Monitor Chassis */}
+        <mesh position={[0, 0, 0]} castShadow>
+          <boxGeometry args={[1.42, 0.68, 0.035]} />
+          <meshStandardMaterial color="#0b1016" metalness={0.85} roughness={0.25} />
+        </mesh>
+        {/* Screen Bezel Inset */}
+        <mesh position={[0, 0, 0.016]}>
+          <boxGeometry args={[1.38, 0.64, 0.008]} />
+          <meshStandardMaterial color="#020617" roughness={0.8} />
+        </mesh>
+
+        {/* Live Functional Wireshark PCAP Packet Telemetry Screen */}
+        <mesh position={[0, 0, 0.022]}>
+          <planeGeometry args={[1.36, 0.62]} />
+          <meshBasicMaterial map={wiresharkScreen.texture} toneMapped={false} />
+        </mesh>
+
+        {/* Top-Mounted Security Optical Sensor / Camera Module */}
+        <group position={[0, 0.36, 0.01]}>
+          <mesh>
+            <boxGeometry args={[0.12, 0.03, 0.03]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.8} />
+          </mesh>
+          <mesh position={[0, 0, 0.016]}>
+            <sphereGeometry args={[0.008, 8, 8]} />
+            <meshBasicMaterial color="#38bdf8" />
+          </mesh>
+        </group>
+
+        {/* Monitor Status Diagnostic LEDs */}
+        {[
+          { x: 0.58, color: '#10b981', label: 'LINK' },
+          { x: 0.61, color: '#38bdf8', label: 'ACT' },
+          { x: 0.64, color: '#ef4444', label: 'ALERT' },
+        ].map((led, i) => (
+          <mesh key={`mon-led-${i}`} position={[led.x, -0.31, 0.02]}>
+            <sphereGeometry args={[0.004, 8, 8]} />
+            <meshBasicMaterial color={led.color} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* ======================================================== */}
+      {/* 5B. INDUSTRIAL CABLE CONDUITS & INTERCONNECT TRUNKING     */}
+      {/* Heavy-duty conduit runs linking systems across Left Wall  */}
+      {/* ======================================================== */}
+      <group position={[-4.92, 0, 0]}>
+        {/* 1. Vertical Ceiling Cable Trunk to Wireshark & Arsenal */}
+        <mesh position={[0, 4.05, 1.25]}>
+          <boxGeometry args={[0.03, 0.5, 0.05]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.85} roughness={0.3} />
+        </mesh>
+        {/* 2. Vertical Conduit between Wireshark and Hardware Pegboard */}
+        <mesh position={[0, 3.06, 1.25]}>
+          <boxGeometry args={[0.025, 0.22, 0.04]} />
+          <meshStandardMaterial color="#0f172a" metalness={0.9} />
+        </mesh>
+        {/* 3. Vertical Ceiling Cable Trunk to MITRE Threat Radar */}
+        <mesh position={[0, 3.65, 3.25]}>
+          <boxGeometry args={[0.03, 1.3, 0.05]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.85} roughness={0.3} />
+        </mesh>
+        {/* 4. Horizontal Interconnect Conduit Bridge between Systems */}
+        <mesh position={[0, 3.06, 2.25]}>
+          <boxGeometry args={[0.02, 0.025, 2.0]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.85} roughness={0.3} />
+        </mesh>
+        {/* Conduit Junction Boxes */}
+        {[1.25, 2.25, 3.25].map((jz, idx) => (
+          <mesh key={`jbox-${idx}`} position={[0.01, 3.06, jz]}>
+            <boxGeometry args={[0.03, 0.06, 0.06]} />
+            <meshStandardMaterial color="#334155" metalness={0.9} roughness={0.2} />
+          </mesh>
+        ))}
+      </group>
       {/* ======================================================== */}
       {/* 6. BACK WALL: CYBERSECURITY CERTIFICATION PLAQUES & TICKER*/}
       {/* Location: Z = -4.95, between X = -4.2 and -2.2, Y = 3.25   */}

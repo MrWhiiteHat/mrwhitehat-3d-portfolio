@@ -255,7 +255,9 @@ export default function DecorElements() {
         {[
           { pos: [-1.5, -0.08, 0.4], rot: [0.2, 0, 0.3], target: 'workstation' },
           { pos: [-1.5, -0.08, -2.0], rot: [0.4, 0, -0.5], target: 'conference' },
+          { pos: [-1.5, -0.08, 1.25], rot: [0, 0, 0.65], target: 'hardware_lab', hasLight: true, lightColor: '#f8fafc' },
           { pos: [-1.5, -0.08, 2.5], rot: [-0.3, 0, 0.2], target: 'printer' },
+          { pos: [-1.5, -0.08, 3.25], rot: [0, 0, 0.65], target: 'mitre_matrix', hasLight: true, lightColor: '#f1f5f9' },
           { pos: [1.5, -0.08, -2.5], rot: [0.3, 0, -0.2], target: 'archive' },
           { pos: [1.5, -0.08, 1.6], rot: [-0.2, 0, -0.4], target: 'lounge' },
         ].map((spot, idx) => (
@@ -268,6 +270,15 @@ export default function DecorElements() {
               <cylinderGeometry args={[0.045, 0.045, 0.01, 16]} />
               <meshBasicMaterial color="#ffffff" />
             </mesh>
+            {spot.hasLight && (
+              <pointLight
+                position={[0, -0.15, 0]}
+                color={spot.lightColor}
+                intensity={1.6}
+                distance={5.2}
+                decay={2}
+              />
+            )}
           </group>
         ))}
       </group>

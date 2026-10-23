@@ -128,6 +128,67 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
             <meshStandardMaterial {...walnutWood} />
           </mesh>
         ))}
+
+        {/* Vertical Acoustic Walnut Wood Slats along Left Wall Front Corner */}
+        {Array.from({ length: 4 }).map((_, i) => (
+          <mesh
+            key={`left-slat-front-${i}`}
+            position={[0.11, 0.1, 3.8 + i * 0.22]}
+            geometry={leftSlatGeom}
+          >
+            <meshStandardMaterial {...walnutWood} />
+          </mesh>
+        ))}
+
+        {/* Sleek Vertical Ambient LED Channel along Left Wall */}
+        <mesh position={[0.11, 0.1, 4.6]}>
+          <boxGeometry args={[0.015, 3.8, 0.04]} />
+          <meshBasicMaterial color={theme.accentColor || "#00f0ff"} />
+        </mesh>
+        <pointLight position={[0.25, 0.2, 4.6]} color={theme.accentColor || "#00f0ff"} intensity={1.2} distance={2.8} />
+
+        {/* Architectural Cyber Operations & Tactical Lab Backing Feature */}
+        <group position={[0.105, 0.1, 2.25]}>
+          {/* Main Brushed Dark Titanium Wall Panel */}
+          <mesh receiveShadow>
+            <boxGeometry args={[0.015, 3.7, 3.4]} />
+            <meshStandardMaterial color="#0f161c" roughness={0.45} metalness={0.7} />
+          </mesh>
+          {/* Subtle Chamfered Perimeter Frame with Glow Trim */}
+          <mesh position={[-0.002, 0, 0]}>
+            <boxGeometry args={[0.012, 3.74, 3.44]} />
+            <meshStandardMaterial color="#070c10" roughness={0.8} />
+          </mesh>
+          {/* Top & Bottom Accent Edge-Glow Lines */}
+          <mesh position={[0.009, 1.83, 0]}>
+            <boxGeometry args={[0.008, 0.02, 3.36]} />
+            <meshBasicMaterial color={theme.accentColor || "#00f0ff"} />
+          </mesh>
+          <mesh position={[0.009, -1.83, 0]}>
+            <boxGeometry args={[0.008, 0.02, 3.36]} />
+            <meshBasicMaterial color={theme.accentColor || "#00f0ff"} />
+          </mesh>
+          {/* Horizontal Heavy-Duty Equipment Mounting Rails (Unistrut / DIN Industrial Tracks) */}
+          {[-1.0, -0.3, 0.5, 1.3].map((ry, idx) => (
+            <group key={`soc-rail-${idx}`} position={[0.012, ry, 0]}>
+              <mesh>
+                <boxGeometry args={[0.012, 0.035, 3.3]} />
+                <meshStandardMaterial color="#334155" metalness={0.9} roughness={0.2} />
+              </mesh>
+              <mesh position={[0.005, 0, 0]}>
+                <boxGeometry args={[0.004, 0.012, 3.28]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.9} />
+              </mesh>
+            </group>
+          ))}
+          {/* Vertical Conduit Chases / Wiring Ducts */}
+          {[-1.0, 1.0].map((cx, idx) => (
+            <mesh key={`conduit-duct-${idx}`} position={[0.014, 0, cx]}>
+              <boxGeometry args={[0.016, 3.65, 0.04]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.85} roughness={0.3} />
+            </mesh>
+          ))}
+        </group>
       </group>
 
       {/* ========================================================================= */}

@@ -295,15 +295,16 @@ export function getParquetFloorTextures(repeatX = 4, repeatY = 4) {
  * Subtle organic mineral mottling and micro-porosity for realistic wall depth.
  */
 export function getPlasterWallTextures(repeatX = 3, repeatY = 2) {
-  const cacheKey = `plaster_clean_matte_v3`;
+  const cacheKey = `plaster_clean_matte_v4`;
   if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
 
   // Clean, luxurious, velvety dark architectural slate/concrete wall
   // High roughness absorbs light softly with ZERO noisy bump speckles or pixel dots
+  // Deep charcoal slate tone that catches ambient lighting smoothly without collapsing into a black void
   const result = {
-    color: new THREE.Color('#121915'),
-    roughness: 0.88,
-    metalness: 0.02,
+    color: new THREE.Color('#1f2823'),
+    roughness: 0.84,
+    metalness: 0.03,
   };
 
   textureCache.set(cacheKey, result);
