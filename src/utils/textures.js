@@ -595,3 +595,151 @@ export function getCeilingTileTextures(repeatX = 5, repeatY = 5) {
   textureCache.set(cacheKey, result);
   return result;
 }
+
+/**
+ * 9. TWILL WEAVE CARBON FIBER (AAA Cyber Surfaces)
+ * Used on high-performance cyber desk surfaces, mouse mats, and hardware enclosures.
+ */
+export function getCarbonFiberTextures(repeatX = 8, repeatY = 8) {
+  const cacheKey = `carbon_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const size = 256;
+  const diffCanvas = createCanvas(size, size);
+  const bumpCanvas = createCanvas(size, size);
+  const roughCanvas = createCanvas(size, size);
+
+  if (!diffCanvas || !bumpCanvas || !roughCanvas) return {};
+
+  const diffCtx = diffCanvas.getContext('2d');
+  const bumpCtx = bumpCanvas.getContext('2d');
+  const roughCtx = roughCanvas.getContext('2d');
+
+  diffCtx.fillStyle = '#0a0d0c';
+  diffCtx.fillRect(0, 0, size, size);
+
+  bumpCtx.fillStyle = '#808080';
+  bumpCtx.fillRect(0, 0, size, size);
+
+  roughCtx.fillStyle = '#404040';
+  roughCtx.fillRect(0, 0, size, size);
+
+  const cellSize = 16;
+  for (let x = 0; x < size; x += cellSize) {
+    for (let y = 0; y < size; y += cellSize) {
+      const isAlt = ((x / cellSize) + (y / cellSize)) % 2 === 0;
+
+      // 2x2 Twill weave fiber block
+      diffCtx.fillStyle = isAlt ? '#161d19' : '#0d120f';
+      diffCtx.fillRect(x, y, cellSize, cellSize);
+
+      // Micro fiber thread lines
+      for (let t = 0; t < cellSize; t += 2) {
+        if (isAlt) {
+          diffCtx.fillStyle = t % 4 === 0 ? 'rgba(45, 60, 50, 0.4)' : 'rgba(0, 0, 0, 0.5)';
+          diffCtx.fillRect(x + t, y, 1, cellSize);
+
+          bumpCtx.fillStyle = t % 4 === 0 ? '#b0b0b0' : '#404040';
+          bumpCtx.fillRect(x + t, y, 1, cellSize);
+        } else {
+          diffCtx.fillStyle = t % 4 === 0 ? 'rgba(45, 60, 50, 0.4)' : 'rgba(0, 0, 0, 0.5)';
+          diffCtx.fillRect(x, y + t, cellSize, 1);
+
+          bumpCtx.fillStyle = t % 4 === 0 ? '#b0b0b0' : '#404040';
+          bumpCtx.fillRect(x, y + t, cellSize, 1);
+        }
+      }
+
+      // Specular sheen variations
+      roughCtx.fillStyle = isAlt ? '#303030' : '#555555';
+      roughCtx.fillRect(x, y, cellSize, cellSize);
+    }
+  }
+
+  const result = {
+    map: configureTexture(diffCanvas, repeatX, repeatY, true),
+    bumpMap: configureTexture(bumpCanvas, repeatX, repeatY, false),
+    roughnessMap: configureTexture(roughCanvas, repeatX, repeatY, false),
+    bumpScale: 0.04,
+    roughness: 0.35,
+    metalness: 0.65,
+  };
+
+  textureCache.set(cacheKey, result);
+  return result;
+}
+
+/**
+ * 10. ACOUSTIC HEXAGONAL CYBER WALL PANELS
+ * Beveled hexagonal sound-dampening panels for futuristic studio walls.
+ */
+export function getCyberHexWallTextures(repeatX = 3, repeatY = 3) {
+  const cacheKey = `cyber_hex_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const size = 512;
+  const diffCanvas = createCanvas(size, size);
+  const bumpCanvas = createCanvas(size, size);
+
+  if (!diffCanvas || !bumpCanvas) return {};
+
+  const diffCtx = diffCanvas.getContext('2d');
+  const bumpCtx = bumpCanvas.getContext('2d');
+
+  diffCtx.fillStyle = '#080d0b';
+  diffCtx.fillRect(0, 0, size, size);
+
+  bumpCtx.fillStyle = '#808080';
+  bumpCtx.fillRect(0, 0, size, size);
+
+  // Draw hexagonal acoustic grid
+  const r = 32;
+  const h = r * Math.sqrt(3);
+
+  function drawHex(ctx, cx, cy, rad, strokeStyle, fillStyle, lineWidth = 2) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const x = cx + rad * Math.cos(angle);
+      const y = cy + rad * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    if (fillStyle) {
+      ctx.fillStyle = fillStyle;
+      ctx.fill();
+    }
+    if (strokeStyle) {
+      ctx.strokeStyle = strokeStyle;
+      ctx.lineWidth = lineWidth;
+      ctx.stroke();
+    }
+  }
+
+  for (let y = -h; y < size + h; y += h) {
+    for (let x = -r; x < size + r * 2; x += r * 3) {
+      const cy1 = y;
+      const cy2 = y + h / 2;
+
+      // Hex 1
+      drawHex(diffCtx, x, cy1, r - 3, 'rgba(85, 246, 154, 0.08)', '#0d1511');
+      drawHex(bumpCtx, x, cy1, r - 3, '#202020', '#b0b0b0', 3);
+
+      // Hex 2 (Offset row)
+      drawHex(diffCtx, x + r * 1.5, cy2, r - 3, 'rgba(85, 246, 154, 0.08)', '#0b120e');
+      drawHex(bumpCtx, x + r * 1.5, cy2, r - 3, '#202020', '#a0a0a0', 3);
+    }
+  }
+
+  const result = {
+    map: configureTexture(diffCanvas, repeatX, repeatY, true),
+    bumpMap: configureTexture(bumpCanvas, repeatX, repeatY, false),
+    bumpScale: 0.035,
+    roughness: 0.55,
+    metalness: 0.35,
+  };
+
+  textureCache.set(cacheKey, result);
+  return result;
+}

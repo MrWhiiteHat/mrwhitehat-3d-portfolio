@@ -6,6 +6,7 @@ import {
   getWalnutWoodTextures,
   getPebbledLeatherTextures,
   getBrushedMetalTextures,
+  getCarbonFiberTextures,
 } from '../../utils/textures.js';
 import { createTerminalScreen, createRadarScreen } from '../../utils/cyberScreens.js';
 import HackerDeskGadgets from './HackerDeskGadgets.jsx';
@@ -26,6 +27,7 @@ export default function WorkstationStation({ onSelect, onHover }) {
   const chairLeather = useMemo(() => getPebbledLeatherTextures(2, 2, '#141c17'), []);
   const deskMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#1c1c1c'), []);
   const chairMetal = useMemo(() => getBrushedMetalTextures(1, 1, '#888888'), []);
+  const carbonMat = useMemo(() => getCarbonFiberTextures(6, 4), []);
 
   // Functional Animated Cyber Screens
   const terminalScreen = useMemo(() => createTerminalScreen(), []);
@@ -153,10 +155,10 @@ export default function WorkstationStation({ onSelect, onHover }) {
 
       {/* 2. Cyber Desk Mat & Peripherals */}
       <group position={[0, 0.785, 0.15]}>
-        {/* Extra-large Cyber Desk Mat */}
+        {/* Extra-large Cyber Desk Mat with Authentic Twill Carbon Fiber Weave */}
         <mesh position={[-0.1, 0.002, 0]} receiveShadow>
           <boxGeometry args={[1.6, 0.005, 0.7]} />
-          <meshStandardMaterial color="#0a120e" roughness={0.9} />
+          <meshStandardMaterial {...carbonMat} />
         </mesh>
         {/* Desk Mat Neon Border */}
         <mesh position={[-0.1, 0.003, 0]}>

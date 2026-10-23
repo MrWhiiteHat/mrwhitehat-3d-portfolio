@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 import {
   playClickSound,
@@ -258,15 +259,26 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         intensity={theme.dirIntensity}
         color={theme.dirColor}
         castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-bias={-0.0001}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-bias={-0.00015}
+        shadow-radius={2.5}
         shadow-camera-near={2}
         shadow-camera-far={26}
         shadow-camera-left={-7}
         shadow-camera-right={7}
         shadow-camera-top={7}
         shadow-camera-bottom={-7}
+      />
+
+      {/* Floating Cinematic Cyber Dust & Atmospheric Motes */}
+      <Sparkles
+        count={75}
+        scale={[10.5, 4.2, 10.5]}
+        size={2.2}
+        speed={0.25}
+        color={theme.accentColor || '#38bdf8'}
+        opacity={0.45}
       />
       <directionalLight
         position={[-8, 9, -8]}

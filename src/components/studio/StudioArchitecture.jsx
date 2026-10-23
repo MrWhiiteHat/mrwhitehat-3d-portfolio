@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
+import { MeshReflectorMaterial } from '@react-three/drei';
+import CyberCitySkyline from './CyberCitySkyline.jsx';
 import {
   getParquetFloorTextures,
   getPlasterWallTextures,
@@ -41,10 +43,28 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
       {/* ========================================================================= */}
       {/* 1. FLOOR & CARPETS                                                        */}
       {/* ========================================================================= */}
-      {/* Main Parquet Hardwood Floor with High-End Reflective Gloss (Mirroring Red & Cyan Neon) */}
+      {/* Main Parquet Hardwood Floor Substrate */}
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[10.3, 0.1, 10.3]} />
-        <meshStandardMaterial {...parquetFloor} roughness={0.22} metalness={0.25} />
+        <meshStandardMaterial {...parquetFloor} roughness={0.35} metalness={0.2} />
+      </mesh>
+
+      {/* Photorealistic AAA Real-Time Floor Reflector (Reflecting Neons, Monitors, and Architecture) */}
+      <mesh position={[0, 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[10.25, 10.25]} />
+        <MeshReflectorMaterial
+          blur={[300, 100]}
+          resolution={typeof window !== 'undefined' && window.innerWidth < 768 ? 512 : 1024}
+          mirror={0.38}
+          mixBlur={1.0}
+          mixStrength={1.8}
+          roughness={0.25}
+          depthScale={1.2}
+          minDepthThreshold={0.4}
+          maxDepthThreshold={1.4}
+          color="#0b120e"
+          metalness={0.45}
+        />
       </mesh>
 
       {/* Floor Border Brass / Dark Walnut Trim */}
@@ -199,6 +219,9 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
             <meshStandardMaterial color="#0b100d" metalness={0.8} />
           </mesh>
         </group>
+
+        {/* Living AAA Cyberpunk Metropolis Skyline outside Window */}
+        <CyberCitySkyline currentThemeKey={currentThemeKey} />
       </group>
 
       {/* ========================================================================= */}

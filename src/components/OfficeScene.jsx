@@ -25,6 +25,8 @@ import VisitorWallCounter from './studio/VisitorWallCounter.jsx';
 import AirlockGate from './game/AirlockGate.jsx';
 import FirstPersonController from './game/FirstPersonController.jsx';
 import SecretVentGate from './vault/SecretVentGate.jsx';
+import CyberEnvironmentRig from './studio/CyberEnvironmentRig.jsx';
+import PostProcessingPipeline from './studio/PostProcessingPipeline.jsx';
 
 function HotspotPins({ onSelect, activeSection }) {
   const pinGroupRef = useRef();
@@ -275,6 +277,12 @@ function SceneContents({
 
       {/* Dynamic Cyber Atmosphere: Lights, Motes, Ceiling Fan, Clock, Hologram Core */}
       <CyberAtmosphere currentThemeKey={themeKey} onCycleTheme={onCycleTheme} />
+
+      {/* 360-Degree Image-Based Lighting (IBL) Environment Rig for Metallic Specular Reflections */}
+      <CyberEnvironmentRig currentThemeKey={themeKey} />
+
+      {/* AAA Post-Processing Pipeline: Unreal Engine Bloom, Lens Vignette & Film Grade */}
+      <PostProcessingPipeline enabled={true} bloomStrength={0.52} />
 
       {/* Handcrafted 3D Studio Architecture & Stations */}
       <group name="CyberCommandStudio">
