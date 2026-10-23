@@ -31,6 +31,7 @@ import {
   Server,
   Shield,
   ShieldAlert,
+  Skull,
   ShieldCheck,
   Sparkles,
   Terminal,
@@ -53,6 +54,8 @@ import MainframeFirewallHack from './hacking/MainframeFirewallHack.jsx';
 import HardwareArsenalHack from './hacking/HardwareArsenalHack.jsx';
 import PacketSnifferHack from './hacking/PacketSnifferHack.jsx';
 import VisitorLogDisplay from './studio/VisitorLogDisplay.jsx';
+import ZeroDayOverloadHack from './hacking/ZeroDayOverloadHack.jsx';
+import BlackHatVaultDisplay from './vault/BlackHatVaultDisplay.jsx';
 
 export const STATION_ORDER = [
   'projects',
@@ -66,6 +69,7 @@ export const STATION_ORDER = [
   'hardware_arsenal',
   'wireshark_monitor',
   'visitor_log',
+  'secret_vault',
 ];
 
 export const stationConfigs = {
@@ -212,6 +216,18 @@ export const stationConfigs = {
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
   },
+  secret_vault: {
+    position: [-3.85, 1.25, -4.85],
+    rotation: [0, 0, 0],
+    camPos: [-3.85, 1.25, -3.25],
+    camTarget: [-3.85, 1.25, -4.85],
+    title: 'Secret Black Hat Vault Mainframe',
+    icon: Skull,
+    distanceFactor: 0.75,
+    lightColor: '#ef4444',
+    lightIntensity: 26,
+    lightPos: [0, 0, 0.45],
+  },
 };
 
 export default function InObjectDisplay({
@@ -221,6 +237,8 @@ export default function InObjectDisplay({
   visitorLogs = [],
   visitorCount = 1,
   playerData = null,
+  onOpenGadgets = null,
+  onOpenLeaderboard = null,
 }) {
   const [selectedProject, setSelectedProject] = useState(0);
   const [selectedSlide, setSelectedSlide] = useState(0);
@@ -249,6 +267,7 @@ export default function InObjectDisplay({
     hardware_arsenal: false,
     wireshark_monitor: false,
     visitor_log: true,
+    secret_vault: false,
   });
 
   // Track active breach transition animation
@@ -495,6 +514,13 @@ export default function InObjectDisplay({
                 <PacketSnifferHack
                   onSolved={() => triggerUnlock('wireshark_monitor')}
                   onBypass={() => triggerUnlock('wireshark_monitor')}
+                />
+              )}
+              {activeSection === 'secret_vault' && (
+                <ZeroDayOverloadHack
+                  onSolved={() => triggerUnlock('secret_vault')}
+                  onBypass={() => triggerUnlock('secret_vault')}
+                  playerData={playerData}
                 />
               )}
             </div>
@@ -1388,10 +1414,32 @@ export default function InObjectDisplay({
                     <div className="at-card-cmd">
                       <code>$ {tool.cmd}</code>
                     </div>
+                    {(tool.name.includes('Flipper') || tool.name.includes('Rubber Ducky')) && (
+                      <button
+                        type="button"
+                        className="at-inspect-3d-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const gadgetId = tool.name.includes('Flipper') ? 'flipper' : 'ducky';
+                          onOpenGadgets?.(gadgetId);
+                        }}
+                      >
+                        <Zap size={12} />
+                        <span>INSPECT 3D MODEL (360° ORBIT) 🔍</span>
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
+          )}
+
+          {/* 11. SECRET BLACK HAT VAULT DOSSIER */}
+          {activeSection === 'secret_vault' && (
+            <BlackHatVaultDisplay
+              onOpenGadgets={onOpenGadgets}
+              onOpenLeaderboard={onOpenLeaderboard}
+            />
           )}
 
           {/* 10. INDUSTRIAL ULTRA-WIDESCREEN WIRESHARK MONITOR DOSSIER */}

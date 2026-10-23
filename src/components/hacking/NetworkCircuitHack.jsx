@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { CheckCircle2, Cpu, RotateCw, ShieldAlert, Sparkles, Terminal } from 'lucide-react';
 import { playBreachFanfare, playHackingBeep, playZapSound } from '../../utils/audio.js';
+import SpeedrunTimer from '../leaderboard/SpeedrunTimer.jsx';
+import { recordSolveTime } from '../../utils/speedrunLeaderboardService.js';
 
 // Directions: 0 = Top, 1 = Right, 2 = Bottom, 3 = Left
 const OPPOSITE = [2, 3, 0, 1];
@@ -94,6 +96,7 @@ export default function NetworkCircuitHack({ onSolved, onBypass }) {
           <span>ctOS // NETWORK_CIRCUIT_BYPASS.sh</span>
         </div>
         <div className="hack-actions-right">
+          <SpeedrunTimer isRunning={!solved} isSolved={solved} puzzleId="projects" onFinish={(t) => recordSolveTime("projects", t)} />
           <span className="hack-status-badge">
             {solved ? 'ACCESS_GRANTED' : 'FIREWALL_LOCKED'}
           </span>

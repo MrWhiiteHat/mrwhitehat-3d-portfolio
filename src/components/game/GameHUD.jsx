@@ -13,6 +13,7 @@ import {
   Lightbulb,
   Sparkles,
   Terminal,
+  Trophy,
   Users,
   Volume2,
   VolumeX,
@@ -37,6 +38,8 @@ export default function GameHUD({
   onMobileMove,
   isFullscreen,
   onToggleFullscreen,
+  onOpenLeaderboard = null,
+  onOpenGadgets = null,
 }) {
   // Locomotion Mode: 'joystick' on mobile/touch, 'wasd' on desktop (switchable anytime)
   const [controlMode, setControlMode] = useState(() => {
@@ -313,6 +316,34 @@ export default function GameHUD({
           >
             #{visitorCount}
           </strong>
+        </button>
+
+        {/* Speedrun Leaderboard Pill */}
+        <button
+          type="button"
+          className="hud-leaderboard-pill"
+          onClick={() => {
+            playClickSound(1000);
+            onOpenLeaderboard?.();
+          }}
+          title="Open Global Speedrun Leaderboard (L)"
+        >
+          <Trophy size={13} style={{ color: '#fbbf24' }} />
+          <span className="lb-pill-label">LEADERBOARD</span>
+        </button>
+
+        {/* 3D Hardware Gadgets Inspector Pill */}
+        <button
+          type="button"
+          className="hud-gadgets-pill"
+          onClick={() => {
+            playClickSound(1000);
+            onOpenGadgets?.('flipper');
+          }}
+          title="Inspect 3D Hardware Tools: Flipper Zero & Rubber Ducky (G)"
+        >
+          <Radio size={13} style={{ color: '#fb923c' }} />
+          <span className="gadget-pill-label">3D GADGETS</span>
         </button>
 
         {/* Quick HUD Controls */}

@@ -18,8 +18,10 @@ import {
   RotateCcw,
   Server,
   ShieldCheck,
+  Skull,
   Sparkles,
   Terminal,
+  Trophy,
   UserCheck,
   UserRound,
   Users,
@@ -33,6 +35,8 @@ import OfficeScene from './components/OfficeScene.jsx';
 import CharacterSelectModal from './components/game/CharacterSelectModal.jsx';
 import GameHUD from './components/game/GameHUD.jsx';
 import CyberLoadingScreen from './components/common/CyberLoadingScreen.jsx';
+import LeaderboardModal from './components/leaderboard/LeaderboardModal.jsx';
+import GadgetInspectorModal from './components/gadgets/GadgetInspectorModal.jsx';
 import { profile } from './data.js';
 import { useFullscreen } from './utils/useFullscreen.js';
 import {
@@ -65,6 +69,7 @@ const NAV_STATIONS = [
   { id: 'hardware_arsenal', label: 'Hardware', icon: Radio, num: '9' },
   { id: 'wireshark_monitor', label: 'Wireshark', icon: Activity, num: '0' },
   { id: 'visitor_log', label: 'Visitor Logs', icon: Users, num: 'V' },
+  { id: 'secret_vault', label: 'Black Hat Vault', icon: Skull, num: 'X' },
 ];
 
 export default function App() {
@@ -116,7 +121,29 @@ export default function App() {
   const [muted, setAudioMuted] = useState(false);
   const [droneActive, setDroneActive] = useState(false);
   const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isGadgetInspectorOpen, setIsGadgetInspectorOpen] = useState(false);
+  const [selectedGadgetId, setSelectedGadgetId] = useState('flipper');
   const stationMenuRef = useRef(null);
+
+  const handleOpenLeaderboard = useCallback(() => {
+    playClickSound(1000);
+    setIsLeaderboardOpen(true);
+  }, []);
+
+  const handleCloseLeaderboard = useCallback(() => {
+    setIsLeaderboardOpen(false);
+  }, []);
+
+  const handleOpenGadgets = useCallback((gadgetId = 'flipper') => {
+    playClickSound(1000);
+    setSelectedGadgetId(gadgetId);
+    setIsGadgetInspectorOpen(true);
+  }, []);
+
+  const handleCloseGadgets = useCallback(() => {
+    setIsGadgetInspectorOpen(false);
+  }, []);
 
   // Close station dropdown on click outside or Escape
   useEffect(() => {
@@ -267,6 +294,14 @@ export default function App() {
         setUnlockedStations((prev) => new Set([...prev, 'visitor_log']));
         return;
       }
+      if (stationId === 'secret_vault' || stationId === 'secret_vent') {
+        playBreachFanfare();
+        playWhooshSound();
+        setSection('secret_vault');
+        setGameState('INSPECT_STATION');
+        setUnlockedStations((prev) => new Set([...prev, 'secret_vault']));
+        return;
+      }
       playWhooshSound();
       setSection(stationId);
       setGameState('INSPECT_STATION');
@@ -350,6 +385,14 @@ export default function App() {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
       if (e.key === 'Escape') {
+        if (isLeaderboardOpen) {
+          setIsLeaderboardOpen(false);
+          return;
+        }
+        if (isGadgetInspectorOpen) {
+          setIsGadgetInspectorOpen(false);
+          return;
+        }
         if (isStationMenuOpen) {
           setIsStationMenuOpen(false);
           return;
@@ -379,6 +422,12 @@ export default function App() {
         handleCycleTheme();
       } else if (e.key === 'f' || e.key === 'F') {
         toggleFullscreen();
+      } else if (e.key === 'l' || e.key === 'L') {
+        handleOpenLeaderboard();
+      } else if (e.key === 'g' || e.key === 'G') {
+        handleOpenGadgets('flipper');
+      } else if (e.key === 'x' || e.key === 'X') {
+        handleStationInteract('secret_vault');
       }
     };
 
@@ -422,6 +471,9 @@ export default function App() {
         visitorLogs={visitorLogs}
         visitorCount={visitorCount}
         playerData={playerData}
+        unlockedCount={unlockedStations.size}
+        onOpenGadgets={handleOpenGadgets}
+        onOpenLeaderboard={handleOpenLeaderboard}
       />
 
       {/* 0. HIGH-TECH CYBER PRELOADER LOADING SCREEN (Pre-loads 3D models & pre-warms shaders) */}
@@ -448,6 +500,8 @@ export default function App() {
           onSetTheme={setThemeKey}
           isFullscreen={isFullscreen}
           onToggleFullscreen={toggleFullscreen}
+          onOpenLeaderboard={handleOpenLeaderboard}
+          onOpenGadgets={handleOpenGadgets}
         />
       )}
 
@@ -590,6 +644,22 @@ export default function App() {
 
           <div className="station-quick-controls">
             <button
+              type="button"
+              className="hud-action-btn"
+              onClick={handleOpenLeaderboard}
+              title="Open Speedrun Leaderboard (L)"
+            >
+              <Trophy size={15} style={{ color: '#fbbf24' }} />
+            </button>
+            <button
+              type="button"
+              className="hud-action-btn"
+              onClick={() => handleOpenGadgets('flipper')}
+              title="Inspect 3D Hardware Tools (G)"
+            >
+              <Radio size={15} style={{ color: '#fb923c' }} />
+            </button>
+            <button
               className={`hud-action-btn ${isFullscreen ? 'active-appliance' : ''}`}
               onClick={toggleFullscreen}
               title={isFullscreen ? 'Exit Full Screen [F]' : 'Enter Full Screen [F]'}
@@ -678,6 +748,19 @@ export default function App() {
           </div>
         </header>
       )}
+      {/* Global Speedrun Leaderboard Modal */}
+      <LeaderboardModal
+        isOpen={isLeaderboardOpen}
+        onClose={handleCloseLeaderboard}
+        playerData={playerData}
+      />
+
+      {/* 3D Interactive Tactical Hardware Gadgets Inspector Modal */}
+      <GadgetInspectorModal
+        isOpen={isGadgetInspectorOpen}
+        initialGadget={selectedGadgetId}
+        onClose={handleCloseGadgets}
+      />
     </div>
   );
 }

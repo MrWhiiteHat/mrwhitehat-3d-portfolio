@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Database, RefreshCw } from 'lucide-react';
 import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../utils/audio.js';
+import SpeedrunTimer from '../leaderboard/SpeedrunTimer.jsx';
+import { recordSolveTime } from '../../utils/speedrunLeaderboardService.js';
 
 const HEX_POOL = ['1C', 'E9', 'BD', '55', '7A'];
 const TARGET_SEQ = ['1C', 'BD', '55'];
@@ -143,6 +145,7 @@ export default function HexBufferHack({ onSolved, onBypass }) {
           <span>VAULT_BREACH // MEMORY_BUFFER_OVERFLOW.hex</span>
         </div>
         <div className="hack-actions-right">
+          <SpeedrunTimer isRunning={!solved} isSolved={solved} puzzleId="skills" onFinish={(t) => recordSolveTime("skills", t)} />
           <span className="hack-status-badge">
             {solved ? 'BUFFER_INJECTED' : 'BUFFER_LOCKED'}
           </span>

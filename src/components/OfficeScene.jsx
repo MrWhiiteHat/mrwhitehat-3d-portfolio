@@ -24,6 +24,7 @@ import AirConditionerUnit from './studio/AirConditionerUnit.jsx';
 import VisitorWallCounter from './studio/VisitorWallCounter.jsx';
 import AirlockGate from './game/AirlockGate.jsx';
 import FirstPersonController from './game/FirstPersonController.jsx';
+import SecretVentGate from './vault/SecretVentGate.jsx';
 
 function HotspotPins({ onSelect, activeSection }) {
   const pinGroupRef = useRef();
@@ -245,6 +246,9 @@ function SceneContents({
   visitorCount = 1,
   playerData = null,
   onReady = null,
+  unlockedCount = 0,
+  onOpenGadgets = null,
+  onOpenLeaderboard = null,
 }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -301,6 +305,13 @@ function SceneContents({
           onHover={onHover}
         />
 
+        {/* Secret Easter Egg Ventilation Duct Gate to Black Hat Vault */}
+        <SecretVentGate
+          unlockedCount={unlockedCount}
+          totalRequired={9}
+          onEnterVault={() => onStationInteract('secret_vault')}
+        />
+
         {/* Animated Cyber Airlock Entrance Gate */}
         <AirlockGate isOpen={isGateOpen} />
 
@@ -329,6 +340,8 @@ function SceneContents({
           visitorLogs={visitorLogs}
           visitorCount={visitorCount}
           playerData={playerData}
+          onOpenGadgets={onOpenGadgets}
+          onOpenLeaderboard={onOpenLeaderboard}
         />
 
         {/* Studio Floor Contact Shadows - Baked once upon mount for 60fps performance */}
