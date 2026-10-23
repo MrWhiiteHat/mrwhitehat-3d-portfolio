@@ -295,69 +295,15 @@ export function getParquetFloorTextures(repeatX = 4, repeatY = 4) {
  * Subtle organic mineral mottling and micro-porosity for realistic wall depth.
  */
 export function getPlasterWallTextures(repeatX = 3, repeatY = 2) {
-  const cacheKey = `plaster_${repeatX}_${repeatY}`;
+  const cacheKey = `plaster_clean_matte_v3`;
   if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
 
-  const size = 512;
-  const diffCanvas = createCanvas(size, size);
-  const bumpCanvas = createCanvas(size, size);
-
-  if (!diffCanvas || !bumpCanvas) return {};
-
-  const diffCtx = diffCanvas.getContext('2d');
-  const bumpCtx = bumpCanvas.getContext('2d');
-
-  diffCtx.fillStyle = '#17221b';
-  diffCtx.fillRect(0, 0, size, size);
-
-  bumpCtx.fillStyle = '#808080';
-  bumpCtx.fillRect(0, 0, size, size);
-
-  // Layered procedural mineral grain
-  for (let i = 0; i < 4000; i++) {
-    const x = Math.random() * size;
-    const y = Math.random() * size;
-    const rad = 1 + Math.random() * 6;
-    const alpha = 0.03 + Math.random() * 0.05;
-
-    const isHighlight = Math.random() > 0.5;
-    diffCtx.fillStyle = isHighlight
-      ? `rgba(38, 55, 45, ${alpha})`
-      : `rgba(14, 20, 16, ${alpha})`;
-    diffCtx.beginPath();
-    diffCtx.arc(x, y, rad, 0, Math.PI * 2);
-    diffCtx.fill();
-
-    bumpCtx.fillStyle = isHighlight
-      ? `rgba(160, 160, 160, ${alpha * 1.5})`
-      : `rgba(90, 90, 90, ${alpha * 1.5})`;
-    bumpCtx.beginPath();
-    bumpCtx.arc(x, y, rad, 0, Math.PI * 2);
-    bumpCtx.fill();
-  }
-
-  // Trowel stroke textures
-  for (let s = 0; s < 30; s++) {
-    const sx = Math.random() * size;
-    const sy = Math.random() * size;
-    const sw = 40 + Math.random() * 80;
-    const sh = 10 + Math.random() * 25;
-    const rot = (Math.random() - 0.5) * 0.6;
-
-    diffCtx.save();
-    diffCtx.translate(sx, sy);
-    diffCtx.rotate(rot);
-    diffCtx.fillStyle = `rgba(28, 42, 34, 0.06)`;
-    diffCtx.fillRect(-sw / 2, -sh / 2, sw, sh);
-    diffCtx.restore();
-  }
-
+  // Clean, luxurious, velvety dark architectural slate/concrete wall
+  // High roughness absorbs light softly with ZERO noisy bump speckles or pixel dots
   const result = {
-    map: configureTexture(diffCanvas, repeatX, repeatY, true),
-    bumpMap: configureTexture(bumpCanvas, repeatX, repeatY, false),
-    bumpScale: 0.02,
-    roughness: 0.76,
-    metalness: 0.04,
+    color: new THREE.Color('#121915'),
+    roughness: 0.88,
+    metalness: 0.02,
   };
 
   textureCache.set(cacheKey, result);
@@ -365,8 +311,7 @@ export function getPlasterWallTextures(repeatX = 3, repeatY = 2) {
 }
 
 /**
- * 3. LINEAR DARK WALNUT WOOD GRAIN
- * Used on acoustic wall slats, conference table, desk top, and credenzas.
+ * Rich dark espresso / walnut wood
  */
 export function getWalnutWoodTextures(repeatX = 1, repeatY = 2) {
   const cacheKey = `walnut_${repeatX}_${repeatY}`;

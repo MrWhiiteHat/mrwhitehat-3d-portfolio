@@ -9,6 +9,26 @@ import {
   playNeonFlickerSound,
 } from '../../utils/audio.js';
 
+// Soft circular radial alpha map to ensure particles are soft round glowing motes, never square pixel artifacts
+function createMoteTexture() {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.7)');
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 32, 32);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+const moteAlphaMap = typeof document !== 'undefined' ? createMoteTexture() : null;
+
 // Lighting atmosphere presets - Calibrated for clear shadow visibility and rich contrast
 export const LIGHTING_THEMES = {
   CYBER_NEON_NOIR: {
@@ -312,10 +332,11 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.045}
+          size={0.022}
+          map={moteAlphaMap}
           color={theme.coreColor}
           transparent
-          opacity={0.65}
+          opacity={0.35}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />

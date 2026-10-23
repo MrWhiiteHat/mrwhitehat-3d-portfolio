@@ -434,8 +434,8 @@ export default function OfficeScene({
         dpr={[
           1,
           typeof window !== 'undefined'
-            ? Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.5)
-            : 1.25,
+            ? Math.min(window.devicePixelRatio || 1, 2.0)
+            : 2.0,
         ]}
         gl={{
           powerPreference: 'high-performance',

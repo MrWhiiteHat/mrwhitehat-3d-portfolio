@@ -38,30 +38,21 @@ const CinematicGradeShader = {
     uniform float time;
     varying vec2 vUv;
 
-    // Fast pseudo-random hash for fine film grain
-    float hash(vec2 p) {
-      return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-    }
-
     void main() {
       vec4 color = texture2D(tDiffuse, vUv);
 
-      // 1. Contrast Adjustment around midpoint 0.5
+      // 1. Contrast Adjustment around midpoint 0.5 (Clean, crystal-clear curve)
       color.rgb = (color.rgb - 0.5) * contrast + 0.5;
 
       // 2. Saturation Adjustment (Rec. 709 luminance weights)
       float luma = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
       color.rgb = mix(vec3(luma), color.rgb, saturation);
 
-      // 3. Cinematic Lens Vignette (Smooth radial attenuation)
+      // 3. Subtle Lens Vignette (Gentle edge soft falloff, zero grain/noise)
       vec2 coord = (vUv - 0.5) * vignetteOffset;
       float dist = length(coord);
-      float vig = smoothstep(0.75, 0.25, dist * (vignetteDarkness * 0.7));
-      color.rgb *= mix(1.0, vig, 0.55);
-
-      // 4. Subtle Film Grain (prevents dark gradient banding)
-      float grain = (hash(vUv + fract(time * 0.01)) - 0.5) * 0.012;
-      color.rgb += grain;
+      float vig = smoothstep(0.75, 0.25, dist * (vignetteDarkness * 0.5));
+      color.rgb *= mix(1.0, vig, 0.25);
 
       gl_FragColor = color;
     }
@@ -95,10 +86,11 @@ export default function PostProcessingPipeline({ enabled = true, bloomStrength =
         colorSpace: THREE.SRGBColorSpace,
         depthBuffer: true,
         stencilBuffer: false,
+        samples: 4, // Hardware 4x Multisample Anti-Aliasing (eliminates pixelated edges)
       });
 
       const composer = new EffectComposer(gl, renderTarget);
-      composer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.0 : 1.35));
+      composer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0));
       composer.setSize(size.width, size.height);
 
       // Pass 1: Scene Render
