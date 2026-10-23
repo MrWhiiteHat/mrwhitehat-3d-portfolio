@@ -3,6 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playHackingBeep, playWhooshSound } from '../../utils/audio.js';
 import {
+  getRealDeskWoodTextures,
+  getRealLeatherTextures,
   getWalnutWoodTextures,
   getPebbledLeatherTextures,
   getBrushedMetalTextures,
@@ -10,6 +12,7 @@ import {
 } from '../../utils/textures.js';
 import { createTerminalScreen, createRadarScreen } from '../../utils/cyberScreens.js';
 import HackerDeskGadgets from './HackerDeskGadgets.jsx';
+import DeskLampModel from './DeskLampModel.jsx';
 
 export default function WorkstationStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -22,9 +25,9 @@ export default function WorkstationStation({ onSelect, onHover }) {
   const deskLedRef = useRef();
   const mugRef = useRef();
 
-  // High-End Procedural PBR Textures
-  const walnutDesk = useMemo(() => getWalnutWoodTextures(2, 1), []);
-  const chairLeather = useMemo(() => getPebbledLeatherTextures(2, 2, '#141c17'), []);
+  // High-End Procedural & Scanned PBR Textures
+  const walnutDesk = useMemo(() => getRealDeskWoodTextures(2, 1), []);
+  const chairLeather = useMemo(() => getRealLeatherTextures(2, 2, '#18241c'), []);
   const deskMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#1c1c1c'), []);
   const chairMetal = useMemo(() => getBrushedMetalTextures(1, 1, '#888888'), []);
   const carbonMat = useMemo(() => getCarbonFiberTextures(6, 4), []);
@@ -242,6 +245,9 @@ export default function WorkstationStation({ onSelect, onHover }) {
 
       {/* Real Cyber Hacking Hardware Gadgets on Desk */}
       <HackerDeskGadgets />
+
+        {/* Photorealistic Scanned Articulated Desk Lamp & Task Spotlight */}
+        <DeskLampModel position={[-1.15, 0.785, -0.22]} rotation={[0, 0.45, 0]} scale={0.38} />
 
       {/* 3. Dual Curved Workstation Monitors (CLICKABLE HOTSPOT FOR PROJECTS) */}
       <group

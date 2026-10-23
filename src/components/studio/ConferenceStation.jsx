@@ -3,6 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playBreachFanfare, playClickSound, playWhooshSound } from '../../utils/audio.js';
 import {
+  getRealDeskWoodTextures,
+  getRealLeatherTextures,
   getWalnutWoodTextures,
   getPebbledLeatherTextures,
   getBrushedMetalTextures,
@@ -19,10 +21,10 @@ export default function ConferenceStation({ onSelect, onHover }) {
   const bricsStarRef = useRef();
   const beamRef = useRef();
 
-  // High-End Procedural PBR Textures
-  const walnutCredenza = useMemo(() => getWalnutWoodTextures(3, 1), []);
-  const walnutTable = useMemo(() => getWalnutWoodTextures(2, 2), []);
-  const chairLeather = useMemo(() => getPebbledLeatherTextures(2, 2, '#141f17'), []);
+  // High-End Scanned & Procedural PBR Textures
+  const walnutCredenza = useMemo(() => getRealDeskWoodTextures(3, 1), []);
+  const walnutTable = useMemo(() => getRealDeskWoodTextures(2, 2), []);
+  const chairLeather = useMemo(() => getRealLeatherTextures(2, 2, '#141f17'), []);
   const darkMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#181818'), []);
 
   // Live Animated Global Cyber Attack Map Screen (throttled to 10 FPS)

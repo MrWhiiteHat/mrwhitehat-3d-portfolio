@@ -2,6 +2,139 @@ import * as THREE from 'three';
 
 // Cache generated textures so they are created once and reused across components
 const textureCache = new Map();
+export const getAssetUrl = (path) => {
+  const base = import.meta.env.BASE_URL || './';
+  const cleanBase = base.endsWith('/') ? base : base + '/';
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return cleanBase + cleanPath;
+};
+
+const pbrTextureLoader = new THREE.TextureLoader();
+
+function loadPbrMap(path, repeatX = 1, repeatY = 1, isColor = false) {
+  const tex = pbrTextureLoader.load(getAssetUrl(path));
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(repeatX, repeatY);
+  if (isColor) {
+    tex.colorSpace = THREE.SRGBColorSpace;
+  }
+  tex.anisotropy = 16;
+  tex.generateMipmaps = true;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+}
+
+/**
+ * Photorealistic Scanned PBR Hardwood Parquet Flooring (1K Scanned Albedo, NormalGL, Roughness, AO)
+ */
+export function getRealParquetFloorTextures(repeatX = 6, repeatY = 6) {
+  const cacheKey = 
+eal_parquet__;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const map = loadPbrMap('textures/floor/parquet_diff.jpg', repeatX, repeatY, true);
+  const normalMap = loadPbrMap('textures/floor/parquet_nor.jpg', repeatX, repeatY, false);
+  const roughnessMap = loadPbrMap('textures/floor/parquet_rough.jpg', repeatX, repeatY, false);
+  const aoMap = loadPbrMap('textures/floor/parquet_ao.jpg', repeatX, repeatY, false);
+
+  const matProps = {
+    map,
+    normalMap,
+    normalScale: new THREE.Vector2(0.85, 0.85),
+    roughnessMap,
+    aoMap,
+    aoMapIntensity: 1.0,
+    roughness: 0.35,
+    metalness: 0.15,
+  };
+  textureCache.set(cacheKey, matProps);
+  return matProps;
+}
+
+/**
+ * Photorealistic Scanned PBR Architectural Dark-Paneled Wood Wall (1K Scanned Albedo, NormalGL, Roughness, AO)
+ */
+export function getRealWallWoodTextures(repeatX = 2.5, repeatY = 1.8) {
+  const cacheKey = 
+eal_wall__;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const map = loadPbrMap('textures/wall/wall_diff.jpg', repeatX, repeatY, true);
+  const normalMap = loadPbrMap('textures/wall/wall_nor.jpg', repeatX, repeatY, false);
+  const roughnessMap = loadPbrMap('textures/wall/wall_rough.jpg', repeatX, repeatY, false);
+  const aoMap = loadPbrMap('textures/wall/wall_ao.jpg', repeatX, repeatY, false);
+
+  const matProps = {
+    map,
+    normalMap,
+    normalScale: new THREE.Vector2(0.75, 0.75),
+    roughnessMap,
+    aoMap,
+    aoMapIntensity: 0.9,
+    roughness: 0.65,
+    metalness: 0.08,
+  };
+  textureCache.set(cacheKey, matProps);
+  return matProps;
+}
+
+/**
+ * Photorealistic Scanned PBR Dark Walnut Wood for Desks & Tables (1K Scanned Albedo, NormalGL, Roughness, AO)
+ */
+export function getRealDeskWoodTextures(repeatX = 2, repeatY = 1) {
+  const cacheKey = 
+eal_desk__;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const map = loadPbrMap('textures/desk/desk_diff.jpg', repeatX, repeatY, true);
+  const normalMap = loadPbrMap('textures/desk/desk_nor.jpg', repeatX, repeatY, false);
+  const roughnessMap = loadPbrMap('textures/desk/desk_rough.jpg', repeatX, repeatY, false);
+  const aoMap = loadPbrMap('textures/desk/desk_ao.jpg', repeatX, repeatY, false);
+
+  const matProps = {
+    map,
+    normalMap,
+    normalScale: new THREE.Vector2(0.7, 0.7),
+    roughnessMap,
+    aoMap,
+    aoMapIntensity: 0.85,
+    roughness: 0.38,
+    metalness: 0.1,
+  };
+  textureCache.set(cacheKey, matProps);
+  return matProps;
+}
+
+/**
+ * Photorealistic Scanned PBR Pebbled Leather for Chairs, Sofas & Headsets (1K Scanned Albedo, NormalGL, Roughness, AO)
+ */
+export function getRealLeatherTextures(repeatX = 2, repeatY = 2, tintColor = null) {
+  const cacheKey = 
+eal_leather___;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const map = loadPbrMap('textures/leather/leather_diff.jpg', repeatX, repeatY, true);
+  const normalMap = loadPbrMap('textures/leather/leather_nor.jpg', repeatX, repeatY, false);
+  const roughnessMap = loadPbrMap('textures/leather/leather_rough.jpg', repeatX, repeatY, false);
+  const aoMap = loadPbrMap('textures/leather/leather_ao.jpg', repeatX, repeatY, false);
+
+  const matProps = {
+    map,
+    normalMap,
+    normalScale: new THREE.Vector2(0.85, 0.85),
+    roughnessMap,
+    aoMap,
+    aoMapIntensity: 0.9,
+    roughness: 0.52,
+    metalness: 0.05,
+    ...(tintColor ? { color: tintColor } : {}),
+  };
+  textureCache.set(cacheKey, matProps);
+  return matProps;
+}
+
 
 /**
  * Creates an offscreen canvas and returns its 2D context.

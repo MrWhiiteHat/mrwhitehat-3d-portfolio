@@ -3,10 +3,12 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
 import {
+  getRealLeatherTextures,
   getPebbledLeatherTextures,
   getNeroMarbleTextures,
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
+import ModernArmchairModel from './ModernArmchairModel.jsx';
 import { createTabletScreen, createAboutDossierScreen } from '../../utils/cyberScreens.js';
 import mrWhiteHatImg from '../../assets/mrwhitehat-hologram.jpg';
 
@@ -16,9 +18,9 @@ export default function LoungeStation({ onSelect, onHover }) {
   const plaqueGlowRef = useRef();
   const cipherRingRef = useRef();
 
-  // High-End Procedural PBR Textures
-  const leatherCushions = useMemo(() => getPebbledLeatherTextures(2, 2, '#1a241e'), []);
-  const leatherBase = useMemo(() => getPebbledLeatherTextures(3, 1, '#131a16'), []);
+  // High-End Scanned & Procedural PBR Textures
+  const leatherCushions = useMemo(() => getRealLeatherTextures(2, 2, '#18241c'), []);
+  const leatherBase = useMemo(() => getRealLeatherTextures(2, 1, '#121a15'), []);
   const marbleTable = useMemo(() => getNeroMarbleTextures(1, 1), []);
   const brassMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#ca8a04'), []);
 
@@ -150,6 +152,9 @@ export default function LoungeStation({ onSelect, onHover }) {
           </mesh>
         </group>
       </group>
+
+      {/* 2.5 Photorealistic 3D Scanned Modern Executive Armchair (CC0 Scanned) */}
+      <ModernArmchairModel position={[-1.35, 0, 0.2]} rotation={[0, Math.PI / 3.4, 0]} scale={0.92} />
 
       {/* 3. Interactive Modern Arched Brass Floor Lamp */}
       <group

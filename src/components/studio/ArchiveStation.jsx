@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
 import {
+  getRealDeskWoodTextures,
   getWalnutWoodTextures,
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
@@ -15,8 +16,8 @@ export default function ArchiveStation({ onSelect, onHover }) {
   const led2Ref = useRef();
   const led3Ref = useRef();
 
-  // High-End Procedural PBR Textures
-  const shelfWood = useMemo(() => getWalnutWoodTextures(3, 1), []);
+  // High-End Scanned PBR Textures
+  const shelfWood = useMemo(() => getRealDeskWoodTextures(3, 1), []);
   const uprightMetal = useMemo(() => getBrushedMetalTextures(1, 4, '#0f172a'), []);
 
   // Generate procedural book stacks for the shelves

@@ -3,6 +3,9 @@ import * as THREE from 'three';
 import { MeshReflectorMaterial } from '@react-three/drei';
 import CyberCitySkyline from './CyberCitySkyline.jsx';
 import {
+  getRealParquetFloorTextures,
+  getRealWallWoodTextures,
+  getRealDeskWoodTextures,
   getParquetFloorTextures,
   getPlasterWallTextures,
   getWalnutWoodTextures,
@@ -14,9 +17,9 @@ import { LIGHTING_THEMES } from './CyberAtmosphere.jsx';
 
 export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR' }) {
   const theme = LIGHTING_THEMES[currentThemeKey] || LIGHTING_THEMES.CYBER_NEON_NOIR;
-  const parquetFloor = useMemo(() => getParquetFloorTextures(8, 8), []);
-  const plasterWall = useMemo(() => getPlasterWallTextures(3, 2), []);
-  const walnutWood = useMemo(() => getWalnutWoodTextures(1, 4), []);
+  const parquetFloor = useMemo(() => getRealParquetFloorTextures(6, 6), []);
+  const plasterWall = useMemo(() => getRealWallWoodTextures(3, 2), []);
+  const walnutWood = useMemo(() => getRealDeskWoodTextures(2, 2), []);
   const techCarpetWorkstation = useMemo(() => getTechCarpetTextures(4, 3, '#0f1c16'), []);
   const techCarpetLounge = useMemo(() => getTechCarpetTextures(3, 3, '#141d18'), []);
   const ceilingTiles = useMemo(() => getCeilingTileTextures(8, 8), []);
@@ -53,17 +56,20 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
       <mesh position={[0, 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[10.25, 10.25]} />
         <MeshReflectorMaterial
-          blur={[300, 100]}
+          blur={[350, 100]}
           resolution={typeof window !== 'undefined' && window.innerWidth < 768 ? 512 : 1024}
-          mirror={0.38}
+          mirror={0.44}
           mixBlur={1.0}
-          mixStrength={1.8}
-          roughness={0.25}
+          mixStrength={2.0}
+          roughness={0.26}
           depthScale={1.2}
           minDepthThreshold={0.4}
           maxDepthThreshold={1.4}
           color="#0b120e"
-          metalness={0.45}
+          metalness={0.35}
+          distortion={0.06}
+          normalMap={parquetFloor.normalMap}
+          normalScale={new THREE.Vector2(0.12, 0.12)}
         />
       </mesh>
 

@@ -291,15 +291,18 @@ export default function ServerRackStation() {
           <boxGeometry args={[0.07, 2.7, 0.02]} />
           <meshStandardMaterial color="#1e293b" metalness={0.9} roughness={0.2} />
         </mesh>
-        {/* Recessed Perforated Mesh Glass Panel */}
+        {/* Photorealistic Smoked Tempered Glass Door with Real Physical Transmission */}
         <mesh>
           <planeGeometry args={[0.76, 2.65]} />
-          <meshStandardMaterial
-            color="#04120a"
-            roughness={0.25}
-            metalness={0.4}
+          <meshPhysicalMaterial
+            color="#071810"
+            transmission={0.65}
+            roughness={0.08}
+            metalness={0.12}
+            ior={1.52}
+            reflectivity={0.9}
             transparent
-            opacity={0.45}
+            opacity={0.7}
           />
         </mesh>
         {/* Chrome Door Key Handle */}
