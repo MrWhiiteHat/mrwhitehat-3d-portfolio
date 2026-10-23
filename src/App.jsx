@@ -225,6 +225,27 @@ export default function App() {
     setGameState('EXPLORE');
   }, []);
 
+  // Instant Skip for Airlock Entry on any user input (Click, Touch, or Keypress)
+  useEffect(() => {
+    if (gameState !== 'AIRLOCK_ENTRY') return;
+
+    const onKeySkip = (e) => {
+      if (['Space', 'Enter', 'Escape', 'KeyE', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+        handleAirlockEntryComplete();
+      }
+    };
+    const onPointerSkip = () => {
+      handleAirlockEntryComplete();
+    };
+
+    window.addEventListener('keydown', onKeySkip);
+    window.addEventListener('pointerdown', onPointerSkip);
+    return () => {
+      window.removeEventListener('keydown', onKeySkip);
+      window.removeEventListener('pointerdown', onPointerSkip);
+    };
+  }, [gameState, handleAirlockEntryComplete]);
+
   // 5. Station Proximity Interaction (Triggered by [E] or Click)
   const handleStationInteract = useCallback(
     (stationId) => {
@@ -507,11 +528,26 @@ export default function App() {
 
       {/* 2. AIRLOCK ENTRY CINEMATIC BANNER */}
       {gameState === 'AIRLOCK_ENTRY' && (
-        <div className="airlock-cinematic-banner">
+        <div
+          className="airlock-cinematic-banner"
+          onClick={handleAirlockEntryComplete}
+          style={{ cursor: 'pointer' }}
+        >
           <div className="cinematic-glitch-badge">
             <span className="cinematic-pulse-dot" />
             <span>BREACHING AIRLOCK // ENTERING STUDIO ARCHITECTURE</span>
           </div>
+          <button
+            type="button"
+            className="airlock-skip-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAirlockEntryComplete();
+            }}
+          >
+            <span>FAST ENTER [CLICK OR SPACE]</span>
+            <span style={{ fontSize: '13px' }}>➔</span>
+          </button>
         </div>
       )}
 

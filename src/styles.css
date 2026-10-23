@@ -5632,8 +5632,37 @@ button, a {
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
-  pointer-events: none;
+  pointer-events: auto;
   animation: fadeIn 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.airlock-skip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(52, 211, 153, 0.55);
+  color: #34d399;
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(52, 211, 153, 0.2);
+}
+
+.airlock-skip-btn:hover {
+  background: rgba(52, 211, 153, 0.2);
+  border-color: #34d399;
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(52, 211, 153, 0.4);
 }
 
 .cinematic-glitch-badge {

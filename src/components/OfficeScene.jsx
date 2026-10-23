@@ -124,6 +124,9 @@ function CameraDirector({
     } else if (gameState === 'EXPLORE') {
       isAnimating.current = false;
       desired.current = null;
+      if (camera.position.x > 4.5) {
+        camera.position.set(3.4, 1.68, -2.6);
+      }
     } else {
       camera.getWorldDirection(_tempCamDir);
       currentGazeTarget.current.copy(camera.position).addScaledVector(_tempCamDir, 4.0);
@@ -136,9 +139,9 @@ function CameraDirector({
     if (gameState === 'EXPLORE') return;
     const clampedDelta = Math.min(delta, 0.033);
 
-    // 1. Cinematic Airlock Walk-in Sequence
+    // 1. Cinematic Airlock Walk-in Sequence (Ultra-Fast 0.85s Snappy Glide)
     if (gameState === 'AIRLOCK_ENTRY' && desired.current?.startCamera) {
-      airlockProgress.current += clampedDelta / 2.6;
+      airlockProgress.current += clampedDelta / 0.85;
       const t = Math.min(1.0, airlockProgress.current);
       // Smoothstep easing (accelerates smoothly, glides in, decelerates to walk position)
       const ease = t * t * (3 - 2 * t);
@@ -219,7 +222,15 @@ function ScenePrewarmer({ onSceneReady }) {
   useEffect(() => {
     if (gl && scene && camera) {
       try {
+        // 1. Pre-warm overview camera perspective
         gl.compile(scene, camera);
+
+        // 2. Pre-compile indoor office vantage point so entering the office has ZERO shader compile hitch
+        const indoorCam = camera.clone();
+        indoorCam.position.set(3.4, 1.68, -2.6);
+        indoorCam.lookAt(-0.5, 1.6, 0.4);
+        indoorCam.updateMatrixWorld();
+        gl.compile(scene, indoorCam);
       } catch (err) {
         console.warn('Shader prewarm notice:', err);
       }

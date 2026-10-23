@@ -22,11 +22,11 @@ export default function AirlockGate({ isOpen = false, onFullyOpen }) {
     const time = state.clock.getElapsedTime();
     const targetProgress = isOpen ? 1.0 : 0.0;
 
-    // Smooth exponential pneumatic door glide (buttery smooth easing)
+    // Fast, responsive pneumatic door glide (swift 0.35s opening with zero lag)
     currentOpenProgress.current = THREE.MathUtils.damp(
       currentOpenProgress.current,
       targetProgress,
-      3.2,
+      8.0,
       delta
     );
 
