@@ -22,28 +22,35 @@ export default function CyberLoadingScreen({ isSceneReady = false, onFinish }) {
   const finishTriggered = useRef(false);
   const soundPlayed = useRef(false);
 
-  // Smoothly increment displayProgress towards target progress
+  // Smoothly increment displayProgress towards target progress using 60/120Hz rAF
   useEffect(() => {
-    const targetProgress = Math.max(
-      progress,
-      isSceneReady ? 100 : (loaded > 0 && total > 0 ? (loaded / total) * 90 : 25)
-    );
+    let animId;
+    let currentVal = displayProgress;
 
-    const timer = setInterval(() => {
-      setDisplayProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          return 100;
+    const tick = () => {
+      const targetProgress = Math.max(
+        progress,
+        isSceneReady ? 100 : (loaded > 0 && total > 0 ? (loaded / total) * 92 : 25)
+      );
+
+      if (targetProgress >= 100 && isSceneReady) {
+        currentVal += (100 - currentVal) * 0.22;
+        if (100 - currentVal < 0.2) {
+          setDisplayProgress(100);
+          return;
         }
-        // Accelerate smoothly towards target
-        const diff = targetProgress - prev;
-        const step = Math.max(1, Math.ceil(diff * 0.15));
-        const next = Math.min(targetProgress, prev + step);
-        return next;
-      });
-    }, 35);
+      } else {
+        const diff = targetProgress - currentVal;
+        currentVal += Math.max(0.4, diff * 0.12);
+        if (currentVal > targetProgress) currentVal = targetProgress;
+      }
 
-    return () => clearInterval(timer);
+      setDisplayProgress(Math.min(100, currentVal));
+      animId = requestAnimationFrame(tick);
+    };
+
+    animId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animId);
   }, [progress, loaded, total, isSceneReady]);
 
   // Advance terminal logs as progress increases

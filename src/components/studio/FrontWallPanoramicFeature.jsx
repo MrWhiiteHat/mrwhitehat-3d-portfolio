@@ -429,14 +429,16 @@ export default function FrontWallPanoramicFeature({ currentThemeKey = 'CYBER_NEO
   const timezoneOffsets = [0, -7, 1, 9];
   const timezoneLabels = ['UTC / ZULU', 'SFO (PST)', 'LON (GMT)', 'TYO (JST)'];
 
-  useFrame(() => {
-    // Update Live Clock Second Hands
-    const now = new Date();
-    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  const clockThrottle = useRef(0);
+  useFrame((_, delta) => {
+    // Update Live Clock Second Hands (throttled to 20Hz, zero Date() heap allocation)
+    clockThrottle.current += delta;
+    if (clockThrottle.current < 0.05) return;
+    clockThrottle.current = 0;
 
+    const baseSec = Date.now() / 1000;
     timezoneOffsets.forEach((offset, idx) => {
-      const targetTime = new Date(utcMs + 3600000 * offset);
-      const sec = targetTime.getSeconds() + targetTime.getMilliseconds() / 1000;
+      const sec = (baseSec + offset * 3600) % 60;
       const ref = clockRefs[idx]?.current;
       if (ref) {
         ref.rotation.z = -sec * ((Math.PI * 2) / 60);

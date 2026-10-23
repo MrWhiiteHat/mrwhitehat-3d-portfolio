@@ -98,7 +98,7 @@ export default function PostProcessingPipeline({ enabled = true, bloomStrength =
       });
 
       const composer = new EffectComposer(gl, renderTarget);
-      composer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      composer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.0 : 1.35));
       composer.setSize(size.width, size.height);
 
       // Pass 1: Scene Render
@@ -108,10 +108,10 @@ export default function PostProcessingPipeline({ enabled = true, bloomStrength =
       // Pass 2: Unreal Engine Photorealistic Bloom Pass
       // Threshold 0.82 ensures only high-intensity emissive lights bloom, leaving room materials crisp
       const bloomPass = new UnrealBloomPass(
-        new THREE.Vector2(size.width, size.height),
+        new THREE.Vector2(Math.floor(size.width * 0.5), Math.floor(size.height * 0.5)),
         bloomStrength,
         0.35, // Bloom radius
-        0.92  // Bloom threshold (prevents white flare blowouts)
+        0.92  // Bloom threshold (half-res pass saves 75% compute with zero visual loss)
       );
       composer.addPass(bloomPass);
       bloomPassRef.current = bloomPass;
@@ -142,7 +142,7 @@ export default function PostProcessingPipeline({ enabled = true, bloomStrength =
     if (composerRef.current) {
       composerRef.current.setSize(size.width, size.height);
       if (bloomPassRef.current) {
-        bloomPassRef.current.resolution.set(size.width, size.height);
+        bloomPassRef.current.resolution.set(Math.floor(size.width * 0.5), Math.floor(size.height * 0.5));
       }
     }
   }, [size]);

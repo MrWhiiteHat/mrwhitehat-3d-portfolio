@@ -11,6 +11,8 @@ export const getAssetUrl = (path) => {
 
 const pbrTextureLoader = new THREE.TextureLoader();
 
+const maxAnisotropy = typeof window !== 'undefined' && window.innerWidth < 768 ? 4 : 8;
+
 function loadPbrMap(path, repeatX = 1, repeatY = 1, isColor = false) {
   const tex = pbrTextureLoader.load(getAssetUrl(path));
   tex.wrapS = THREE.RepeatWrapping;
@@ -19,7 +21,7 @@ function loadPbrMap(path, repeatX = 1, repeatY = 1, isColor = false) {
   if (isColor) {
     tex.colorSpace = THREE.SRGBColorSpace;
   }
-  tex.anisotropy = 16;
+  tex.anisotropy = maxAnisotropy;
   tex.generateMipmaps = true;
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   tex.magFilter = THREE.LinearFilter;

@@ -202,11 +202,11 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
       fanRef.current.rotation.y += delta * fanSpeed.current;
     }
 
-    // Real-time Clock Hands
-    const now = new Date();
-    const sec = now.getSeconds() + now.getMilliseconds() / 1000;
-    const min = now.getMinutes() + sec / 60;
-    const hr = (now.getHours() % 12) + min / 60;
+    // Real-time Clock Hands (Zero-allocation smooth calculation)
+    const nowMs = Date.now();
+    const sec = (nowMs / 1000) % 60;
+    const min = (nowMs / 60000) % 60;
+    const hr = ((nowMs / 3600000) + 5.5) % 12;
 
     if (secondHandRef.current) {
       secondHandRef.current.rotation.z = -sec * ((Math.PI * 2) / 60);
@@ -258,8 +258,8 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         intensity={theme.dirIntensity}
         color={theme.dirColor}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-bias={-0.00015}
         shadow-radius={2.5}
         shadow-camera-near={2}

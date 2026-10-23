@@ -56,20 +56,20 @@ export default function StudioArchitecture({ currentThemeKey = 'CYBER_NEON_NOIR'
       <mesh position={[0, 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[10.25, 10.25]} />
         <MeshReflectorMaterial
-          blur={[350, 100]}
-          resolution={typeof window !== 'undefined' && window.innerWidth < 768 ? 512 : 1024}
-          mirror={0.32}
-          mixBlur={1.0}
-          mixStrength={1.5}
-          roughness={0.34}
+          blur={[250, 80]}
+          resolution={typeof window !== 'undefined' && window.innerWidth < 768 ? 256 : 512}
+          mirror={0.30}
+          mixBlur={1.2}
+          mixStrength={1.4}
+          roughness={0.36}
           depthScale={1.2}
           minDepthThreshold={0.4}
           maxDepthThreshold={1.4}
           color="#141a16"
-          metalness={0.35}
-          distortion={0.06}
+          metalness={0.22}
+          distortion={0.04}
           normalMap={parquetFloor.normalMap}
-          normalScale={new THREE.Vector2(0.12, 0.12)}
+          normalScale={new THREE.Vector2(0.08, 0.08)}
         />
       </mesh>
 
