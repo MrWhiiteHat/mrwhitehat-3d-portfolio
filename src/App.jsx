@@ -5,6 +5,7 @@ import {
   Award,
   BookOpen,
   BriefcaseBusiness,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Code2,
@@ -114,6 +115,29 @@ export default function App() {
   const [themeKey, setThemeKey] = useState('CYBER_NEON_NOIR');
   const [muted, setAudioMuted] = useState(false);
   const [droneActive, setDroneActive] = useState(false);
+  const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
+  const stationMenuRef = useRef(null);
+
+  // Close station dropdown on click outside or Escape
+  useEffect(() => {
+    if (!isStationMenuOpen) return;
+    const handleOutsideClick = (e) => {
+      if (stationMenuRef.current && !stationMenuRef.current.contains(e.target)) {
+        setIsStationMenuOpen(false);
+      }
+    };
+    const handleKey = (e) => {
+      if (e.key === 'Escape') {
+        setIsStationMenuOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', handleOutsideClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('pointerdown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [isStationMenuOpen]);
 
   // Fullscreen management across PC & Phone
   const { isFullscreen, toggleFullscreen, toastMessage } = useFullscreen();
@@ -266,6 +290,7 @@ export default function App() {
       document.activeElement.blur();
     }
     playWhooshSound();
+    setIsStationMenuOpen(false);
     setSection(null);
     setGameState('EXPLORE');
   }, []);
@@ -273,6 +298,7 @@ export default function App() {
   // 8. Reset to Character Customizer / Studio Overview
   const handleResetToCustomize = useCallback(() => {
     playWhooshSound();
+    setIsStationMenuOpen(false);
     setSection(null);
     setIsGateOpen(false);
     setGameState('CUSTOMIZE');
@@ -283,6 +309,7 @@ export default function App() {
     (direction) => {
       const ids = NAV_STATIONS.map((s) => s.id);
       playWhooshSound();
+      setIsStationMenuOpen(false);
       if (!section) {
         const nextId = direction > 0 ? ids[0] : ids[ids.length - 1];
         setSection(nextId);
@@ -323,11 +350,19 @@ export default function App() {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
       if (e.key === 'Escape') {
+        if (isStationMenuOpen) {
+          setIsStationMenuOpen(false);
+          return;
+        }
         if (gameState === 'INSPECT_STATION') {
           handleClose();
         } else if (gameState === 'EXPLORE') {
           handleResetToCustomize();
         }
+      } else if (e.key === '[' || (e.key === 'ArrowLeft' && gameState === 'INSPECT_STATION')) {
+        handleStepStation(-1);
+      } else if (e.key === ']' || (e.key === 'ArrowRight' && gameState === 'INSPECT_STATION')) {
+        handleStepStation(1);
       } else if (e.key >= '1' && e.key <= '9') {
         const target = NAV_STATIONS[parseInt(e.key, 10) - 1];
         if (target) {
@@ -351,7 +386,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [
     gameState,
+    isStationMenuOpen,
     handleClose,
+    handleStepStation,
     handleCycleTheme,
     handleToggleMute,
     toggleFullscreen,
@@ -361,6 +398,9 @@ export default function App() {
   ]);
 
   const currentTheme = LIGHTING_THEMES[themeKey] || LIGHTING_THEMES.CYBER_MATRIX;
+  const activeStationObj = NAV_STATIONS.find((s) => s.id === section);
+  const activeStationIndex = NAV_STATIONS.findIndex((s) => s.id === section);
+  const ActiveStationIcon = activeStationObj?.icon || Terminal;
 
   return (
     <div className="portfolio-container">
@@ -451,12 +491,101 @@ export default function App() {
             title="Return to First-Person Free Roam (Esc)"
           >
             <ArrowLeft size={16} />
-            <span>RETURN TO FREE ROAM [ESC]</span>
+            <span className="station-back-btn-text">RETURN TO FREE ROAM [ESC]</span>
           </button>
 
-          <div className="station-title-badge">
-            <Terminal size={14} style={{ color: playerData.accentColor || '#34d399' }} />
-            <span>TERMINAL ACTIVE: {section?.toUpperCase()}</span>
+          {/* STATION NAVIGATOR: Sleek, non-intrusive station cycler & dropdown (Zero game overlap) */}
+          <div className="station-nav-switcher" ref={stationMenuRef}>
+            <button
+              type="button"
+              className="station-step-arrow-btn"
+              onClick={() => {
+                handleStepStation(-1);
+                setIsStationMenuOpen(false);
+              }}
+              title="Previous Station (← or [ )"
+              aria-label="Previous Station"
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            <button
+              type="button"
+              className={`station-selector-trigger ${isStationMenuOpen ? 'open' : ''}`}
+              onClick={() => setIsStationMenuOpen((prev) => !prev)}
+              title="Click to jump to any of the 11 stations"
+              aria-haspopup="listbox"
+              aria-expanded={isStationMenuOpen}
+            >
+              <span className="station-live-dot" />
+              <ActiveStationIcon size={14} className="station-trigger-icon" />
+              <span className="station-trigger-title">
+                {activeStationObj?.label || section?.toUpperCase()}
+              </span>
+              <span className="station-trigger-count">
+                {activeStationIndex >= 0 ? `${activeStationIndex + 1}/${NAV_STATIONS.length}` : ''}
+              </span>
+              <ChevronDown
+                size={13}
+                className={`station-trigger-chevron ${isStationMenuOpen ? 'rotate' : ''}`}
+              />
+            </button>
+
+            <button
+              type="button"
+              className="station-step-arrow-btn"
+              onClick={() => {
+                handleStepStation(1);
+                setIsStationMenuOpen(false);
+              }}
+              title="Next Station (→ or ] )"
+              aria-label="Next Station"
+            >
+              <ChevronRight size={16} />
+            </button>
+
+            {/* Fast Jump Matrix Dropdown */}
+            {isStationMenuOpen && (
+              <div className="station-nav-dropdown" role="listbox">
+                <div className="station-dropdown-header">
+                  <span>TERMINAL MATRIX</span>
+                  <span className="station-dropdown-total">11 SECTORS</span>
+                </div>
+                <div className="station-dropdown-grid">
+                  {NAV_STATIONS.map((st) => {
+                    const IconComp = st.icon;
+                    const isCurrent = section === st.id;
+                    const isBreached = unlockedStations.has(st.id);
+                    return (
+                      <button
+                        key={st.id}
+                        type="button"
+                        className={`station-dropdown-card ${isCurrent ? 'is-current' : ''} ${
+                          isBreached ? 'is-breached' : ''
+                        }`}
+                        onClick={() => {
+                          playWhooshSound();
+                          setSection(st.id);
+                          setUnlockedStations((prev) => new Set([...prev, st.id]));
+                          setIsStationMenuOpen(false);
+                        }}
+                        role="option"
+                        aria-selected={isCurrent}
+                      >
+                        <div className="station-card-left">
+                          <span className="station-card-num">{st.num}</span>
+                          <IconComp size={15} className="station-card-icon" />
+                          <span className="station-card-label">{st.label}</span>
+                        </div>
+                        <span className="station-card-status">
+                          {isCurrent ? 'ACTIVE' : isBreached ? 'BREACHED' : 'ENCRYPTED'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="station-quick-controls">
@@ -548,55 +677,6 @@ export default function App() {
             </a>
           </div>
         </header>
-      )}
-
-      {/* 6. Quick Navigation Dock (Available in INSPECT_STATION for fast cycling) */}
-      {gameState === 'INSPECT_STATION' && (
-        <nav className="quick-nav-dock in-station" aria-label="Quick Navigation">
-          <button
-            className="dock-arrow-btn"
-            onClick={() => handleStepStation(-1)}
-            title="Previous station"
-            aria-label="Previous station"
-          >
-            <ChevronLeft size={14} />
-          </button>
-
-          <div className="dock-stations-group">
-            {NAV_STATIONS.map((st) => {
-              const IconComponent = st.icon;
-              const isActive = section === st.id;
-              const isBreached = unlockedStations.has(st.id);
-              return (
-                <button
-                  key={st.id}
-                  className={`dock-pill ${isActive ? 'active-pill' : ''} ${
-                    isBreached ? 'breached-pill' : ''
-                  }`}
-                  onClick={() => {
-                    playWhooshSound();
-                    setSection(st.id);
-                    setUnlockedStations((prev) => new Set([...prev, st.id]));
-                  }}
-                  title={`Focus ${st.label} (${st.num})`}
-                >
-                  <IconComponent size={14} className="dock-icon" />
-                  <span className="dock-label">{st.label}</span>
-                  <span className="dock-key">{st.num}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <button
-            className="dock-arrow-btn"
-            onClick={() => handleStepStation(1)}
-            title="Next station"
-            aria-label="Next station"
-          >
-            <ChevronRight size={14} />
-          </button>
-        </nav>
       )}
     </div>
   );
