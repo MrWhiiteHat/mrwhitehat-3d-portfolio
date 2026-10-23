@@ -394,42 +394,6 @@ export default function InObjectDisplay({
                   <span>Re-lock 🔒</span>
                 </button>
               )}
-              <button
-                className="obj-step-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onNavigate?.(prevSection);
-                }}
-                title="Previous object in office (←)"
-                aria-label="Previous object"
-              >
-                <ChevronLeft size={13} />
-              </button>
-              <span className="obj-step-index">
-                {currentIndex + 1}/{STATION_ORDER.length}
-              </span>
-              <button
-                className="obj-step-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onNavigate?.(nextSection);
-                }}
-                title="Next object in office (→)"
-                aria-label="Next object"
-              >
-                <ChevronRight size={13} />
-              </button>
-              <button
-                className="obj-exit-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose();
-                }}
-                title="Step back to full office view (Esc)"
-              >
-                <span>Back</span>
-                <RotateCcw size={11} />
-              </button>
             </div>
           </div>
 
@@ -525,7 +489,7 @@ export default function InObjectDisplay({
               )}
             </div>
           ) : (
-            <>
+            <div className="physical-station-scroll-body">
 
           {/* 1. DUAL MONITORS WORKSTATION (Projects) */}
           {activeSection === 'projects' && (
@@ -1522,8 +1486,8 @@ export default function InObjectDisplay({
               onClose={onClose}
             />
           )}
-          </>
-        )}
+            </div>
+          )}
       </div>
     </Html>
   </group>

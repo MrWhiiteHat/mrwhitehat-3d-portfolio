@@ -1038,12 +1038,54 @@ button, a {
 .physical-object-medium {
   display: flex;
   flex-direction: column;
+  max-height: 560px;
   overflow: hidden;
   user-select: auto;
   pointer-events: auto;
   position: relative;
-  border-radius: 6px;
+  border-radius: 10px;
   font-family: var(--font);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85);
+  box-sizing: border-box;
+}
+
+/* Dedicated Inner Dossier Body with Smooth Cybernetic Scroll */
+.physical-station-scroll-body {
+  flex: 1;
+  max-height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Base custom scrollbar for physical terminals */
+.physical-station-scroll-body::-webkit-scrollbar,
+.physical-object-medium ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.physical-station-scroll-body::-webkit-scrollbar-track,
+.physical-object-medium ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 3px;
+}
+
+.physical-station-scroll-body::-webkit-scrollbar-thumb,
+.physical-object-medium ::-webkit-scrollbar-thumb {
+  background: rgba(85, 246, 154, 0.35);
+  border-radius: 3px;
+  border: 1px solid rgba(85, 246, 154, 0.2);
+}
+
+.physical-station-scroll-body::-webkit-scrollbar-thumb:hover,
+.physical-object-medium ::-webkit-scrollbar-thumb:hover {
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
 }
 
 /* Universal Physical Device Top Status Bar */
@@ -1051,17 +1093,22 @@ button, a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background: rgba(9, 17, 12, 0.95);
+  padding: 8px 14px;
+  height: 38px;
+  background: rgba(8, 14, 11, 0.98);
   border-bottom: 1px solid rgba(85, 246, 154, 0.22);
-  gap: 10px;
+  gap: 12px;
   z-index: 10;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .obj-status-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .obj-beacon-led {
@@ -1071,6 +1118,7 @@ button, a {
   background: var(--green);
   box-shadow: 0 0 10px var(--green);
   animation: pulse 1.8s infinite ease-in-out;
+  flex-shrink: 0;
 }
 
 .obj-device-label {
@@ -1079,71 +1127,73 @@ button, a {
   font-weight: 700;
   color: #79f2aa;
   letter-spacing: 1.2px;
+  white-space: nowrap;
+}
+
+.obj-sec-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.obj-sec-tag.unlocked {
+  background: rgba(85, 246, 154, 0.12);
+  border: 1px solid rgba(85, 246, 154, 0.35);
+  color: var(--green);
+}
+
+.obj-sec-tag.locked {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
 }
 
 .obj-status-actions {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-.obj-step-btn {
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  background: rgba(85, 246, 154, 0.08);
-  border: 1px solid rgba(85, 246, 154, 0.25);
-  color: #c5efd3;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.obj-step-btn:hover {
-  background: var(--green);
-  color: #050d08;
-  border-color: var(--green);
-  transform: scale(1.06);
-}
-
-.obj-step-index {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: rgba(85, 246, 154, 0.7);
-  padding: 0 4px;
-}
-
-.obj-exit-btn {
-  display: flex;
+.obj-relock-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  background: rgba(85, 246, 154, 0.12);
-  border: 1px solid rgba(85, 246, 154, 0.35);
+  gap: 5px;
+  padding: 4px 9px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
   border-radius: 4px;
   font-family: var(--mono);
   font-size: 9px;
-  font-weight: 600;
-  color: #d1eed8;
+  font-weight: 700;
+  color: #fca5a5;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.obj-exit-btn:hover {
-  background: var(--green);
-  color: #050d08;
-  border-color: var(--green);
+.obj-relock-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
 /* ==========================================================================
    1. DUAL MONITORS WORKSTATION (Projects)
    ========================================================================== */
 .physical-projects {
-  width: 760px;
+  width: 800px;
+  max-width: 95vw;
   background: #060b08;
-  border: 2px solid rgba(56, 189, 248, 0.4);
-  box-shadow: 0 0 50px rgba(56, 189, 248, 0.2);
+  border: 2px solid rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 50px rgba(56, 189, 248, 0.25);
 }
 
 .dual-monitors-rig {
@@ -1431,10 +1481,11 @@ button, a {
    2. AUDITORIUM PROJECTOR SCREEN (Achievements)
    ========================================================================== */
 .physical-achievements {
-  width: 640px;
+  width: 760px;
+  max-width: 95vw;
   background: #09140e;
-  border: 3px solid rgba(85, 246, 154, 0.5);
-  box-shadow: 0 0 60px rgba(85, 246, 154, 0.3);
+  border: 2px solid rgba(85, 246, 154, 0.45);
+  box-shadow: 0 0 50px rgba(85, 246, 154, 0.25);
 }
 
 .projector-cloth-slide {
@@ -1616,10 +1667,11 @@ button, a {
    3. ARCHIVE BOOKCASE (Skills Board)
    ========================================================================== */
 .physical-skills {
-  width: 520px;
+  width: 780px;
+  max-width: 95vw;
   background: #08110c;
-  border: 2px solid rgba(52, 211, 153, 0.4);
-  box-shadow: 0 0 40px rgba(52, 211, 153, 0.2);
+  border: 2px solid rgba(52, 211, 153, 0.45);
+  box-shadow: 0 0 45px rgba(52, 211, 153, 0.25);
 }
 
 .archive-bookcase-board {
@@ -1691,12 +1743,10 @@ button, a {
 }
 
 .board-catalogue-grid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   flex: 1;
-  overflow-y: auto;
-  overscroll-behavior: contain;
 }
 
 .shelf-drawer-card {
@@ -1770,10 +1820,11 @@ button, a {
    4. EXECUTIVE LOUNGE WALL PLAQUE (About Me)
    ========================================================================== */
 .physical-about {
-  width: 460px;
+  width: 760px;
+  max-width: 95vw;
   background: #0f1511;
-  border: 2px solid rgba(251, 191, 36, 0.4);
-  box-shadow: 0 0 45px rgba(251, 191, 36, 0.2);
+  border: 2px solid rgba(251, 191, 36, 0.45);
+  box-shadow: 0 0 50px rgba(251, 191, 36, 0.25);
 }
 
 .executive-wall-plaque {
@@ -1892,12 +1943,13 @@ button, a {
    5. LASER PRINTER OUTPUT TRAY (Printed A4 Resume)
    ========================================================================== */
 .physical-resume {
-  width: 420px;
-  background: #f4f6f0;
+  width: 620px;
+  max-width: 95vw;
+  background: #ffffff;
   color: #1e2922;
-  border: 1px solid #d1d5db;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
-  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+  border-radius: 6px;
 }
 
 .printer-paper-sheet {
@@ -3743,17 +3795,129 @@ button, a {
 }
 
 /* ==========================================================================
-   UNLOCKED DOSSIERS FOR STATIONS 8, 9, 10
+   PHYSICAL CONTAINERS & DOSSIERS FOR STATIONS 8, 9, 10, 11, 12
    ========================================================================== */
+
+/* Station 8: 42U Mainframe Server Rack */
+.physical-server_rack {
+  width: 840px;
+  max-width: 95vw;
+  background: #080305;
+  border: 2px solid rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 50px rgba(239, 68, 68, 0.25);
+}
+
+/* Station 9: Tactical Hardware Arsenal */
+.physical-hardware_arsenal {
+  width: 860px;
+  max-width: 95vw;
+  background: #0d0805;
+  border: 2px solid rgba(249, 115, 22, 0.45);
+  box-shadow: 0 0 50px rgba(249, 115, 22, 0.25);
+}
+
+/* Station 10: Wireshark Industrial Monitor */
+.physical-wireshark_monitor {
+  width: 880px;
+  max-width: 95vw;
+  background: #040d12;
+  border: 2px solid rgba(6, 182, 212, 0.45);
+  box-shadow: 0 0 50px rgba(6, 182, 212, 0.25);
+}
+
+/* Station 11: CTOS Visitor Access Terminal */
+.physical-visitor_log {
+  width: 820px;
+  max-width: 95vw;
+  background: rgba(8, 14, 11, 0.98);
+  border: 2px solid rgba(85, 246, 154, 0.45);
+  box-shadow: 0 0 50px rgba(85, 246, 154, 0.25);
+}
+
+/* Station 12: Secret Black Hat Vault */
+.physical-secret_vault {
+  width: 840px;
+  max-width: 95vw;
+  background: #080305;
+  border: 2px solid rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 50px rgba(239, 68, 68, 0.25);
+}
+
+/* Theme-specific custom scrollbars for physical terminals */
+.physical-resume ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.physical-resume ::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border: 1px solid #cbd5e1;
+}
+.physical-resume ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.physical-hardware_arsenal ::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.4);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+.physical-hardware_arsenal ::-webkit-scrollbar-thumb:hover {
+  background: #fb923c;
+  box-shadow: 0 0 10px #fb923c;
+}
+
+.physical-server_rack ::-webkit-scrollbar-thumb,
+.physical-secret_vault ::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.4);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.physical-server_rack ::-webkit-scrollbar-thumb:hover,
+.physical-secret_vault ::-webkit-scrollbar-thumb:hover {
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444;
+}
+
+.physical-wireshark_monitor ::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.4);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+.physical-wireshark_monitor ::-webkit-scrollbar-thumb:hover {
+  background: #06b6d4;
+  box-shadow: 0 0 10px #06b6d4;
+}
+
+.physical-projects ::-webkit-scrollbar-thumb,
+.physical-operator ::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.4);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+.physical-projects ::-webkit-scrollbar-thumb:hover,
+.physical-operator ::-webkit-scrollbar-thumb:hover {
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
+}
+
+.physical-about ::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.4);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+.physical-about ::-webkit-scrollbar-thumb:hover {
+  background: #fbbf24;
+  box-shadow: 0 0 10px #fbbf24;
+}
 
 /* Mainframe Dossier */
 .mainframe-dossier-terminal, .arsenal-dossier-terminal, .pcap-dossier-terminal {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 14px 18px;
+  padding: 14px 18px 28px 18px;
   background: #060d09;
   box-sizing: border-box;
+}
+
+.mainframe-dossier-terminal .operative-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
 .blip-red {
@@ -6222,10 +6386,11 @@ html, body, .portfolio-container {
    7. MRWHITEHAT // OPERATIVE HOLOGRAPHIC DOSSIER STYLES
    ========================================================================== */
 .physical-operator {
-  width: 500px;
+  width: 800px;
+  max-width: 95vw;
   background: #040d16;
   border: 2px solid rgba(56, 189, 248, 0.45);
-  box-shadow: 0 0 50px rgba(56, 189, 248, 0.3), inset 0 0 30px rgba(14, 165, 233, 0.08);
+  box-shadow: 0 0 50px rgba(56, 189, 248, 0.25);
 }
 
 .operative-dossier-terminal {
