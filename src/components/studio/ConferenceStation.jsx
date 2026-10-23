@@ -55,7 +55,7 @@ export default function ConferenceStation({ onSelect, onHover }) {
 
     // 3. Projector Beam Intensity Pulse
     if (beamRef.current) {
-      beamRef.current.intensity = (hovered ? 5.5 : 4.0) + Math.sin(time * 2.8) * 0.5;
+      beamRef.current.intensity = (hovered ? 1.6 : 1.1) + Math.sin(time * 1.5) * 0.1;
     }
 
     // 4. Smooth physics spin for trophies without React re-renders
@@ -125,8 +125,8 @@ export default function ConferenceStation({ onSelect, onHover }) {
           ref={beamRef}
           position={[0, 0, 0.5]}
           color="#38bdf8"
-          intensity={hovered ? 5.0 : 3.5}
-          distance={3.2}
+          intensity={hovered ? 1.6 : 1.1}
+          distance={2.5}
         />
       </group>
 

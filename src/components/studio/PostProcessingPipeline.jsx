@@ -17,9 +17,9 @@ const CinematicGradeShader = {
   uniforms: {
     tDiffuse: { value: null },
     vignetteOffset: { value: 1.1 },
-    vignetteDarkness: { value: 1.35 },
-    saturation: { value: 1.08 },
-    contrast: { value: 1.06 },
+    vignetteDarkness: { value: 0.8 },
+    saturation: { value: 1.04 },
+    contrast: { value: 1.02 },
     time: { value: 0 },
   },
   vertexShader: `
@@ -75,7 +75,7 @@ const CinematicGradeShader = {
  * - sRGB Output Transform
  * - Fully hardware-adaptive: throttles back resolution on lower-end devices to maintain 60 FPS
  */
-export default function PostProcessingPipeline({ enabled = true, bloomStrength = 0.58 }) {
+export default function PostProcessingPipeline({ enabled = true, bloomStrength = 0.22 }) {
   const { gl, scene, camera, size } = useThree();
   const composerRef = useRef(null);
   const bloomPassRef = useRef(null);
@@ -110,8 +110,8 @@ export default function PostProcessingPipeline({ enabled = true, bloomStrength =
       const bloomPass = new UnrealBloomPass(
         new THREE.Vector2(size.width, size.height),
         bloomStrength,
-        0.55, // Bloom radius
-        0.82  // Bloom threshold
+        0.35, // Bloom radius
+        0.92  // Bloom threshold (prevents white flare blowouts)
       );
       composer.addPass(bloomPass);
       bloomPassRef.current = bloomPass;

@@ -39,7 +39,7 @@ export default function ServerRackStation() {
 
     // 2. KVM Console Glow Pulse
     if (kvmGlowRef.current) {
-      kvmGlowRef.current.intensity = (activeBurst ? 3.0 : 1.8) + Math.sin(time * 3.5) * 0.4;
+      kvmGlowRef.current.intensity = (activeBurst ? 1.2 : 0.7) + Math.sin(time * 2.0) * 0.15;
     }
 
     // 3. Random blinking port activity LEDs
@@ -50,9 +50,9 @@ export default function ServerRackStation() {
       });
     }
 
-    // 4. Breach Alarm Strobe
+    // 4. Gentle, Calm Ambient Beacon Pulse (No strobe)
     if (breachAlarmRef.current) {
-      breachAlarmRef.current.intensity = (activeBurst ? 4.2 : 2.4) + Math.sin(time * 7) * 1.6;
+      breachAlarmRef.current.intensity = (activeBurst ? 0.8 : 0.45) + Math.sin(time * 1.2) * 0.1;
     }
 
     // 5. Floating Holographic HUD Hover Sine Waves
@@ -200,8 +200,8 @@ export default function ServerRackStation() {
           ref={kvmGlowRef}
           position={[0, 0.04, 0.1]}
           color="#34d399"
-          intensity={1.8}
-          distance={1.5}
+          intensity={0.7}
+          distance={1.2}
         />
         {/* Mini Membrane Keyboard Trackpad */}
         <mesh position={[0, -0.025, 0.042]}>
@@ -419,9 +419,9 @@ export default function ServerRackStation() {
       <pointLight
         ref={breachAlarmRef}
         position={[0, 2.1, 0.8]}
-        color="#ff1744"
-        intensity={2.6}
-        distance={3.2}
+        color="#f43f5e"
+        intensity={0.45}
+        distance={2.0}
       />
     </group>
   );

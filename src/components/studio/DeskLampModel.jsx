@@ -65,23 +65,24 @@ export default function DeskLampModel({
     >
       <primitive object={clonedScene} />
 
-      {/* Warm Task Light Emitter at Lamp Hood */}
+      {/* Warm Task Light Emitter at Lamp Hood (Recessed, no glare) */}
       {isOn && (
         <group position={[0.22, 0.65, 0.12]}>
-          {/* Subtle visible light bulb sphere */}
-          <mesh>
-            <sphereGeometry args={[0.035, 16, 16]} />
-            <meshBasicMaterial color="#fffbeb" />
+          {/* Soft recessed bulb mesh */}
+          <mesh position={[0, -0.015, 0]}>
+            <sphereGeometry args={[0.02, 12, 12]} />
+            <meshStandardMaterial
+              color="#fed7aa"
+              emissive="#fed7aa"
+              emissiveIntensity={0.5}
+              roughness={0.6}
+            />
           </mesh>
           <pointLight
-            color="#fed7aa"
-            intensity={2.8}
-            distance={2.2}
+            color="#ffedd5"
+            intensity={0.6}
+            distance={1.6}
             decay={2}
-            castShadow
-            shadow-mapSize-width={512}
-            shadow-mapSize-height={512}
-            shadow-bias={-0.0005}
           />
         </group>
       )}

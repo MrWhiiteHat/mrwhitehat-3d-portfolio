@@ -282,7 +282,7 @@ function SceneContents({
       <CyberEnvironmentRig currentThemeKey={themeKey} />
 
       {/* AAA Post-Processing Pipeline: Unreal Engine Bloom, Lens Vignette & Film Grade */}
-      <PostProcessingPipeline enabled={true} bloomStrength={0.52} />
+      <PostProcessingPipeline enabled={true} bloomStrength={0.22} />
 
       {/* Handcrafted 3D Studio Architecture & Stations */}
       <group name="CyberCommandStudio">

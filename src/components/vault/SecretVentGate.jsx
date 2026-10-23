@@ -52,36 +52,34 @@ export default function SecretVentGate({
       rotation={[0, 0, 0]}
       onClick={handleVentClick}
     >
-      {/* 1. Heavy Industrial Wall Vent Frame */}
+      {/* 1. Heavy Industrial Wall Vent Outer Frame (Dark Gunmetal) */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[1.65, 1.25, 0.12]} />
-        <meshStandardMaterial color="#0f172a" roughness={0.8} metalness={0.4} />
+        <meshStandardMaterial color="#0f172a" roughness={0.65} metalness={0.6} />
       </mesh>
 
-      {/* Frame Outer Bezel with Warning Hazard Stripes */}
-      <mesh position={[0, 0, 0.065]}>
-        <boxGeometry args={[1.75, 1.35, 0.04]} />
-        <meshStandardMaterial
-          color={isUnlocked ? '#10b981' : '#f59e0b'}
-          roughness={0.5}
-        />
+      {/* Subtle Top & Bottom Hazard Accent Rails */}
+      <mesh position={[0, 0.6, 0.065]}>
+        <boxGeometry args={[1.65, 0.04, 0.02]} />
+        <meshStandardMaterial color={isUnlocked ? '#10b981' : '#ca8a04'} roughness={0.4} metalness={0.7} />
+      </mesh>
+      <mesh position={[0, -0.6, 0.065]}>
+        <boxGeometry args={[1.65, 0.04, 0.02]} />
+        <meshStandardMaterial color={isUnlocked ? '#10b981' : '#ca8a04'} roughness={0.4} metalness={0.7} />
       </mesh>
 
       {/* Internal Dark Shaft Void */}
       <mesh position={[0, 0, -0.2]}>
         <boxGeometry args={[1.45, 1.05, 0.5]} />
-        <meshStandardMaterial
-          color="#050807"
-          roughness={0.9}
-        />
+        <meshStandardMaterial color="#030605" roughness={0.95} />
       </mesh>
 
-      {/* Internal Crimson/Green Light Beam from inside vault */}
+      {/* Gentle, Ambient Shaft Backlight */}
       <pointLight
-        position={[0, 0, 0.15]}
-        color={isUnlocked ? '#10b981' : '#ef4444'}
-        intensity={isUnlocked ? 18 : 6}
-        distance={2.5}
+        position={[0, 0, 0.05]}
+        color={isUnlocked ? '#10b981' : '#f59e0b'}
+        intensity={isUnlocked ? 0.8 : 0.25}
+        distance={1.6}
       />
 
       {/* 2. Sliding Left Grate Shutter */}
@@ -146,11 +144,12 @@ export default function SecretVentGate({
         <group position={[0, 0, 0.08]}>
           {[-0.35, -0.12, 0.12, 0.35].map((y, i) => (
             <mesh key={i} position={[0, y, 0]}>
-              <boxGeometry args={[1.4, 0.015, 0.015]} />
+              <boxGeometry args={[1.4, 0.006, 0.006]} />
               <meshStandardMaterial
                 color="#ef4444"
-                emissive="#ff0000"
-                emissiveIntensity={3.0}
+                emissive="#ef4444"
+                emissiveIntensity={0.8}
+                roughness={0.3}
               />
             </mesh>
           ))}

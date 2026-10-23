@@ -63,7 +63,7 @@ export default function LoungeStation({ onSelect, onHover }) {
 
     // Wall Plaque Gold Rim Glow
     if (plaqueGlowRef.current) {
-      plaqueGlowRef.current.intensity = (hovered ? 4.0 : 2.5) + Math.sin(time * 2.0) * 0.4;
+      plaqueGlowRef.current.intensity = (hovered ? 1.8 : 1.1) + Math.sin(time * 1.5) * 0.1;
     }
   });
 
@@ -196,8 +196,8 @@ export default function LoungeStation({ onSelect, onHover }) {
         <pointLight
           position={[-0.2, 2.15, -0.2]}
           color="#fbbf24"
-          intensity={lampOn ? 4.8 : 0}
-          distance={4.0}
+          intensity={lampOn ? 1.6 : 0}
+          distance={3.0}
         />
       </group>
 
@@ -321,8 +321,8 @@ export default function LoungeStation({ onSelect, onHover }) {
           ref={plaqueGlowRef}
           position={[0, 0.35, 0.45]}
           color="#fbbf24"
-          intensity={hovered ? 5.0 : 3.2}
-          distance={2.8}
+          intensity={hovered ? 1.8 : 1.1}
+          distance={2.2}
           decay={2}
         />
       </group>

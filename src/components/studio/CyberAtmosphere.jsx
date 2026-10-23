@@ -14,97 +14,97 @@ export const LIGHTING_THEMES = {
   CYBER_NEON_NOIR: {
     id: 'CYBER_NEON_NOIR',
     name: 'Cyber Neon Noir (Red & Cyan)',
-    ambient: '#0e1628',
-    ambientIntensity: 1.65,
-    hemiSky: '#223249',
-    hemiGround: '#0f172a',
-    hemiIntensity: 0.95,
-    dirColor: '#ff2244',
-    dirIntensity: 2.7,
-    windowColor: '#00f0ff',
-    windowIntensity: 3.0,
-    accentColor: '#00f0ff',
-    accentIntensity: 22,
-    crimsonColor: '#ff1744',
-    crimsonIntensity: 24,
+    ambient: '#141c2b',
+    ambientIntensity: 1.4,
+    hemiSky: '#2a3b54',
+    hemiGround: '#111827',
+    hemiIntensity: 0.8,
+    dirColor: '#ffdada',
+    dirIntensity: 1.8,
+    windowColor: '#38bdf8',
+    windowIntensity: 1.5,
+    accentColor: '#38bdf8',
+    accentIntensity: 1.6,
+    crimsonColor: '#f43f5e',
+    crimsonIntensity: 1.6,
     loungeFillColor: '#f59e0b',
-    coreColor: '#ff2244',
+    coreColor: '#38bdf8',
   },
   CYBER_MATRIX: {
     id: 'CYBER_MATRIX',
     name: 'Cyber Command (Matrix Green)',
-    ambient: '#0f1f14',
-    ambientIntensity: 2.2,
-    hemiSky: '#1b382b',
-    hemiGround: '#0d1a12',
-    hemiIntensity: 0.9,
-    dirColor: '#ffffff',
-    dirIntensity: 2.8,
+    ambient: '#122017',
+    ambientIntensity: 1.5,
+    hemiSky: '#1f3d2e',
+    hemiGround: '#0f1a14',
+    hemiIntensity: 0.8,
+    dirColor: '#f0fdf4',
+    dirIntensity: 1.8,
     windowColor: '#60a5fa',
-    windowIntensity: 1.8,
+    windowIntensity: 1.4,
     accentColor: '#34d399',
-    accentIntensity: 14,
+    accentIntensity: 1.6,
     crimsonColor: '#34d399',
-    crimsonIntensity: 14,
+    crimsonIntensity: 1.6,
     loungeFillColor: '#fbbf24',
     coreColor: '#55f69a',
   },
   SYNTHWAVE_NEON: {
     id: 'SYNTHWAVE_NEON',
     name: 'Night City (Synthwave Magenta)',
-    ambient: '#1a1024',
-    ambientIntensity: 2.4,
-    hemiSky: '#311b47',
-    hemiGround: '#140c1c',
-    hemiIntensity: 0.9,
-    dirColor: '#e0e7ff',
-    dirIntensity: 2.5,
+    ambient: '#1c1426',
+    ambientIntensity: 1.5,
+    hemiSky: '#36224d',
+    hemiGround: '#140e1c',
+    hemiIntensity: 0.8,
+    dirColor: '#fae8ff',
+    dirIntensity: 1.8,
     windowColor: '#38bdf8',
-    windowIntensity: 2.4,
+    windowIntensity: 1.5,
     accentColor: '#ec4899',
-    accentIntensity: 18,
+    accentIntensity: 1.6,
     crimsonColor: '#f43f5e',
-    crimsonIntensity: 18,
-    loungeFillColor: '#a855f7',
+    crimsonIntensity: 1.6,
+    loungeFillColor: '#c084fc',
     coreColor: '#f43f5e',
   },
   STEALTH_ICE: {
     id: 'STEALTH_ICE',
     name: 'Stealth Ops (Arctic Cyan)',
-    ambient: '#0e1a24',
-    ambientIntensity: 2.3,
-    hemiSky: '#1e3347',
-    hemiGround: '#0a141d',
-    hemiIntensity: 0.9,
-    dirColor: '#f8fafc',
-    dirIntensity: 2.6,
+    ambient: '#111e29',
+    ambientIntensity: 1.5,
+    hemiSky: '#22384c',
+    hemiGround: '#0e171f',
+    hemiIntensity: 0.8,
+    dirColor: '#f0f9ff',
+    dirIntensity: 1.8,
     windowColor: '#38bdf8',
-    windowIntensity: 2.6,
+    windowIntensity: 1.6,
     accentColor: '#06b6d4',
-    accentIntensity: 16,
+    accentIntensity: 1.6,
     crimsonColor: '#38bdf8',
-    crimsonIntensity: 16,
+    crimsonIntensity: 1.6,
     loungeFillColor: '#60a5fa',
     coreColor: '#38bdf8',
   },
   WARM_AMBER: {
     id: 'WARM_AMBER',
     name: 'Executive Suite (Warm Amber)',
-    ambient: '#1f160e',
-    ambientIntensity: 2.3,
-    hemiSky: '#3d2b17',
-    hemiGround: '#171008',
-    hemiIntensity: 0.9,
+    ambient: '#1e1812',
+    ambientIntensity: 1.5,
+    hemiSky: '#382819',
+    hemiGround: '#140f0a',
+    hemiIntensity: 0.8,
     dirColor: '#fef3c7',
-    dirIntensity: 2.8,
+    dirIntensity: 1.8,
     windowColor: '#93c5fd',
-    windowIntensity: 1.5,
+    windowIntensity: 1.4,
     accentColor: '#f59e0b',
-    accentIntensity: 15,
+    accentIntensity: 1.6,
     crimsonColor: '#f59e0b',
-    crimsonIntensity: 15,
-    loungeFillColor: '#d97706',
-    coreColor: '#fbbf24',
+    crimsonIntensity: 1.6,
+    loungeFillColor: '#fbbf24',
+    coreColor: '#f59e0b',
   },
 };
 
@@ -547,8 +547,8 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         <pointLight
           position={[0, -0.3, 0]}
           color={theme.crimsonColor || '#ff1744'}
-          intensity={neonOn ? (theme.crimsonIntensity || 24) : 0}
-          distance={8.5}
+          intensity={neonOn ? (theme.crimsonIntensity || 1.6) : 0}
+          distance={4.5}
           decay={2}
         />
       </group>
@@ -622,8 +622,8 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         <pointLight
           position={[0, -0.15, 0]}
           color={theme.loungeFillColor || '#f59e0b'}
-          intensity={edisonOn ? 8.5 : 0}
-          distance={5.2}
+          intensity={edisonOn ? 1.0 : 0}
+          distance={3.5}
           decay={2}
         />
       </group>
@@ -666,8 +666,8 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         <pointLight
           position={[0, 0, 0.25]}
           color={theme.accentColor || '#00f0ff'}
-          intensity={14}
-          distance={6.5}
+          intensity={1.2}
+          distance={3.5}
           decay={2}
         />
       </group>
