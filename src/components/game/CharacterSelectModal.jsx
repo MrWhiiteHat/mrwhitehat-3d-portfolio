@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
+  BriefcaseBusiness,
   CheckCircle2,
   Cpu,
   Lock,
@@ -201,6 +202,20 @@ export default function CharacterSelectModal({
             <span>ENTER OFFICE // VISITOR CLEARANCE</span>
           </div>
           <div className="char-header-right">
+            {onOpenRecruiter && (
+              <button
+                type="button"
+                className="btn-recruiter-quick"
+                onClick={() => {
+                  playClickSound(1000);
+                  onOpenRecruiter();
+                }}
+                title="Recruiter Fast View: Instant 2D Dossier, Projects & Resume"
+              >
+                <BriefcaseBusiness size={13} />
+                <span>RECRUITER FAST VIEW</span>
+              </button>
+            )}
             <button
               type="button"
               className="char-guide-toggle-btn"
@@ -371,6 +386,21 @@ export default function CharacterSelectModal({
 
         {/* Clean Simple Footer */}
         <div className="char-card-footer">
+          {onOpenRecruiter && (
+            <button
+              type="button"
+              className="btn-recruiter-quick"
+              onClick={() => {
+                playClickSound(1000);
+                onOpenRecruiter();
+              }}
+              title="Recruiter Fast View: Instant 2D Dossier, Projects & Resume"
+              style={{ marginRight: 'auto' }}
+            >
+              <BriefcaseBusiness size={14} />
+              <span>RECRUITER DOSSIER</span>
+            </button>
+          )}
           <div className="footer-brief">
             <span className="brief-bullet">●</span>
             {isNameEntered ? (

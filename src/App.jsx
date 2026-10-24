@@ -37,6 +37,7 @@ import GameHUD from './components/game/GameHUD.jsx';
 import CyberLoadingScreen from './components/common/CyberLoadingScreen.jsx';
 import LeaderboardModal from './components/leaderboard/LeaderboardModal.jsx';
 import GadgetInspectorModal from './components/gadgets/GadgetInspectorModal.jsx';
+import RecruiterDossierModal from './components/recruiter/RecruiterDossierModal.jsx';
 import { profile } from './data.js';
 import { useFullscreen } from './utils/useFullscreen.js';
 import {
@@ -124,7 +125,22 @@ export default function App() {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isGadgetInspectorOpen, setIsGadgetInspectorOpen] = useState(false);
   const [selectedGadgetId, setSelectedGadgetId] = useState('flipper');
+  const [isRecruiterOpen, setIsRecruiterOpen] = useState(false);
   const stationMenuRef = useRef(null);
+
+  const handleOpenRecruiter = useCallback(() => {
+    playClickSound(1000);
+    setIsRecruiterOpen(true);
+  }, []);
+
+  const handleCloseRecruiter = useCallback(() => {
+    setIsRecruiterOpen(false);
+  }, []);
+
+  const handleToggleRecruiter = useCallback(() => {
+    playClickSound(900);
+    setIsRecruiterOpen((prev) => !prev);
+  }, []);
 
   const handleOpenLeaderboard = useCallback(() => {
     playClickSound(1000);
@@ -428,6 +444,8 @@ export default function App() {
         handleOpenGadgets('flipper');
       } else if (e.key === 'x' || e.key === 'X') {
         handleStationInteract('secret_vault');
+      } else if (e.key === 'r' || e.key === 'R') {
+        handleToggleRecruiter();
       }
     };
 
@@ -474,6 +492,7 @@ export default function App() {
         unlockedCount={unlockedStations.size}
         onOpenGadgets={handleOpenGadgets}
         onOpenLeaderboard={handleOpenLeaderboard}
+        onOpenRecruiter={handleOpenRecruiter}
       />
 
       {/* 0. HIGH-TECH CYBER PRELOADER LOADING SCREEN (Pre-loads 3D models & pre-warms shaders) */}
@@ -502,6 +521,7 @@ export default function App() {
           onToggleFullscreen={toggleFullscreen}
           onOpenLeaderboard={handleOpenLeaderboard}
           onOpenGadgets={handleOpenGadgets}
+          onOpenRecruiter={handleOpenRecruiter}
         />
       )}
 
@@ -532,6 +552,9 @@ export default function App() {
           onMobileMove={handleMobileMove}
           isFullscreen={isFullscreen}
           onToggleFullscreen={toggleFullscreen}
+          onOpenLeaderboard={handleOpenLeaderboard}
+          onOpenGadgets={handleOpenGadgets}
+          onOpenRecruiter={handleOpenRecruiter}
         />
       )}
 
@@ -646,6 +669,14 @@ export default function App() {
             <button
               type="button"
               className="hud-action-btn"
+              onClick={handleOpenRecruiter}
+              title="Open Executive Recruiter Dossier (R)"
+            >
+              <BriefcaseBusiness size={15} style={{ color: '#34d399' }} />
+            </button>
+            <button
+              type="button"
+              className="hud-action-btn"
               onClick={handleOpenLeaderboard}
               title="Open Speedrun Leaderboard (L)"
             >
@@ -699,6 +730,15 @@ export default function App() {
           </div>
 
           <div className="header-actions">
+            <button
+              type="button"
+              className="hud-recruiter-pill"
+              onClick={handleOpenRecruiter}
+              title="Open Executive Recruiter Dossier & Fast View (R)"
+            >
+              <BriefcaseBusiness size={13} />
+              <span>RECRUITER DOSSIER (R)</span>
+            </button>
             <button
               className={`hud-action-btn ${isFullscreen ? 'active-appliance' : ''}`}
               onClick={toggleFullscreen}
@@ -760,6 +800,12 @@ export default function App() {
         isOpen={isGadgetInspectorOpen}
         initialGadget={selectedGadgetId}
         onClose={handleCloseGadgets}
+      />
+
+      {/* Executive Recruiter 2D Dossier Modal */}
+      <RecruiterDossierModal
+        isOpen={isRecruiterOpen}
+        onClose={handleCloseRecruiter}
       />
     </div>
   );

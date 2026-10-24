@@ -399,6 +399,7 @@ export default function OfficeScene({
   visitorLogs = [],
   visitorCount = 1,
   playerData = null,
+  onOpenRecruiter,
 }) {
   const controlsRef = useRef(null);
   const [failed, setFailed] = useState(false);
@@ -414,41 +415,64 @@ export default function OfficeScene({
   return (
     <div className="canvas-wrap">
       {failed ? (
-        <div className="scene-fallback">
-          <strong>3D workspace unavailable</strong>
-          <p>WebGL encountered an issue initializing.</p>
+        <div className="scene-fallback" style={{ textAlign: 'center', padding: '30px' }}>
+          <strong style={{ fontSize: '18px', color: '#f87171', display: 'block', marginBottom: '8px' }}>
+            3D CYBER COMMAND WORKSPACE UNAVAILABLE
+          </strong>
+          <p style={{ color: '#94a3b8', maxWidth: '420px', margin: '0 auto 16px' }}>
+            Hardware WebGL acceleration is unavailable or blocked in this browser environment.
+          </p>
+          {onOpenRecruiter && (
+            <button
+              type="button"
+              className="btn-recruiter-quick"
+              onClick={onOpenRecruiter}
+              style={{ margin: '0 auto' }}
+            >
+              OPEN 2D RECRUITER DOSSIER & RESUME
+            </button>
+          )}
         </div>
       ) : null}
       <Canvas
-        shadows
+        shadows={typeof window !== 'undefined' ? window.innerWidth >= 768 : true}
         frameloop="always"
         performance={{ min: 0.5 }}
         dpr={[
           1,
           typeof window !== 'undefined'
-            ? Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.5)
-            : 1.25,
+            ? Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.0 : 1.5)
+            : 1.0,
         ]}
         gl={{
-          powerPreference: 'high-performance',
-          antialias: true,
+          powerPreference: typeof window !== 'undefined' && window.innerWidth < 768 ? 'low-power' : 'high-performance',
+          antialias: typeof window !== 'undefined' ? window.innerWidth >= 768 : true,
           stencil: false,
           depth: true,
           alpha: false,
-          precision: 'highp',
+          precision: typeof window !== 'undefined' && window.innerWidth < 768 ? 'mediump' : 'highp',
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.15,
         }}
         onCreated={({ gl }) => {
-          gl.shadowMap.type = THREE.PCFSoftShadowMap;
-          gl.shadowMap.autoUpdate = false;
-          gl.shadowMap.needsUpdate = true;
+          const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+          if (!isMobile) {
+            gl.shadowMap.enabled = true;
+            gl.shadowMap.type = THREE.PCFSoftShadowMap;
+            gl.shadowMap.autoUpdate = false;
+            gl.shadowMap.needsUpdate = true;
+          } else {
+            gl.shadowMap.enabled = false;
+          }
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = 1.15;
           gl.outputColorSpace = THREE.SRGBColorSpace;
         }}
         camera={{ position: [10.2, 8.2, 10.2], fov: 34, near: 0.1, far: 100 }}
-        onError={() => setFailed(true)}
+        onError={() => {
+          setFailed(true);
+          if (onOpenRecruiter) setTimeout(onOpenRecruiter, 300);
+        }}
       >
         <Suspense fallback={null}>
           <SceneContents

@@ -141,8 +141,8 @@ export const projects = [
       'A mobile application security research project combining static analysis, reverse-engineering signals, vulnerability mapping, retrieval-augmented knowledge, and an LLM-assisted false-positive review workflow. Achieves 94.2% detection rate with 100% offline, privacy-preserving local LLM inference.',
   },
   {
-    id: 'ksecurity-platform',
-    title: 'KSecurity – AI-Powered Community Threat Intelligence Platform',
+    id: 'aegis-ksecurity',
+    title: 'AegisAI / KSecurity – AI-Powered Community Threat Intelligence Platform',
     short: 'Real-time AI threat detection protecting Discord communities with 3 parallel analyzers and GPT-4o-mini',
     period: '2025',
     status: 'Platform Project',
@@ -157,14 +157,47 @@ export const projects = [
       'Docker',
       'Railway CI/CD',
     ],
+    problem:
+      'Online communities and enterprise workspaces face sophisticated phishing, impersonation scams, and malicious link dissemination that bypass traditional static regex filters.',
+    solution:
+      'Engineered an autonomous AI triage pipeline combining an OpenAI GPT-4o-mini message classifier, an algorithmic URL typosquatting engine across 10+ brands, and a Jaccard behavioral similarity tracker with weighted risk scoring.',
     highlights: [
-      'Built a real-time AI-powered threat detection platform protecting Discord communities from phishing and social engineering using three parallel analyzers (LLM classifier, URL phishing engine, behavioral tracker) with weighted composite risk scoring.',
-      'Integrated OpenAI GPT-4o-mini for real-time message classification across 6 threat categories with a 3-second circuit breaker and automatic heuristic fallback for zero-downtime detection.',
-      'Engineered a URL phishing analysis engine with typosquatting detection for 10+ brands and a behavioral anomaly tracker with Jaccard similarity for spam detection, burst monitoring, and account-age risk scoring.',
-      'Built a Next.js 14 admin dashboard with JWT authentication, real-time threat analytics, and audit logs; architected a TypeScript monorepo with Docker Compose, Railway PaaS, and GitHub Actions CI/CD pipeline.',
+      'Built a real-time AI-powered threat detection platform protecting Discord communities from phishing and social engineering using three parallel analyzers with weighted composite risk scoring.',
+      'Integrated OpenAI GPT-4o-mini for real-time message classification across 6 threat categories with a 3-second circuit breaker and automatic heuristic fallback for zero downtime.',
+      'Engineered a URL phishing analysis engine with typosquatting detection for 10+ brands and a behavioral anomaly tracker with Jaccard similarity for burst spam monitoring and account-age risk scoring.',
+      'Built a Next.js 14 admin dashboard with JWT authentication, real-time threat telemetry analytics, and audit logs; orchestrated with Docker Compose and Railway CI/CD.',
     ],
     description:
       'A modular moderation and threat intelligence platform using Discord bot services, persistent PostgreSQL storage, and AI-assisted content intelligence to mitigate phishing, brand impersonation, and social engineering in high-volume communities.',
+  },
+  {
+    id: 'realfake-detection',
+    title: 'RealFake Detection – Deepfake Media Analysis Platform',
+    short: 'Computer-vision pipeline for classifying manipulated facial media with FastAPI inference API and Docker',
+    period: '2024 – 2025',
+    status: 'Deployed Research Project',
+    type: 'Personal Project',
+    link: 'https://github.com/MrWhiiteHat',
+    tags: [
+      'Python',
+      'PyTorch',
+      'ResNet50',
+      'Computer Vision',
+      'FastAPI',
+      'Docker',
+      'Facial Forensics',
+    ],
+    problem:
+      'Rapid proliferation of AI-generated deepfake synthetic media creates significant authentication, disinformation, and identity fraud vulnerabilities.',
+    solution:
+      'Engineered a computer-vision classification pipeline utilizing a fine-tuned ResNet50 neural architecture with frequency-domain artifact analysis and a high-throughput FastAPI inference microservice.',
+    highlights: [
+      'Developed a deepfake media classifier trained on benchmark facial forensics datasets to detect subtle GAN/diffusion boundary distortions and eye/facial frequency inconsistencies.',
+      'Constructed a containerized FastAPI REST inference service packaged via Docker for high-concurrency media ingestion and classification.',
+      'Built an interactive submission interface allowing users to upload suspicious media and inspect localized heatmap confidence scores.',
+    ],
+    description:
+      'A computer-vision project for classifying manipulated facial media, featuring a fine-tuned ResNet50 model, a model-serving API with Docker containerization, and a responsive interface for inspecting forensic confidence indicators.',
   },
   {
     id: 'krishimitra-assistant',

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  BriefcaseBusiness,
   Compass,
   Crosshair,
   Footprints,
@@ -40,6 +41,7 @@ export default function GameHUD({
   onToggleFullscreen,
   onOpenLeaderboard = null,
   onOpenGadgets = null,
+  onOpenRecruiter = null,
 }) {
   // Locomotion Mode: 'joystick' on mobile/touch, 'wasd' on desktop (switchable anytime)
   const [controlMode, setControlMode] = useState(() => {
@@ -345,6 +347,23 @@ export default function GameHUD({
           <Radio size={13} style={{ color: '#fb923c' }} />
           <span className="gadget-pill-label">3D GADGETS</span>
         </button>
+
+        {/* Executive Recruiter 2D Dossier Pill */}
+        {onOpenRecruiter && (
+          <button
+            type="button"
+            className="hud-recruiter-pill"
+            onClick={() => {
+              playClickSound(1000);
+              onOpenRecruiter();
+            }}
+            title="Open Executive Recruiter Dossier & Fast View (R)"
+          >
+            <BriefcaseBusiness size={13} style={{ color: '#34d399' }} />
+            <span className="recruiter-pill-label">RECRUITER DOSSIER</span>
+            <span className="recruiter-pill-key">(R)</span>
+          </button>
+        )}
 
         {/* Quick HUD Controls */}
         <div className="hud-right-actions">
