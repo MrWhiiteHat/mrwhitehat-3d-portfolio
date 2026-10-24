@@ -47,17 +47,21 @@ const STATIONS = [
       ),
     ],
   },
-  // 4. Auditorium Projector & Trophies Credenza
+  // 4. Auditorium Projector, Trophies & Briefing Table
   {
     id: 'achievements',
-    title: 'Auditorium Projector',
-    action: 'BYPASS RADAR FIREWALL // ACHIEVEMENTS',
-    position: [-4.6, 2.1, -2.0],
-    maxDist: 4.2,
+    title: 'Presentation Briefing Table',
+    action: 'CYCLE PRESENTATION SLIDES // VIEW AWARDS (E)',
+    position: [-3.08, 0.9, -2.0],
+    maxDist: 3.6,
     boxes: [
       new THREE.Box3(
         new THREE.Vector3(-4.95, 0.2, -3.5),
         new THREE.Vector3(-4.2, 3.25, -0.5)
+      ),
+      new THREE.Box3(
+        new THREE.Vector3(-4.0, 0.2, -3.0),
+        new THREE.Vector3(-2.1, 1.8, -1.0)
       ),
     ],
   },
@@ -127,7 +131,7 @@ const STATIONS = [
     title: 'MrWhiteHat Operative Hologram',
     action: 'DECRYPT OPERATIVE DOSSIER // MR. WHITE HAT',
     position: [-3.35, 1.6, -3.85],
-    maxDist: 3.8,
+    maxDist: 2.2,
     boxes: [
       new THREE.Box3(
         new THREE.Vector3(-3.85, 0.85, -4.35),

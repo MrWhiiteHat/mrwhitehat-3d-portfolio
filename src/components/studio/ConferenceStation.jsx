@@ -33,6 +33,24 @@ export default function ConferenceStation({ onSelect, onHover }) {
   const presentationLaptop = useMemo(() => createPresentationLaptopScreen(), []);
   const laptopTimer = useRef(0);
   const [laptopHovered, setLaptopHovered] = useState(false);
+  const [folderHovered, setFolderHovered] = useState(false);
+  const [clickerHovered, setClickerHovered] = useState(false);
+  const [laserActive, setLaserActive] = useState(false);
+
+  const handleFolderClick = (e) => {
+    e.stopPropagation();
+    playClickSound(1050, 0.08);
+    playWhooshSound();
+    onSelect?.({ section: 'projects', label: 'Top-Secret CVE Audit Dossier · Penetration Testing' });
+  };
+
+  const handleClickerClick = (e) => {
+    e.stopPropagation();
+    playClickSound(1400, 0.05);
+    setLaserActive(true);
+    presentationLaptop.nextSlide();
+    setTimeout(() => setLaserActive(false), 600);
+  };
 
   const handleLaptopClick = (e) => {
     e.stopPropagation();
@@ -144,6 +162,17 @@ export default function ConferenceStation({ onSelect, onHover }) {
           intensity={hovered ? 5.0 : 3.5}
           distance={3.2}
         />
+
+        {/* Live Red Laser Dot from Presentation Remote when fired */}
+        {laserActive && (
+          <group position={[0, 0, 0.035]}>
+            <mesh>
+              <circleGeometry args={[0.035, 16]} />
+              <meshBasicMaterial color="#ff0033" />
+            </mesh>
+            <pointLight color="#ff0033" intensity={4} distance={0.5} />
+          </group>
+        )}
       </group>
 
       {/* 2. Floating Media Credenza with 3D Trophies & Awards below screen */}
@@ -290,53 +319,100 @@ export default function ConferenceStation({ onSelect, onHover }) {
           <meshStandardMaterial {...walnutTable} roughness={0.32} metalness={0.12} />
         </mesh>
 
-        {/* Conference Table Assets: Security Briefing Dossiers & Laser Clicker */}
+        {/* Conference Table Assets: Security Briefing Dossiers, Presentation Laptop & Laser Clicker */}
         <group position={[0, 0.76, 0]}>
-          {/* 1. Laminated Red Team Briefing Folder */}
-          <group position={[-0.15, 0, 0.08]} rotation={[0, 0.2, 0]}>
+          {/* 1. Functional Laminated Red Team Briefing Folder */}
+          <group
+            position={[-0.26, folderHovered ? 0.008 : 0, -0.06]}
+            rotation={[0, 0.45, 0]}
+            onClick={handleFolderClick}
+            onPointerOver={(e) => {
+              e.stopPropagation();
+              setFolderHovered(true);
+              document.body.style.cursor = 'pointer';
+              onHover?.('Top-Secret CVE Audit Dossier · [CLICK TO EXAMINE FINDINGS]');
+            }}
+            onPointerOut={() => {
+              setFolderHovered(false);
+              document.body.style.cursor = 'auto';
+              onHover?.(null);
+            }}
+          >
+            {/* Folder Base Binder */}
             <mesh castShadow>
               <boxGeometry args={[0.22, 0.005, 0.28]} />
-              <meshStandardMaterial color="#0f172a" roughness={0.4} />
+              <meshStandardMaterial
+                color={folderHovered ? '#1e293b' : '#0f172a'}
+                roughness={0.4}
+              />
             </mesh>
+            {/* White Printed Audit Report Sheet */}
             <mesh position={[0, 0.003, 0]}>
               <planeGeometry args={[0.18, 0.24]} />
-              <meshBasicMaterial color="#f8fafc" />
+              <meshBasicMaterial color={folderHovered ? '#ffffff' : '#f1f5f9'} />
             </mesh>
             {/* Red "TOP SECRET // CVE AUDIT" Stamp */}
             <mesh position={[0, 0.004, -0.06]}>
-              <planeGeometry args={[0.12, 0.03]} />
-              <meshBasicMaterial color="#dc2626" />
+              <planeGeometry args={[0.13, 0.032]} />
+              <meshBasicMaterial color={folderHovered ? '#ef4444' : '#dc2626'} />
+            </mesh>
+            {/* Mini Security Chip / Seal */}
+            <mesh position={[0.06, 0.004, 0.08]}>
+              <circleGeometry args={[0.012, 16]} />
+              <meshBasicMaterial color="#eab308" />
             </mesh>
           </group>
 
-          {/* 2. Wireless Presentation Laser Clicker Remote */}
-          <group position={[0.26, 0, 0.04]} rotation={[0, -0.35, 0]}>
+          {/* 2. Functional Wireless Presentation Laser Clicker Remote */}
+          <group
+            position={[0.26, clickerHovered ? 0.006 : 0, -0.04]}
+            rotation={[0, -0.55, 0]}
+            onClick={handleClickerClick}
+            onPointerOver={(e) => {
+              e.stopPropagation();
+              setClickerHovered(true);
+              document.body.style.cursor = 'pointer';
+              onHover?.('Presentation Remote · [CLICK TO FIRE LASER & NEXT SLIDE]');
+            }}
+            onPointerOut={() => {
+              setClickerHovered(false);
+              document.body.style.cursor = 'auto';
+              onHover?.(null);
+            }}
+          >
             <mesh castShadow>
               <boxGeometry args={[0.03, 0.012, 0.09]} />
-              <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.7} />
+              <meshStandardMaterial
+                color={clickerHovered ? '#334155' : '#1e293b'}
+                roughness={0.3}
+                metalness={0.7}
+              />
             </mesh>
             {/* Clicker Forward Button */}
             <mesh position={[0, 0.007, -0.015]}>
               <cylinderGeometry args={[0.006, 0.006, 0.004, 12]} />
-              <meshStandardMaterial color="#38bdf8" roughness={0.4} />
+              <meshStandardMaterial color={laserActive ? '#ef4444' : '#38bdf8'} roughness={0.4} />
             </mesh>
             {/* Laser Aperture Indicator */}
             <mesh position={[0, 0, -0.046]}>
-              <sphereGeometry args={[0.002, 8, 8]} />
-              <meshBasicMaterial color="#ef4444" />
+              <sphereGeometry args={[0.003, 8, 8]} />
+              <meshBasicMaterial color={laserActive ? '#ff0033' : '#ef4444'} />
             </mesh>
+            {laserActive && (
+              <pointLight position={[0, 0, -0.06]} color="#ff0033" intensity={4} distance={0.5} />
+            )}
           </group>
 
-          {/* 3. Executive Cyber Presentation Briefing Laptop */}
+          {/* 3. Executive Cyber Presentation Briefing Laptop (Facing approaching visitors) */}
           <group
-            position={[0.02, 0.005, -0.08]}
-            rotation={[0, -0.15, 0]}
+            position={[0.0, 0.006, 0.06]}
+            rotation={[0, Math.PI, 0]}
             onClick={handleLaptopClick}
             onPointerOver={(e) => {
               e.stopPropagation();
               setLaptopHovered(true);
               document.body.style.cursor = 'pointer';
-              onHover?.('Briefing Presentation Laptop · [CLICK TO CYCLE SLIDE / OPEN AWARDS]');
+              onHover?.('Presentation Briefing Laptop · [CLICK TO CYCLE SLIDE / OPEN AWARDS]');
             }}
             onPointerOut={() => {
               setLaptopHovered(false);
@@ -346,35 +422,35 @@ export default function ConferenceStation({ onSelect, onHover }) {
           >
             {/* Laptop Base Chassis with subtle hover lift */}
             <mesh castShadow position={[0, laptopHovered ? 0.005 : 0, 0]}>
-              <boxGeometry args={[0.26, 0.01, 0.19]} />
+              <boxGeometry args={[0.28, 0.01, 0.20]} />
               <meshStandardMaterial
                 color={laptopHovered ? '#1e293b' : '#0f172a'}
                 roughness={0.25}
                 metalness={0.8}
               />
             </mesh>
-            {/* Keyboard & Backlight */}
+            {/* Keyboard & Cyan Backlight */}
             <mesh position={[0, (laptopHovered ? 0.005 : 0) + 0.006, -0.02]}>
-              <planeGeometry args={[0.22, 0.09]} />
-              <meshBasicMaterial color={laptopHovered ? '#0284c7' : '#020617'} />
+              <planeGeometry args={[0.24, 0.10]} />
+              <meshBasicMaterial color={laptopHovered ? '#0284c7' : '#0369a1'} />
             </mesh>
             {/* Trackpad */}
-            <mesh position={[0, (laptopHovered ? 0.005 : 0) + 0.006, 0.055]}>
-              <planeGeometry args={[0.07, 0.045]} />
+            <mesh position={[0, (laptopHovered ? 0.005 : 0) + 0.006, 0.06]}>
+              <planeGeometry args={[0.08, 0.05]} />
               <meshStandardMaterial color="#334155" roughness={0.5} />
             </mesh>
-            {/* Open Display Lid */}
-            <group position={[0, (laptopHovered ? 0.005 : 0) + 0.005, -0.095]} rotation={[1.85, 0, 0]}>
+            {/* Open Display Lid tilted facing player */}
+            <group position={[0, (laptopHovered ? 0.005 : 0) + 0.005, -0.1]} rotation={[1.92, 0, 0]}>
               <mesh castShadow>
-                <boxGeometry args={[0.26, 0.18, 0.008]} />
+                <boxGeometry args={[0.28, 0.19, 0.008]} />
                 <meshStandardMaterial color="#0f172a" roughness={0.25} metalness={0.85} />
               </mesh>
               {/* Dynamic Presentation Slide Face */}
               <mesh position={[0, 0, 0.005]}>
-                <planeGeometry args={[0.24, 0.16]} />
+                <planeGeometry args={[0.26, 0.17]} />
                 <meshBasicMaterial map={presentationLaptop.texture} toneMapped={false} />
               </mesh>
-              <pointLight position={[0, 0, 0.06]} color="#38bdf8" intensity={laptopHovered ? 1.5 : 0.8} distance={0.6} />
+              <pointLight position={[0, 0, 0.08]} color="#38bdf8" intensity={laptopHovered ? 2.0 : 1.1} distance={0.8} />
             </group>
           </group>
         </group>
