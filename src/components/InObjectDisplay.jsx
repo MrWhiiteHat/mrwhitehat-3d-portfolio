@@ -139,12 +139,12 @@ export const stationConfigs = {
     lightPos: [0, 0.15, 0.25],
   },
   contact: {
-    // Intercom Console on Desk
-    position: [-0.15, 0.86, 0.65],
-    rotation: [-Math.PI / 4.5, 0, 0],
-    camPos: [-0.15, 1.35, 1.65],
-    camTarget: [-0.15, 0.86, 0.65],
-    title: 'Desk Intercom Console',
+    // Secure Comms Relay & Phone Reception Station
+    position: [3.75, 0.84, -1.25],
+    rotation: [0, -Math.PI / 2, 0],
+    camPos: [2.55, 1.25, -1.25],
+    camTarget: [3.75, 0.84, -1.25],
+    title: 'Secure Comms Relay // Contact',
     icon: Mail,
     distanceFactor: 0.55,
     lightColor: '#22c55e',
@@ -217,10 +217,10 @@ export const stationConfigs = {
     lightPos: [0, 0, 0.45],
   },
   secret_vault: {
-    position: [-3.85, 1.25, -4.85],
+    position: [-1.15, 0.55, -4.92],
     rotation: [0, 0, 0],
-    camPos: [-3.85, 1.25, -3.25],
-    camTarget: [-3.85, 1.25, -4.85],
+    camPos: [-1.15, 0.85, -3.35],
+    camTarget: [-1.15, 0.55, -4.92],
     title: 'Secret Black Hat Vault Mainframe',
     icon: Skull,
     distanceFactor: 0.75,

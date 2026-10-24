@@ -5,17 +5,17 @@ import { playClickSound, playFootstepSound, playProximityChime } from '../../uti
 
 // Station interaction coordinates, reach limits & exact 3D Box3 physical hit-volumes
 const STATIONS = [
-  // 1. Desk Intercom Console (Prioritized small sub-target on desk)
+  // 1. Secure Comms Relay & Phone Reception Station
   {
     id: 'contact',
-    title: 'Desk Intercom Console',
+    title: 'Secure Comms Relay & Hotline',
     action: 'TUNE FREQUENCY // CONTACT',
-    position: [-0.15, 0.85, 0.6],
-    maxDist: 2.8,
+    position: [3.75, 0.9, -1.25],
+    maxDist: 3.5,
     boxes: [
       new THREE.Box3(
-        new THREE.Vector3(-0.4, 0.72, 0.4),
-        new THREE.Vector3(0.1, 1.2, 0.8)
+        new THREE.Vector3(3.1, 0.2, -1.85),
+        new THREE.Vector3(4.5, 1.8, -0.65)
       ),
     ],
   },
@@ -29,7 +29,7 @@ const STATIONS = [
     boxes: [
       new THREE.Box3(
         new THREE.Vector3(-2.65, 0.35, -0.35),
-        new THREE.Vector3(0.25, 1.65, 1.25)
+        new THREE.Vector3(0.05, 1.65, 1.25)
       ),
     ],
   },
@@ -261,17 +261,17 @@ const STATIONS = [
       ),
     ],
   },
-  // 19. Secret Ventilation Duct // Black Hat Vault Hatch
+  // 19. Secret Ventilation Duct // Black Hat Vault Hatch (Floor duct beside Server Rack)
   {
     id: 'secret_vault',
     title: 'Secret Ventilation Duct',
     action: 'INFILTRATE // BLACK HAT VAULT (E)',
-    position: [-3.85, 0.95, -4.85],
-    maxDist: 3.8,
+    position: [-1.15, 0.45, -4.85],
+    maxDist: 3.5,
     boxes: [
       new THREE.Box3(
-        new THREE.Vector3(-4.7, 0.2, -4.95),
-        new THREE.Vector3(-3.0, 2.0, -4.6)
+        new THREE.Vector3(-1.9, 0.1, -4.98),
+        new THREE.Vector3(-0.4, 1.2, -4.5)
       ),
     ],
   },
@@ -302,6 +302,8 @@ const OBSTACLES = [
   { minX: 1.9, maxX: 2.5, minZ: -4.5, maxZ: -3.9 },
   // 11. Potted Plant (Left Front Corner, [-4.4, 0, 1.8])
   { minX: -4.7, maxX: -4.1, minZ: 1.5, maxZ: 2.1 },
+  // 12. Secure Comms Pedestal Desk ([3.75, 0, -1.25])
+  { minX: 3.3, maxX: 4.2, minZ: -1.65, maxZ: -0.85 },
 ];
 
 /**

@@ -1688,3 +1688,218 @@ export function createAboutDossierScreen(imageUrl) {
 }
 
 
+
+
+/**
+ * 11. DYNAMIC THINKPAD HACKER LAPTOP TERMINAL SCREEN
+ * Custom interactive terminal for the LoungeStation ThinkPad laptop.
+ */
+export function createLaptopTerminalScreen() {
+  const width = 512;
+  const height = 320;
+  const canvas = createScreenCanvas(width, height);
+  if (!canvas) return { texture: null, update: () => {}, injectCommand: () => {} };
+
+  const ctx = canvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  const logs = [
+    'mrwhitehat@thinkpad:~$ whoami',
+    'Sadashiba Sarangi // Lead Security Researcher',
+    'mrwhitehat@thinkpad:~$ cat ~/skills/domains.json',
+    '{"focus": ["Binary Exploitation", "Frida", "LLM Defense"]}',
+    'mrwhitehat@thinkpad:~$ ./check_status.sh',
+    '[+] Kernel Defense Ring 0: ACTIVE',
+    '[+] 1st Place National CTF Champion (Odisha)',
+    '[+] Hall of Fame: Google VRP, Microsoft',
+    'mrwhitehat@thinkpad:~$ echo "Ready for engagement"',
+    'mrwhitehat@thinkpad:~$ [CLICK LAPTOP TO OPEN ABOUT ME]',
+  ];
+
+  let cursorBlink = 0;
+  let customCmd = '';
+
+  function render() {
+    ctx.fillStyle = '#050a08';
+    ctx.fillRect(0, 0, width, height);
+
+    // Top Window Header Bar
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, width, 32);
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath(); ctx.arc(16, 16, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath(); ctx.arc(32, 16, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#10b981';
+    ctx.beginPath(); ctx.arc(48, 16, 5, 0, Math.PI * 2); ctx.fill();
+
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('bash · mrwhitehat@thinkpad-x1:~ (arch-linux-sec)', 68, 20);
+
+    // Terminal Body Lines
+    ctx.font = '13px monospace';
+    const visibleLines = customCmd ? [...logs, customCmd] : logs;
+    const startIdx = Math.max(0, visibleLines.length - 11);
+
+    visibleLines.slice(startIdx).forEach((line, i) => {
+      const y = 56 + i * 23;
+      if (line.startsWith('mrwhitehat@')) {
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillText(line, 16, y);
+      } else if (line.startsWith('[+]') || line.includes('Champion') || line.includes('ACTIVE')) {
+        ctx.fillStyle = '#34d399';
+        ctx.fillText(line, 16, y);
+      } else if (line.includes('CLICK LAPTOP')) {
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = 'bold 13px monospace';
+        ctx.fillText(line, 16, y);
+        ctx.font = '13px monospace';
+      } else {
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillText(line, 16, y);
+      }
+    });
+
+    // Blinking Green Block Cursor
+    if (Math.sin(cursorBlink) > 0) {
+      ctx.fillStyle = '#10b981';
+      const lastLine = visibleLines[visibleLines.length - 1] || '';
+      const lastY = 56 + (Math.min(visibleLines.length, 11) - 1) * 23;
+      ctx.fillRect(Math.min(lastLine.length * 7.8 + 20, width - 30), lastY - 11, 8, 14);
+    }
+
+    texture.needsUpdate = true;
+  }
+
+  function update(delta) {
+    cursorBlink += delta * 4;
+    render();
+  }
+
+  function injectCommand(cmd) {
+    customCmd = 'mrwhitehat@thinkpad:~$ ' + cmd;
+    render();
+  }
+
+  render();
+  return { texture, update, injectCommand };
+}
+
+/**
+ * 12. DYNAMIC CONFERENCE PRESENTATION LAPTOP SCREEN
+ * Interactive briefing slides for the ConferenceStation table laptop.
+ */
+export function createPresentationLaptopScreen() {
+  const width = 512;
+  const height = 320;
+  const canvas = createScreenCanvas(width, height);
+  if (!canvas) return { texture: null, update: () => {}, nextSlide: () => {} };
+
+  const ctx = canvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  const slides = [
+    {
+      tag: 'SLIDE 01 // INTERNATIONAL SUMMIT',
+      title: 'BRICS Future Skills Challenge 2026',
+      sub: 'Cybersecurity & Cross-Border Digital Defense',
+      metric: 'REPRESENTING INDIA // INTERNATIONAL COALITION',
+      color: '#38bdf8',
+    },
+    {
+      tag: 'SLIDE 02 // STATE CHAMPIONSHIP',
+      title: 'National Cyber Defense CTF 2025',
+      sub: 'Odisha State Championship · 1st Place Gold',
+      metric: 'SCORE: 100% FLAGS CAPTURED // ZERO HINTS',
+      color: '#f59e0b',
+    },
+    {
+      tag: 'SLIDE 03 // VULNERABILITY RESEARCH',
+      title: 'Autonomous Mobile Pen-Test Agent',
+      sub: 'LLM + Frida Framework for Automated Zero-Day Discovery',
+      metric: 'TRIAGE ACCELERATION: 12.4X OVER MANUAL AUDIT',
+      color: '#10b981',
+    },
+  ];
+
+  let currentSlide = 0;
+  let pulseTimer = 0;
+
+  function render() {
+    const s = slides[currentSlide];
+    ctx.fillStyle = '#070f14';
+    ctx.fillRect(0, 0, width, height);
+
+    // Presentation Header Bar
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, width, 40);
+
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = s.color;
+    ctx.fillText(s.tag, 20, 25);
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('SLIDE ' + (currentSlide + 1) + ' / ' + slides.length, width - 20, 25);
+    ctx.textAlign = 'left';
+
+    // Slide Title
+    ctx.font = 'bold 20px monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(s.title, 20, 95);
+
+    // Subtitle
+    ctx.font = '13px monospace';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(s.sub, 20, 125);
+
+    // Metric Highlight Banner
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+    ctx.fillRect(20, 160, width - 40, 60);
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(20, 160, width - 40, 60);
+
+    ctx.font = 'bold 13px monospace';
+    ctx.fillStyle = s.color;
+    ctx.fillText(s.metric, 36, 196);
+
+    // Bottom Action Bar
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.12)';
+    ctx.fillRect(20, 250, width - 40, 42);
+    ctx.strokeStyle = '#38bdf8';
+    ctx.strokeRect(20, 250, width - 40, 42);
+
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('▶ [CLICK LAPTOP] TO CYCLE SLIDE // OPEN AWARDS ◀', width / 2, 276);
+    ctx.textAlign = 'left';
+
+    texture.needsUpdate = true;
+  }
+
+  function update(delta) {
+    pulseTimer += delta;
+    if (pulseTimer > 6.0) {
+      currentSlide = (currentSlide + 1) % slides.length;
+      pulseTimer = 0;
+      render();
+    }
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    pulseTimer = 0;
+    render();
+  }
+
+  render();
+  return { texture, update, nextSlide };
+}

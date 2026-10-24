@@ -326,6 +326,6 @@ export const hotspots = [
   { id: 'achievements', label: 'Awards', position: [-4.86, 2.7, -2.0], icon: '🏆' },
   { id: 'about', label: 'About', position: [4.95, 2.8, 1.6], icon: '👤' },
   { id: 'resume', label: 'Resume', position: [-3.6, 1.45, 1.05], icon: '📄' },
-  { id: 'contact', label: 'Contact', position: [-0.15, 1.15, 0.65], icon: '📞' },
+  { id: 'contact', label: 'Contact', position: [3.75, 1.45, -1.25], icon: '📞' },
   { id: 'operator', label: 'MrWhiteHat', position: [-3.35, 1.85, -3.85], icon: '🛡️' },
 ];

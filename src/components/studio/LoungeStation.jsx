@@ -7,7 +7,11 @@ import {
   getNeroMarbleTextures,
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
-import { createTabletScreen, createAboutDossierScreen } from '../../utils/cyberScreens.js';
+import {
+  createTabletScreen,
+  createAboutDossierScreen,
+  createLaptopTerminalScreen,
+} from '../../utils/cyberScreens.js';
 import mrWhiteHatImg from '../../assets/mrwhitehat-hologram.jpg';
 
 export default function LoungeStation({ onSelect, onHover }) {
@@ -22,10 +26,29 @@ export default function LoungeStation({ onSelect, onHover }) {
   const marbleTable = useMemo(() => getNeroMarbleTextures(1, 1), []);
   const brassMetal = useMemo(() => getBrushedMetalTextures(1, 2, '#ca8a04'), []);
 
-  // Functional Biometric Security Tablet Screen & Executive Dossier Plaque Screen
+  // Functional Biometric Security Tablet Screen, Executive Dossier Plaque, and Interactive ThinkPad Laptop
   const tabletScreen = useMemo(() => createTabletScreen(), []);
   const tabletTimer = useRef(0);
   const dossierScreen = useMemo(() => createAboutDossierScreen(mrWhiteHatImg), []);
+  const laptopScreen = useMemo(() => createLaptopTerminalScreen(), []);
+  const laptopTimer = useRef(0);
+  const [laptopHovered, setLaptopHovered] = useState(false);
+
+  const handleLaptopClick = (e) => {
+    e.stopPropagation();
+    playClickSound(850 + Math.random() * 250, 0.05);
+    const commands = [
+      'cat ~/credentials/certifications.txt',
+      'nmap -p 22,80,443 -sV offensive-target.lab',
+      './decrypt_clearance_matrix.sh',
+      'whoami --all',
+      'echo "MrWhiteHat Security Research"',
+    ];
+    const picked = commands[Math.floor(Math.random() * commands.length)];
+    laptopScreen.injectCommand(picked);
+    playWhooshSound();
+    onSelect?.({ section: 'about', label: 'Operative ThinkPad · About Me' });
+  };
 
   const toggleLamp = (e) => {
     e?.stopPropagation?.();
@@ -45,11 +68,16 @@ export default function LoungeStation({ onSelect, onHover }) {
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Tablet Screen (Paced to 6 FPS for optimal GPU performance)
+    // 0. Update Screens (Paced to 6 FPS for optimal GPU performance)
     tabletTimer.current += delta;
     if (tabletTimer.current > 0.16) {
       tabletScreen.update(tabletTimer.current);
       tabletTimer.current = 0;
+    }
+    laptopTimer.current += delta;
+    if (laptopTimer.current > 0.16) {
+      laptopScreen.update(laptopTimer.current);
+      laptopTimer.current = 0;
     }
 
     // 1. Silky smooth 60fps 3D Cipher Rings (rotates on GPU with ZERO canvas overhead)
@@ -169,48 +197,68 @@ export default function LoungeStation({ onSelect, onHover }) {
           </mesh>
         </group>
 
-        {/* BESPOKE ABOUT ME 3D ASSETS: HACKER LAPTOP (ThinkPad Style) & OPERATIVE BADGE */}
-        <group position={[-0.12, 0.41, 0.02]} rotation={[0, 0.35, 0]}>
-          {/* Laptop Base Chassis */}
-          <mesh castShadow>
+        {/* BESPOKE ABOUT ME 3D ASSETS: FUNCTIONAL HACKER LAPTOP (ThinkPad X1) & OPERATIVE BADGE */}
+        <group
+          position={[-0.12, 0.41, 0.02]}
+          rotation={[0, 0.35, 0]}
+          onClick={handleLaptopClick}
+          onPointerOver={(e) => {
+            e.stopPropagation();
+            setLaptopHovered(true);
+            document.body.style.cursor = 'pointer';
+            onHover?.('Operative ThinkPad X1 · [CLICK TO TYPE & OPEN ABOUT ME]');
+          }}
+          onPointerOut={() => {
+            setLaptopHovered(false);
+            document.body.style.cursor = 'auto';
+            onHover?.(null);
+          }}
+        >
+          {/* Laptop Base Chassis with subtle hover lift */}
+          <mesh castShadow position={[0, laptopHovered ? 0.006 : 0, 0]}>
             <boxGeometry args={[0.28, 0.012, 0.2]} />
-            <meshStandardMaterial color="#0b0f14" roughness={0.4} metalness={0.6} />
+            <meshStandardMaterial
+              color={laptopHovered ? '#141e17' : '#0b0f14'}
+              roughness={0.35}
+              metalness={0.7}
+            />
           </mesh>
-          {/* Keyboard Inset & Touchpad */}
-          <mesh position={[0, 0.007, -0.02]}>
+          {/* Keyboard Inset & Backlit Keys */}
+          <mesh position={[0, (laptopHovered ? 0.006 : 0) + 0.007, -0.02]}>
             <planeGeometry args={[0.24, 0.1]} />
-            <meshBasicMaterial color="#030708" />
+            <meshBasicMaterial color={laptopHovered ? '#064e3b' : '#030708'} />
           </mesh>
-          {/* Red TrackPoint Nub */}
-          <mesh position={[0, 0.008, -0.02]}>
+          {/* Iconic Red TrackPoint Nub */}
+          <mesh position={[0, (laptopHovered ? 0.006 : 0) + 0.008, -0.02]}>
             <sphereGeometry args={[0.003, 8, 8]} />
             <meshBasicMaterial color="#ef4444" />
           </mesh>
           {/* Touchpad */}
-          <mesh position={[0, 0.007, 0.06]}>
+          <mesh position={[0, (laptopHovered ? 0.006 : 0) + 0.007, 0.06]}>
             <planeGeometry args={[0.08, 0.05]} />
             <meshStandardMaterial color="#1e293b" roughness={0.6} />
           </mesh>
 
+          {/* Pulsing ThinkPad Status LED on palm rest */}
+          <mesh position={[0.11, (laptopHovered ? 0.006 : 0) + 0.008, 0.07]}>
+            <sphereGeometry args={[0.002, 8, 8]} />
+            <meshBasicMaterial color="#ef4444" />
+          </mesh>
+
           {/* Laptop Open Display Screen (Angled 115 degrees) */}
-          <group position={[0, 0.006, -0.1]} rotation={[1.9, 0, 0]}>
-            {/* Screen Bezel & Lid */}
+          <group position={[0, (laptopHovered ? 0.006 : 0) + 0.006, -0.1]} rotation={[1.9, 0, 0]}>
+            {/* Screen Bezel & Magnesium Lid */}
             <mesh castShadow>
               <boxGeometry args={[0.28, 0.19, 0.008]} />
               <meshStandardMaterial color="#0b0f14" roughness={0.3} metalness={0.8} />
             </mesh>
-            {/* Active Hacker Terminal Screen: Offensive Mindset Bio Prompt */}
+            {/* Active Functional Hacker Terminal Screen */}
             <mesh position={[0, 0, 0.005]}>
               <planeGeometry args={[0.26, 0.17]} />
-              <meshBasicMaterial color="#021c15" />
+              <meshBasicMaterial map={laptopScreen.texture} toneMapped={false} />
             </mesh>
-            {/* Terminal Green Prompt Lines */}
-            {[-0.05, -0.02, 0.01, 0.04].map((py, idx) => (
-              <mesh key={`lap-line-${idx}`} position={[-0.02, py, 0.006]}>
-                <planeGeometry args={[0.2, 0.01]} />
-                <meshBasicMaterial color={idx === 0 ? '#38bdf8' : '#34d399'} transparent opacity={0.85} />
-              </mesh>
-            ))}
+            {/* Screen Glow Light */}
+            <pointLight position={[0, 0, 0.08]} color="#34d399" intensity={laptopHovered ? 1.4 : 0.7} distance={0.6} />
           </group>
         </group>
 

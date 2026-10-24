@@ -7,7 +7,7 @@ import {
   getPebbledLeatherTextures,
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
-import { createProjectorScreen } from '../../utils/cyberScreens.js';
+import { createProjectorScreen, createPresentationLaptopScreen } from '../../utils/cyberScreens.js';
 
 export default function ConferenceStation({ onSelect, onHover }) {
   const [hovered, setHovered] = useState(false);
@@ -29,14 +29,32 @@ export default function ConferenceStation({ onSelect, onHover }) {
   const projectorScreen = useMemo(() => createProjectorScreen(), []);
   const screenTimer = useRef(0);
 
+  // Functional Conference Table Presentation Briefing Laptop
+  const presentationLaptop = useMemo(() => createPresentationLaptopScreen(), []);
+  const laptopTimer = useRef(0);
+  const [laptopHovered, setLaptopHovered] = useState(false);
+
+  const handleLaptopClick = (e) => {
+    e.stopPropagation();
+    playClickSound(980, 0.06);
+    presentationLaptop.nextSlide();
+    playWhooshSound();
+    onSelect?.({ section: 'achievements', label: 'Briefing Presentation Laptop · Awards' });
+  };
+
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 0. Update Projector Screen (Paced to gentle 8 FPS for optimal GPU performance)
+    // 0. Update Screens (Paced for smooth 60fps GPU performance)
     screenTimer.current += delta;
     if (screenTimer.current > 0.125) {
       projectorScreen.update(screenTimer.current);
       screenTimer.current = 0;
+    }
+    laptopTimer.current += delta;
+    if (laptopTimer.current > 0.125) {
+      presentationLaptop.update(laptopTimer.current);
+      laptopTimer.current = 0;
     }
 
     // 1. Holographic Ring Spin on BRICS Trophy
@@ -292,7 +310,7 @@ export default function ConferenceStation({ onSelect, onHover }) {
           </group>
 
           {/* 2. Wireless Presentation Laser Clicker Remote */}
-          <group position={[0.18, 0, -0.05]} rotation={[0, -0.35, 0]}>
+          <group position={[0.26, 0, 0.04]} rotation={[0, -0.35, 0]}>
             <mesh castShadow>
               <boxGeometry args={[0.03, 0.012, 0.09]} />
               <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.7} />
@@ -307,6 +325,57 @@ export default function ConferenceStation({ onSelect, onHover }) {
               <sphereGeometry args={[0.002, 8, 8]} />
               <meshBasicMaterial color="#ef4444" />
             </mesh>
+          </group>
+
+          {/* 3. Executive Cyber Presentation Briefing Laptop */}
+          <group
+            position={[0.02, 0.005, -0.08]}
+            rotation={[0, -0.15, 0]}
+            onClick={handleLaptopClick}
+            onPointerOver={(e) => {
+              e.stopPropagation();
+              setLaptopHovered(true);
+              document.body.style.cursor = 'pointer';
+              onHover?.('Briefing Presentation Laptop · [CLICK TO CYCLE SLIDE / OPEN AWARDS]');
+            }}
+            onPointerOut={() => {
+              setLaptopHovered(false);
+              document.body.style.cursor = 'auto';
+              onHover?.(null);
+            }}
+          >
+            {/* Laptop Base Chassis with subtle hover lift */}
+            <mesh castShadow position={[0, laptopHovered ? 0.005 : 0, 0]}>
+              <boxGeometry args={[0.26, 0.01, 0.19]} />
+              <meshStandardMaterial
+                color={laptopHovered ? '#1e293b' : '#0f172a'}
+                roughness={0.25}
+                metalness={0.8}
+              />
+            </mesh>
+            {/* Keyboard & Backlight */}
+            <mesh position={[0, (laptopHovered ? 0.005 : 0) + 0.006, -0.02]}>
+              <planeGeometry args={[0.22, 0.09]} />
+              <meshBasicMaterial color={laptopHovered ? '#0284c7' : '#020617'} />
+            </mesh>
+            {/* Trackpad */}
+            <mesh position={[0, (laptopHovered ? 0.005 : 0) + 0.006, 0.055]}>
+              <planeGeometry args={[0.07, 0.045]} />
+              <meshStandardMaterial color="#334155" roughness={0.5} />
+            </mesh>
+            {/* Open Display Lid */}
+            <group position={[0, (laptopHovered ? 0.005 : 0) + 0.005, -0.095]} rotation={[1.85, 0, 0]}>
+              <mesh castShadow>
+                <boxGeometry args={[0.26, 0.18, 0.008]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.25} metalness={0.85} />
+              </mesh>
+              {/* Dynamic Presentation Slide Face */}
+              <mesh position={[0, 0, 0.005]}>
+                <planeGeometry args={[0.24, 0.16]} />
+                <meshBasicMaterial map={presentationLaptop.texture} toneMapped={false} />
+              </mesh>
+              <pointLight position={[0, 0, 0.06]} color="#38bdf8" intensity={laptopHovered ? 1.5 : 0.8} distance={0.6} />
+            </group>
           </group>
         </group>
         {/* Center Pedestal Base */}
