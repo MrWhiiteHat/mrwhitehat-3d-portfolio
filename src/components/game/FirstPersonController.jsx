@@ -261,20 +261,6 @@ const STATIONS = [
       ),
     ],
   },
-  // 19. Secret Ventilation Duct // Black Hat Vault Hatch (Floor duct beside Server Rack)
-  {
-    id: 'secret_vault',
-    title: 'Secret Ventilation Duct',
-    action: 'INFILTRATE // BLACK HAT VAULT (E)',
-    position: [-1.15, 0.45, -4.85],
-    maxDist: 3.5,
-    boxes: [
-      new THREE.Box3(
-        new THREE.Vector3(-1.9, 0.1, -4.98),
-        new THREE.Vector3(-0.4, 1.2, -4.5)
-      ),
-    ],
-  },
 ];
 
 // Room Obstacle Bounding Boxes for AABB Collision Response

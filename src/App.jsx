@@ -70,7 +70,6 @@ const NAV_STATIONS = [
   { id: 'hardware_arsenal', label: 'Hardware', icon: Radio, num: '9' },
   { id: 'wireshark_monitor', label: 'Wireshark', icon: Activity, num: '0' },
   { id: 'visitor_log', label: 'Visitor Logs', icon: Users, num: 'V' },
-  { id: 'secret_vault', label: 'Black Hat Vault', icon: Skull, num: 'X' },
 ];
 
 export default function App() {
@@ -442,8 +441,7 @@ export default function App() {
         handleOpenLeaderboard();
       } else if (e.key === 'g' || e.key === 'G') {
         handleOpenGadgets('flipper');
-      } else if (e.key === 'x' || e.key === 'X') {
-        handleStationInteract('secret_vault');
+
       } else if (e.key === 'r' || e.key === 'R') {
         handleToggleRecruiter();
       }
