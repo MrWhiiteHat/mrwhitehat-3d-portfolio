@@ -131,6 +131,112 @@ export default function ArchiveStation({ onSelect, onHover }) {
           </group>
         ))}
 
+        {/* ========================================================================= */}
+        {/* BESPOKE SKILLS 3D ASSETS: 4 CLASSIFIED CYBER DATABANK CARTRIDGES         */}
+        {/* Represents: 4 Skill Tiers from the Skills Dossier                         */}
+        {/* ========================================================================= */}
+        <group position={[0, 2.06, 0]}>
+          {[
+            { x: -0.75, color: '#ef4444', label: '01_REVERSE_ENG', title: 'Binary & Assembly' },
+            { x: -0.25, color: '#38bdf8', label: '02_WEB_CLOUD', title: 'OWASP & Cloud' },
+            { x: 0.25, color: '#22c55e', label: '03_NET_RECON', title: 'Packet & RF' },
+            { x: 0.75, color: '#a855f7', label: '04_AI_CRYPTO', title: 'ZeroKnowledge & AI' },
+          ].map((cart, cIdx) => (
+            <group key={`databank-cart-${cIdx}`} position={[cart.x, 0, 0]}>
+              {/* Heavy Anodized Brushed Titanium Cartridge Chassis */}
+              <mesh castShadow>
+                <boxGeometry args={[0.28, 0.24, 0.36]} />
+                <meshStandardMaterial color="#0b1016" roughness={0.3} metalness={0.85} />
+              </mesh>
+              {/* Front Beveled Faceplate */}
+              <mesh position={[0, 0, 0.182]}>
+                <boxGeometry args={[0.26, 0.22, 0.005]} />
+                <meshStandardMaterial color="#1e293b" roughness={0.4} metalness={0.6} />
+              </mesh>
+              {/* Categorical Glowing LED Identification Light Bar */}
+              <mesh position={[0, 0.08, 0.186]}>
+                <boxGeometry args={[0.22, 0.015, 0.006]} />
+                <meshBasicMaterial color={cart.color} />
+              </mesh>
+              <pointLight position={[0, 0.08, 0.22]} color={cart.color} intensity={0.7} distance={0.6} />
+              {/* Cooling Heatsink Vents on Top */}
+              {[-0.08, -0.04, 0, 0.04, 0.08].map((vx, i) => (
+                <mesh key={`vent-${i}`} position={[vx, 0.122, 0]}>
+                  <boxGeometry args={[0.015, 0.004, 0.28]} />
+                  <meshStandardMaterial color="#020617" roughness={0.9} />
+                </mesh>
+              ))}
+              {/* Front Extraction Handle */}
+              <mesh position={[0, -0.06, 0.195]}>
+                <boxGeometry args={[0.12, 0.02, 0.02]} />
+                <meshStandardMaterial color="#475569" metalness={0.9} roughness={0.2} />
+              </mesh>
+              {/* Classified Stencil Label Inset */}
+              <mesh position={[0, 0.01, 0.186]}>
+                <planeGeometry args={[0.2, 0.05]} />
+                <meshBasicMaterial color="#020617" />
+              </mesh>
+            </group>
+          ))}
+        </group>
+
+        {/* ========================================================================= */}
+        {/* BESPOKE SKILLS 3D ASSETS: HARDCOVER CYBERSECURITY FIELD MANUALS (Tier 1-4)*/}
+        {/* ========================================================================= */}
+        <group position={[0.55, 1.45, 0]}>
+          {[
+            { offset: -0.16, width: 0.065, color: '#1c1917', gold: '#d4af37', label: 'SHELLCODERS' },
+            { offset: -0.08, width: 0.075, color: '#0f172a', gold: '#38bdf8', label: 'MALWARE_ANALYSIS' },
+            { offset: 0.01, width: 0.08, color: '#142a1f', gold: '#4ade80', label: 'BLACK_HAT_PYTHON' },
+            { offset: 0.11, width: 0.07, color: '#261230', gold: '#c084fc', label: 'CRYPTOGRAPHY_APPLIED' },
+          ].map((bk, bIdx) => (
+            <group key={`manual-${bIdx}`} position={[bk.offset, 0, 0]}>
+              {/* Hardcover Book Spine */}
+              <mesh castShadow>
+                <boxGeometry args={[bk.width, 0.38, 0.35]} />
+                <meshStandardMaterial color={bk.color} roughness={0.35} metalness={0.15} />
+              </mesh>
+              {/* Embossed Metallic Gold Spine Title Plate */}
+              <mesh position={[0, 0, 0.176]}>
+                <planeGeometry args={[bk.width * 0.8, 0.32]} />
+                <meshStandardMaterial color={bk.gold} metalness={0.9} roughness={0.2} />
+              </mesh>
+              {/* Spine Text Simulation Ribs */}
+              {[-0.1, -0.05, 0, 0.05, 0.1].map((ry, rIdx) => (
+                <mesh key={`rib-${rIdx}`} position={[0, ry, 0.177]}>
+                  <boxGeometry args={[bk.width * 0.6, 0.008, 0.002]} />
+                  <meshBasicMaterial color="#020617" />
+                </mesh>
+              ))}
+            </group>
+          ))}
+        </group>
+
+        {/* ========================================================================= */}
+        {/* BESPOKE SKILLS 3D ASSET: MILITARY-GRADE HARDWARE KEYPAD USB CRYPTO DRIVE   */}
+        {/* ========================================================================= */}
+        <group position={[-0.75, 0.78, 0.1]} rotation={[0, 0.35, 0]}>
+          {/* IronKey Style Anodized Blue Metal Casing */}
+          <mesh castShadow>
+            <boxGeometry args={[0.09, 0.02, 0.045]} />
+            <meshStandardMaterial color="#0369a1" roughness={0.3} metalness={0.8} />
+          </mesh>
+          {/* 10-Key PIN Keypad */}
+          <mesh position={[-0.01, 0.011, 0]}>
+            <planeGeometry args={[0.055, 0.035]} />
+            <meshBasicMaterial color="#0f172a" />
+          </mesh>
+          {/* Hardware Lock/Unlock LEDs */}
+          <mesh position={[0.03, 0.012, -0.01]}>
+            <sphereGeometry args={[0.0025, 8, 8]} />
+            <meshBasicMaterial color="#ef4444" />
+          </mesh>
+          <mesh position={[0.03, 0.012, 0.01]}>
+            <sphereGeometry args={[0.0025, 8, 8]} />
+            <meshBasicMaterial color="#22c55e" />
+          </mesh>
+        </group>
+
         {/* Interactive Feature: "Cyber Security Dossier" pulled book on shelf level 2 */}
         <group
           ref={pulledBookRef}

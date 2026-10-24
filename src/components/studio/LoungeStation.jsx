@@ -88,6 +88,25 @@ export default function LoungeStation({ onSelect, onHover }) {
           <meshStandardMaterial {...leatherCushions} roughness={0.48} metalness={0.12} />
         </mesh>
 
+        {/* Studio Monitor Headphones resting on Couch Cushion */}
+        <group position={[0.55, 0.48, 0.05]} rotation={[0.2, 0.4, 0]}>
+          {/* Headband Spring Arch */}
+          <mesh castShadow rotation={[0, 0, Math.PI / 2]}>
+            <torusGeometry args={[0.065, 0.006, 12, 24, Math.PI]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.9} roughness={0.2} />
+          </mesh>
+          {/* Left Ear Cushion */}
+          <mesh position={[-0.065, -0.01, 0]}>
+            <cylinderGeometry args={[0.025, 0.025, 0.02, 16]} />
+            <meshStandardMaterial color="#090d16" roughness={0.7} />
+          </mesh>
+          {/* Right Ear Cushion */}
+          <mesh position={[0.065, -0.01, 0]}>
+            <cylinderGeometry args={[0.025, 0.025, 0.02, 16]} />
+            <meshStandardMaterial color="#090d16" roughness={0.7} />
+          </mesh>
+        </group>
+
         {/* Left & Right Armrests */}
         <mesh position={[-0.98, 0.48, 0]} castShadow>
           <boxGeometry args={[0.16, 0.36, 0.8]} />
@@ -138,7 +157,7 @@ export default function LoungeStation({ onSelect, onHover }) {
         ))}
 
         {/* Digital Cyber Tablet on Table */}
-        <group position={[0.05, 0.41, 0.05]} rotation={[-Math.PI / 2, 0, 0.3]}>
+        <group position={[0.16, 0.41, -0.05]} rotation={[-Math.PI / 2, 0, 0.4]}>
           <mesh castShadow>
             <boxGeometry args={[0.22, 0.15, 0.01]} />
             <meshStandardMaterial color="#0f172a" roughness={0.2} metalness={0.8} />
@@ -147,6 +166,72 @@ export default function LoungeStation({ onSelect, onHover }) {
           <mesh position={[0, 0, 0.006]}>
             <planeGeometry args={[0.2, 0.13]} />
             <meshBasicMaterial map={tabletScreen.texture} toneMapped={false} />
+          </mesh>
+        </group>
+
+        {/* BESPOKE ABOUT ME 3D ASSETS: HACKER LAPTOP (ThinkPad Style) & OPERATIVE BADGE */}
+        <group position={[-0.12, 0.41, 0.02]} rotation={[0, 0.35, 0]}>
+          {/* Laptop Base Chassis */}
+          <mesh castShadow>
+            <boxGeometry args={[0.28, 0.012, 0.2]} />
+            <meshStandardMaterial color="#0b0f14" roughness={0.4} metalness={0.6} />
+          </mesh>
+          {/* Keyboard Inset & Touchpad */}
+          <mesh position={[0, 0.007, -0.02]}>
+            <planeGeometry args={[0.24, 0.1]} />
+            <meshBasicMaterial color="#030708" />
+          </mesh>
+          {/* Red TrackPoint Nub */}
+          <mesh position={[0, 0.008, -0.02]}>
+            <sphereGeometry args={[0.003, 8, 8]} />
+            <meshBasicMaterial color="#ef4444" />
+          </mesh>
+          {/* Touchpad */}
+          <mesh position={[0, 0.007, 0.06]}>
+            <planeGeometry args={[0.08, 0.05]} />
+            <meshStandardMaterial color="#1e293b" roughness={0.6} />
+          </mesh>
+
+          {/* Laptop Open Display Screen (Angled 115 degrees) */}
+          <group position={[0, 0.006, -0.1]} rotation={[1.9, 0, 0]}>
+            {/* Screen Bezel & Lid */}
+            <mesh castShadow>
+              <boxGeometry args={[0.28, 0.19, 0.008]} />
+              <meshStandardMaterial color="#0b0f14" roughness={0.3} metalness={0.8} />
+            </mesh>
+            {/* Active Hacker Terminal Screen: Offensive Mindset Bio Prompt */}
+            <mesh position={[0, 0, 0.005]}>
+              <planeGeometry args={[0.26, 0.17]} />
+              <meshBasicMaterial color="#021c15" />
+            </mesh>
+            {/* Terminal Green Prompt Lines */}
+            {[-0.05, -0.02, 0.01, 0.04].map((py, idx) => (
+              <mesh key={`lap-line-${idx}`} position={[-0.02, py, 0.006]}>
+                <planeGeometry args={[0.2, 0.01]} />
+                <meshBasicMaterial color={idx === 0 ? '#38bdf8' : '#34d399'} transparent opacity={0.85} />
+              </mesh>
+            ))}
+          </group>
+        </group>
+
+        {/* Laminated Operative ID Badge with Photo Hologram */}
+        <group position={[0.02, 0.405, 0.22]} rotation={[0, -0.25, 0]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.095, 0.002, 0.06]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.3} />
+          </mesh>
+          <mesh position={[-0.02, 0.002, 0]}>
+            <planeGeometry args={[0.035, 0.045]} />
+            <meshBasicMaterial color="#38bdf8" />
+          </mesh>
+          <mesh position={[0.025, 0.002, 0.01]}>
+            <planeGeometry args={[0.035, 0.015]} />
+            <meshBasicMaterial color="#34d399" />
+          </mesh>
+          {/* Lanyard Cord */}
+          <mesh position={[0.07, 0.002, 0]} rotation={[0, 0.5, 0]}>
+            <boxGeometry args={[0.08, 0.001, 0.012]} />
+            <meshStandardMaterial color="#eab308" roughness={0.7} />
           </mesh>
         </group>
       </group>

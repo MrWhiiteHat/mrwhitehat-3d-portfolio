@@ -205,6 +205,42 @@ export default function ConferenceStation({ onSelect, onHover }) {
           </group>
         </group>
 
+        {/* Award Trophy 1B: Engraved CTF National Championship Plaque */}
+        <group position={[-0.4, 0.28, 0.1]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.22, 0.12, 0.015]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.8} />
+          </mesh>
+          <mesh position={[0, 0, 0.01]}>
+            <planeGeometry args={[0.2, 0.1]} />
+            <meshStandardMaterial color="#eab308" metalness={0.95} roughness={0.15} />
+          </mesh>
+          {/* Engraved Star */}
+          <mesh position={[0, 0.02, 0.012]}>
+            <circleGeometry args={[0.018, 5]} />
+            <meshBasicMaterial color="#78350f" />
+          </mesh>
+        </group>
+
+        {/* Award Trophy 2B: 4 Framed Hall of Fame Bounty Badges on Credenza Back */}
+        <group position={[0.4, 0.28, 0.1]}>
+          {[-0.09, -0.03, 0.03, 0.09].map((bx, idx) => {
+            const badgeColors = ['#ea4335', '#00a4ef', '#ff6600', '#10b981'];
+            return (
+              <group key={`bounty-badge-${idx}`} position={[bx, 0, 0]}>
+                <mesh castShadow>
+                  <boxGeometry args={[0.05, 0.08, 0.01]} />
+                  <meshStandardMaterial color="#1e293b" metalness={0.8} roughness={0.3} />
+                </mesh>
+                <mesh position={[0, 0.015, 0.007]}>
+                  <circleGeometry args={[0.014, 16]} />
+                  <meshStandardMaterial color={badgeColors[idx]} metalness={0.9} roughness={0.2} />
+                </mesh>
+              </group>
+            );
+          })}
+        </group>
+
         {/* Award Trophy 3: Bronze Medal Plaque (Odisha Skills 2025-2026) */}
         <group
           ref={trophyBronzeRef}
@@ -235,6 +271,44 @@ export default function ConferenceStation({ onSelect, onHover }) {
           <cylinderGeometry args={[0.75, 0.75, 0.06, 32]} />
           <meshStandardMaterial {...walnutTable} roughness={0.32} metalness={0.12} />
         </mesh>
+
+        {/* Conference Table Assets: Security Briefing Dossiers & Laser Clicker */}
+        <group position={[0, 0.76, 0]}>
+          {/* 1. Laminated Red Team Briefing Folder */}
+          <group position={[-0.15, 0, 0.08]} rotation={[0, 0.2, 0]}>
+            <mesh castShadow>
+              <boxGeometry args={[0.22, 0.005, 0.28]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.4} />
+            </mesh>
+            <mesh position={[0, 0.003, 0]}>
+              <planeGeometry args={[0.18, 0.24]} />
+              <meshBasicMaterial color="#f8fafc" />
+            </mesh>
+            {/* Red "TOP SECRET // CVE AUDIT" Stamp */}
+            <mesh position={[0, 0.004, -0.06]}>
+              <planeGeometry args={[0.12, 0.03]} />
+              <meshBasicMaterial color="#dc2626" />
+            </mesh>
+          </group>
+
+          {/* 2. Wireless Presentation Laser Clicker Remote */}
+          <group position={[0.18, 0, -0.05]} rotation={[0, -0.35, 0]}>
+            <mesh castShadow>
+              <boxGeometry args={[0.03, 0.012, 0.09]} />
+              <meshStandardMaterial color="#1e293b" roughness={0.3} metalness={0.7} />
+            </mesh>
+            {/* Clicker Forward Button */}
+            <mesh position={[0, 0.007, -0.015]}>
+              <cylinderGeometry args={[0.006, 0.006, 0.004, 12]} />
+              <meshStandardMaterial color="#38bdf8" roughness={0.4} />
+            </mesh>
+            {/* Laser Aperture Indicator */}
+            <mesh position={[0, 0, -0.046]}>
+              <sphereGeometry args={[0.002, 8, 8]} />
+              <meshBasicMaterial color="#ef4444" />
+            </mesh>
+          </group>
+        </group>
         {/* Center Pedestal Base */}
         <mesh position={[0, 0.34, 0]} castShadow>
           <cylinderGeometry args={[0.18, 0.32, 0.68, 24]} />

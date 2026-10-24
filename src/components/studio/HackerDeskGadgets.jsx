@@ -256,6 +256,151 @@ export default function HackerDeskGadgets() {
           <meshStandardMaterial color="#0284c7" roughness={0.8} />
         </mesh>
       </group>
+
+      {/* ========================================================================= */}
+      {/* 5. PROJECT 1 ASSET: MOBILE APP PEN-TEST ANDROID PHONE & RIG               */}
+      {/* Represents: LLM-Based Autonomous Mobile App Security Penetration Agent   */}
+      {/* ========================================================================= */}
+      <group position={[0.26, 0.015, -0.15]} rotation={[0, -0.18, 0]}>
+        {/* Angled CNC Aluminum Desktop Phone Stand */}
+        <group position={[0, 0.025, 0]} rotation={[-0.45, 0, 0]}>
+          {/* Stand Backplate */}
+          <mesh position={[0, 0, -0.006]}>
+            <boxGeometry args={[0.075, 0.13, 0.006]} />
+            <meshStandardMaterial color="#334155" metalness={0.9} roughness={0.2} />
+          </mesh>
+          {/* Bottom Lip Hook */}
+          <mesh position={[0, -0.065, 0.008]}>
+            <boxGeometry args={[0.075, 0.01, 0.02]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.9} />
+          </mesh>
+
+          {/* Test Android Smartphone Body (Matte Black Bezel) */}
+          <mesh castShadow position={[0, 0.005, 0.004]}>
+            <boxGeometry args={[0.07, 0.145, 0.008]} />
+            <meshStandardMaterial color="#0b0f14" roughness={0.25} metalness={0.85} />
+          </mesh>
+          {/* Live Mobile Vulnerability Triage OLED Screen */}
+          <mesh position={[0, 0.005, 0.009]}>
+            <planeGeometry args={[0.064, 0.136]} />
+            <meshBasicMaterial color="#04202c" />
+          </mesh>
+          {/* Mobile Terminal Audit Trace Lines */}
+          {[-0.045, -0.025, -0.005, 0.015, 0.035, 0.055].map((ly, idx) => (
+            <mesh key={`phone-trace-${idx}`} position={[-0.002, ly, 0.01]}>
+              <planeGeometry args={[0.054, 0.007]} />
+              <meshBasicMaterial color={idx === 1 ? '#ef4444' : (idx === 4 ? '#22c55e' : '#38bdf8')} transparent opacity={0.85} />
+            </mesh>
+          ))}
+          {/* Camera Punch-hole */}
+          <mesh position={[0, 0.065, 0.009]}>
+            <circleGeometry args={[0.003, 12]} />
+            <meshBasicMaterial color="#000000" />
+          </mesh>
+        </group>
+
+        {/* Braided Blue USB-C Debugging Tether running to desk raceway */}
+        <mesh position={[0.02, 0.005, -0.04]} rotation={[0, 0.3, 0]}>
+          <cylinderGeometry args={[0.0018, 0.0018, 0.12, 8]} />
+          <meshStandardMaterial color="#0284c7" roughness={0.5} />
+        </mesh>
+      </group>
+
+      {/* ========================================================================= */}
+      {/* 6. PROJECT 2 ASSET: NEUROFLUX BCI NEURAL SENSOR HEADBAND                  */}
+      {/* Represents: NeuroFlux Multimodal Real-Time Input Pipeline                 */}
+      {/* ========================================================================= */}
+      <group position={[-0.52, 0.018, 0.12]} rotation={[0, 0.35, 0]}>
+        {/* Ergonomic Curved Carbon-Fiber Headband */}
+        <mesh castShadow position={[0, 0.015, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.075, 0.006, 12, 28, Math.PI * 0.9]} />
+          <meshStandardMaterial color="#090d16" roughness={0.3} metalness={0.8} />
+        </mesh>
+        {/* 4 Golden EEG Dry-Contact Electrodes */}
+        {[-0.05, -0.02, 0.02, 0.05].map((ex, idx) => (
+          <group key={`eeg-node-${idx}`} position={[ex, 0.015, -0.035]}>
+            <mesh>
+              <cylinderGeometry args={[0.005, 0.005, 0.006, 12]} />
+              <meshStandardMaterial color="#eab308" metalness={0.95} roughness={0.15} />
+            </mesh>
+            {/* Glowing Neural Telemetry Ring */}
+            <mesh position={[0, 0.004, 0]}>
+              <ringGeometry args={[0.005, 0.007, 12]} />
+              <meshBasicMaterial color="#a855f7" />
+            </mesh>
+          </group>
+        ))}
+        {/* Central Neural Signal DSP Processing Core */}
+        <mesh position={[0, 0.018, 0.04]}>
+          <boxGeometry args={[0.026, 0.014, 0.022]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.8} />
+        </mesh>
+        <pointLight position={[0, 0.025, 0.04]} color="#a855f7" intensity={0.8} distance={0.5} />
+      </group>
+
+      {/* ========================================================================= */}
+      {/* 7. PROJECT 3 ASSET: KSECURITY THREAT RADAR MINI-OLED TABLET               */}
+      {/* Represents: KSecurity AI-Powered Threat Intelligence Platform             */}
+      {/* ========================================================================= */}
+      <group position={[0.92, 0.025, -0.16]} rotation={[-0.3, -0.4, 0]}>
+        {/* Beveled Gunmetal Tablet Frame */}
+        <mesh castShadow>
+          <boxGeometry args={[0.13, 0.09, 0.008]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.9} />
+        </mesh>
+        {/* Active STIX/TAXII Threat Radar OLED Screen */}
+        <mesh position={[0, 0, 0.005]}>
+          <planeGeometry args={[0.12, 0.08]} />
+          <meshBasicMaterial color="#082f49" />
+        </mesh>
+        {/* Concentric Radar Sweeper Circles */}
+        <mesh position={[0, 0, 0.006]}>
+          <ringGeometry args={[0.018, 0.022, 24]} />
+          <meshBasicMaterial color="#38bdf8" transparent opacity={0.7} />
+        </mesh>
+        <mesh position={[0, 0, 0.006]}>
+          <ringGeometry args={[0.032, 0.035, 24]} />
+          <meshBasicMaterial color="#38bdf8" transparent opacity={0.4} />
+        </mesh>
+        {/* Blinking CVE Threat Nodes */}
+        {[
+          { x: 0.02, y: 0.015, c: '#ef4444' },
+          { x: -0.025, y: -0.01, c: '#f59e0b' },
+          { x: 0.035, y: -0.02, c: '#22c55e' },
+        ].map((node, i) => (
+          <mesh key={`cve-blip-${i}`} position={[node.x, node.y, 0.007]}>
+            <circleGeometry args={[0.0035, 8]} />
+            <meshBasicMaterial color={node.c} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* ========================================================================= */}
+      {/* 8. PROJECT 4 ASSET: KRISHIMITRA IOT EDGE AGRICULTURAL TELEMETRY NODE      */}
+      {/* Represents: KrishiMitra Multimodal Agricultural AI Assistant              */}
+      {/* ========================================================================= */}
+      <group position={[-1.02, 0.02, 0.16]} rotation={[0, 0.15, 0]}>
+        {/* Weatherproof IP67 Green Enclosure */}
+        <mesh castShadow>
+          <boxGeometry args={[0.065, 0.035, 0.075]} />
+          <meshStandardMaterial color="#166534" roughness={0.4} metalness={0.2} />
+        </mesh>
+        {/* Top Solar Energy Harvester Cell */}
+        <mesh position={[0, 0.018, 0]}>
+          <planeGeometry args={[0.055, 0.065]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.2} metalness={0.8} />
+        </mesh>
+        {/* Stubby Rubber 868MHz LoRa / Soil Telemetry Antenna */}
+        <mesh position={[0.022, 0.035, -0.025]}>
+          <cylinderGeometry args={[0.003, 0.004, 0.05, 8]} />
+          <meshStandardMaterial color="#1e293b" roughness={0.5} />
+        </mesh>
+        {/* Telemetry Status Pulse LED */}
+        <mesh position={[-0.02, 0.019, 0.025]}>
+          <sphereGeometry args={[0.003, 8, 8]} />
+          <meshBasicMaterial color="#4ade80" />
+        </mesh>
+      </group>
     </group>
   );
 }
