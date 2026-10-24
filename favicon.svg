@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#38bdf8" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#030712" />
+  <path d="M32 6 L52 14 V28 C52 42 43 53 32 58 C21 53 12 42 12 28 V14 Z" fill="url(#shieldGrad)" stroke="#38bdf8" stroke-width="2" />
+  <path d="M32 10 L48 16.5 V28 C48 39.5 40.5 49 32 53.5 C23.5 49 16 39.5 16 28 V16.5 Z" fill="#0b1320" />
+  <!-- Terminal Prompt >_ in Neon Mint -->
+  <path d="M24 25 L31 31 L24 37" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlow)" />
+  <line x1="34" y1="37" x2="41" y2="37" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" filter="url(#neonGlow)" />
+</svg>
