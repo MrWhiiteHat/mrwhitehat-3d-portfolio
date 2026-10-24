@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { playTelephoneTone, playWhooshSound } from '../../utils/audio.js';
@@ -9,42 +9,49 @@ import { playTelephoneTone, playWhooshSound } from '../../utils/audio.js';
  */
 function createCommsScreenTexture() {
   if (typeof document === 'undefined') return null;
-  const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 128;
-  const ctx = canvas.getContext('2d');
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
 
-  // Dark Military Emerald LCD Matrix Base
-  ctx.fillStyle = '#02180e';
-  ctx.fillRect(0, 0, 256, 128);
+    // Dark Military Emerald LCD Matrix Base
+    ctx.fillStyle = '#02180e';
+    ctx.fillRect(0, 0, 256, 128);
 
-  // Top Status Bar
-  ctx.fillStyle = '#064e3b';
-  ctx.fillRect(8, 8, 240, 22);
+    // Top Status Bar
+    ctx.fillStyle = '#064e3b';
+    ctx.fillRect(8, 8, 240, 22);
 
-  ctx.font = 'bold 11px monospace';
-  ctx.fillStyle = '#34d399';
-  ctx.fillText('ENC-COMMS // PGP 4096-BIT', 16, 23);
+    ctx.font = 'bold 11px monospace';
+    ctx.fillStyle = '#34d399';
+    ctx.fillText('ENC-COMMS // PGP 4096-BIT', 16, 23);
 
-  // Main Call Target
-  ctx.font = 'bold 15px monospace';
-  ctx.fillStyle = '#10b981';
-  ctx.fillText('CALL: MRWHITEHAT', 16, 56);
+    // Main Call Target
+    ctx.font = 'bold 15px monospace';
+    ctx.fillStyle = '#10b981';
+    ctx.fillText('CALL: MRWHITEHAT', 16, 56);
 
-  ctx.font = '10px monospace';
-  ctx.fillStyle = '#6ee7b7';
-  ctx.fillText('kanhasarangi39@gmail.com', 16, 74);
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#6ee7b7';
+    ctx.fillText('kanhasarangi39@gmail.com', 16, 74);
 
-  // Audio Equalizer Frequency Bars
-  const bars = [14, 22, 18, 30, 24, 34, 28, 38, 20, 16, 26, 18, 12];
-  bars.forEach((h, i) => {
-    ctx.fillStyle = h > 28 ? '#f59e0b' : '#34d399';
-    ctx.fillRect(16 + i * 16, 118 - h, 10, h);
-  });
+    // Audio Equalizer Frequency Bars
+    const bars = [14, 22, 18, 30, 24, 34, 28, 38, 20, 16, 26, 18, 12];
+    bars.forEach((h, i) => {
+      ctx.fillStyle = h > 28 ? '#f59e0b' : '#34d399';
+      ctx.fillRect(16 + i * 16, 118 - h, 10, h);
+    });
 
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return texture;
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.needsUpdate = true;
+    return texture;
+  } catch (err) {
+    console.warn('Failed to create comms texture:', err);
+    return null;
+  }
 }
 
 export default function CommsStation({ onSelect, onHover }) {

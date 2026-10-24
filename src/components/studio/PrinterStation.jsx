@@ -13,109 +13,116 @@ import {
  */
 function createResumeSheetTexture() {
   if (typeof document === 'undefined') return null;
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 680;
-  const ctx = canvas.getContext('2d');
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 680;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
 
-  // Parchment / Crisp Security White Paper Base
-  ctx.fillStyle = '#f8fafc';
-  ctx.fillRect(0, 0, 512, 680);
+    // Parchment / Crisp Security White Paper Base
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, 512, 680);
 
-  // Subtle Header Watermark Bar
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(36, 36, 440, 52);
+    // Subtle Header Watermark Bar
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(36, 36, 440, 52);
 
-  // Candidate Name & Title
-  ctx.font = 'bold 22px monospace';
-  ctx.fillStyle = '#38bdf8';
-  ctx.fillText('SADASHIBA SARANGI', 52, 68);
+    // Candidate Name & Title
+    ctx.font = 'bold 22px monospace';
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText('SADASHIBA SARANGI', 52, 68);
 
-  ctx.font = '12px monospace';
-  ctx.fillStyle = '#94a3b8';
-  ctx.fillText('CYBERSECURITY ARCHITECT & AI RESEARCHER', 52, 84);
+    ctx.font = '12px monospace';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('CYBERSECURITY ARCHITECT & AI RESEARCHER', 52, 84);
 
-  // Decorative Accent Bar
-  ctx.fillStyle = '#10b981';
-  ctx.fillRect(36, 96, 440, 4);
+    // Decorative Accent Bar
+    ctx.fillStyle = '#10b981';
+    ctx.fillRect(36, 96, 440, 4);
 
-  // Section 1: Executive Summary
-  ctx.fillStyle = '#1e293b';
-  ctx.font = 'bold 14px monospace';
-  ctx.fillText('// OPERATIONAL SUMMARY', 36, 126);
+    // Section 1: Executive Summary
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText('// OPERATIONAL SUMMARY', 36, 126);
 
-  ctx.fillStyle = '#475569';
-  ctx.font = '10px monospace';
-  ctx.fillText('Offensive security researcher specializing in binary exploitation,', 36, 146);
-  ctx.fillText('automated mobile vulnerability triage, and AI-driven defense.', 36, 162);
+    ctx.fillStyle = '#475569';
+    ctx.font = '10px monospace';
+    ctx.fillText('Offensive security researcher specializing in binary exploitation,', 36, 146);
+    ctx.fillText('automated mobile vulnerability triage, and AI-driven defense.', 36, 162);
 
-  // Section 2: Experience & Projects
-  ctx.fillStyle = '#1e293b';
-  ctx.font = 'bold 14px monospace';
-  ctx.fillText('// TECHNICAL ACHIEVEMENTS', 36, 198);
+    // Section 2: Experience & Projects
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText('// TECHNICAL ACHIEVEMENTS', 36, 198);
 
-  const bullets = [
-    '> Lead Security Researcher · KSecurity Threat Platform',
-    '> Autonomous Mobile App Security Pen-Test Agent (LLM + Frida)',
-    '> KrishiMitra · Multimodal AI Edge Agricultural System',
-    '> NeuroFlux · Low-Latency Brainwave Sensor Pipeline',
-    '> 1st Place National Cyber Defense CTF Champion (Odisha)',
-    '> Hall of Fame Contributor · Google VRP, Microsoft, Bugcrowd',
-  ];
+    const bullets = [
+      '> Lead Security Researcher · KSecurity Threat Platform',
+      '> Autonomous Mobile App Security Pen-Test Agent (LLM + Frida)',
+      '> KrishiMitra · Multimodal AI Edge Agricultural System',
+      '> NeuroFlux · Low-Latency Brainwave Sensor Pipeline',
+      '> 1st Place National Cyber Defense CTF Champion (Odisha)',
+      '> Hall of Fame Contributor · Google VRP, Microsoft, Bugcrowd',
+    ];
 
-  ctx.font = '10px monospace';
-  ctx.fillStyle = '#334155';
-  bullets.forEach((b, i) => {
-    ctx.fillText(b, 44, 222 + i * 22);
-  });
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#334155';
+    bullets.forEach((b, i) => {
+      ctx.fillText(b, 44, 222 + i * 22);
+    });
 
-  // Section 3: Core Skills Matrix
-  ctx.fillStyle = '#1e293b';
-  ctx.font = 'bold 14px monospace';
-  ctx.fillText('// CORE DOMAINS', 36, 376);
+    // Section 3: Core Skills Matrix
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText('// CORE DOMAINS', 36, 376);
 
-  const skills = [
-    '[REVERSE_ENG: Ghidra, IDA Pro, x86/ARM, ROP Chains]',
-    '[CLOUD_SEC: AWS IAM, Kubernetes, Docker, Terraform]',
-    '[WEB_PENTEST: Burp Suite Pro, OWASP Top 10, GraphQL]',
-    '[AI_SECURITY: Transformers, PyTorch, Model Hardening]',
-  ];
+    const skills = [
+      '[REVERSE_ENG: Ghidra, IDA Pro, x86/ARM, ROP Chains]',
+      '[CLOUD_SEC: AWS IAM, Kubernetes, Docker, Terraform]',
+      '[WEB_PENTEST: Burp Suite Pro, OWASP Top 10, GraphQL]',
+      '[AI_SECURITY: Transformers, PyTorch, Model Hardening]',
+    ];
 
-  ctx.font = '10px monospace';
-  ctx.fillStyle = '#0369a1';
-  skills.forEach((s, i) => {
-    ctx.fillText(s, 44, 400 + i * 22);
-  });
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#0369a1';
+    skills.forEach((s, i) => {
+      ctx.fillText(s, 44, 400 + i * 22);
+    });
 
-  // Red Verification Official Security Seal
-  ctx.save();
-  ctx.translate(400, 560);
-  ctx.rotate(-0.15);
-  ctx.strokeStyle = '#dc2626';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(-65, -30, 130, 60);
+    // Red Verification Official Security Seal
+    ctx.save();
+    ctx.translate(400, 560);
+    ctx.rotate(-0.15);
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(-65, -30, 130, 60);
 
-  ctx.font = 'bold 12px monospace';
-  ctx.fillStyle = '#dc2626';
-  ctx.textAlign = 'center';
-  ctx.fillText('MRWHITEHAT', 0, -10);
-  ctx.font = '9px monospace';
-  ctx.fillText('VERIFIED RESUME', 0, 8);
-  ctx.fillText('LEVEL 4 CLEARANCE', 0, 22);
-  ctx.restore();
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#dc2626';
+    ctx.textAlign = 'center';
+    ctx.fillText('MRWHITEHAT', 0, -10);
+    ctx.font = '9px monospace';
+    ctx.fillText('VERIFIED RESUME', 0, 8);
+    ctx.fillText('LEVEL 4 CLEARANCE', 0, 22);
+    ctx.restore();
 
-  // QR Code / Verification Stamp Box
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(36, 520, 80, 80);
-  ctx.fillStyle = '#38bdf8';
-  ctx.fillRect(44, 528, 20, 20);
-  ctx.fillRect(88, 528, 20, 20);
-  ctx.fillRect(44, 572, 20, 20);
-  ctx.fillRect(72, 556, 16, 16);
+    // QR Code / Verification Stamp Box
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(36, 520, 80, 80);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(44, 528, 20, 20);
+    ctx.fillRect(88, 528, 20, 20);
+    ctx.fillRect(44, 572, 20, 20);
+    ctx.fillRect(72, 556, 16, 16);
 
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return texture;
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.needsUpdate = true;
+    return texture;
+  } catch (err) {
+    console.warn('Failed to create resume texture:', err);
+    return null;
+  }
 }
 
 export default function PrinterStation({ onSelect, onHover }) {

@@ -81,6 +81,26 @@ export default function CyberLoadingScreen({ isSceneReady = false, onFinish }) {
     }
   }, [displayProgress, isSceneReady, onFinish]);
 
+  // Failsafe timeout so visitor is never trapped on loading screen
+  useEffect(() => {
+    const safetyTimer = setTimeout(() => {
+      if (!finishTriggered.current) {
+        setDisplayProgress(100);
+        finishTriggered.current = true;
+        if (!soundPlayed.current) {
+          soundPlayed.current = true;
+          playHackingBeep(1400);
+        }
+        setIsFading(true);
+        setTimeout(() => {
+          onFinish?.();
+        }, 500);
+      }
+    }, 2800);
+
+    return () => clearTimeout(safetyTimer);
+  }, [onFinish]);
+
   // Format current asset filename for the ticker
   const currentAsset = item
     ? item.split('/').pop().split('?')[0]
