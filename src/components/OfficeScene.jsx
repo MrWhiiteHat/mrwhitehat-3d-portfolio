@@ -399,7 +399,7 @@ export default function OfficeScene({
   visitorLogs = [],
   visitorCount = 1,
   playerData = null,
-  onOpenRecruiter,
+  onOpenRecruiter = null,
 }) {
   const controlsRef = useRef(null);
   const [failed, setFailed] = useState(false);

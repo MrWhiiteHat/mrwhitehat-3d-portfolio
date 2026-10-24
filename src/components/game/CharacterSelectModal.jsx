@@ -157,6 +157,9 @@ export default function CharacterSelectModal({
   onSetTheme,
   isFullscreen,
   onToggleFullscreen,
+  onOpenLeaderboard = null,
+  onOpenGadgets = null,
+  onOpenRecruiter = null,
 }) {
   // Empty by default: user must enter their name (no presets/suggestions)
   const [name, setName] = useState('');
