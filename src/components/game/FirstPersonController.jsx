@@ -74,8 +74,8 @@ const STATIONS = [
         new THREE.Vector3(5.02, 2.85, 2.45)
       ),
       new THREE.Box3(
-        new THREE.Vector3(1.7, 0.25, 0.6),
-        new THREE.Vector3(2.2, 0.65, 1.1)
+        new THREE.Vector3(1.65, 0.25, 0.45),
+        new THREE.Vector3(2.75, 0.65, 1.55)
       ),
     ],
   },
@@ -278,10 +278,10 @@ const OBSTACLES = [
   { minX: -0.6, maxX: 1.8, minZ: -4.95, maxZ: -4.5 },
   // 6. 42U Mainframe Server Rack (Back Wall Left, [-2.3, 0, -4.55])
   { minX: -2.75, maxX: -1.85, minZ: -4.95, maxZ: -4.12 },
-  // 7. Lounge Leather Couch (Rotated 45 deg, [2.8, 0, 1.6])
-  { minX: 2.0, maxX: 3.8, minZ: 0.8, maxZ: 2.5 },
-  // 8. Lounge Coffee Table (Marble Disc, [1.95, 0, 0.85])
-  { minX: 1.45, maxX: 2.45, minZ: 0.35, maxZ: 1.35 },
+  // 7. Lounge Leather Couch (Rotated -135 deg, [3.15, 0, 1.95])
+  { minX: 2.25, maxX: 4.05, minZ: 1.05, maxZ: 2.85 },
+  // 8. Lounge Coffee Table (Marble Disc, [2.2, 0, 1.0])
+  { minX: 1.65, maxX: 2.75, minZ: 0.45, maxZ: 1.55 },
   // 9. Laser Printer Credenza Storage ([-3.6, 0, 0.8])
   { minX: -4.2, maxX: -3.0, minZ: 0.47, maxZ: 1.13 },
   // 10. Tall Designer Monstera Plant (Back Right Corner, [2.2, 0, -4.2])

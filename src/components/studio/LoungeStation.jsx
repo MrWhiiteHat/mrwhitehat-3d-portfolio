@@ -95,7 +95,7 @@ export default function LoungeStation({ onSelect, onHover }) {
   return (
     <group position={[2.8, 0, 1.6]} name="LoungeStation">
       {/* 1. Luxury Executive Leather Couch (facing inward) */}
-      <group position={[0, 0, 0]} rotation={[0, -Math.PI / 4, 0]}>
+      <group position={[0.35, 0, 0.35]} rotation={[0, -3 * Math.PI / 4, 0]}>
         {/* Base Cushion Platform */}
         <mesh position={[0, 0.22, 0]} castShadow receiveShadow>
           <boxGeometry args={[2.0, 0.24, 0.82]} />
@@ -160,7 +160,7 @@ export default function LoungeStation({ onSelect, onHover }) {
       </group>
 
       {/* 2. Round Marble & Brass Coffee Table */}
-      <group position={[-0.85, 0, -0.75]}>
+      <group position={[-0.60, 0, -0.60]}>
         {/* Tabletop Marble Disc */}
         <mesh position={[0, 0.38, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[0.5, 0.5, 0.04, 32]} />
@@ -185,7 +185,7 @@ export default function LoungeStation({ onSelect, onHover }) {
         ))}
 
         {/* Digital Cyber Tablet on Table */}
-        <group position={[0.16, 0.41, -0.05]} rotation={[-Math.PI / 2, 0, 0.4]}>
+        <group position={[0.18, 0.406, 0.12]} rotation={[-Math.PI / 2, 0, Math.PI / 4 + 0.3]}>
           <mesh castShadow>
             <boxGeometry args={[0.22, 0.15, 0.01]} />
             <meshStandardMaterial color="#0f172a" roughness={0.2} metalness={0.8} />
@@ -199,8 +199,8 @@ export default function LoungeStation({ onSelect, onHover }) {
 
         {/* BESPOKE ABOUT ME 3D ASSETS: FUNCTIONAL HACKER LAPTOP (ThinkPad X1) & OPERATIVE BADGE */}
         <group
-          position={[-0.12, 0.41, 0.02]}
-          rotation={[0, 0.35, 0]}
+          position={[-0.06, 0.408, -0.06]}
+          rotation={[0, Math.PI / 4, 0]}
           onClick={handleLaptopClick}
           onPointerOver={(e) => {
             e.stopPropagation();
@@ -263,7 +263,7 @@ export default function LoungeStation({ onSelect, onHover }) {
         </group>
 
         {/* Laminated Operative ID Badge with Photo Hologram */}
-        <group position={[0.02, 0.405, 0.22]} rotation={[0, -0.25, 0]}>
+        <group position={[-0.14, 0.404, 0.20]} rotation={[0, 0.25, 0]}>
           <mesh castShadow>
             <boxGeometry args={[0.095, 0.002, 0.06]} />
             <meshStandardMaterial color="#0f172a" roughness={0.3} />
@@ -286,7 +286,7 @@ export default function LoungeStation({ onSelect, onHover }) {
 
       {/* 3. Interactive Modern Arched Brass Floor Lamp */}
       <group
-        position={[1.4, 0, 0.8]}
+        position={[1.2, 0, 0.2]}
         onClick={toggleLamp}
         onPointerOver={() => {
           document.body.style.cursor = 'pointer';
