@@ -334,6 +334,7 @@ function SceneContents({
             activeVantageId={hackerModeData.activeVantageId}
             onSelectNode={hackerModeData.onSelectNode}
             onRotateNode={hackerModeData.onRotateNode}
+            controlsRef={controlsRef}
           />
         )}
 
@@ -367,18 +368,18 @@ function SceneContents({
       <OrbitControls
         ref={controlsRef}
         makeDefault
-        enabled={gameState === 'CUSTOMIZE'}
+        enabled={gameState === 'CUSTOMIZE' || gameState === 'HACKING'}
         enableDamping
-        dampingFactor={0.05}
-        rotateSpeed={0.65}
-        zoomSpeed={0.75}
+        dampingFactor={0.06}
+        rotateSpeed={0.7}
+        zoomSpeed={0.8}
         panSpeed={0.65}
         enablePan={true}
         screenSpacePanning={true}
-        minDistance={2.0}
-        maxDistance={22}
+        minDistance={gameState === 'HACKING' ? 0.6 : 2.0}
+        maxDistance={gameState === 'HACKING' ? 9.5 : 22}
         minPolarAngle={0.15}
-        maxPolarAngle={Math.PI / 2.05}
+        maxPolarAngle={gameState === 'HACKING' ? Math.PI / 2.02 : Math.PI / 2.05}
       />
       <CameraDirector
         gameState={gameState}

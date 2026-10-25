@@ -48,13 +48,13 @@ export const STAGES = [
     targetName: 'DUAL-MONITOR WORKSTATION',
     timeLimit: null, // Relaxed tutorial
     cameraPreset: 'DESK_VIEW',
-    camPos: [2.2, 2.4, 2.5],
-    camTarget: [-0.6, 0.8, 0.4],
+    camPos: [1.8, 2.1, 2.4],
+    camTarget: [0.1, 0.75, 0.4],
     nodes: [
       {
         id: 's1_n0',
         type: NODE_TYPES.SOURCE,
-        position: [1.95, 0.72, 0.82],
+        position: [2.00, 0.58, 0.95],
         basePorts: [3], // West
         rotationIndex: 0,
         solutionRotation: 0,
@@ -64,7 +64,7 @@ export const STAGES = [
       {
         id: 's1_n1',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [0.75, 0.12, 0.82],
+        position: [1.00, 0.45, 0.95],
         basePorts: [1, 2],
         rotationIndex: 2, // Scrambled
         solutionRotation: 0,
@@ -74,7 +74,7 @@ export const STAGES = [
       {
         id: 's1_n2',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [0.75, 0.12, 0.15],
+        position: [1.00, 0.45, 0.15],
         basePorts: [0, 3],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -84,7 +84,7 @@ export const STAGES = [
       {
         id: 's1_n3',
         type: NODE_TYPES.SWITCH_STRAIGHT,
-        position: [-0.25, 0.12, 0.15],
+        position: [-0.15, 0.55, 0.15],
         basePorts: [1, 3],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -94,7 +94,7 @@ export const STAGES = [
       {
         id: 's1_n4',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [-1.20, 0.82, 0.15],
+        position: [-0.85, 0.88, 0.15],
         basePorts: [1, 0],
         rotationIndex: 3, // Scrambled
         solutionRotation: 0,
@@ -104,7 +104,7 @@ export const STAGES = [
       {
         id: 's1_n5',
         type: NODE_TYPES.TARGET,
-        position: [-1.20, 1.35, 0.15],
+        position: [-1.20, 1.28, 0.15],
         basePorts: [2], // Input from bottom
         rotationIndex: 0,
         solutionRotation: 0,
@@ -132,13 +132,13 @@ export const STAGES = [
     targetName: '42U HARDENED SERVER RACK',
     timeLimit: null,
     cameraPreset: 'SERVER_WALL',
-    camPos: [-1.4, 2.6, -0.4],
-    camTarget: [-3.8, 1.5, -2.6],
+    camPos: [-1.2, 2.2, -0.6],
+    camTarget: [-3.6, 1.4, -2.6],
     nodes: [
       {
         id: 's2_n0',
         type: NODE_TYPES.SOURCE,
-        position: [-4.85, 2.35, 1.25],
+        position: [-4.50, 2.10, 1.25],
         basePorts: [2], // South along wall
         rotationIndex: 0,
         solutionRotation: 0,
@@ -148,9 +148,9 @@ export const STAGES = [
       {
         id: 's2_n1',
         type: NODE_TYPES.SWITCH_T,
-        position: [-4.85, 2.35, -0.4],
+        position: [-4.50, 2.10, -0.40],
         basePorts: [0, 1, 2],
-        rotationIndex: 2, // Scrambled
+        rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         label: 'Wall Master Splitter',
         desc: '3-Way Junction Router',
@@ -158,7 +158,7 @@ export const STAGES = [
       {
         id: 's2_n2',
         type: NODE_TYPES.HOSTILE_IDS,
-        position: [-4.85, 3.40, -0.4],
+        position: [-4.50, 3.10, -0.40],
         basePorts: [0],
         rotationIndex: 0,
         solutionRotation: 0,
@@ -168,7 +168,7 @@ export const STAGES = [
       {
         id: 's2_n3',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [-3.5, 0.95, -0.4],
+        position: [-3.40, 1.05, -0.40],
         basePorts: [3, 2],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -178,7 +178,7 @@ export const STAGES = [
       {
         id: 's2_n4',
         type: NODE_TYPES.KEY_NODE,
-        position: [-3.5, 0.95, -2.0],
+        position: [-3.40, 1.05, -2.00],
         basePorts: [0],
         unlocksNodeId: 's2_n6',
         rotationIndex: 0,
@@ -189,7 +189,7 @@ export const STAGES = [
       {
         id: 's2_n5',
         type: NODE_TYPES.SWITCH_STRAIGHT,
-        position: [-4.85, 1.20, -2.0],
+        position: [-4.50, 1.15, -2.00],
         basePorts: [0, 2],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -199,7 +199,7 @@ export const STAGES = [
       {
         id: 's2_n6',
         type: NODE_TYPES.LOCKED_ROUTER,
-        position: [-3.80, 0.85, -3.4],
+        position: [-3.60, 1.10, -3.30],
         basePorts: [3, 1],
         rotationIndex: 2, // Scrambled
         solutionRotation: 0,
@@ -210,7 +210,7 @@ export const STAGES = [
       {
         id: 's2_n7',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [-3.30, 0.85, -4.2],
+        position: [-3.10, 1.10, -4.10],
         basePorts: [3, 1],
         rotationIndex: 3, // Scrambled
         solutionRotation: 0,
@@ -220,7 +220,7 @@ export const STAGES = [
       {
         id: 's2_n8',
         type: NODE_TYPES.TARGET,
-        position: [-2.85, 1.45, -4.4],
+        position: [-2.85, 1.55, -4.15],
         basePorts: [3], // Input from West
         rotationIndex: 0,
         solutionRotation: 0,
@@ -252,13 +252,13 @@ export const STAGES = [
     targetName: 'CYBER SENTINEL DRONE ROOT CORE',
     timeLimit: 60, // 60 seconds countdown
     cameraPreset: 'CORNER_DRONE',
-    camPos: [-1.2, 2.7, -1.6],
-    camTarget: [-3.8, 1.9, -3.8],
+    camPos: [-1.6, 2.3, -1.8],
+    camTarget: [-3.9, 1.7, -3.9],
     nodes: [
       {
         id: 's3_n0',
         type: NODE_TYPES.SOURCE,
-        position: [0.0, 3.40, -2.5],
+        position: [0.00, 3.00, -2.50],
         basePorts: [3], // West
         rotationIndex: 0,
         solutionRotation: 0,
@@ -268,9 +268,9 @@ export const STAGES = [
       {
         id: 's3_n1',
         type: NODE_TYPES.SWITCH_T,
-        position: [-1.2, 3.40, -2.5],
+        position: [-1.20, 3.00, -2.50],
         basePorts: [1, 0, 3],
-        rotationIndex: 1, // Scrambled
+        rotationIndex: 3, // Scrambled
         solutionRotation: 0,
         label: 'Overhead Bridge Router',
         desc: '3-Way Junction Router',
@@ -278,7 +278,7 @@ export const STAGES = [
       {
         id: 's3_n2',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [0.6, 3.10, -4.5],
+        position: [0.60, 3.00, -4.15],
         basePorts: [3, 2],
         rotationIndex: 2, // Scrambled
         solutionRotation: 0,
@@ -288,7 +288,7 @@ export const STAGES = [
       {
         id: 's3_n3',
         type: NODE_TYPES.SWITCH_STRAIGHT,
-        position: [0.6, 2.10, -4.5],
+        position: [0.60, 2.10, -4.15],
         basePorts: [0, 2],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -298,7 +298,7 @@ export const STAGES = [
       {
         id: 's3_n4',
         type: NODE_TYPES.KEY_NODE,
-        position: [0.6, 1.10, -4.5],
+        position: [0.60, 1.20, -4.15],
         basePorts: [0],
         unlocksNodeId: 's3_n6',
         rotationIndex: 0,
@@ -309,7 +309,7 @@ export const STAGES = [
       {
         id: 's3_n5',
         type: NODE_TYPES.HOSTILE_IDS,
-        position: [-1.8, 3.40, -4.2],
+        position: [-1.80, 3.00, -3.80],
         basePorts: [1],
         rotationIndex: 0,
         solutionRotation: 0,
@@ -319,7 +319,7 @@ export const STAGES = [
       {
         id: 's3_n6',
         type: NODE_TYPES.LOCKED_ROUTER,
-        position: [-2.85, 2.60, -4.4],
+        position: [-2.85, 2.40, -3.85],
         basePorts: [0, 2],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -330,7 +330,7 @@ export const STAGES = [
       {
         id: 's3_n7',
         type: NODE_TYPES.SWITCH_T,
-        position: [-2.85, 1.80, -4.4],
+        position: [-2.85, 1.70, -3.85],
         basePorts: [0, 2, 3],
         rotationIndex: 2, // Scrambled
         solutionRotation: 0,
@@ -340,7 +340,7 @@ export const STAGES = [
       {
         id: 's3_n8',
         type: NODE_TYPES.KEY_NODE,
-        position: [-2.85, 0.70, -4.4],
+        position: [-2.85, 0.90, -3.85],
         basePorts: [0],
         unlocksNodeId: 's3_n10',
         rotationIndex: 0,
@@ -351,7 +351,7 @@ export const STAGES = [
       {
         id: 's3_n9',
         type: NODE_TYPES.HOSTILE_IDS,
-        position: [-3.8, 0.60, -3.8],
+        position: [-3.80, 0.90, -3.80],
         basePorts: [1],
         rotationIndex: 0,
         solutionRotation: 0,
@@ -361,7 +361,7 @@ export const STAGES = [
       {
         id: 's3_n10',
         type: NODE_TYPES.LOCKED_ROUTER,
-        position: [-3.60, 1.60, -4.2],
+        position: [-3.60, 1.70, -3.95],
         basePorts: [1, 3],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -372,7 +372,7 @@ export const STAGES = [
       {
         id: 's3_n11',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [-4.20, 1.80, -3.8],
+        position: [-4.20, 1.80, -3.95],
         basePorts: [2, 0],
         rotationIndex: 3, // Scrambled
         solutionRotation: 0,
@@ -382,7 +382,7 @@ export const STAGES = [
       {
         id: 's3_n12',
         type: NODE_TYPES.TARGET,
-        position: [-4.20, 2.45, -4.2],
+        position: [-4.20, 2.25, -3.95],
         basePorts: [2], // Input from bottom
         rotationIndex: 0,
         solutionRotation: 0,
