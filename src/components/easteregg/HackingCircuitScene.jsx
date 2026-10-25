@@ -517,77 +517,225 @@ function CircuitNode({
   );
 }
 
+const _flyForward = new THREE.Vector3();
+const _flyRight = new THREE.Vector3();
+const _flyMoveDelta = new THREE.Vector3();
+
 /**
- * Camera Director for Hacker Mode: smoothly lerps to vantage presets,
- * then yields 100% control to OrbitControls for free mouse/touch orbiting.
+ * Camera Director for Hacker Mode:
+ * - Smoothly glides to chosen camera vantage presets when selected
+ * - Yields complete free control to the player:
+ *   - WASD / Arrow keys for full 3D room flight
+ *   - Space / PageUp to elevate, Shift / C / PageDown to descend
+ *   - Left-click drag or single-finger touch for free 360° orbit look
+ *   - Right-click or two-finger drag for screen-space pan
+ *   - Scroll wheel / pinch for zooming
  */
 function HackerCameraDirector({ activeVantageId, controlsRef }) {
   const { camera, gl } = useThree();
   const isTransitioning = useRef(true);
   const targetCamPos = useRef(new THREE.Vector3());
   const targetCamLook = useRef(new THREE.Vector3());
+  const lastVantageRef = useRef(null);
 
-  // Trigger smooth flight whenever vantage preset changes
+  // Active keyboard state for smooth flight
+  const keysDown = useRef({
+    forward: false,
+    backward: false,
+    left: false,
+    right: false,
+    up: false,
+    down: false,
+    fast: false,
+  });
+
+  // Trigger smooth glide whenever activeVantageId changes
   useEffect(() => {
-    const v = CAMERA_VANTAGES[activeVantageId] || CAMERA_VANTAGES.DESK_VIEW;
-    targetCamPos.current.set(...v.pos);
-    targetCamLook.current.set(...v.target);
-    isTransitioning.current = true;
-  }, [activeVantageId]);
+    if (lastVantageRef.current !== activeVantageId) {
+      lastVantageRef.current = activeVantageId;
+      const v = CAMERA_VANTAGES[activeVantageId] || CAMERA_VANTAGES.DESK_VIEW;
+      targetCamPos.current.set(...v.pos);
+      targetCamLook.current.set(...v.target);
+      isTransitioning.current = true;
 
-  // Cancel auto-flight if user manually starts dragging or zooming
+      // Failsafe timer so camera is never stuck in flight mode
+      const timer = setTimeout(() => {
+        if (isTransitioning.current) {
+          isTransitioning.current = false;
+          if (controlsRef?.current) {
+            controlsRef.current.target.copy(targetCamLook.current);
+            controlsRef.current.update();
+          }
+        }
+      }, 850);
+
+      return () => clearTimeout(timer);
+    }
+  }, [activeVantageId, controlsRef]);
+
+  // Cancel flight transition immediately on any player input
   useEffect(() => {
     const dom = gl?.domElement;
     if (!dom) return;
 
-    const stopAutoFlight = () => {
+    const stopFlight = () => {
       isTransitioning.current = false;
     };
 
-    dom.addEventListener('pointerdown', stopAutoFlight);
-    dom.addEventListener('wheel', stopAutoFlight, { passive: true });
-    dom.addEventListener('touchstart', stopAutoFlight, { passive: true });
+    dom.addEventListener('pointerdown', stopFlight);
+    dom.addEventListener('wheel', stopFlight, { passive: true });
+    dom.addEventListener('touchstart', stopFlight, { passive: true });
 
     return () => {
-      dom.removeEventListener('pointerdown', stopAutoFlight);
-      dom.removeEventListener('wheel', stopAutoFlight);
-      dom.removeEventListener('touchstart', stopAutoFlight);
+      dom.removeEventListener('pointerdown', stopFlight);
+      dom.removeEventListener('wheel', stopFlight);
+      dom.removeEventListener('touchstart', stopFlight);
     };
   }, [gl]);
 
+  // Keyboard navigation listener (WASD / Arrows / Space / Shift / C)
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const k = e.key.toLowerCase();
+      let handled = false;
+
+      if (k === 'w' || e.key === 'ArrowUp') {
+        keysDown.current.forward = true;
+        handled = true;
+      }
+      if (k === 's' || e.key === 'ArrowDown') {
+        keysDown.current.backward = true;
+        handled = true;
+      }
+      if (k === 'a' || e.key === 'ArrowLeft') {
+        keysDown.current.left = true;
+        handled = true;
+      }
+      if (k === 'd' || e.key === 'ArrowRight') {
+        keysDown.current.right = true;
+        handled = true;
+      }
+      if (e.key === ' ' || k === 'pageup') {
+        keysDown.current.up = true;
+        handled = true;
+      }
+      if (k === 'c' || k === 'pagedown') {
+        keysDown.current.down = true;
+        handled = true;
+      }
+      if (e.shiftKey) {
+        keysDown.current.fast = true;
+      }
+
+      if (handled) {
+        isTransitioning.current = false;
+      }
+    };
+
+    const onKeyUp = (e) => {
+      const k = e.key.toLowerCase();
+      if (k === 'w' || e.key === 'ArrowUp') keysDown.current.forward = false;
+      if (k === 's' || e.key === 'ArrowDown') keysDown.current.backward = false;
+      if (k === 'a' || e.key === 'ArrowLeft') keysDown.current.left = false;
+      if (k === 'd' || e.key === 'ArrowRight') keysDown.current.right = false;
+      if (e.key === ' ' || k === 'pageup') keysDown.current.up = false;
+      if (k === 'c' || k === 'pagedown') keysDown.current.down = false;
+      if (!e.shiftKey) {
+        keysDown.current.fast = false;
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+    };
+  }, []);
+
   useFrame((state, delta) => {
-    if (!isTransitioning.current) {
+    const clampedDelta = Math.min(delta, 0.04);
+
+    // 1. Process automated glide to preset vantage point
+    if (isTransitioning.current) {
+      const alpha = 1 - Math.exp(-6.5 * clampedDelta);
+      camera.position.lerp(targetCamPos.current, alpha);
+
       if (controlsRef?.current) {
+        controlsRef.current.target.lerp(targetCamLook.current, alpha);
         controlsRef.current.update();
+      } else {
+        camera.lookAt(targetCamLook.current);
+      }
+
+      const distPos = camera.position.distanceTo(targetCamPos.current);
+      const distTarget = controlsRef?.current
+        ? controlsRef.current.target.distanceTo(targetCamLook.current)
+        : 0;
+
+      if (distPos < 0.05 && distTarget < 0.05) {
+        camera.position.copy(targetCamPos.current);
+        if (controlsRef?.current) {
+          controlsRef.current.target.copy(targetCamLook.current);
+          controlsRef.current.update();
+        }
+        isTransitioning.current = false;
       }
       return;
     }
 
-    const clampedDelta = Math.min(delta, 0.033);
-    const alpha = 1 - Math.exp(-5.5 * clampedDelta);
+    // 2. Free flight camera movement via WASD / Arrows
+    const k = keysDown.current;
+    if (k.forward || k.backward || k.left || k.right || k.up || k.down) {
+      // Calculate horizontal forward vector from current camera rotation
+      _flyForward.set(0, 0, -1).applyQuaternion(camera.quaternion);
+      _flyForward.y = 0;
+      if (_flyForward.lengthSq() > 0.0001) {
+        _flyForward.normalize();
+      } else {
+        _flyForward.set(0, 0, -1);
+      }
 
-    camera.position.lerp(targetCamPos.current, alpha);
+      // Calculate horizontal right vector
+      _flyRight.set(1, 0, 0).applyQuaternion(camera.quaternion);
+      _flyRight.y = 0;
+      if (_flyRight.lengthSq() > 0.0001) {
+        _flyRight.normalize();
+      } else {
+        _flyRight.set(1, 0, 0);
+      }
 
-    if (controlsRef?.current) {
-      controlsRef.current.target.lerp(targetCamLook.current, alpha);
-      controlsRef.current.update();
-    } else {
-      camera.lookAt(targetCamLook.current);
+      _flyMoveDelta.set(0, 0, 0);
+      if (k.forward) _flyMoveDelta.add(_flyForward);
+      if (k.backward) _flyMoveDelta.sub(_flyForward);
+      if (k.right) _flyMoveDelta.add(_flyRight);
+      if (k.left) _flyMoveDelta.sub(_flyRight);
+      if (k.up) _flyMoveDelta.y += 1.0;
+      if (k.down) _flyMoveDelta.y -= 1.0;
+
+      if (_flyMoveDelta.lengthSq() > 0) {
+        const speed = k.fast ? 5.2 : 3.2;
+        _flyMoveDelta.normalize().multiplyScalar(speed * clampedDelta);
+
+        camera.position.add(_flyMoveDelta);
+        // Generous room bounds so player can fly anywhere inside studio
+        camera.position.x = Math.max(-4.8, Math.min(4.8, camera.position.x));
+        camera.position.y = Math.max(0.3, Math.min(5.5, camera.position.y));
+        camera.position.z = Math.max(-4.8, Math.min(4.8, camera.position.z));
+
+        if (controlsRef?.current) {
+          controlsRef.current.target.add(_flyMoveDelta);
+          controlsRef.current.target.x = Math.max(-4.8, Math.min(4.8, controlsRef.current.target.x));
+          controlsRef.current.target.y = Math.max(0.1, Math.min(4.8, controlsRef.current.target.y));
+          controlsRef.current.target.z = Math.max(-4.8, Math.min(4.8, controlsRef.current.target.z));
+        }
+      }
     }
 
-    // Check if close enough to hand over complete control to player
-    const distPos = camera.position.distanceTo(targetCamPos.current);
-    const distTarget = controlsRef?.current
-      ? controlsRef.current.target.distanceTo(targetCamLook.current)
-      : 0;
-
-    if (distPos < 0.04 && distTarget < 0.04) {
-      camera.position.copy(targetCamPos.current);
-      if (controlsRef?.current) {
-        controlsRef.current.target.copy(targetCamLook.current);
-        controlsRef.current.update();
-      }
-      isTransitioning.current = false;
+    // 3. Keep OrbitControls synced every frame for mouse and touch dragging
+    if (controlsRef?.current) {
+      controlsRef.current.update();
     }
   });
 

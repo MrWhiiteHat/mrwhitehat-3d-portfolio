@@ -193,6 +193,7 @@ export default function App() {
   }, []);
 
   const handleInvestigateEasterEgg = useCallback(() => {
+    setIsLoadingFinished(true);
     markEasterEggDiscovered();
     preHackerStateRef.current = { themeKey, gameState: 'EXPLORE' };
     setThemeKey('HACKER_NETRUN');
@@ -509,6 +510,9 @@ export default function App() {
   // 5. Station Proximity Interaction (Triggered by [E] or Click)
   const handleStationInteract = useCallback(
     (stationId) => {
+      // Disallow triggering station inspection or appliances during hacker Easter egg mode
+      if (gameState === 'HACKING' || gameState === 'ANNOUNCEMENT') return;
+
       // Interactive Studio Appliances (AC, Fan, Lights)
       if (stationId === 'air_conditioner') {
         window.__TOGGLE_AC__?.();
@@ -592,13 +596,18 @@ export default function App() {
   );
 
   // 6. Direct selection from 3D object click or hotspot
-  const handleObjectSelect = useCallback((selection) => {
-    if (!selection || !selection.section) return;
-    playWhooshSound();
-    setSection(selection.section);
-    setGameState('INSPECT_STATION');
-    setUnlockedStations((prev) => new Set([...prev, selection.section]));
-  }, []);
+  const handleObjectSelect = useCallback(
+    (selection) => {
+      // Disallow clicking studio objects/stations while in hacker Easter egg mode
+      if (gameState === 'HACKING' || gameState === 'ANNOUNCEMENT') return;
+      if (!selection || !selection.section) return;
+      playWhooshSound();
+      setSection(selection.section);
+      setGameState('INSPECT_STATION');
+      setUnlockedStations((prev) => new Set([...prev, selection.section]));
+    },
+    [gameState]
+  );
 
   // 7. Close Station Inspector -> Return to First-Person Walking
   const handleClose = useCallback(() => {

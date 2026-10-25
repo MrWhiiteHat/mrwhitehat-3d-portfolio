@@ -238,55 +238,62 @@ function HackerModelOpacityController({ isHackerActive }) {
 
   useEffect(() => {
     const studioGroup = scene.getObjectByName('CyberCommandStudio');
-    if (!studioGroup) return;
+    const atmosGroup = scene.getObjectByName('CyberAtmosphere');
+    const groups = [studioGroup, atmosGroup].filter(Boolean);
+    if (groups.length === 0) return;
 
     if (isHackerActive) {
       const savedMap = new Map();
-      studioGroup.traverse((obj) => {
-        if (obj.isMesh && obj.material) {
-          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-          mats.forEach((mat) => {
-            if (!savedMap.has(mat)) {
-              savedMap.set(mat, {
-                opacity: mat.opacity,
-                transparent: mat.transparent,
-                color: mat.color ? mat.color.clone() : null,
-                emissive: mat.emissive ? mat.emissive.clone() : null,
-                emissiveIntensity: mat.emissiveIntensity,
-                depthWrite: mat.depthWrite,
+
+      groups.forEach((grp) => {
+        grp.traverse((obj) => {
+          if (obj.isMesh) {
+            // Completely disable raycasting on studio models in hacker mode
+            // so clicking never triggers normal station inspection modals
+            if (!savedMap.has(obj)) {
+              savedMap.set(obj, {
+                originalRaycast: obj.raycast,
               });
             }
-            mat.transparent = true;
-            mat.opacity = 0.28;
-            mat.depthWrite = true;
-            if (mat.color) {
-              mat.color.set('#0c182a');
+            obj.raycast = () => null;
+
+            if (obj.material) {
+              const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+              mats.forEach((mat) => {
+                if (!savedMap.has(mat)) {
+                  savedMap.set(mat, {
+                    opacity: mat.opacity,
+                    transparent: mat.transparent,
+                    color: mat.color ? mat.color.clone() : null,
+                    emissive: mat.emissive ? mat.emissive.clone() : null,
+                    emissiveIntensity: mat.emissiveIntensity,
+                    depthWrite: mat.depthWrite,
+                  });
+                }
+                mat.transparent = true;
+                mat.opacity = 0.28;
+                mat.depthWrite = true;
+                if (mat.color) {
+                  mat.color.set('#0c182a');
+                }
+                if (mat.emissive) {
+                  mat.emissive.set('#020610');
+                  mat.emissiveIntensity = 0.15;
+                }
+                mat.needsUpdate = true;
+              });
             }
-            if (mat.emissive) {
-              mat.emissive.set('#020610');
-              mat.emissiveIntensity = 0.15;
-            }
-            mat.needsUpdate = true;
-          });
-        }
+          }
+        });
       });
+
       savedPropsRef.current = savedMap;
     } else if (savedPropsRef.current.size > 0) {
-      savedPropsRef.current.forEach((props, mat) => {
-        mat.opacity = props.opacity;
-        mat.transparent = props.transparent;
-        if (props.depthWrite !== undefined) mat.depthWrite = props.depthWrite;
-        if (props.color && mat.color) mat.color.copy(props.color);
-        if (props.emissive && mat.emissive) mat.emissive.copy(props.emissive);
-        if (props.emissiveIntensity !== undefined) mat.emissiveIntensity = props.emissiveIntensity;
-        mat.needsUpdate = true;
-      });
-      savedPropsRef.current.clear();
-    }
-
-    return () => {
-      if (savedPropsRef.current.size > 0) {
-        savedPropsRef.current.forEach((props, mat) => {
+      savedPropsRef.current.forEach((props, item) => {
+        if (item.isMesh) {
+          if (props.originalRaycast) item.raycast = props.originalRaycast;
+        } else if (item.isMaterial || props.opacity !== undefined) {
+          const mat = item;
           mat.opacity = props.opacity;
           mat.transparent = props.transparent;
           if (props.depthWrite !== undefined) mat.depthWrite = props.depthWrite;
@@ -294,6 +301,26 @@ function HackerModelOpacityController({ isHackerActive }) {
           if (props.emissive && mat.emissive) mat.emissive.copy(props.emissive);
           if (props.emissiveIntensity !== undefined) mat.emissiveIntensity = props.emissiveIntensity;
           mat.needsUpdate = true;
+        }
+      });
+      savedPropsRef.current.clear();
+    }
+
+    return () => {
+      if (savedPropsRef.current.size > 0) {
+        savedPropsRef.current.forEach((props, item) => {
+          if (item.isMesh) {
+            if (props.originalRaycast) item.raycast = props.originalRaycast;
+          } else if (item.isMaterial || props.opacity !== undefined) {
+            const mat = item;
+            mat.opacity = props.opacity;
+            mat.transparent = props.transparent;
+            if (props.depthWrite !== undefined) mat.depthWrite = props.depthWrite;
+            if (props.color && mat.color) mat.color.copy(props.color);
+            if (props.emissive && mat.emissive) mat.emissive.copy(props.emissive);
+            if (props.emissiveIntensity !== undefined) mat.emissiveIntensity = props.emissiveIntensity;
+            mat.needsUpdate = true;
+          }
         });
         savedPropsRef.current.clear();
       }
@@ -358,14 +385,35 @@ function SceneContents({
       {/* Handcrafted 3D Studio Architecture & Stations */}
       <group name="CyberCommandStudio">
         <StudioArchitecture currentThemeKey={themeKey} />
-        <WorkstationStation onSelect={onSelect} onHover={onHover} />
-        <ConferenceStation onSelect={onSelect} onHover={onHover} />
-        <ArchiveStation onSelect={onSelect} onHover={onHover} />
+        <WorkstationStation
+          onSelect={hackerModeData?.isActive ? undefined : onSelect}
+          onHover={hackerModeData?.isActive ? undefined : onHover}
+        />
+        <ConferenceStation
+          onSelect={hackerModeData?.isActive ? undefined : onSelect}
+          onHover={hackerModeData?.isActive ? undefined : onHover}
+        />
+        <ArchiveStation
+          onSelect={hackerModeData?.isActive ? undefined : onSelect}
+          onHover={hackerModeData?.isActive ? undefined : onHover}
+        />
         <ServerRackStation />
-        <CyberSentinelDrone onSelect={onSelect} onHover={onHover} />
-        <LoungeStation onSelect={onSelect} onHover={onHover} />
-        <PrinterStation onSelect={onSelect} onHover={onHover} />
-        <CommsStation onSelect={onSelect} onHover={onHover} />
+        <CyberSentinelDrone
+          onSelect={hackerModeData?.isActive ? undefined : onSelect}
+          onHover={hackerModeData?.isActive ? undefined : onHover}
+        />
+        <LoungeStation
+          onSelect={hackerModeData?.isActive ? undefined : onSelect}
+          onHover={hackerModeData?.isActive ? undefined : onHover}
+        />
+        <PrinterStation
+          onSelect={hackerModeData?.isActive ? undefined : onSelect}
+          onHover={hackerModeData?.isActive ? undefined : onHover}
+        />
+        <CommsStation
+          onSelect={hackerModeData?.isActive ? undefined : onSelect}
+          onHover={hackerModeData?.isActive ? undefined : onHover}
+        />
         <Suspense fallback={null}>
           <DecorElements />
         </Suspense>
@@ -373,15 +421,18 @@ function SceneContents({
         <Suspense fallback={null}>
           <FrontWallPanoramicFeature currentThemeKey={themeKey} />
         </Suspense>
-        <AirConditionerUnit onSelect={onSelect} onHover={onHover} />
+        <AirConditionerUnit
+          onSelect={hackerModeData?.isActive ? undefined : onSelect}
+          onHover={hackerModeData?.isActive ? undefined : onHover}
+        />
 
         {/* 3D Wall-Mounted Visitor Counter & Roster Terminal */}
         <VisitorWallCounter
           visitorCount={visitorCount}
           latestVisitor={visitorLogs[0] || null}
           currentThemeKey={themeKey}
-          onSelect={onSelect}
-          onHover={onHover}
+          onSelect={hackerModeData?.isActive ? undefined : onSelect}
+          onHover={hackerModeData?.isActive ? undefined : onHover}
         />
 
         {/* Animated Cyber Airlock Entrance Gate */}
@@ -415,21 +466,23 @@ function SceneContents({
           />
         )}
 
-        {/* Interactive In-Object Displays */}
-        <InObjectDisplay
-          onStationBreached={onStationBreached}
-          activeSection={activeSection}
-          onClose={onDeselect}
-          onNavigate={(sec) => {
-            playWhooshSound();
-            onSelect({ section: sec });
-          }}
-          visitorLogs={visitorLogs}
-          visitorCount={visitorCount}
-          playerData={playerData}
-          onOpenGadgets={onOpenGadgets}
-          onOpenLeaderboard={onOpenLeaderboard}
-        />
+        {/* Interactive In-Object Displays (hidden in hacker mode so no accidental popups) */}
+        {!hackerModeData?.isActive && (
+          <InObjectDisplay
+            onStationBreached={onStationBreached}
+            activeSection={activeSection}
+            onClose={onDeselect}
+            onNavigate={(sec) => {
+              playWhooshSound();
+              onSelect({ section: sec });
+            }}
+            visitorLogs={visitorLogs}
+            visitorCount={visitorCount}
+            playerData={playerData}
+            onOpenGadgets={onOpenGadgets}
+            onOpenLeaderboard={onOpenLeaderboard}
+          />
+        )}
 
         {/* Studio Floor Contact Shadows - Baked once upon mount for 60fps performance */}
         <ContactShadows
@@ -448,15 +501,15 @@ function SceneContents({
         enabled={gameState === 'CUSTOMIZE' || gameState === 'HACKING'}
         enableDamping
         dampingFactor={0.06}
-        rotateSpeed={0.7}
-        zoomSpeed={0.8}
-        panSpeed={0.65}
+        rotateSpeed={0.9}
+        zoomSpeed={0.9}
+        panSpeed={0.85}
         enablePan={true}
         screenSpacePanning={true}
-        minDistance={gameState === 'HACKING' ? 0.6 : 2.0}
-        maxDistance={gameState === 'HACKING' ? 9.5 : 22}
-        minPolarAngle={0.15}
-        maxPolarAngle={gameState === 'HACKING' ? Math.PI / 2.02 : Math.PI / 2.05}
+        minDistance={gameState === 'HACKING' ? 0.2 : 2.0}
+        maxDistance={gameState === 'HACKING' ? 25.0 : 22}
+        minPolarAngle={0.05}
+        maxPolarAngle={gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
       />
       <CameraDirector
         gameState={gameState}

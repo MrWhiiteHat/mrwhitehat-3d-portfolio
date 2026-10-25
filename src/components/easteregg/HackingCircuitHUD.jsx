@@ -281,11 +281,15 @@ export default function HackingCircuitHUD({
           </div>
         ) : (
           <div className="hacker-hint-bar">
-            <span>[CLICK / TAP] SELECT NODE</span>
+            <span>[WASD / ARROWS] FLY CAMERA</span>
+            <span>•</span>
+            <span>[DRAG] FREE LOOK</span>
+            <span>•</span>
+            <span>[CLICK NODE] SELECT</span>
             <span>•</span>
             <span>[E] ROTATE SWITCH</span>
             <span>•</span>
-            <span>[CAM 01–04] VANTAGE FEEDS</span>
+            <span>[CAM 01–04] VANTAGE</span>
             <span>•</span>
             <span>[R] RESET</span>
             <span>•</span>
