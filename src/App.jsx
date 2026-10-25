@@ -1,3 +1,27 @@
+import HackingCircuitAnnouncement from './components/easteregg/HackingCircuitAnnouncement.jsx';
+import HackingCircuitHUD from './components/easteregg/HackingCircuitHUD.jsx';
+import { STAGES, evaluateCircuit, NODE_TYPES } from './components/easteregg/circuitPuzzleLogic.js';
+import {
+  getCompletedStations,
+  markStationCompleted,
+  hasCompletedAllStations,
+  isEasterEggDiscovered,
+  markEasterEggDiscovered,
+  isEasterEggCompleted,
+  markEasterEggCompleted,
+  resetEasterEggProgress,
+  REQUIRED_STATIONS,
+} from './components/easteregg/easterEggState.js';
+import {
+  playCircuitRotate,
+  playCircuitPowerUp,
+  playHostileShock,
+  playLockRelease,
+  playStageVictory,
+  playFinalOverrideVictory,
+  playTimerTick,
+  playGlitchTransition,
+} from './components/easteregg/easterEggAudio.js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Activity,
@@ -92,7 +116,221 @@ export default function App() {
 
   const [isGateOpen, setIsGateOpen] = useState(false);
   const [activeProximity, setActiveProximity] = useState(null);
-  const [unlockedStations, setUnlockedStations] = useState(new Set());
+  const [unlockedStations, setUnlockedStations] = useState(() => new Set(getCompletedStations()));
+  // Watch Dogs 2 3D Hacking Circuit State Machine
+  const [hackerStageIndex, setHackerStageIndex] = useState(0);
+  const [hackerNodeStates, setHackerNodeStates] = useState({});
+  const [hackerSelectedNodeId, setHackerSelectedNodeId] = useState('s1_n1');
+  const [hackerActiveVantageId, setHackerActiveVantageId] = useState('DESK_VIEW');
+  const [hackerTimeLeft, setHackerTimeLeft] = useState(null);
+  const [hackerIsPaused, setHackerIsPaused] = useState(false);
+  const [hackerIsVictory, setHackerIsVictory] = useState(false);
+  const [hackerIsGameOver, setHackerIsGameOver] = useState(false);
+  const [hackerTotalElapsed, setHackerTotalElapsed] = useState(0);
+  const preHackerStateRef = useRef({ themeKey: 'CYBER_NEON_NOIR', gameState: 'EXPLORE' });
+  const hasSeenAnnouncementRef = useRef(false);
+  const prevPoweredCountRef = useRef(1);
+  const prevUnlockedSetRef = useRef(new Set());
+
+  const currentHackerStage = STAGES[hackerStageIndex] || STAGES[0];
+  const hackerEvaluation = useMemo(() => {
+    return evaluateCircuit(currentHackerStage, hackerNodeStates);
+  }, [currentHackerStage, hackerNodeStates]);
+
+  const initHackerStage = useCallback((stageIdx) => {
+    const stage = STAGES[stageIdx] || STAGES[0];
+    setHackerStageIndex(stageIdx);
+    setHackerActiveVantageId(stage.cameraPreset || 'DESK_VIEW');
+    const initialStates = {};
+    stage.nodes.forEach((n) => {
+      initialStates[n.id] = {
+        rotationIndex: n.rotationIndex,
+        isLocked: n.isLocked || false,
+      };
+    });
+    setHackerNodeStates(initialStates);
+    setHackerSelectedNodeId(stage.nodes[1]?.id || null);
+    setHackerTimeLeft(stage.timeLimit);
+    setHackerIsPaused(false);
+    setHackerIsVictory(false);
+    setHackerIsGameOver(false);
+    prevPoweredCountRef.current = 1;
+    prevUnlockedSetRef.current = new Set();
+  }, []);
+
+  const handleInvestigateEasterEgg = useCallback(() => {
+    markEasterEggDiscovered();
+    preHackerStateRef.current = { themeKey, gameState: 'EXPLORE' };
+    setThemeKey('HACKER_NETRUN');
+    initHackerStage(0);
+    setHackerTotalElapsed(0);
+    setGameState('HACKING');
+  }, [themeKey, initHackerStage]);
+
+  const handleSkipEasterEgg = useCallback(() => {
+    markEasterEggDiscovered();
+    setGameState('EXPLORE');
+  }, []);
+
+  const handleLaunchEasterEgg = useCallback(() => {
+    playGlitchTransition();
+    preHackerStateRef.current = { themeKey, gameState: 'EXPLORE' };
+    setThemeKey('HACKER_NETRUN');
+    initHackerStage(0);
+    setHackerTotalElapsed(0);
+    setGameState('HACKING');
+  }, [themeKey, initHackerStage]);
+
+  const handleExitHackerMode = useCallback(() => {
+    playGlitchTransition();
+    setThemeKey(preHackerStateRef.current.themeKey || 'CYBER_NEON_NOIR');
+    setGameState('EXPLORE');
+    setHackerIsPaused(false);
+  }, []);
+
+  const handleRotateHackerNode = useCallback((nodeId) => {
+    const stage = STAGES[hackerStageIndex];
+    if (!stage) return;
+    const node = stage.nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+    const isRotatable =
+      node.type === NODE_TYPES.SWITCH_STRAIGHT ||
+      node.type === NODE_TYPES.SWITCH_ELBOW ||
+      node.type === NODE_TYPES.SWITCH_T ||
+      (node.type === NODE_TYPES.LOCKED_ROUTER && !hackerNodeStates[nodeId]?.isLocked);
+    if (!isRotatable) return;
+
+    playCircuitRotate();
+
+    setHackerNodeStates((prev) => {
+      const currentRot = prev[nodeId]?.rotationIndex !== undefined ? prev[nodeId].rotationIndex : (node.rotationIndex || 0);
+      const nextRot = (currentRot + 1) % 4;
+      const nextStates = {
+        ...prev,
+        [nodeId]: {
+          ...prev[nodeId],
+          rotationIndex: nextRot,
+        },
+      };
+
+      const ev = evaluateCircuit(stage, nextStates);
+
+      if (ev.poweredConnectionIndices.size > prevPoweredCountRef.current) {
+        playCircuitPowerUp();
+      }
+      prevPoweredCountRef.current = ev.poweredConnectionIndices.size;
+
+      ev.unlockedNodeIds.forEach((uid) => {
+        if (!prevUnlockedSetRef.current.has(uid)) {
+          playLockRelease();
+          prevUnlockedSetRef.current.add(uid);
+        }
+      });
+
+      if (ev.isHostileTriggered) {
+        playHostileShock();
+        if (stage.timeLimit) {
+          setHackerTimeLeft((t) => (typeof t === 'number' ? Math.max(0, t - 10) : t));
+        }
+      }
+
+      if (ev.isTargetPowered) {
+        if (hackerStageIndex < STAGES.length - 1) {
+          playStageVictory();
+        } else {
+          playFinalOverrideVictory();
+          markEasterEggCompleted();
+        }
+        setHackerIsVictory(true);
+      }
+
+      return nextStates;
+    });
+  }, [hackerStageIndex, hackerNodeStates]);
+
+  const handleNextHackerStage = useCallback(() => {
+    if (hackerStageIndex < STAGES.length - 1) {
+      initHackerStage(hackerStageIndex + 1);
+    }
+  }, [hackerStageIndex, initHackerStage]);
+
+  const handleResetHackerStage = useCallback(() => {
+    initHackerStage(hackerStageIndex);
+  }, [hackerStageIndex, initHackerStage]);
+
+  const handleStationBreached = useCallback((stationId) => {
+    markStationCompleted(stationId);
+    setUnlockedStations((prev) => {
+      const next = new Set([...prev, stationId]);
+      if (hasCompletedAllStations(next) && !hasSeenAnnouncementRef.current) {
+        hasSeenAnnouncementRef.current = true;
+        setTimeout(() => {
+          setGameState('ANNOUNCEMENT');
+        }, 1200);
+      }
+      return next;
+    });
+  }, []);
+
+  // Timer & countdown for stage 3
+  useEffect(() => {
+    if (gameState !== 'HACKING' || hackerIsPaused || hackerIsVictory || hackerIsGameOver) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setHackerTotalElapsed((prev) => prev + 1);
+
+      if (typeof hackerTimeLeft === 'number') {
+        setHackerTimeLeft((prev) => {
+          if (prev <= 1) {
+            playHostileShock();
+            setHackerIsGameOver(true);
+            return 0;
+          }
+          if (prev <= 11) {
+            playTimerTick(true);
+          } else if (prev % 5 === 0) {
+            playTimerTick(false);
+          }
+          return prev - 1;
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameState, hackerIsPaused, hackerIsVictory, hackerIsGameOver, hackerTimeLeft]);
+
+  // Hacker mode dedicated keyboard handler
+  useEffect(() => {
+    if (gameState !== 'HACKING') return;
+
+    const onHackerKey = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if (e.key === 'Escape') {
+        setHackerIsPaused((prev) => !prev);
+      } else if (e.key === 'e' || e.key === 'E' || e.key === 'Enter') {
+        if (hackerSelectedNodeId) {
+          handleRotateHackerNode(hackerSelectedNodeId);
+        }
+      } else if (e.key === 'r' || e.key === 'R') {
+        handleResetHackerStage();
+      } else if (e.key === '1') {
+        setHackerActiveVantageId('DESK_VIEW');
+      } else if (e.key === '2') {
+        setHackerActiveVantageId('SERVER_WALL');
+      } else if (e.key === '3') {
+        setHackerActiveVantageId('CORNER_DRONE');
+      } else if (e.key === '4') {
+        setHackerActiveVantageId('ROOM_OVERVIEW');
+      }
+    };
+
+    window.addEventListener('keydown', onHackerKey);
+    return () => window.removeEventListener('keydown', onHackerKey);
+  }, [gameState, hackerSelectedNodeId, handleRotateHackerNode, handleResetHackerStage]);
+
   const mobileInputRef = useRef({ x: 0, y: 0 });
   const handleMobileMove = useCallback((pos) => {
     mobileInputRef.current = pos;

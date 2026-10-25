@@ -105,6 +105,25 @@ export const LIGHTING_THEMES = {
     loungeFillColor: '#d97706',
     coreColor: '#fbbf24',
   },
+  HACKER_NETRUN: {
+    id: 'HACKER_NETRUN',
+    name: 'DedSec Netrun (Dark Navy & Cyan)',
+    ambient: '#050a14',
+    ambientIntensity: 1.2,
+    hemiSky: '#09152a',
+    hemiGround: '#03060f',
+    hemiIntensity: 0.65,
+    dirColor: '#00e5ff',
+    dirIntensity: 2.4,
+    windowColor: '#00f0ff',
+    windowIntensity: 2.8,
+    accentColor: '#00e5ff',
+    accentIntensity: 28,
+    crimsonColor: '#ff0033',
+    crimsonIntensity: 30,
+    loungeFillColor: '#ffaa00',
+    coreColor: '#00f0ff',
+  },
 };
 
 export const THEME_KEYS = Object.keys(LIGHTING_THEMES);

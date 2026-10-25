@@ -10238,3 +10238,940 @@ body.is-pseudo-fullscreen .portfolio-container {
   color: #ffffff;
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
 }
+
+
+/* ==========================================================================
+   WATCH DOGS 2 INSPIRED 3D HACKING EASTER EGG & HUD STYLES
+   ========================================================================== */
+
+/* 1. Cinematic Announcement Modal */
+.hacker-announcement-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 7, 18, 0.88);
+  backdrop-filter: blur(16px);
+  padding: 20px;
+  animation: hackerFadeIn 0.35s ease forwards;
+}
+
+@keyframes hackerFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.hacker-announcement-card {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  background: linear-gradient(145deg, rgba(8, 16, 32, 0.98), rgba(4, 8, 18, 0.98));
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.25), inset 0 0 20px rgba(0, 240, 255, 0.08);
+  overflow: hidden;
+  padding: 28px;
+}
+
+.announcement-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 240, 255, 0.03) 0px,
+    rgba(0, 240, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.6;
+}
+
+.announcement-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.announcement-alert-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ff4d6d;
+}
+
+.announcement-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff4d6d;
+  box-shadow: 0 0 10px #ff4d6d;
+  animation: pulseBeacon 1.2s infinite ease-in-out;
+}
+
+.announcement-close-btn {
+  color: #64748b;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.announcement-close-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.announcement-title {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.glitch-word {
+  position: relative;
+  display: inline-block;
+  color: #00f0ff;
+  text-shadow: 0 0 16px rgba(0, 240, 255, 0.6);
+}
+
+.announcement-subtitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 22px;
+}
+
+.announcement-body-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 26px;
+}
+
+.body-box-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #00f0ff;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.body-box-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.announcement-actions {
+  display: flex;
+  gap: 14px;
+}
+
+.announcement-btn-investigate {
+  flex: 1.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #00f0ff, #0077ff);
+  color: #030712;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  border-radius: 10px;
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.4);
+  transition: all 0.25s ease;
+}
+
+.announcement-btn-investigate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 34px rgba(0, 240, 255, 0.7);
+  color: #000000;
+}
+
+.announcement-btn-skip {
+  flex: 1;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.announcement-btn-skip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* 2. Fullscreen Hacker Mode HUD */
+.hacker-hud-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px;
+}
+
+.hacker-hud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 18px;
+  background: rgba(6, 12, 24, 0.85);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+}
+
+.hacker-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hacker-logo-glitch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #00f0ff;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.hacker-zap-icon {
+  animation: pulseBeacon 1.2s infinite ease-in-out;
+}
+
+.hacker-stage-tag {
+  padding: 4px 10px;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #e0f7ff;
+}
+
+.hacker-stage-tracker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stage-step-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: rgba(255, 255, 255, 0.04);
+  color: #64748b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stage-step-pill.is-active {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+.stage-step-pill.is-completed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.stage-step-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.hacker-timer-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 8px;
+  color: #fbbf24;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.hacker-timer-pill.is-urgent {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #f87171;
+  animation: pulseUrgent 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes pulseUrgent {
+  from { transform: scale(1); box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+  to { transform: scale(1.04); box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
+}
+
+.hacker-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hacker-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+  font-family: var(--mono);
+  transition: all 0.2s ease;
+}
+
+.hacker-action-btn:hover {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+}
+
+.btn-key-hint {
+  font-size: 9px;
+  opacity: 0.6;
+}
+
+/* 3. Objective Banner */
+.hacker-objective-banner {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: rgba(6, 12, 24, 0.8);
+  backdrop-filter: blur(10px);
+  border-left: 3px solid #00f0ff;
+  border-radius: 0 8px 8px 0;
+  max-width: 520px;
+}
+
+.objective-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #00f0ff;
+  margin-bottom: 2px;
+}
+
+.objective-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+/* 4. Tactical Minimap Radar */
+.hacker-minimap-card {
+  position: absolute;
+  top: 90px;
+  right: 18px;
+  width: 170px;
+  height: 170px;
+  background: rgba(6, 12, 24, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.minimap-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #00f0ff;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.minimap-radar-screen {
+  position: relative;
+  flex: 1;
+  border-radius: 8px;
+  background: rgba(2, 6, 14, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  overflow: hidden;
+}
+
+.radar-grid-lines {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 40%, rgba(0, 240, 255, 0.06) 41%, transparent 42%),
+              linear-gradient(to right, rgba(0, 240, 255, 0.08) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
+  background-size: 100% 100%, 25px 25px, 25px 25px;
+}
+
+.radar-node-blip {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #ffffff;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.radar-node-blip.is-selected {
+  transform: translate(-50%, -50%) scale(1.6);
+  border-color: #ffffff;
+  box-shadow: 0 0 12px #ffffff !important;
+}
+
+/* 5. Tactical Camera Switcher */
+.hacker-cam-switcher {
+  position: absolute;
+  bottom: 120px;
+  left: 18px;
+  background: rgba(6, 12, 24, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.cam-switcher-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #00f0ff;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.cam-buttons-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cam-select-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.cam-select-btn:hover {
+  background: rgba(0, 240, 255, 0.12);
+  color: #00f0ff;
+  border-color: rgba(0, 240, 255, 0.3);
+}
+
+.cam-select-btn.is-active {
+  background: rgba(0, 240, 255, 0.2);
+  color: #ffffff;
+  border-color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
+
+.cam-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* 6. Contextual Interaction Footer */
+.hacker-hud-footer {
+  display: flex;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.node-control-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 22px;
+  background: rgba(6, 12, 24, 0.9);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 14px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
+  max-width: 620px;
+  width: 100%;
+}
+
+.node-control-info {
+  flex: 1;
+}
+
+.node-control-type {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #00f0ff;
+  margin-bottom: 2px;
+}
+
+.node-control-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.node-control-desc {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.btn-rotate-active {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #00f0ff, #0088ff);
+  color: #020617;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-rotate-active:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.65);
+}
+
+.badge-locked-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 8px;
+  color: #f87171;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-hostile-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  color: #fca5a5;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.badge-target-status {
+  padding: 10px 16px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 8px;
+  color: #fbbf24;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.hacker-hint-bar {
+  padding: 10px 20px;
+  background: rgba(6, 12, 24, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+/* 7. Dialog Modals */
+.hacker-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 18, 0.85);
+  backdrop-filter: blur(16px);
+  padding: 20px;
+}
+
+.hacker-dialog-card {
+  width: 100%;
+  max-width: 520px;
+  background: linear-gradient(145deg, rgba(8, 16, 32, 0.98), rgba(4, 8, 18, 0.98));
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.2);
+  padding: 28px;
+  animation: hackerFadeIn 0.3s ease forwards;
+}
+
+.dialog-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 20px;
+  color: #00f0ff;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.dialog-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+}
+
+.dialog-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.dialog-btn-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dialog-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 18px;
+  background: linear-gradient(135deg, #00f0ff, #0077ff);
+  color: #020617;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.dialog-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.7);
+}
+
+.dialog-btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.dialog-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.dialog-btn-danger {
+  padding: 12px 18px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.dialog-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #ffffff;
+}
+
+/* Final Victory Modal Specifics */
+.final-victory-card {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 60px rgba(16, 185, 129, 0.3);
+}
+
+.final-badge {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.final-title {
+  color: #ffffff;
+}
+
+.hacker-clearance-badge {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+
+.clearance-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.clearance-rank {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  color: #34d399;
+}
+
+.clearance-code {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+}
+
+.clearance-sub {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.secret-transmission-box {
+  background: rgba(2, 6, 14, 0.7);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 20px;
+}
+
+.transmission-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #00f0ff;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.transmission-text {
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.final-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.stat-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.stat-val {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* 8. 3D In-Scene Floating Node Badges */
+.circuit-3d-node-badge {
+  padding: 6px 12px;
+  background: rgba(6, 12, 24, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  text-align: center;
+  transform: translateY(-8px);
+}
+
+.node-badge-type {
+  display: block;
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 800;
+  color: #00f0ff;
+  letter-spacing: 0.1em;
+}
+
+.node-badge-title {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.node-badge-hint {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: #fbbf24;
+  margin-top: 2px;
+}
+
+.node-badge-locked {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 800;
+  color: #f87171;
+  margin-top: 2px;
+}
+
+.node-badge-danger {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 800;
+  color: #ef4444;
+  margin-top: 2px;
+}
+
+/* 9. HUD Netrun Pill */
+.hud-netrun-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 8px;
+  color: #00f0ff;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: pulseBeacon 2s infinite ease-in-out;
+}
+
+.hud-netrun-pill:hover {
+  background: rgba(0, 240, 255, 0.25);
+  border-color: #00f0ff;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
+}

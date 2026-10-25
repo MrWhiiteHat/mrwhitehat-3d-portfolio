@@ -365,6 +365,22 @@ export default function GameHUD({
           </button>
         )}
 
+                {/* Discreet Watch Dogs 2 Netrun Easter Egg Pill */}
+        {isEasterEggAvailable && (
+          <button
+            type="button"
+            className="hud-netrun-pill"
+            onClick={() => {
+              playClickSound(1200);
+              onLaunchEasterEgg?.();
+            }}
+            title="Launch Watch Dogs 2 3D Circuit Network Bypass (Hidden Easter Egg)"
+          >
+            <Zap size={13} style={{ color: '#00f0ff' }} />
+            <span className="netrun-pill-label">NETRUN [OVERRIDE]</span>
+          </button>
+        )}
+
         {/* Quick HUD Controls */}
         <div className="hud-right-actions">
           {/* Working AC Quick Toggle */}

@@ -1,3 +1,4 @@
+import { getCompletedStations, markStationCompleted } from './easteregg/easterEggState.js';
 import { useEffect, useState } from 'react';
 import { Html } from '@react-three/drei';
 import {

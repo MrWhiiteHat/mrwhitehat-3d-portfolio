@@ -1,3 +1,4 @@
+import HackingCircuitScene from './easteregg/HackingCircuitScene.jsx';
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { ContactShadows, Html, OrbitControls } from '@react-three/drei';
