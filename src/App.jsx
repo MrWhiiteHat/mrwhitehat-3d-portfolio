@@ -207,6 +207,7 @@ export default function App() {
   }, []);
 
   const handleLaunchEasterEgg = useCallback(() => {
+    setIsLoadingFinished(true);
     playGlitchTransition();
     preHackerStateRef.current = { themeKey, gameState: 'EXPLORE' };
     setThemeKey('HACKER_NETRUN');

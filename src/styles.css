@@ -10587,13 +10587,15 @@ body.is-pseudo-fullscreen .portfolio-container {
 
 /* 3. Objective Banner - Watch Dogs 2 Orange Tag */
 .hacker-objective-banner {
-  align-self: flex-start;
-  margin-top: 10px;
+  position: absolute;
+  top: 88px;
+  left: 18px;
   display: flex;
   flex-direction: column;
   gap: 0;
-  max-width: 520px;
+  max-width: 480px;
   pointer-events: auto !important;
+  z-index: 10;
 }
 
 .objective-tag-wd2 {
