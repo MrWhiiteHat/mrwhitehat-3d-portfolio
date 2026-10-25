@@ -42,7 +42,7 @@ export const CAMERA_VANTAGES = {
 };
 
 /**
- * Animated Conduit Line between two 3D spatial points
+ * Animated Conduit Line between two 3D spatial points (Watch Dogs 2 laser neon style)
  */
 function CircuitConduit({
   from,
@@ -54,11 +54,11 @@ function CircuitConduit({
   const lineMeshRef = useRef();
   const pulseMeshRef = useRef();
 
-  const { curve, length, orientation } = useMemo(() => {
+  const { length, orientation, midpoint } = useMemo(() => {
     const start = new THREE.Vector3(...from);
     const end = new THREE.Vector3(...to);
     const distance = start.distanceTo(end);
-    const midpoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+    const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
 
     // Compute rotation to align cylinder with start->end
     const dir = new THREE.Vector3().subVectors(end, start).normalize();
@@ -68,7 +68,7 @@ function CircuitConduit({
 
     return {
       length: distance,
-      midpoint,
+      midpoint: mid,
       orientation: rot,
     };
   }, [from, to]);
@@ -77,7 +77,7 @@ function CircuitConduit({
   useFrame((state) => {
     if (!pulseMeshRef.current || (!isPowered && !isCompleted)) return;
     const time = state.clock.getElapsedTime();
-    const cycle = (time * 1.8) % 1.0;
+    const cycle = (time * 2.2) % 1.0;
     _v1.set(...from);
     _v2.set(...to);
     pulseMeshRef.current.position.lerpVectors(_v1, _v2, cycle);
@@ -89,44 +89,44 @@ function CircuitConduit({
     ? '#ff1744'
     : isPowered
     ? '#00f0ff'
-    : '#0c2438';
+    : '#0c2238';
 
-  const conduitOpacity = isPowered || isCompleted ? 0.95 : 0.45;
+  const conduitOpacity = isPowered || isCompleted ? 0.95 : 0.4;
 
   return (
     <group>
       {/* Outer Glow Tube */}
-      <mesh position={curve?.midpoint} rotation={orientation}>
-        <cylinderGeometry args={[0.034, 0.034, length, 8]} />
+      <mesh position={midpoint} rotation={orientation}>
+        <cylinderGeometry args={[0.026, 0.026, length, 8]} />
         <meshStandardMaterial
           color={conduitColor}
           emissive={conduitColor}
-          emissiveIntensity={isPowered || isCompleted ? 2.4 : 0.25}
+          emissiveIntensity={isPowered || isCompleted ? 2.8 : 0.2}
           transparent
           opacity={conduitOpacity}
-          roughness={0.2}
-          metalness={0.8}
+          roughness={0.15}
+          metalness={0.85}
         />
       </mesh>
 
-      {/* Core Glowing Wire */}
-      <mesh position={curve?.midpoint} rotation={orientation}>
-        <cylinderGeometry args={[0.012, 0.012, length, 6]} />
+      {/* Core Laser Wire */}
+      <mesh position={midpoint} rotation={orientation}>
+        <cylinderGeometry args={[0.010, 0.010, length, 6]} />
         <meshBasicMaterial
-          color={isCompleted ? '#a7f3d0' : isPowered ? '#e0f7ff' : '#061a29'}
+          color={isCompleted ? '#a7f3d0' : isHostile ? '#ff8a80' : isPowered ? '#ffffff' : '#081d30'}
           transparent
-          opacity={isPowered || isCompleted ? 0.95 : 0.35}
+          opacity={isPowered || isCompleted ? 1.0 : 0.4}
         />
       </mesh>
 
       {/* Traveling Data Pulse Particle */}
       {(isPowered || isCompleted) && (
         <mesh ref={pulseMeshRef} position={from}>
-          <sphereGeometry args={[0.065, 8, 8]} />
+          <sphereGeometry args={[0.055, 8, 8]} />
           <meshBasicMaterial
             color={isCompleted ? '#6ee7b7' : '#ffffff'}
             transparent
-            opacity={0.9}
+            opacity={0.95}
           />
         </mesh>
       )}
@@ -135,7 +135,7 @@ function CircuitConduit({
 }
 
 /**
- * 3D Interactive Node Component
+ * 3D Interactive Node Component (Watch Dogs 2 NetHack aesthetic)
  */
 function CircuitNode({
   node,
@@ -147,6 +147,9 @@ function CircuitNode({
   onRotate,
 }) {
   const meshGroupRef = useRef();
+  const diamondLockRef = useRef();
+  const hostileAuraRef = useRef();
+  const targetWaypointRef = useRef();
   const targetRotationY = useRef((node.rotationIndex || 0) * (Math.PI / 2));
 
   // Smooth visual rotation animation when switch turns
@@ -155,6 +158,8 @@ function CircuitNode({
   }, [node.rotationIndex]);
 
   useFrame((state, delta) => {
+    const time = state.clock.getElapsedTime();
+
     if (meshGroupRef.current) {
       meshGroupRef.current.rotation.y = THREE.MathUtils.damp(
         meshGroupRef.current.rotation.y,
@@ -162,6 +167,26 @@ function CircuitNode({
         14,
         delta
       );
+    }
+
+    // Watch Dogs 2 Rotating Diamond Lock Animation
+    if (diamondLockRef.current) {
+      diamondLockRef.current.rotation.z += delta * 0.75;
+      diamondLockRef.current.position.y = 0.28 + Math.sin(time * 2.4) * 0.02;
+    }
+
+    // Watch Dogs 2 Hostile Red Radial Aura Pulse
+    if (hostileAuraRef.current) {
+      const pulse = 0.35 + Math.sin(time * 3.8) * 0.15;
+      hostileAuraRef.current.material.opacity = pulse;
+      const s = 1.0 + Math.sin(time * 3.8) * 0.06;
+      hostileAuraRef.current.scale.set(s, s, s);
+    }
+
+    // Watch Dogs 2 Objective Waypoint Beacon Animation
+    if (targetWaypointRef.current) {
+      targetWaypointRef.current.rotation.z += delta * 0.6;
+      targetWaypointRef.current.position.y = 0.32 + Math.sin(time * 2.2) * 0.025;
     }
   });
 
@@ -208,161 +233,275 @@ function CircuitNode({
 
   return (
     <group position={node.position}>
-      {/* Selection Holographic Reticle Bracket */}
+      {/* 1. Watch Dogs 2 Selection Square Reticle Bracket */}
       {(isSelected || isHovered) && (
         <group>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.26, 0.30, 32]} />
+          {/* Outer Square Reticle Frame */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, 0]}>
+            <ringGeometry args={[0.26, 0.29, 4]} />
             <meshBasicMaterial
-              color={isHostile ? '#ff1744' : isTargetPowered ? '#10b981' : '#00f0ff'}
+              color={isHostile ? '#ff1744' : isTargetPowered ? '#10b981' : '#ffffff'}
               transparent
-              opacity={0.9}
+              opacity={0.95}
               side={THREE.DoubleSide}
             />
           </mesh>
-          <mesh position={[0, 0.38, 0]}>
-            <octahedronGeometry args={[0.06, 0]} />
-            <meshBasicMaterial
-              color={isHostile ? '#ff1744' : isTargetPowered ? '#10b981' : '#ffffff'}
-            />
+
+          {/* Corner Tick Marks */}
+          {[-0.24, 0.24].map((tx) =>
+            [-0.24, 0.24].map((tz) => (
+              <mesh key={`tick-${tx}-${tz}`} position={[tx, 0.02, tz]}>
+                <boxGeometry args={[0.04, 0.01, 0.04]} />
+                <meshBasicMaterial color="#00f0ff" />
+              </mesh>
+            ))
+          )}
+
+          {/* Floating Waypoint Pip */}
+          <mesh position={[0, 0.44, 0]}>
+            <octahedronGeometry args={[0.045, 0]} />
+            <meshBasicMaterial color={isHostile ? '#ff1744' : '#ffffff'} />
           </mesh>
         </group>
       )}
 
-      {/* Main Interactive Node Body */}
+      {/* 2. Main Interactive Node Body */}
       <group
         ref={meshGroupRef}
         onClick={handleClick}
         onPointerOver={handlePointerOver}
       >
-        {/* Switch Puck (Straight, Elbow, T-Junction, or Unlocked Router) */}
+        {/* SWITCH PUCKS (Straight, Elbow, T-Junction, Unlocked Router) */}
         {(node.type === NODE_TYPES.SWITCH_STRAIGHT ||
           node.type === NODE_TYPES.SWITCH_ELBOW ||
           node.type === NODE_TYPES.SWITCH_T ||
           node.type === NODE_TYPES.LOCKED_ROUTER) && (
           <group>
-            {/* Outer Cyber Rim */}
-            <mesh>
-              <cylinderGeometry args={[0.18, 0.19, 0.06, 24]} />
+            {/* Dark Base Hub Disc */}
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[0.19, 0.20, 0.04, 32]} />
               <meshStandardMaterial
-                color="#090d16"
+                color="#060e1a"
                 roughness={0.25}
                 metalness={0.9}
               />
             </mesh>
 
+            {/* Glowing White/Cyan Outer Rim */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.042, 0]}>
+              <ringGeometry args={[0.17, 0.19, 32]} />
+              <meshBasicMaterial
+                color={isPowered ? '#00f0ff' : '#94a3b8'}
+                transparent
+                opacity={0.85}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+
             {/* Glowing Face Plate */}
-            <mesh position={[0, 0.034, 0]}>
-              <cylinderGeometry args={[0.16, 0.16, 0.015, 24]} />
+            <mesh position={[0, 0.038, 0]}>
+              <cylinderGeometry args={[0.155, 0.155, 0.012, 32]} />
               <meshStandardMaterial
                 color={nodeColor}
                 emissive={nodeColor}
-                emissiveIntensity={isPowered ? 2.5 : isLocked ? 1.4 : 0.5}
+                emissiveIntensity={isPowered ? 2.6 : isLocked ? 1.4 : 0.45}
                 roughness={0.2}
               />
             </mesh>
 
-            {/* Circuit Port Direction Markers */}
+            {/* Directional Circuit Port Neon Traces */}
             {(node.basePorts || [0, 2]).map((port) => {
               const angle = (port * Math.PI) / 2;
               return (
-                <mesh
-                  key={port}
-                  position={[Math.sin(angle) * 0.12, 0.046, Math.cos(angle) * 0.12]}
-                  rotation={[0, angle, 0]}
-                >
-                  <boxGeometry args={[0.045, 0.014, 0.075]} />
-                  <meshBasicMaterial
-                    color={isPowered ? '#ffffff' : '#94a3b8'}
-                  />
-                </mesh>
+                <group key={port} rotation={[0, -angle, 0]}>
+                  <mesh position={[0, 0.046, 0.11]}>
+                    <boxGeometry args={[0.045, 0.014, 0.09]} />
+                    <meshBasicMaterial
+                      color={isPowered ? '#ffffff' : '#cbd5e1'}
+                    />
+                  </mesh>
+                </group>
               );
             })}
-
-            {/* Locked Padlock Hologram */}
-            {isLocked && (
-              <group position={[0, 0.14, 0]}>
-                <mesh>
-                  <boxGeometry args={[0.11, 0.09, 0.045]} />
-                  <meshStandardMaterial
-                    color="#ff1744"
-                    emissive="#ff1744"
-                    emissiveIntensity={2.4}
-                  />
-                </mesh>
-                <mesh position={[0, 0.07, 0]}>
-                  <torusGeometry args={[0.04, 0.014, 8, 16, Math.PI]} />
-                  <meshStandardMaterial color="#ffffff" />
-                </mesh>
-              </group>
-            )}
           </group>
         )}
 
-        {/* Source Energy Injector Node */}
-        {node.type === NODE_TYPES.SOURCE && (
-          <group>
-            <mesh>
-              <sphereGeometry args={[0.16, 20, 20]} />
-              <meshStandardMaterial
-                color="#00f0ff"
-                emissive="#00f0ff"
-                emissiveIntensity={3.0}
-                roughness={0.1}
-              />
-            </mesh>
-            <mesh rotation={[Math.PI / 4, 0, Math.PI / 4]}>
-              <torusGeometry args={[0.26, 0.022, 8, 24]} />
-              <meshBasicMaterial color="#ffffff" transparent opacity={0.8} />
-            </mesh>
-          </group>
-        )}
-
-        {/* Target Objective Gateway Node */}
-        {node.type === NODE_TYPES.TARGET && (
-          <group>
-            <mesh>
-              <cylinderGeometry args={[0.25, 0.25, 0.09, 6]} />
-              <meshStandardMaterial
-                color={isTargetPowered ? '#10b981' : '#f59e0b'}
-                emissive={isTargetPowered ? '#10b981' : '#f59e0b'}
-                emissiveIntensity={isTargetPowered ? 3.5 : 1.8}
-              />
-            </mesh>
-            <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.07, 0]}>
-              <ringGeometry args={[0.14, 0.18, 6]} />
+        {/* 3. Watch Dogs 2 Iconic Holographic Rotating Diamond Lock */}
+        {isLocked && (
+          <group ref={diamondLockRef} position={[0, 0.28, 0]}>
+            {/* Outer Diamond Frame */}
+            <mesh rotation={[0, 0, Math.PI / 4]}>
+              <ringGeometry args={[0.22, 0.25, 4]} />
               <meshBasicMaterial
-                color={isTargetPowered ? '#ffffff' : '#fed7aa'}
+                color="#ffffff"
+                transparent
+                opacity={0.95}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+
+            {/* Inner Diamond Frame */}
+            <mesh rotation={[0, 0, Math.PI / 4]}>
+              <ringGeometry args={[0.16, 0.18, 4]} />
+              <meshBasicMaterial
+                color="#00f0ff"
+                transparent
+                opacity={0.8}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+
+            {/* Padlock Hologram in Center */}
+            <group position={[0, -0.015, 0.01]}>
+              <mesh position={[0, -0.02, 0]}>
+                <boxGeometry args={[0.085, 0.075, 0.02]} />
+                <meshBasicMaterial color="#ffffff" />
+              </mesh>
+              <mesh position={[0, 0.03, 0]}>
+                <torusGeometry args={[0.03, 0.01, 8, 16, Math.PI]} />
+                <meshBasicMaterial color="#ffffff" />
+              </mesh>
+            </group>
+
+            {/* Soft Lock Threat Aura */}
+            <mesh position={[0, 0, -0.015]}>
+              <circleGeometry args={[0.24, 24]} />
+              <meshBasicMaterial
+                color="#ff1744"
+                transparent
+                opacity={0.22}
                 side={THREE.DoubleSide}
               />
             </mesh>
           </group>
         )}
 
-        {/* Key / Sub-routine Decryption Node */}
-        {node.type === NODE_TYPES.KEY_NODE && (
+        {/* 4. Watch Dogs 2 Hostile IDS Alarm (Diffused Red Radial Aura Halo) */}
+        {node.type === NODE_TYPES.HOSTILE_IDS && (
           <group>
-            <mesh position={[0, 0.1, 0]}>
-              <octahedronGeometry args={[0.16, 0]} />
+            {/* Large Diffused Red Radial Glow Aura Halo on surface */}
+            <mesh ref={hostileAuraRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+              <ringGeometry args={[0.06, 0.65, 32]} />
+              <meshBasicMaterial
+                color="#ff1744"
+                transparent
+                opacity={0.4}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+
+            {/* Pulsing Outer Warning Ring */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.008, 0]}>
+              <ringGeometry args={[0.62, 0.65, 32]} />
+              <meshBasicMaterial
+                color="#ff1744"
+                transparent
+                opacity={0.8}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+
+            {/* Central Red Threat Core Puck */}
+            <mesh position={[0, 0.04, 0]}>
+              <cylinderGeometry args={[0.15, 0.17, 0.05, 24]} />
               <meshStandardMaterial
-                color={isPowered ? '#34d399' : '#fbbf24'}
-                emissive={isPowered ? '#34d399' : '#fbbf24'}
-                emissiveIntensity={isPowered ? 2.8 : 1.4}
-                wireframe={!isPowered}
+                color="#ff1744"
+                emissive="#ff1744"
+                emissiveIntensity={3.2}
+              />
+            </mesh>
+
+            {/* Threat Diamond Marker */}
+            <mesh position={[0, 0.22, 0]}>
+              <octahedronGeometry args={[0.09, 0]} />
+              <meshStandardMaterial
+                color="#ff1744"
+                emissive="#ff1744"
+                emissiveIntensity={3.5}
               />
             </mesh>
           </group>
         )}
 
-        {/* Hostile IDS Alarm Node */}
-        {node.type === NODE_TYPES.HOSTILE_IDS && (
+        {/* 5. Watch Dogs 2 Target Gateway (Orange Waypoint Diamond Beacon) */}
+        {node.type === NODE_TYPES.TARGET && (
           <group>
-            <mesh position={[0, 0.1, 0]}>
-              <octahedronGeometry args={[0.18, 0]} />
+            {/* Base Gateway Cylinder */}
+            <mesh position={[0, 0.04, 0]}>
+              <cylinderGeometry args={[0.22, 0.24, 0.07, 6]} />
               <meshStandardMaterial
-                color="#ff1744"
-                emissive="#ff1744"
-                emissiveIntensity={3.0}
+                color={isTargetPowered ? '#10b981' : '#f59e0b'}
+                emissive={isTargetPowered ? '#10b981' : '#f59e0b'}
+                emissiveIntensity={isTargetPowered ? 3.5 : 2.2}
+              />
+            </mesh>
+
+            {/* Floating Waypoint Diamond Marker */}
+            <group ref={targetWaypointRef} position={[0, 0.32, 0]}>
+              <mesh rotation={[0, 0, Math.PI / 4]}>
+                <ringGeometry args={[0.18, 0.21, 4]} />
+                <meshBasicMaterial
+                  color={isTargetPowered ? '#10b981' : '#f59e0b'}
+                  transparent
+                  opacity={0.9}
+                  side={THREE.DoubleSide}
+                />
+              </mesh>
+              <mesh rotation={[Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[0.26, 0.29, 32]} />
+                <meshBasicMaterial
+                  color={isTargetPowered ? '#10b981' : '#f59e0b'}
+                  transparent
+                  opacity={0.7}
+                  side={THREE.DoubleSide}
+                />
+              </mesh>
+              <mesh>
+                <octahedronGeometry args={[0.05, 0]} />
+                <meshBasicMaterial color={isTargetPowered ? '#ffffff' : '#fed7aa'} />
+              </mesh>
+            </group>
+          </group>
+        )}
+
+        {/* 6. Source Energy Injector Node */}
+        {node.type === NODE_TYPES.SOURCE && (
+          <group>
+            <mesh position={[0, 0.08, 0]}>
+              <sphereGeometry args={[0.16, 20, 20]} />
+              <meshStandardMaterial
+                color="#00f0ff"
+                emissive="#00f0ff"
+                emissiveIntensity={3.2}
+                roughness={0.1}
+              />
+            </mesh>
+            <mesh rotation={[Math.PI / 4, 0, Math.PI / 4]} position={[0, 0.08, 0]}>
+              <torusGeometry args={[0.26, 0.022, 8, 24]} />
+              <meshBasicMaterial color="#ffffff" transparent opacity={0.8} />
+            </mesh>
+          </group>
+        )}
+
+        {/* 7. Key / Sub-routine Decryption Node */}
+        {node.type === NODE_TYPES.KEY_NODE && (
+          <group>
+            <mesh position={[0, 0.12, 0]}>
+              <octahedronGeometry args={[0.16, 0]} />
+              <meshStandardMaterial
+                color={isPowered ? '#34d399' : '#fbbf24'}
+                emissive={isPowered ? '#34d399' : '#fbbf24'}
+                emissiveIntensity={isPowered ? 3.0 : 1.5}
+                wireframe={!isPowered}
+              />
+            </mesh>
+            <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.12, 0]}>
+              <ringGeometry args={[0.22, 0.25, 6]} />
+              <meshBasicMaterial
+                color={isPowered ? '#34d399' : '#fbbf24'}
+                transparent
+                opacity={0.75}
+                side={THREE.DoubleSide}
               />
             </mesh>
           </group>

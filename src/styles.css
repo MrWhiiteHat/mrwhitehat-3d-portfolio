@@ -10585,31 +10585,95 @@ body.is-pseudo-fullscreen .portfolio-container {
   opacity: 0.6;
 }
 
-/* 3. Objective Banner */
+/* 3. Objective Banner - Watch Dogs 2 Orange Tag */
 .hacker-objective-banner {
   align-self: flex-start;
   margin-top: 10px;
-  padding: 8px 16px;
-  background: rgba(6, 12, 24, 0.8);
-  backdrop-filter: blur(10px);
-  border-left: 3px solid #00f0ff;
-  border-radius: 0 8px 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   max-width: 520px;
+  pointer-events: auto !important;
 }
 
-.objective-label {
+.objective-tag-wd2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ea580c;
+  color: #ffffff;
+  padding: 4px 12px;
   font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  color: #00f0ff;
-  margin-bottom: 2px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 4px 4px 0 0;
+  width: fit-content;
+  box-shadow: 0 2px 10px rgba(234, 88, 12, 0.4);
 }
 
 .objective-text {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: #e2e8f0;
+  background: rgba(4, 9, 20, 0.88);
+  backdrop-filter: blur(10px);
+  padding: 8px 14px;
+  border-left: 3px solid #ea580c;
+  border-radius: 0 6px 6px 6px;
+  margin-top: 0;
+}
+
+/* Watch Dogs 2 Horizontal Countdown Progress Bar */
+.hacker-timer-wd2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(4, 9, 20, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: var(--mono);
+}
+
+.timer-wd2-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.timer-wd2-track {
+  width: 120px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.timer-wd2-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #38bdf8);
+  transition: width 0.3s linear;
+}
+
+.hacker-timer-wd2.is-urgent .timer-wd2-fill {
+  background: #ff1744;
+}
+
+.timer-wd2-val {
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffffff;
+  min-width: 44px;
+}
+
+.hacker-timer-wd2.is-urgent .timer-wd2-val {
+  color: #ff1744;
+  animation: pulse 1s infinite;
 }
 
 /* 4. Tactical Minimap Radar */
@@ -10856,16 +10920,21 @@ body.is-pseudo-fullscreen .portfolio-container {
 }
 
 .hacker-hint-bar {
-  padding: 10px 20px;
-  background: rgba(6, 12, 24, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 22px;
+  background: rgba(4, 9, 20, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   font-family: var(--mono);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   color: #94a3b8;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  pointer-events: auto !important;
 }
 
 /* 7. Dialog Modals */

@@ -227,6 +227,82 @@ function ScenePrewarmer({ onSceneReady }) {
   return null;
 }
 
+/**
+ * Watch Dogs 2 NetHack Mode: Transitions all environmental studio models
+ * into translucent, dark slate-navy x-ray geometry during hacker mode,
+ * making the glowing 3D circuit conduits and nodes pop with 100% clarity.
+ */
+function HackerModelOpacityController({ isHackerActive }) {
+  const { scene } = useThree();
+  const savedPropsRef = useRef(new Map());
+
+  useEffect(() => {
+    const studioGroup = scene.getObjectByName('CyberCommandStudio');
+    if (!studioGroup) return;
+
+    if (isHackerActive) {
+      const savedMap = new Map();
+      studioGroup.traverse((obj) => {
+        if (obj.isMesh && obj.material) {
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          mats.forEach((mat) => {
+            if (!savedMap.has(mat)) {
+              savedMap.set(mat, {
+                opacity: mat.opacity,
+                transparent: mat.transparent,
+                color: mat.color ? mat.color.clone() : null,
+                emissive: mat.emissive ? mat.emissive.clone() : null,
+                emissiveIntensity: mat.emissiveIntensity,
+                depthWrite: mat.depthWrite,
+              });
+            }
+            mat.transparent = true;
+            mat.opacity = 0.28;
+            mat.depthWrite = true;
+            if (mat.color) {
+              mat.color.set('#0c182a');
+            }
+            if (mat.emissive) {
+              mat.emissive.set('#020610');
+              mat.emissiveIntensity = 0.15;
+            }
+            mat.needsUpdate = true;
+          });
+        }
+      });
+      savedPropsRef.current = savedMap;
+    } else if (savedPropsRef.current.size > 0) {
+      savedPropsRef.current.forEach((props, mat) => {
+        mat.opacity = props.opacity;
+        mat.transparent = props.transparent;
+        if (props.depthWrite !== undefined) mat.depthWrite = props.depthWrite;
+        if (props.color && mat.color) mat.color.copy(props.color);
+        if (props.emissive && mat.emissive) mat.emissive.copy(props.emissive);
+        if (props.emissiveIntensity !== undefined) mat.emissiveIntensity = props.emissiveIntensity;
+        mat.needsUpdate = true;
+      });
+      savedPropsRef.current.clear();
+    }
+
+    return () => {
+      if (savedPropsRef.current.size > 0) {
+        savedPropsRef.current.forEach((props, mat) => {
+          mat.opacity = props.opacity;
+          mat.transparent = props.transparent;
+          if (props.depthWrite !== undefined) mat.depthWrite = props.depthWrite;
+          if (props.color && mat.color) mat.color.copy(props.color);
+          if (props.emissive && mat.emissive) mat.emissive.copy(props.emissive);
+          if (props.emissiveIntensity !== undefined) mat.emissiveIntensity = props.emissiveIntensity;
+          mat.needsUpdate = true;
+        });
+        savedPropsRef.current.clear();
+      }
+    };
+  }, [isHackerActive, scene]);
+
+  return null;
+}
+
 function SceneContents({
   gameState = 'EXPLORE',
   onSelect,
@@ -271,7 +347,8 @@ function SceneContents({
 
   return (
     <>
-      <color attach="background" args={['#070a08']} />
+      <color attach="background" args={[hackerModeData?.isActive ? '#040813' : '#070a08']} />
+      <HackerModelOpacityController isHackerActive={hackerModeData?.isActive} />
       <ShadowController themeKey={themeKey} isGateOpen={isGateOpen} gameState={gameState} />
       <ScenePrewarmer onSceneReady={onReady} />
 

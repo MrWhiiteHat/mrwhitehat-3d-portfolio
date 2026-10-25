@@ -104,18 +104,22 @@ export default function HackingCircuitHUD({
           ))}
         </div>
 
-        {/* Countdown Timer (Stage 3) */}
+        {/* Countdown Timer (Stage 3 - Watch Dogs 2 Style) */}
         {typeof timeLeft === 'number' && (
           <div
-            className={`hacker-timer-pill ${
+            className={`hacker-timer-wd2 ${
               timeLeft <= 15 ? 'is-urgent' : ''
             }`}
           >
-            <Clock size={15} />
-            <span className="timer-label">TRACE IN:</span>
-            <strong className="timer-val">
-              {Math.floor(timeLeft / 60)}:
-              {String(timeLeft % 60).padStart(2, '0')}s
+            <span className="timer-wd2-label">Time left</span>
+            <div className="timer-wd2-track">
+              <div
+                className="timer-wd2-fill"
+                style={{ width: `${Math.max(0, Math.min(100, (timeLeft / 60) * 100))}%` }}
+              />
+            </div>
+            <strong className="timer-wd2-val">
+              00:{String(timeLeft).padStart(2, '0')}
             </strong>
           </div>
         )}
@@ -159,9 +163,12 @@ export default function HackingCircuitHUD({
         </div>
       </header>
 
-      {/* 2. OBJECTIVE BANNER */}
-      <div className="hacker-objective-banner">
-        <div className="objective-label">MISSION OBJECTIVE</div>
+      {/* 2. OBJECTIVE BANNER (Watch Dogs 2 Style) */}
+      <div className="hacker-objective-banner" style={{ pointerEvents: 'auto' }}>
+        <div className="objective-tag-wd2">
+          <Zap size={13} />
+          <span>COMPLETE THE HACKER CHALLENGE</span>
+        </div>
         <div className="objective-text">{currentStage.objective}</div>
       </div>
 
@@ -274,7 +281,15 @@ export default function HackingCircuitHUD({
           </div>
         ) : (
           <div className="hacker-hint-bar">
-            <span>[CLICK OR TAP] A JUNCTION NODE TO SELECT · [E] TO ROTATE 90° · [R] TO RESET</span>
+            <span>[CLICK / TAP] SELECT NODE</span>
+            <span>•</span>
+            <span>[E] ROTATE SWITCH</span>
+            <span>•</span>
+            <span>[CAM 01–04] VANTAGE FEEDS</span>
+            <span>•</span>
+            <span>[R] RESET</span>
+            <span>•</span>
+            <span>[ESC] SUSPEND</span>
           </div>
         )}
       </footer>
