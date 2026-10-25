@@ -438,6 +438,19 @@ export function evaluateCircuit(stageConfig, nodeStates) {
   const poweredNodeIds = new Set();
   const poweredConnectionIndices = new Set();
   const unlockedNodeIds = new Set();
+  const flowDirections = new Map();
+
+  // Initialize all connections with canonical topological direction (idle/unpowered)
+  stageConfig.connections.forEach((conn, idx) => {
+    flowDirections.set(idx, {
+      fromId: conn.from,
+      toId: conn.to,
+      forward: true,
+      bidirectional: false,
+      isPowered: false,
+    });
+  });
+
   let isHostileTriggered = false;
   let triggeredHostileId = null;
 
@@ -451,6 +464,7 @@ export function evaluateCircuit(stageConfig, nodeStates) {
       isHostileTriggered,
       triggeredHostileId,
       isTargetPowered: false,
+      flowDirections,
     };
   }
 
@@ -502,6 +516,19 @@ export function evaluateCircuit(stageConfig, nodeStates) {
           changed = true;
         }
 
+        const flow = flowDirections.get(connIdx);
+        if (flow) {
+          if (!flow.isPowered) {
+            flow.isPowered = true;
+            flow.fromId = currentId;
+            flow.toId = neighborId;
+            flow.forward = conn.from === currentId;
+            flow.bidirectional = false;
+          } else if (flow.fromId !== currentId) {
+            flow.bidirectional = true;
+          }
+        }
+
         if (!poweredNodeIds.has(neighborId)) {
           poweredNodeIds.add(neighborId);
           changed = true;
@@ -536,5 +563,6 @@ export function evaluateCircuit(stageConfig, nodeStates) {
     isHostileTriggered,
     triggeredHostileId,
     isTargetPowered,
+    flowDirections,
   };
 }

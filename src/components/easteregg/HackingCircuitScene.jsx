@@ -12,6 +12,10 @@ import {
 // Pre-allocated temporary Three.js objects for zero GC garbage collection
 const _v1 = new THREE.Vector3();
 const _v2 = new THREE.Vector3();
+const _up = new THREE.Vector3(0, 1, 0);
+const _tempPos = new THREE.Vector3();
+const _tempTangent = new THREE.Vector3();
+const _tempQuat = new THREE.Quaternion();
 
 // Camera vantage presets calibrated inside room bounds and beneath ceiling
 export const CAMERA_VANTAGES = {
@@ -42,46 +46,70 @@ export const CAMERA_VANTAGES = {
 };
 
 /**
- * Animated Conduit Line between two 3D spatial points (Watch Dogs 2 laser neon style)
+ * Animated Conduit Line between two 3D spatial points with Watch Dogs 2
+ * directional chevron arrows synchronized to actual circuit flow topology.
  */
 function CircuitConduit({
   from,
   to,
+  waypoints,
   isPowered,
   isHostile,
   isCompleted,
+  flowDirection,
 }) {
-  const lineMeshRef = useRef();
   const pulseMeshRef = useRef();
+  const arrowForwardGroupRef = useRef();
+  const arrowReverseGroupRef = useRef();
 
-  const { length, orientation, midpoint } = useMemo(() => {
+  const { length, orientation, midpoint, dir, curve } = useMemo(() => {
     const start = new THREE.Vector3(...from);
     const end = new THREE.Vector3(...to);
     const distance = start.distanceTo(end);
     const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
 
-    // Compute rotation to align cylinder with start->end
-    const dir = new THREE.Vector3().subVectors(end, start).normalize();
+    const d = new THREE.Vector3().subVectors(end, start).normalize();
     const up = new THREE.Vector3(0, 1, 0);
-    const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
+    const quat = new THREE.Quaternion().setFromUnitVectors(up, d);
     const rot = new THREE.Euler().setFromQuaternion(quat);
+
+    let c = null;
+    if (waypoints && waypoints.length > 0) {
+      const pts = [
+        start,
+        ...waypoints.map((wp) => new THREE.Vector3(...wp)),
+        end,
+      ];
+      c = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.2);
+    }
 
     return {
       length: distance,
       midpoint: mid,
       orientation: rot,
+      dir: d,
+      curve: c,
     };
-  }, [from, to]);
+  }, [from, to, waypoints]);
 
-  // Animate traveling power pulses along energized conduits
-  useFrame((state) => {
-    if (!pulseMeshRef.current || (!isPowered && !isCompleted)) return;
-    const time = state.clock.getElapsedTime();
-    const cycle = (time * 2.2) % 1.0;
-    _v1.set(...from);
-    _v2.set(...to);
-    pulseMeshRef.current.position.lerpVectors(_v1, _v2, cycle);
-  });
+  // Arrow counts and base offsets along centerline
+  const arrowOffsets = useMemo(() => {
+    if (length < 0.7) return [0.5];
+    if (length < 1.7) return [0.35, 0.65];
+    return [0.25, 0.50, 0.75];
+  }, [length]);
+
+  const isFlowing = isPowered || isCompleted;
+  const isForward = flowDirection ? flowDirection.forward !== false : true;
+  const isBidirectional = flowDirection ? Boolean(flowDirection.bidirectional) : false;
+
+  const arrowColor = isCompleted
+    ? '#10b981'
+    : isHostile
+    ? '#ff1744'
+    : isPowered
+    ? '#00f0ff'
+    : '#00c8ff';
 
   const conduitColor = isCompleted
     ? '#10b981'
@@ -89,21 +117,106 @@ function CircuitConduit({
     ? '#ff1744'
     : isPowered
     ? '#00f0ff'
-    : '#0099cc'; // Vibrant laser cyan trace even when unpowered
+    : '#0088cc';
 
-  const conduitOpacity = isPowered || isCompleted ? 0.95 : 0.75;
+  // Animate traveling signal pulses & directional arrows along the centerline
+  useFrame((state) => {
+    const time = state.clock.getElapsedTime();
+
+    // 1. Traveling Data Pulse Particle
+    if (pulseMeshRef.current && isFlowing) {
+      const pCycle = (time * 1.8) % 1.0;
+      const t = isForward ? pCycle : 1.0 - pCycle;
+      if (curve) {
+        pulseMeshRef.current.position.copy(curve.getPointAt(t));
+      } else {
+        _v1.set(...from);
+        _v2.set(...to);
+        pulseMeshRef.current.position.lerpVectors(_v1, _v2, t);
+      }
+    }
+
+    // 2. Animate Forward Arrow Chevrons
+    if (arrowForwardGroupRef.current) {
+      const speed = isFlowing ? 0.32 : 0;
+      const cycle = (time * speed) % 1.0;
+
+      arrowForwardGroupRef.current.children.forEach((child, i) => {
+        const baseT = arrowOffsets[i] || 0.5;
+        let t = isFlowing ? (baseT + cycle) % 1.0 : baseT;
+        if (!isForward && !isBidirectional) {
+          t = 1.0 - t;
+        }
+
+        let pt, tangent;
+        if (curve) {
+          pt = curve.getPointAt(t);
+          tangent = curve.getTangentAt(t).normalize();
+        } else {
+          _v1.set(...from);
+          _v2.set(...to);
+          pt = _tempPos.lerpVectors(_v1, _v2, t);
+          tangent = dir;
+        }
+
+        if (!isForward && !isBidirectional) {
+          _tempTangent.copy(tangent).negate();
+        } else {
+          _tempTangent.copy(tangent);
+        }
+
+        child.position.copy(pt);
+        _tempQuat.setFromUnitVectors(_up, _tempTangent);
+        child.quaternion.copy(_tempQuat);
+
+        const edgeFade = isFlowing ? Math.sin(t * Math.PI) : 1.0;
+        const scale = (isFlowing ? 1.0 : 0.85) * (0.35 + 0.65 * edgeFade);
+        child.scale.set(scale, scale, scale);
+      });
+    }
+
+    // 3. Animate Reverse Arrow Chevrons (only for valid bidirectional paths)
+    if (arrowReverseGroupRef.current && isBidirectional) {
+      const speed = isFlowing ? 0.32 : 0;
+      const cycle = (time * speed) % 1.0;
+
+      arrowReverseGroupRef.current.children.forEach((child, i) => {
+        const baseT = arrowOffsets[i] || 0.5;
+        let t = isFlowing ? 1.0 - ((baseT + cycle) % 1.0) : 1.0 - baseT;
+
+        let pt, tangent;
+        if (curve) {
+          pt = curve.getPointAt(t);
+          tangent = curve.getTangentAt(t).normalize().negate();
+        } else {
+          _v1.set(...from);
+          _v2.set(...to);
+          pt = _tempPos.lerpVectors(_v1, _v2, t);
+          tangent = _tempTangent.copy(dir).negate();
+        }
+
+        child.position.copy(pt);
+        _tempQuat.setFromUnitVectors(_up, tangent);
+        child.quaternion.copy(_tempQuat);
+
+        const edgeFade = isFlowing ? Math.sin(t * Math.PI) : 1.0;
+        const scale = (isFlowing ? 1.0 : 0.85) * (0.35 + 0.65 * edgeFade);
+        child.scale.set(scale, scale, scale);
+      });
+    }
+  });
 
   return (
     <group>
       {/* Outer Glow Tube */}
       <mesh position={midpoint} rotation={orientation}>
-        <cylinderGeometry args={[0.026, 0.026, length, 8]} />
+        <cylinderGeometry args={[0.024, 0.024, length, 8]} />
         <meshStandardMaterial
           color={conduitColor}
           emissive={conduitColor}
-          emissiveIntensity={isPowered || isCompleted ? 3.5 : 1.2}
+          emissiveIntensity={isPowered || isCompleted ? 3.5 : 0.9}
           transparent
-          opacity={conduitOpacity}
+          opacity={isPowered || isCompleted ? 0.95 : 0.45}
           roughness={0.15}
           metalness={0.85}
         />
@@ -111,20 +224,80 @@ function CircuitConduit({
 
       {/* Core Laser Wire */}
       <mesh position={midpoint} rotation={orientation}>
-        <cylinderGeometry args={[0.010, 0.010, length, 6]} />
+        <cylinderGeometry args={[0.009, 0.009, length, 6]} />
         <meshBasicMaterial
           color={isCompleted ? '#a7f3d0' : isHostile ? '#ff8a80' : isPowered ? '#ffffff' : '#38bdf8'}
           transparent
-          opacity={isPowered || isCompleted ? 1.0 : 0.8}
+          opacity={isPowered || isCompleted ? 1.0 : 0.6}
         />
       </mesh>
 
+      {/* 3D Directional Circuit Arrows (Forward / Dominant Flow) */}
+      <group ref={arrowForwardGroupRef}>
+        {arrowOffsets.map((_, idx) => (
+          <group key={`arrow-fwd-${idx}`}>
+            {/* Diamond 3D Arrowhead */}
+            <mesh>
+              <coneGeometry args={[0.075, 0.17, 4]} />
+              <meshStandardMaterial
+                color={arrowColor}
+                emissive={arrowColor}
+                emissiveIntensity={isFlowing ? 3.8 : 0.5}
+                transparent
+                opacity={isFlowing ? 0.95 : 0.32}
+                roughness={0.2}
+              />
+            </mesh>
+            {/* Trailing Chevron Collar Wing */}
+            <mesh position={[0, -0.055, 0]} rotation={[0, Math.PI / 4, 0]}>
+              <ringGeometry args={[0.045, 0.08, 4]} />
+              <meshBasicMaterial
+                color={arrowColor}
+                transparent
+                opacity={isFlowing ? 0.85 : 0.25}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+        ))}
+      </group>
+
+      {/* 3D Directional Circuit Arrows (Reverse / Bidirectional Flow) */}
+      {isBidirectional && (
+        <group ref={arrowReverseGroupRef}>
+          {arrowOffsets.map((_, idx) => (
+            <group key={`arrow-rev-${idx}`}>
+              <mesh>
+                <coneGeometry args={[0.075, 0.17, 4]} />
+                <meshStandardMaterial
+                  color={arrowColor}
+                  emissive={arrowColor}
+                  emissiveIntensity={isFlowing ? 3.8 : 0.5}
+                  transparent
+                  opacity={isFlowing ? 0.95 : 0.32}
+                  roughness={0.2}
+                />
+              </mesh>
+              <mesh position={[0, -0.055, 0]} rotation={[0, Math.PI / 4, 0]}>
+                <ringGeometry args={[0.045, 0.08, 4]} />
+                <meshBasicMaterial
+                  color={arrowColor}
+                  transparent
+                  opacity={isFlowing ? 0.85 : 0.25}
+                  side={THREE.DoubleSide}
+                />
+              </mesh>
+            </group>
+          ))}
+        </group>
+      )}
+
       {/* Traveling Data Pulse Particle */}
-      {(isPowered || isCompleted) && (
+      {isFlowing && (
         <mesh ref={pulseMeshRef} position={from}>
           <sphereGeometry args={[0.055, 8, 8]} />
           <meshBasicMaterial
-            color={isCompleted ? '#6ee7b7' : '#ffffff'}
+            color={isCompleted ? '#6ee7b7' : isHostile ? '#ff8a80' : '#ffffff'}
             transparent
             opacity={0.95}
           />
@@ -822,7 +995,7 @@ export default function HackingCircuitScene({
         color="#00f0ff"
       />
 
-      {/* Render 3D Circuit Conduits */}
+      {/* Render 3D Circuit Conduits with Directional Flow Arrows */}
       {currentStage.connections.map((conn, idx) => {
         const fromNode = currentStage.nodes.find((n) => n.id === conn.from);
         const toNode = currentStage.nodes.find((n) => n.id === conn.to);
@@ -832,15 +1005,18 @@ export default function HackingCircuitScene({
         const isHostile =
           fromNode.type === NODE_TYPES.HOSTILE_IDS ||
           toNode.type === NODE_TYPES.HOSTILE_IDS;
+        const flowDirection = evaluation?.flowDirections?.get(idx);
 
         return (
           <CircuitConduit
             key={`${conn.from}-${conn.to}-${idx}`}
             from={fromNode.position}
             to={toNode.position}
+            waypoints={conn.waypoints}
             isPowered={isPowered}
             isHostile={isHostile && isPowered}
             isCompleted={isTargetPowered}
+            flowDirection={flowDirection}
           />
         );
       })}

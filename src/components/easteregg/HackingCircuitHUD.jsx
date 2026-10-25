@@ -198,6 +198,95 @@ export default function HackingCircuitHUD({
         </div>
         <div className="minimap-radar-screen">
           <div className="radar-grid-lines" />
+          {/* Synchronized 2D Minimap Circuit Connections & Directed Flow Arrows */}
+          <svg
+            className="minimap-connections-svg"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'none',
+            }}
+          >
+            <defs>
+              <marker
+                id="minimap-arrow-powered"
+                viewBox="0 0 10 10"
+                refX="7"
+                refY="5"
+                markerWidth="5"
+                markerHeight="5"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#00f0ff" />
+              </marker>
+              <marker
+                id="minimap-arrow-dim"
+                viewBox="0 0 10 10"
+                refX="7"
+                refY="5"
+                markerWidth="5"
+                markerHeight="5"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284c7" opacity="0.6" />
+              </marker>
+              <marker
+                id="minimap-arrow-completed"
+                viewBox="0 0 10 10"
+                refX="7"
+                refY="5"
+                markerWidth="5"
+                markerHeight="5"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10b981" />
+              </marker>
+            </defs>
+            {currentStage.connections.map((conn, idx) => {
+              const n1 = currentStage.nodes.find((n) => n.id === conn.from);
+              const n2 = currentStage.nodes.find((n) => n.id === conn.to);
+              if (!n1 || !n2) return null;
+
+              const x1 = Math.min(92, Math.max(8, 50 + (n1.position[0] / 5.5) * 42));
+              const y1 = Math.min(92, Math.max(8, 50 + (n1.position[2] / 5.5) * 42));
+              const x2 = Math.min(92, Math.max(8, 50 + (n2.position[0] / 5.5) * 42));
+              const y2 = Math.min(92, Math.max(8, 50 + (n2.position[2] / 5.5) * 42));
+
+              const isPowered = evaluation.poweredConnectionIndices.has(idx);
+              const isCompleted = evaluation.isTargetPowered;
+              const flow = evaluation?.flowDirections?.get(idx);
+              const isFwd = flow ? flow.forward !== false : true;
+
+              const stroke = isCompleted ? '#10b981' : isPowered ? '#00f0ff' : '#0284c7';
+              const opacity = isPowered || isCompleted ? 0.95 : 0.32;
+              const marker = isCompleted
+                ? 'url(#minimap-arrow-completed)'
+                : isPowered
+                ? 'url(#minimap-arrow-powered)'
+                : 'url(#minimap-arrow-dim)';
+
+              const sx = isFwd ? x1 : x2;
+              const sy = isFwd ? y1 : y2;
+              const ex = isFwd ? x2 : x1;
+              const ey = isFwd ? y2 : y1;
+
+              return (
+                <line
+                  key={`mini-conn-${idx}`}
+                  x1={`${sx}%`}
+                  y1={`${sy}%`}
+                  x2={`${ex}%`}
+                  y2={`${ey}%`}
+                  stroke={stroke}
+                  strokeWidth={isPowered || isCompleted ? '2' : '1'}
+                  strokeOpacity={opacity}
+                  markerEnd={marker}
+                />
+              );
+            })}
+          </svg>
           {/* Render 2D representation of nodes */}
           {currentStage.nodes.map((node) => {
             // Project 3D X/Z into 2D radar bounds
