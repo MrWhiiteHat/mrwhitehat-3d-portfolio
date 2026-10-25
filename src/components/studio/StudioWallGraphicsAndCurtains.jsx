@@ -853,7 +853,7 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       {/* Relocated from behind bookcase (X = 0.3) to open gallery  */}
       {/* space at X = -1.45, Y = 2.35, Z = -4.92                  */}
       {/* ======================================================== */}
-      <group position={[-1.45, 2.35, -4.92]}>
+      <group position={[-1.75, 2.35, -4.92]}>
         {/* Gallery Anodized Black Metal Frame */}
         <mesh castShadow>
           <boxGeometry args={[1.22, 1.52, 0.04]} />
