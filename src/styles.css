@@ -10748,14 +10748,16 @@ body.is-pseudo-fullscreen .portfolio-container {
 /* 5. Tactical Camera Switcher */
 .hacker-cam-switcher {
   position: absolute;
-  bottom: 120px;
+  bottom: 80px;
   left: 18px;
-  background: rgba(6, 12, 24, 0.85);
+  background: rgba(6, 12, 24, 0.88);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 240, 255, 0.25);
-  border-radius: 12px;
-  padding: 10px 14px;
+  border-radius: 10px;
+  padding: 8px 10px;
   pointer-events: auto !important;
+  max-width: 155px;
+  z-index: 100;
 }
 
 .cam-switcher-label {
@@ -10767,30 +10769,31 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .cam-buttons-row {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .cam-select-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  gap: 6px;
+  padding: 5px 8px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
+  border-radius: 5px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #94a3b8;
   cursor: pointer;
   pointer-events: auto !important;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .cam-select-btn:hover {

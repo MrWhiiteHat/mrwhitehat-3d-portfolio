@@ -18,8 +18,8 @@ export const CAMERA_VANTAGES = {
   DESK_VIEW: {
     id: 'DESK_VIEW',
     label: 'CAM 01: DESK',
-    pos: [2.2, 2.3, 2.2],
-    target: [0.2, 0.75, 0.4],
+    pos: [2.5, 2.6, 2.3],
+    target: [0.3, 0.65, 0.4],
   },
   SERVER_WALL: {
     id: 'SERVER_WALL',
@@ -152,6 +152,18 @@ function CircuitNode({
   const targetWaypointRef = useRef();
   const targetRotationY = useRef((node.rotationIndex || 0) * (Math.PI / 2));
 
+  // Local state for instant, rock-solid cursor and hover feedback
+  const [isLocalHovered, setIsLocalHovered] = useState(false);
+  const downPosRef = useRef({ x: 0, y: 0, time: 0 });
+  const lastTriggerTimeRef = useRef(0);
+
+  // Restore cursor on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = 'default';
+    };
+  }, []);
+
   // Smooth visual rotation animation when switch turns
   useEffect(() => {
     targetRotationY.current = (node.rotationIndex || 0) * (Math.PI / 2);
@@ -190,8 +202,11 @@ function CircuitNode({
     }
   });
 
-  const handleClick = (e) => {
-    e.stopPropagation();
+  const triggerNodeAction = () => {
+    const now = Date.now();
+    if (now - lastTriggerTimeRef.current < 160) return; // Debounce rapid multi-clicks
+    lastTriggerTimeRef.current = now;
+
     onSelect?.(node.id);
     if (
       node.type === NODE_TYPES.SWITCH_STRAIGHT ||
@@ -203,10 +218,44 @@ function CircuitNode({
     }
   };
 
+  const handlePointerDown = (e) => {
+    e.stopPropagation();
+    downPosRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      time: Date.now(),
+    };
+  };
+
+  const handlePointerUp = (e) => {
+    e.stopPropagation();
+    const dx = e.clientX - downPosRef.current.x;
+    const dy = e.clientY - downPosRef.current.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const duration = Date.now() - downPosRef.current.time;
+
+    // Generous movement tolerance: up to 25px leeway and held for <800ms
+    if (dist < 25 && duration < 800) {
+      triggerNodeAction();
+    }
+  };
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    triggerNodeAction();
+  };
+
   const handlePointerOver = (e) => {
     e.stopPropagation();
+    setIsLocalHovered(true);
+    document.body.style.cursor = 'pointer';
     playSelectNode();
-    onSelect?.(node.id, false);
+  };
+
+  const handlePointerOut = (e) => {
+    e.stopPropagation();
+    setIsLocalHovered(false);
+    document.body.style.cursor = 'default';
   };
 
   // Node Color Logic
@@ -234,7 +283,7 @@ function CircuitNode({
   return (
     <group position={node.position}>
       {/* 1. Watch Dogs 2 Selection Square Reticle Bracket */}
-      {(isSelected || isHovered) && (
+      {(isSelected || isHovered || isLocalHovered) && (
         <group>
           {/* Outer Square Reticle Frame */}
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, 0]}>
@@ -269,7 +318,10 @@ function CircuitNode({
       <group
         ref={meshGroupRef}
         onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
         onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
       >
         {/* SWITCH PUCKS (Straight, Elbow, T-Junction, Unlocked Router) */}
         {(node.type === NODE_TYPES.SWITCH_STRAIGHT ||
@@ -507,10 +559,10 @@ function CircuitNode({
           </group>
         )}
 
-        {/* Large invisible raycast hit volume for effortless clicking/tapping */}
-        <mesh>
-          <sphereGeometry args={[0.45, 12, 12]} />
-          <meshBasicMaterial visible={false} />
+        {/* Generous invisible raycast hit cylinder volume for effortless clicking/tapping */}
+        <mesh position={[0, 0.16, 0]}>
+          <cylinderGeometry args={[0.44, 0.44, 0.42, 24]} />
+          <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
         </mesh>
       </group>
     </group>

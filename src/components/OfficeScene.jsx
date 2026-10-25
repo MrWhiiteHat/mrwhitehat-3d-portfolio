@@ -452,20 +452,6 @@ function SceneContents({
           <HotspotPins onSelect={onSelect} activeSection={activeSection} />
         )}
 
-        {/* Watch Dogs 2 Inspired 3D Hacking Circuit Network */}
-        {hackerModeData?.isActive && (
-          <HackingCircuitScene
-            currentStage={hackerModeData.currentStage}
-            nodeStates={hackerModeData.nodeStates}
-            evaluation={hackerModeData.evaluation}
-            selectedNodeId={hackerModeData.selectedNodeId}
-            activeVantageId={hackerModeData.activeVantageId}
-            onSelectNode={hackerModeData.onSelectNode}
-            onRotateNode={hackerModeData.onRotateNode}
-            controlsRef={controlsRef}
-          />
-        )}
-
         {/* Interactive In-Object Displays (hidden in hacker mode so no accidental popups) */}
         {!hackerModeData?.isActive && (
           <InObjectDisplay
@@ -494,6 +480,22 @@ function SceneContents({
           frames={1}
         />
       </group>
+
+      {/* Watch Dogs 2 Inspired 3D Hacking Circuit Network (TOP LEVEL - OUTSIDE CyberCommandStudio) */}
+      {hackerModeData?.isActive && (
+        <group name="HackerCircuitNetwork">
+          <HackingCircuitScene
+            currentStage={hackerModeData.currentStage}
+            nodeStates={hackerModeData.nodeStates}
+            evaluation={hackerModeData.evaluation}
+            selectedNodeId={hackerModeData.selectedNodeId}
+            activeVantageId={hackerModeData.activeVantageId}
+            onSelectNode={hackerModeData.onSelectNode}
+            onRotateNode={hackerModeData.onRotateNode}
+            controlsRef={controlsRef}
+          />
+        </group>
+      )}
 
       <OrbitControls
         ref={controlsRef}
