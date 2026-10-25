@@ -281,7 +281,7 @@ const OBSTACLES = [
   // 5. Cyber Security Archive Bookcase (Back Wall Center, [0.6, 0, -4.75])
   { minX: -0.6, maxX: 1.8, minZ: -4.95, maxZ: -4.5 },
   // 6. 42U Mainframe Server Rack (Back Wall Left, [-2.3, 0, -4.55])
-  { minX: -4.30, maxX: -3.40, minZ: -4.95, maxZ: -4.12 },
+  { minX: -3.35, maxX: -2.35, minZ: -4.95, maxZ: -4.12 },
   // 7. Lounge Leather Couch (Rotated -135 deg, [3.15, 0, 1.95])
   { minX: 2.25, maxX: 4.05, minZ: 1.05, maxZ: 2.85 },
   // 8. Lounge Coffee Table (Marble Disc, [2.2, 0, 1.0])

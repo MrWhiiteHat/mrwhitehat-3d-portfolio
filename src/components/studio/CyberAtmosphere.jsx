@@ -223,7 +223,7 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
       const coreSpeed = hoveredCore ? 3.5 : 1.2;
       holoCoreRef.current.rotation.y += delta * coreSpeed;
       holoCoreRef.current.rotation.x += delta * (coreSpeed * 0.6);
-      holoCoreRef.current.position.y = 0.08 + Math.sin(time * 2.4) * 0.008;
+      holoCoreRef.current.position.y = 0.28 + Math.sin(time * 2.4) * 0.015;
 
       const scaleTarget = hoveredCore ? 1.25 : 1.0;
       const currentScale = holoCoreRef.current.scale.x;
@@ -356,7 +356,7 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
       </group>
 
       {/* 4. Real-time Animated Clock on Back Wall */}
-      <group position={[-3.85, 3.85, -4.92]}>
+      <group position={[-2.85, 3.85, -4.92]}>
         {/* Outer Ring */}
         <mesh castShadow>
           <cylinderGeometry args={[0.34, 0.34, 0.03, 32]} />
@@ -400,11 +400,14 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
 
       {/* 5. Interactive Holographic Cyber Core Theme Lamp on Marble Coffee Table */}
       <group
-        position={[2.48, 0.40, 0.82]}
+        position={[2.42, 0.40, 0.82]}
         onClick={(e) => {
           e.stopPropagation();
           playHackingBeep(1400);
           onCycleTheme?.();
+          if (typeof window !== 'undefined' && window.__CYCLE_THEME__) {
+            window.__CYCLE_THEME__();
+          }
         }}
         onPointerOver={(e) => {
           e.stopPropagation();
@@ -416,53 +419,80 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
           setHoveredCore(false);
         }}
       >
-        {/* Sleek Compact Projector Base on Marble Tabletop */}
-        <mesh position={[0, 0.01, 0]} castShadow>
-          <cylinderGeometry args={[0.045, 0.06, 0.02, 24]} />
-          <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.8} />
-        </mesh>
-        {/* Hologram Emitter Lens */}
-        <mesh position={[0, 0.022, 0]}>
-          <cylinderGeometry args={[0.035, 0.035, 0.008, 24]} />
-          <meshBasicMaterial color={theme.coreColor} />
+        {/* Invisible Generous Raycast Hit Target for effortless 3D clicking */}
+        <mesh position={[0, 0.25, 0]}>
+          <cylinderGeometry args={[0.22, 0.22, 0.50, 16]} />
+          <meshBasicMaterial visible={false} />
         </mesh>
 
-        {/* Floating Holographic Geometric Core (Tightly bounded, low height) */}
-        <group ref={holoCoreRef} position={[0, 0.08, 0]}>
+        {/* Weighted Brushed Obsidian Lamp Base with Brass Accent Collar */}
+        <mesh position={[0, 0.02, 0]} castShadow>
+          <cylinderGeometry args={[0.08, 0.11, 0.04, 32]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.85} />
+        </mesh>
+        <mesh position={[0, 0.041, 0]}>
+          <cylinderGeometry args={[0.082, 0.082, 0.006, 32]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.92} roughness={0.2} />
+        </mesh>
+
+        {/* Vertical Metallic Lamp Stem Column */}
+        <mesh position={[0, 0.11, 0]} castShadow>
+          <cylinderGeometry args={[0.016, 0.016, 0.14, 16]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.9} roughness={0.25} />
+        </mesh>
+
+        {/* Frosted Acrylic Hologram Projector Emitter Collar */}
+        <mesh position={[0, 0.19, 0]}>
+          <cylinderGeometry args={[0.065, 0.045, 0.03, 24]} />
+          <meshStandardMaterial
+            color={theme.coreColor}
+            emissive={theme.coreColor}
+            emissiveIntensity={0.6}
+            roughness={0.2}
+          />
+        </mesh>
+        {/* Top Emitter Lens Rim */}
+        <mesh position={[0, 0.206, 0]}>
+          <cylinderGeometry args={[0.06, 0.06, 0.005, 24]} />
+          <meshBasicMaterial color="#ffffff" />
+        </mesh>
+
+        {/* Floating Holographic Cyber Core (Proportionate, vibrant, and interactive) */}
+        <group ref={holoCoreRef} position={[0, 0.28, 0]}>
           {/* Inner Polyhedron */}
           <mesh>
-            <octahedronGeometry args={[0.04, 0]} />
+            <octahedronGeometry args={[0.075, 0]} />
             <meshStandardMaterial
               color={theme.coreColor}
               emissive={theme.coreColor}
-              emissiveIntensity={0.8}
-              roughness={0.2}
-              metalness={0.2}
+              emissiveIntensity={0.9}
+              roughness={0.15}
+              metalness={0.25}
               transparent
-              opacity={0.7}
+              opacity={0.8}
             />
           </mesh>
           {/* Wireframe Holographic Outer Shell */}
           <mesh>
-            <icosahedronGeometry args={[0.055, 0]} />
-            <meshBasicMaterial color={theme.coreColor} wireframe transparent opacity={0.65} />
+            <icosahedronGeometry args={[0.105, 0]} />
+            <meshBasicMaterial color={theme.coreColor} wireframe transparent opacity={0.7} />
           </mesh>
         </group>
 
         {/* Spinning Orbital Ring */}
-        <group ref={holoOuterRingRef} position={[0, 0.08, 0]}>
+        <group ref={holoOuterRingRef} position={[0, 0.28, 0]}>
           <mesh rotation={[Math.PI / 3, 0, 0]}>
-            <torusGeometry args={[0.075, 0.0025, 8, 24]} />
-            <meshBasicMaterial color={theme.coreColor} transparent opacity={0.5} />
+            <torusGeometry args={[0.14, 0.004, 8, 32]} />
+            <meshBasicMaterial color={theme.coreColor} transparent opacity={0.6} />
           </mesh>
         </group>
 
-        {/* Soft Table Surface Glow */}
+        {/* Dedicated Ambient Tabletop Glow */}
         <pointLight
-          position={[0, 0.10, 0]}
+          position={[0, 0.30, 0]}
           color={theme.coreColor}
-          intensity={hoveredCore ? 1.6 : 0.9}
-          distance={1.0}
+          intensity={hoveredCore ? 3.2 : 2.0}
+          distance={2.2}
           decay={2}
         />
       </group>

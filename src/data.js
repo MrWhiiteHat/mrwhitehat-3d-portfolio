@@ -360,5 +360,5 @@ export const hotspots = [
   { id: 'about', label: 'About', position: [4.95, 2.8, 1.6], icon: '👤' },
   { id: 'resume', label: 'Resume', position: [-3.6, 1.45, 1.05], icon: '📄' },
   { id: 'contact', label: 'Contact', position: [3.75, 1.45, -1.25], icon: '📞' },
-  { id: 'operator', label: 'MrWhiteHat', position: [-2.75, 1.85, -3.45], icon: '🛡️' },
+  { id: 'operator', label: 'MrWhiteHat', position: [-4.20, 1.85, -4.20], icon: '🛡️' },
 ];

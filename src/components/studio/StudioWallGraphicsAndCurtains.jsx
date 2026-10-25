@@ -780,7 +780,7 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       {/* 6. BACK WALL: CYBERSECURITY CERTIFICATION PLAQUES & TICKER*/}
       {/* Location: Z = -4.95, between X = -4.2 and -2.2, Y = 3.25   */}
       {/* ======================================================== */}
-      <group position={[-3.85, 3.15, -4.95]}>
+      <group position={[-2.85, 3.15, -4.95]}>
         {/* 3 Prestigious Framed Wall Certificates */}
         {[
           { x: -0.65, title: 'OSCP', badgeColor: '#d4af37', plateColor: '#1e293b' },
@@ -853,7 +853,7 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       {/* Relocated from behind bookcase (X = 0.3) to open gallery  */}
       {/* space at X = -1.45, Y = 2.35, Z = -4.92                  */}
       {/* ======================================================== */}
-      <group position={[-1.75, 2.35, -4.92]}>
+      <group position={[-1.50, 2.35, -4.92]}>
         {/* Gallery Anodized Black Metal Frame */}
         <mesh castShadow>
           <boxGeometry args={[1.22, 1.52, 0.04]} />

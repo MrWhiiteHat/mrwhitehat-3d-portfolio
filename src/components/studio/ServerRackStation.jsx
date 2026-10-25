@@ -81,7 +81,7 @@ export default function ServerRackStation() {
 
   return (
     <group
-      position={[-3.85, 0, -4.55]}
+      position={[-2.85, 0, -4.55]}
       name="ServerRackStation"
       onClick={handleRackClick}
       onPointerOver={() => {

@@ -157,8 +157,8 @@ export default function CyberSentinelDrone({ onSelect, onHover }) {
   return (
     <group
       ref={droneGroupRef}
-      position={[-2.75, 2.38, -3.45]}
-      rotation={[0, 0.45, 0]}
+      position={[-4.20, 2.45, -4.20]}
+      rotation={[0, Math.PI / 4, 0]}
       name="CyberSentinelDrone"
       onClick={handleDroneClick}
       onPointerOver={() => {
