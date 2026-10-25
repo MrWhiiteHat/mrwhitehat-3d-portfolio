@@ -116,29 +116,6 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       {/* Window center is at X = 3.35, Y = 2.25, Z = -5.05         */}
       {/* ======================================================== */}
       <group position={[3.35, 0, -4.92]}>
-        {/* Sleek Gunmetal & Brass Curtain Rod */}
-        <mesh position={[0, 4.15, 0]}>
-          <cylinderGeometry args={[0.022, 0.022, 3.2, 16]} />
-          <meshStandardMaterial color="#2d3748" metalness={0.85} roughness={0.25} />
-        </mesh>
-        {/* Rod Finials (Decorative Brass End Caps) */}
-        <mesh position={[-1.62, 4.15, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.035, 0.025, 0.08, 16]} />
-          <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.3} />
-        </mesh>
-        <mesh position={[1.62, 4.15, 0]} rotation={[0, 0, -Math.PI / 2]}>
-          <cylinderGeometry args={[0.035, 0.025, 0.08, 16]} />
-          <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.3} />
-        </mesh>
-
-        {/* Rod Wall Mounting Brackets */}
-        {[-1.5, 0, 1.5].map((bx, idx) => (
-          <mesh key={`curtain-bracket-${idx}`} position={[bx, 4.15, -0.06]}>
-            <boxGeometry args={[0.03, 0.06, 0.12]} />
-            <meshStandardMaterial color="#1a202c" metalness={0.8} />
-          </mesh>
-        ))}
-
         {/* Left Curtain Drape (Pleated Fabric with Tie-Back) */}
         <group ref={leftCurtainRef} position={[-1.38, 2.05, 0]}>
           {/* Main Gathered Fabric Pleats */}
@@ -872,26 +849,62 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       </group>
 
       {/* ======================================================== */}
-      {/* 8. BACK WALL: CYBERPUNK POP-ART POSTER FRAME (Image 1)   */}
-      {/* Location: X = 0.3, Y = 2.75, Z = -4.92                    */}
+      {/* 8. BACK WALL: CYBERPUNK POP-ART POSTER FRAME             */}
+      {/* Relocated from behind bookcase (X = 0.3) to open gallery  */}
+      {/* space at X = -1.45, Y = 2.35, Z = -4.92                  */}
       {/* ======================================================== */}
-      <group position={[0.3, 2.75, -4.92]}>
+      <group position={[-1.45, 2.35, -4.92]}>
         {/* Gallery Anodized Black Metal Frame */}
         <mesh castShadow>
-          <boxGeometry args={[1.18, 1.48, 0.04]} />
+          <boxGeometry args={[1.22, 1.52, 0.04]} />
           <meshStandardMaterial color="#0b1016" metalness={0.9} roughness={0.2} />
         </mesh>
         {/* Frame Inner Neon Pink Bevel Liner */}
         <mesh position={[0, 0, 0.018]}>
-          <boxGeometry args={[1.14, 1.44, 0.01]} />
+          <boxGeometry args={[1.16, 1.46, 0.01]} />
           <meshBasicMaterial color="#ec4899" />
         </mesh>
 
         {/* Dynamic Pop-Art Marilyn Canvas */}
         <mesh position={[0, 0, 0.024]}>
-          <planeGeometry args={[1.12, 1.42]} />
+          <planeGeometry args={[1.14, 1.44]} />
           <meshBasicMaterial map={popArtScreen.texture} toneMapped={false} />
         </mesh>
+
+        {/* Overhead Gallery Art Picture Light Fixture */}
+        <group position={[0, 0.82, 0.08]}>
+          {/* Brass Standoff Arms */}
+          {[-0.22, 0.22].map((ax, ai) => (
+            <mesh key={`art-arm-${ai}`} position={[ax, 0, -0.04]}>
+              <boxGeometry args={[0.015, 0.015, 0.08]} />
+              <meshStandardMaterial color="#d4af37" metalness={0.92} roughness={0.2} />
+            </mesh>
+          ))}
+          {/* Horizontal Gallery Hood Bar */}
+          <mesh castShadow>
+            <boxGeometry args={[0.78, 0.024, 0.035]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.85} roughness={0.25} />
+          </mesh>
+          {/* Downward Warm Diffuser Lens */}
+          <mesh position={[0, -0.012, 0]}>
+            <boxGeometry args={[0.74, 0.005, 0.025]} />
+            <meshBasicMaterial color="#fef08a" />
+          </mesh>
+          {/* Soft Downward Accent Light */}
+          <pointLight position={[0, -0.08, 0.06]} color="#fef08a" intensity={2.2} distance={2.4} decay={2} />
+        </group>
+
+        {/* Brass Gallery Title Plaque */}
+        <group position={[0, -0.84, 0.02]}>
+          <mesh>
+            <boxGeometry args={[0.42, 0.07, 0.01]} />
+            <meshStandardMaterial color="#0f172a" metalness={0.9} roughness={0.3} />
+          </mesh>
+          <mesh position={[0, 0, 0.006]}>
+            <boxGeometry args={[0.38, 0.045, 0.004]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.2} />
+          </mesh>
+        </group>
       </group>
     </group>
   );
