@@ -1,83 +1,195 @@
-# MrWhiteHat Interactive 3D Portfolio
+# 🛡️ MrWhiteHat // 3D Interactive Cyber Command Portfolio
 
-🌐 **Live 24/7 Deployment:** [https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/](https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/)
+[![Live Deployment](https://img.shields.io/badge/Live%20Demo-Online%2024%2F7-00ffcc?style=for-the-badge&logo=googlechrome&logoColor=black)](https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/)
+[![Three.js](https://img.shields.io/badge/Three.js-r172-black?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
+[![React](https://img.shields.io/badge/React-18.3-61dafb?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![React Three Fiber](https://img.shields.io/badge/R3F-8.17-white?style=for-the-badge&logo=three.js&logoColor=black)](https://docs.pmnd.rs/react-three-fiber)
+[![Vite](https://img.shields.io/badge/Vite-6.0-646cff?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
 
-A 3D cybersecurity operations studio with first-person free-roam locomotion, character customization, interactive terminal stations, and cyber mini-games.
+> **Live Production URL:** 🌐 [https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/](https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/)
 
-### Locomotion Controls:
-* **W**: Walk Forward (aligned with camera view)
-* **A**: Strafe Left
-* **S**: Walk Backward
-* **D**: Strafe Right
-* **Shift**: Sprint
-* **Mouse**: Look Around (click to lock cursor)
-* **Left Click / E**: Hack / Inspect targeted terminal
-* **Esc**: Unlock Cursor / Menu
-* **Virtual Keypad**: On-screen tactical WASD pad & touch joystick for mobile/touch devices
+An immersive, production-grade **3D Cybersecurity Operations Studio** and developer portfolio engineered by **Sadashiba Sarangi (MrWhiteHat)**. Built with **Three.js, React Three Fiber, and WebGL**, this experience fuses offensive red-teaming aesthetics with a fully interactive cyber command environment, tactile first-person locomotion, live CTF mini-games, and an instant Executive Recruiter Dossier.
 
-## Deploy to GitHub Pages (1 Command)
-```bash
-npm run deploy
+---
+
+## ⚡ Key Highlights & Architectural Features
+
+### 🕹️ First-Person Tactical Free-Roam Locomotion
+- **FPS Controller with Pointer Lock**: Smooth WASD movement mapped directly to the camera's directional vector with pitch/yaw mouse look.
+- **AABB Collision Physics Engine**: Real-time bounding-box collision detection preventing clipping through office desks, chairs, server racks, bookcases, and perimeter walls.
+- **Mobile & Touch Optimized**: On-screen tactical virtual D-pad and responsive touch joystick with adaptive sensitivity for mobile and tablet visitors.
+- **Proximity Raycasting**: Proximity sensors highlight interactive terminals, hardware gadgets, and workstations as the operative approaches.
+
+### 🖥️ Interactive Cyber Command Stations
+- **Primary Multi-Monitor Workstation**: Interactive high-resolution displays spotlighting flagship projects (LLM Mobile AppSec Agent, AegisAI, RealFake Detection, KrishiMitra, and NeuroFlux) with live demo and repository links.
+- **Archive Bookcase & Intelligence Wall**: Interactive library displaying comprehensive AppSec, AI Security, Full-Stack, and DevOps capability matrices.
+- **Executive Conference Area**: Functional presentation laptop, interactive **Top-Secret CVE Audit Dossier folder**, and wireless presenter remote highlighting honors and championships.
+- **Executive Lounge Station**: Modern coffee table featuring a personal laptop, tablet, and executive biography.
+- **Hardware Arsenal & Field Gadgets**: 3D interactive hardware arsenal featuring cybersecurity tools (Flipper Zero, WiFi Pineapple, BadUSB Rubber Ducky, HackRF One).
+- **Dispatch Printer Station**: Quick-view and direct PDF download for official resume files.
+- **Comm & Refreshment Station**: Instant contact channels (Encrypted Email, Discord, LinkedIn, GitHub).
+- **Holographic Sentinel Operative**: Voice-synthesized cyber avatar of MrWhiteHat with bio telemetry and threat radar.
+
+### 🎯 9 Interactive CTF Hacking Minigames
+Test your offensive and defensive cybersecurity skills directly inside the 3D terminal:
+1. **SQL Injection (SQLi)**: Bypass authentication mechanisms using payload injections.
+2. **Hash Cracker**: Crack MD5 and SHA-256 password hashes using rainbow lookup logic.
+3. **Port Scanner & Recon**: Enumerate open services, banner-grab, and detect attack vectors.
+4. **Network Packet Sniffer**: Analyze raw PCAP telemetry to intercept credentials and detect anomalies.
+5. **Cipher Decryptor**: Decode layered Caesar, XOR, and Base64 ciphertexts.
+6. **Memory Hex Inspector**: Analyze memory dumps to locate injected shellcode strings.
+7. **Firewall Rule Bypass**: Reconfigure ACLs and packet filters to pivot into secured subnets.
+8. **Brute-Force Pin Breaker**: Execute timed brute-force routines against encrypted vaults.
+9. **Exploit Payload Generator**: Construct reverse shells and buffer overflow test strings.
+
+### 📋 Executive Recruiter Quick-Access Dossier (`Key: R`)
+- Press **`R`** on the keyboard or tap the floating **Executive Dossier** badge for an instant 2D recruiter-optimized modal.
+- Provides immediate access to resume highlights, candidate summary, flagship project case studies, verified achievements, and direct communication channels—ideal for recruiters who need high-signal information without navigating 3D space.
+
+### 🔊 Procedural Web Audio Engine
+- Built-in Web Audio API synthesizer generating real-time ambient computer room hums, mechanical keyboard clicks, radar telemetry pings, and access granted/denied chimes with an on-screen mute toggle.
+
+### 🚀 Optimized 60 FPS Performance
+- **Zero Heavy Model Bloat**: Replaced legacy 20MB+ single-mesh models with modular, procedurally instanced geometry and optimized materials.
+- **Adaptive DPR & Dynamic Shadows**: Automatically adjusts device pixel ratio and shadow-map resolution based on device hardware and mobile viewport.
+
+---
+
+## 🎮 Locomotion & Control Reference
+
+| Input | Action |
+| :--- | :--- |
+| **`W`** / **`↑`** | Walk Forward (aligned with camera gaze) |
+| **`S`** / **`↓`** | Walk Backward |
+| **`A`** / **`←`** | Strafe Left |
+| **`D`** / **`→`** | Strafe Right |
+| **`Shift`** | Sprint / Tactical Rush |
+| **`Mouse Move`** | Look Around (click canvas to lock cursor) |
+| **`Left Click`** / **`E`** | Interact / Hack / Inspect targeted terminal |
+| **`R`** | Open Executive Recruiter Dossier |
+| **`M`** | Toggle Procedural Audio Synthesis |
+| **`Esc`** | Unlock Cursor / Close Modal / Open Main Menu |
+| **Virtual Touch Controls** | On-screen tactical D-pad & joystick for mobile/tablet devices |
+
+---
+
+## 🛠️ Technology Stack
+
+```
+Frontend Architecture      React 18.3 · Modern ESNext · HTML5 / CSS3
+3D Scene & Rendering       Three.js (r172) · React Three Fiber (@react-three/fiber)
+3D Helpers & Shaders       React Three Drei (@react-three/drei)
+Motion & Transitions       Framer Motion 11
+Iconography & UI           Lucide React · Tailwind CSS
+Audio Engine               Web Audio API (Procedural Synthesizer)
+Build & Bundler            Vite 6.0
+Hosting & Deployment       GitHub Pages (Automated via gh-pages)
 ```
 
-## Requirements
-- Node.js 18.18+ (Node 20 LTS recommended)
-- npm
+---
 
-## Run locally
+## 🏆 Featured Flagship Projects
 
+### 1. [LLM Autonomous Mobile AppSec Penetration Testing Agent](https://github.com/MrWhiiteHat/LLM-Powered-Autonomous-Mobile-Application-Security-Penetration-Testing-Platform)
+- **Tech Stack:** `Python` · `FastAPI` · `Frida` · `Ollama` · `RAG` · `Qwen 2.5-Coder` · `ADB` · `OWASP Mobile Top 10`
+- **Impact:** 10-phase autonomous Android APK security scanning pipeline achieving a **94.2% detection rate** with only 7.8% false positives.
+- **Key Innovation:** Custom RAG engine indexing 2,075 security documents (OWASP, CWE, CAPEC, NVD) with BM25/TF-IDF hybrid retrieval and 100% offline, privacy-preserving local LLM inference via Ollama.
+
+### 2. [AegisAI / KSecurity – AI Community Threat Intelligence Platform](https://github.com/MrWhiiteHat/KSecurity-Ai-Intelligence-Discord-bot)
+- **Tech Stack:** `TypeScript` · `Next.js 14` · `Node.js` · `OpenAI API (GPT-4o-mini)` · `PostgreSQL` · `Docker`
+- **Impact:** Real-time threat detection system protecting Discord communities from phishing, brand impersonation, and social engineering.
+- **Key Innovation:** 3 parallel analyzers with weighted risk scoring, 3-second LLM circuit-breaker with heuristic fallback, and brand typosquatting detection across 10+ major brands.
+
+### 3. [RealFake Detection – Deepfake Media Analysis Platform](https://github.com/MrWhiiteHat)
+- **Tech Stack:** `Python` · `PyTorch` · `ResNet50` · `Computer Vision` · `FastAPI` · `Docker`
+- **Impact:** Neural computer-vision classifier detecting subtle GAN/diffusion boundary distortions and frequency artifacts in facial synthetic media with containerized high-throughput REST inference.
+
+### 4. [KrishiMitra – Multimodal AI Agricultural Advisory Assistant](https://github.com/MrWhiiteHat/AI-Powered-Agricultural-Advisory-Chatbot-for-Indian-Farmers)
+- **Tech Stack:** `Python` · `FastAPI` · `Google Gemini` · `TensorFlow` · `MobileNetV2` · `Whisper` · `Twilio` · `Redis`
+- **Impact:** Multimodal WhatsApp advisory bot serving Indian farmers, pairing MobileNetV2 CNN (**94.7% crop disease accuracy** across 54k images) with zero-hallucination Gemini prompt guardrails and async webhook queues.
+
+### 5. [NeuroFlux – Multimodal Real-Time Input Pipeline](https://neuroflux-alpha.vercel.app)
+- **Tech Stack:** `TypeScript` · `React 18` · `Computer Vision` · `WebSockets` · `Tailwind CSS` · `Vercel`
+- **Impact:** Ultra-low-latency browser gesture classification and live voice command recognition pipeline for hands-free control and telemetry routing in cyber operations centers.
+
+---
+
+## 🎖️ Honors & State Competitions
+
+- 🥉 **Bronze Medal (3rd Position) — Odisha Skills Competition 2025–2026**
+  - *Track:* Cyber Security
+  - *Issuer:* Skill Development & Technical Education Department, Govt. of Odisha
+  - Evaluated on live-fire incident response, packet capture forensics, system hardening, and web application exploitation under competitive constraints.
+- 🥉 **Bronze Medal (3rd Position) — Odisha Skills Competition 2020–2021**
+  - *Track:* Cyber Security
+  - *Issuer:* Skill Development & Technical Education Department, Govt. of Odisha
+  - State-level recognition in vulnerability assessment, penetration testing, cryptography, and network defense.
+- 🌐 **BRICS Hi-Tech Future Skills Development Program (2026)**
+  - *Track:* International Cybersecurity Skills Development
+  - Represented technical proficiency in international future skills initiative focused on resilient digital infrastructure and AI defense.
+
+---
+
+## 💻 Local Development & Installation
+
+### Prerequisites
+- **Node.js 18.18+** (Node 20+ LTS recommended)
+- **npm** or **yarn**
+
+### Quickstart
 ```bash
+# 1. Clone the repository
+git clone https://github.com/MrWhiiteHat/mrwhitehat-3d-portfolio.git
+
+# 2. Navigate to project root
+cd mrwhitehat-3d-portfolio/mrwhitehat-3d-portfolio
+
+# 3. Install dependencies
 npm install
+
+# 4. Start local development server
 npm run dev
 ```
 
-Open the local URL Vite prints, usually `http://localhost:5173`.
+Open the local development URL printed by Vite (typically `http://localhost:5173`).
 
-## Build and preview
+---
 
+## 📦 Production Build & Deployment
+
+### Build Locally
 ```bash
+# Build optimized production bundle to dist/
 npm run build
+
+# Preview production build locally
 npm run preview
 ```
 
-The production website is generated in `dist/`.
+### 1-Command Deploy to GitHub Pages
+```bash
+npm run deploy
+```
+*This command runs `vite build` followed by `npx gh-pages -d dist`, pushing the compiled production assets directly to the `gh-pages` branch.*
 
-## Personalize before publishing
+---
 
-Edit `src/data.js`:
-- Set the real email address, GitHub URL, LinkedIn URL, and resume path.
-- Replace example project links with each exact repository/demo URL.
-- Confirm all project descriptions, skill levels, award names, and dates.
-- Add your PDF as `public/resume.pdf` if you want the resume download to work.
+## 👤 Author & Connect
 
-The content is deliberately kept in one data file so it is easy to maintain. Do not publish private contact details you do not want to share publicly.
+**Sadashiba Sarangi (MrWhiteHat)**  
+*Cybersecurity-Focused Software Developer · AppSec & AI Engineer*  
+📍 Bhubaneswar, Odisha, India
 
-## How object clicks map to sections
+- 🌐 **Interactive Portfolio:** [https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/](https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/)
+- 💻 **GitHub:** [@MrWhiiteHat](https://github.com/MrWhiiteHat)
+- 💼 **LinkedIn:** [linkedin.com/in/sadashiba-sarangi](https://www.linkedin.com/in/sadashiba-sarangi/)
+- 💬 **Discord:** `mr.whitehat`
+- 📧 **Email:** [kanhasarangi39@gmail.com](mailto:kanhasarangi39@gmail.com)
 
-`src/data.js` exports `objectMap`. `src/components/OfficeScene.jsx` walks up the clicked mesh's parent chain and matches its GLB node names against semantic regular expressions. The supplied model contains many generated mesh names, so the matcher uses parent names such as `Monitor`, `Book`, `Cabinet`, `Office_Chair`, `printer`, and `Projector` where present. If an object opens the wrong section, adjust the rules in `objectMap` or add a more specific rule near the top. Unknown meshes open the Discover panel.
+---
 
-The camera smoothly moves toward the clicked surface. Visitors can continue rotating and zooming with OrbitControls. The navigation menu and section cards provide a non-3D alternative.
-
-## Mobile and performance
-
-The layout switches to a stacked view on smaller screens, retains touch orbit controls, and reduces device pixel ratio. The 19 MB GLB is included as supplied. Consider compressing it with glTF Transform (Meshopt or Draco where appropriate) after validating visual quality. Keep the original asset as a backup.
-
-If your model doesn't load, confirm this file exists at `public/models/isometric_office.glb` and inspect the browser console/network panel.
-
-## Deploy to Vercel
-
-1. Create a GitHub repository and push this project.
-2. In Vercel, choose **Add New → Project** and import the repository.
-3. Framework preset: **Vite**. Build command: `npm run build`. Output directory: `dist`.
-4. Deploy. Vercel will provide a public URL; add a custom domain in project settings if desired.
-
-No backend is required for the current static portfolio. A backend is only needed if you later want to store contact-form submissions, user accounts, or other server-side data.
-
-## Asset attribution
-
-The provided GLB contains metadata indicating CC BY 4.0 and Companion_Cube as author. Preserve appropriate attribution and include a source link for the original asset before publishing. Confirm the original asset page and attribution details from the download source.
-
-## License
+## ⚖️ License & Intellectual Property
 
 Copyright © 2026 **Sadashiba Sarangi (MrWhiteHat)**. All Rights Reserved.
 
@@ -88,5 +200,4 @@ This repository and all original code, custom 3D shaders, dynamic procedural tex
 - 🚫 **No Unauthorized Redistribution**: Mirroring, redistributing, or re-licensing this codebase is forbidden.
 - 👁️ **Evaluation & Educational Study Only**: Permission is granted solely to inspect the source code on GitHub for peer review, educational study, and recruitment evaluation.
 
-For the full legal terms and conditions, see the [LICENSE](LICENSE) file.
-
+For the full legal terms and conditions, please consult the [LICENSE](LICENSE) file.
