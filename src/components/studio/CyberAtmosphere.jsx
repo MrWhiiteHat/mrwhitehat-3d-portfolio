@@ -223,7 +223,7 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
       const coreSpeed = hoveredCore ? 3.5 : 1.2;
       holoCoreRef.current.rotation.y += delta * coreSpeed;
       holoCoreRef.current.rotation.x += delta * (coreSpeed * 0.6);
-      holoCoreRef.current.position.y = 1.08 + Math.sin(time * 2.4) * 0.05;
+      holoCoreRef.current.position.y = 0.08 + Math.sin(time * 2.4) * 0.008;
 
       const scaleTarget = hoveredCore ? 1.25 : 1.0;
       const currentScale = holoCoreRef.current.scale.x;
@@ -356,7 +356,7 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
       </group>
 
       {/* 4. Real-time Animated Clock on Back Wall */}
-      <group position={[-3.2, 3.4, -4.92]}>
+      <group position={[-3.85, 3.85, -4.92]}>
         {/* Outer Ring */}
         <mesh castShadow>
           <cylinderGeometry args={[0.34, 0.34, 0.03, 32]} />
@@ -400,7 +400,7 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
 
       {/* 5. Interactive Holographic Cyber Core Theme Lamp on Marble Coffee Table */}
       <group
-        position={[2.30, 0.40, 0.78]}
+        position={[2.48, 0.40, 0.82]}
         onClick={(e) => {
           e.stopPropagation();
           playHackingBeep(1400);
@@ -416,22 +416,22 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
           setHoveredCore(false);
         }}
       >
-        {/* Pedestal Stand Base resting directly on marble tabletop surface */}
-        <mesh position={[0, 0.018, 0]} castShadow>
-          <cylinderGeometry args={[0.07, 0.09, 0.035, 24]} />
+        {/* Sleek Compact Projector Base on Marble Tabletop */}
+        <mesh position={[0, 0.01, 0]} castShadow>
+          <cylinderGeometry args={[0.045, 0.06, 0.02, 24]} />
           <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.8} />
         </mesh>
-        {/* Hologram Projector Emitter Lens */}
-        <mesh position={[0, 0.038, 0]}>
-          <cylinderGeometry args={[0.05, 0.05, 0.01, 24]} />
+        {/* Hologram Emitter Lens */}
+        <mesh position={[0, 0.022, 0]}>
+          <cylinderGeometry args={[0.035, 0.035, 0.008, 24]} />
           <meshBasicMaterial color={theme.coreColor} />
         </mesh>
 
-        {/* Floating Holographic Geometric Core */}
-        <group ref={holoCoreRef} position={[0, 0.22, 0]}>
+        {/* Floating Holographic Geometric Core (Tightly bounded, low height) */}
+        <group ref={holoCoreRef} position={[0, 0.08, 0]}>
           {/* Inner Polyhedron */}
           <mesh>
-            <octahedronGeometry args={[0.075, 0]} />
+            <octahedronGeometry args={[0.04, 0]} />
             <meshStandardMaterial
               color={theme.coreColor}
               emissive={theme.coreColor}
@@ -444,25 +444,25 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
           </mesh>
           {/* Wireframe Holographic Outer Shell */}
           <mesh>
-            <icosahedronGeometry args={[0.10, 0]} />
+            <icosahedronGeometry args={[0.055, 0]} />
             <meshBasicMaterial color={theme.coreColor} wireframe transparent opacity={0.65} />
           </mesh>
         </group>
 
         {/* Spinning Orbital Ring */}
-        <group ref={holoOuterRingRef} position={[0, 0.22, 0]}>
+        <group ref={holoOuterRingRef} position={[0, 0.08, 0]}>
           <mesh rotation={[Math.PI / 3, 0, 0]}>
-            <torusGeometry args={[0.13, 0.0035, 8, 32]} />
+            <torusGeometry args={[0.075, 0.0025, 8, 24]} />
             <meshBasicMaterial color={theme.coreColor} transparent opacity={0.5} />
           </mesh>
         </group>
 
-        {/* Ambient Projector Table Glow */}
+        {/* Soft Table Surface Glow */}
         <pointLight
-          position={[0, 0.24, 0]}
+          position={[0, 0.10, 0]}
           color={theme.coreColor}
-          intensity={hoveredCore ? 2.5 : 1.4}
-          distance={1.8}
+          intensity={hoveredCore ? 1.6 : 0.9}
+          distance={1.0}
           decay={2}
         />
       </group>

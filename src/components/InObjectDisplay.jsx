@@ -153,10 +153,10 @@ export const stationConfigs = {
   },
   operator: {
     // Cyber Sentinel Drone & Hologram Operator on Back-Left Wall
-    position: [-3.35, 1.60, -3.85],
-    rotation: [0, 0.65, 0],
-    camPos: [-1.75, 1.70, -2.35],
-    camTarget: [-3.35, 1.60, -3.85],
+    position: [-2.75, 1.60, -3.45],
+    rotation: [0, 0.45, 0],
+    camPos: [-1.45, 1.70, -2.15],
+    camTarget: [-2.75, 1.60, -3.45],
     title: 'Operative Terminal // MrWhiteHat',
     icon: Terminal,
     distanceFactor: 0.70,
@@ -166,10 +166,10 @@ export const stationConfigs = {
   },
   server_rack: {
     // 42U Mainframe Server Rack between Conference & Archive
-    position: [-2.3, 1.40, -4.20],
+    position: [-3.85, 1.40, -4.20],
     rotation: [0, 0, 0],
-    camPos: [-2.3, 1.55, -2.60],
-    camTarget: [-2.3, 1.40, -4.20],
+    camPos: [-3.85, 1.55, -2.60],
+    camTarget: [-3.85, 1.40, -4.20],
     title: '42U Mainframe Server Rack',
     icon: Server,
     distanceFactor: 0.70,
