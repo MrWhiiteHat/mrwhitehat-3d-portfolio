@@ -22,7 +22,7 @@ import {
   playTimerTick,
   playGlitchTransition,
 } from './components/easteregg/easterEggAudio.js';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Activity,
   ArrowLeft,
