@@ -131,7 +131,7 @@ function CameraDirector({
   }, [gameState, activeSection, defaultCam, defaultTarget, camera, controlsRef]);
 
   useFrame((state, delta) => {
-    if (gameState === 'EXPLORE') return;
+    if (gameState === 'EXPLORE' || gameState === 'HACKING') return;
     const clampedDelta = Math.min(delta, 0.033);
 
     // 1. Cinematic Airlock Walk-in Sequence
@@ -249,6 +249,8 @@ function SceneContents({
   unlockedCount = 0,
   onOpenGadgets = null,
   onOpenLeaderboard = null,
+  hackerModeData = null,
+  onStationBreached = null,
 }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -310,7 +312,7 @@ function SceneContents({
 
         {/* First Person Walking Controller & Physics */}
         <FirstPersonController
-          isActive={gameState === 'EXPLORE'}
+          isActive={gameState === 'EXPLORE' && !hackerModeData?.isActive}
           onProximityChange={onProximityChange}
           onInteract={onStationInteract}
           mobileInput={mobileInput}
@@ -322,8 +324,22 @@ function SceneContents({
           <HotspotPins onSelect={onSelect} activeSection={activeSection} />
         )}
 
+        {/* Watch Dogs 2 Inspired 3D Hacking Circuit Network */}
+        {hackerModeData?.isActive && (
+          <HackingCircuitScene
+            currentStage={hackerModeData.currentStage}
+            nodeStates={hackerModeData.nodeStates}
+            evaluation={hackerModeData.evaluation}
+            selectedNodeId={hackerModeData.selectedNodeId}
+            activeVantageId={hackerModeData.activeVantageId}
+            onSelectNode={hackerModeData.onSelectNode}
+            onRotateNode={hackerModeData.onRotateNode}
+          />
+        )}
+
         {/* Interactive In-Object Displays */}
         <InObjectDisplay
+          onStationBreached={onStationBreached}
           activeSection={activeSection}
           onClose={onDeselect}
           onNavigate={(sec) => {
@@ -393,6 +409,8 @@ export default function OfficeScene({
   visitorCount = 1,
   playerData = null,
   onOpenRecruiter = null,
+  hackerModeData = null,
+  onStationBreached = null,
 }) {
   const controlsRef = useRef(null);
   const [failed, setFailed] = useState(false);
@@ -487,6 +505,8 @@ export default function OfficeScene({
             visitorCount={visitorCount}
             playerData={playerData}
             onReady={onReady}
+            hackerModeData={hackerModeData}
+            onStationBreached={onStationBreached}
           />
         </Suspense>
       </Canvas>

@@ -240,6 +240,7 @@ export default function InObjectDisplay({
   playerData = null,
   onOpenGadgets = null,
   onOpenLeaderboard = null,
+  onStationBreached = null,
 }) {
   const [selectedProject, setSelectedProject] = useState(0);
   const [selectedSlide, setSelectedSlide] = useState(0);
@@ -255,20 +256,27 @@ export default function InObjectDisplay({
     }
   };
 
-  // Track unlocked state per station
-  const [unlockedStations, setUnlockedStations] = useState({
-    projects: false,
-    skills: false,
-    achievements: false,
-    about: false,
-    resume: false,
-    contact: false,
-    operator: false,
-    server_rack: false,
-    hardware_arsenal: false,
-    wireshark_monitor: false,
-    visitor_log: true,
-    secret_vault: false,
+  // Track unlocked state per station with persistent storage
+  const [unlockedStations, setUnlockedStations] = useState(() => {
+    const saved = getCompletedStations();
+    const initial = {
+      projects: false,
+      skills: false,
+      achievements: false,
+      about: false,
+      resume: false,
+      contact: false,
+      operator: false,
+      server_rack: false,
+      hardware_arsenal: false,
+      wireshark_monitor: false,
+      visitor_log: true,
+      secret_vault: false,
+    };
+    saved.forEach((st) => {
+      initial[st] = true;
+    });
+    return initial;
   });
 
   // Track active breach transition animation
@@ -279,6 +287,8 @@ export default function InObjectDisplay({
     setTimeout(() => {
       setUnlockedStations((prev) => ({ ...prev, [sectionKey]: true }));
       setBreachingSection(null);
+      markStationCompleted(sectionKey);
+      onStationBreached?.(sectionKey);
     }, 1100);
   };
 
@@ -300,6 +310,10 @@ export default function InObjectDisplay({
           server_rack: true,
           hardware_arsenal: true,
           wireshark_monitor: true,
+        });
+        REQUIRED_STATIONS.forEach((st) => {
+          markStationCompleted(st);
+          onStationBreached?.(st);
         });
       };
       window.__RELOCK_ALL_HACKS__ = () => {

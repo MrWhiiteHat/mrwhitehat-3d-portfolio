@@ -292,6 +292,17 @@ export default function App() {
     initHackerStage(hackerStageIndex);
   }, [hackerStageIndex, initHackerStage]);
 
+  // Auto-trigger announcement when all stations are genuinely breached
+  useEffect(() => {
+    if (hasCompletedAllStations(unlockedStations) && !hasSeenAnnouncementRef.current) {
+      hasSeenAnnouncementRef.current = true;
+      const timer = setTimeout(() => {
+        setGameState('ANNOUNCEMENT');
+      }, 900);
+      return () => clearTimeout(timer);
+    }
+  }, [unlockedStations]);
+
   const handleStationBreached = useCallback((stationId) => {
     markStationCompleted(stationId);
     setUnlockedStations((prev) => {
@@ -633,10 +644,25 @@ export default function App() {
       window.__TOGGLE_FULLSCREEN__ = toggleFullscreen;
       window.__START_GAME__ = handleStartGame;
       window.__RESET_CUSTOMIZE__ = handleResetToCustomize;
+      window.__TRIGGER_HACKER_EASTER_EGG__ = () => {
+        setGameState('ANNOUNCEMENT');
+      };
+      window.__LAUNCH_HACKER_MODE__ = handleLaunchEasterEgg;
+      window.__UNLOCK_ALL_HACKS__ = () => {
+        REQUIRED_STATIONS.forEach((st) => markStationCompleted(st));
+        setUnlockedStations(new Set(REQUIRED_STATIONS));
+        setGameState('ANNOUNCEMENT');
+      };
+      window.__RESET_HACKER_EASTER_EGG__ = () => {
+        resetEasterEggProgress();
+        setUnlockedStations(new Set());
+        setGameState('EXPLORE');
+      };
     }
 
     const onKey = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (gameState === 'HACKING' || gameState === 'ANNOUNCEMENT') return;
 
       if (e.key === 'Escape') {
         if (isLeaderboardOpen) {
@@ -1057,6 +1083,43 @@ export default function App() {
         isOpen={isRecruiterOpen}
         onClose={handleCloseRecruiter}
       />
+
+      {/* Cinematic Glitch Announcement Modal */}
+      {gameState === 'ANNOUNCEMENT' && (
+        <HackingCircuitAnnouncement
+          onInvestigate={handleInvestigateEasterEgg}
+          onSkip={handleSkipEasterEgg}
+        />
+      )}
+
+      {/* Watch Dogs 2 3D Hacking Circuit 2D HUD */}
+      {gameState === 'HACKING' && (
+        <HackingCircuitHUD
+          currentStage={currentHackerStage}
+          stageIndex={hackerStageIndex}
+          totalStages={STAGES.length}
+          nodeStates={hackerNodeStates}
+          evaluation={hackerEvaluation}
+          selectedNodeId={hackerSelectedNodeId}
+          activeVantageId={hackerActiveVantageId}
+          timeLeft={hackerTimeLeft}
+          isPaused={hackerIsPaused}
+          isVictory={hackerIsVictory}
+          isGameOver={hackerIsGameOver}
+          totalElapsedSeconds={hackerTotalElapsed}
+          muted={muted}
+          isFullscreen={isFullscreen}
+          onSelectNode={(id) => setHackerSelectedNodeId(id)}
+          onRotateNode={handleRotateHackerNode}
+          onResetStage={handleResetHackerStage}
+          onSelectVantage={(vid) => setHackerActiveVantageId(vid)}
+          onTogglePause={() => setHackerIsPaused((prev) => !prev)}
+          onToggleMute={handleToggleMute}
+          onToggleFullscreen={toggleFullscreen}
+          onExitHackerMode={handleExitHackerMode}
+          onNextStage={handleNextHackerStage}
+        />
+      )}
     </div>
   );
 }
