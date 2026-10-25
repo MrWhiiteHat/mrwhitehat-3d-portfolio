@@ -730,6 +730,17 @@ export default function App() {
         onOpenGadgets={handleOpenGadgets}
         onOpenLeaderboard={handleOpenLeaderboard}
         onOpenRecruiter={handleOpenRecruiter}
+        hackerModeData={{
+          isActive: gameState === 'HACKING',
+          currentStage: currentHackerStage,
+          nodeStates: hackerNodeStates,
+          evaluation: hackerEvaluation,
+          selectedNodeId: hackerSelectedNodeId,
+          activeVantageId: hackerActiveVantageId,
+          onSelectNode: (id) => setHackerSelectedNodeId(id),
+          onRotateNode: handleRotateHackerNode,
+        }}
+        onStationBreached={handleStationBreached}
       />
 
       {/* 0. HIGH-TECH CYBER PRELOADER LOADING SCREEN (Pre-loads 3D models & pre-warms shaders) */}
@@ -759,6 +770,8 @@ export default function App() {
           onOpenLeaderboard={handleOpenLeaderboard}
           onOpenGadgets={handleOpenGadgets}
           onOpenRecruiter={handleOpenRecruiter}
+          isEasterEggAvailable={isEasterEggDiscovered() || hasCompletedAllStations(unlockedStations)}
+          onLaunchEasterEgg={handleLaunchEasterEgg}
         />
       )}
 

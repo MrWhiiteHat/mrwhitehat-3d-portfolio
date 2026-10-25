@@ -42,6 +42,8 @@ export default function GameHUD({
   onOpenLeaderboard = null,
   onOpenGadgets = null,
   onOpenRecruiter = null,
+  isEasterEggAvailable = false,
+  onLaunchEasterEgg = null,
 }) {
   // Locomotion Mode: 'joystick' on mobile/touch, 'wasd' on desktop (switchable anytime)
   const [controlMode, setControlMode] = useState(() => {
