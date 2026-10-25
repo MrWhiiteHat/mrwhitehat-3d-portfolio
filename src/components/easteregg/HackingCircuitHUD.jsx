@@ -74,9 +74,9 @@ export default function HackingCircuitHUD({
   };
 
   return (
-    <div className="hacker-hud-layer" pointerEvents="none">
+    <div className="hacker-hud-layer" style={{ pointerEvents: 'none' }}>
       {/* 1. TOP STATUS BAR */}
-      <header className="hacker-hud-header" pointerEvents="auto">
+      <header className="hacker-hud-header" style={{ pointerEvents: 'auto' }}>
         <div className="hacker-brand">
           <div className="hacker-logo-glitch">
             <Zap size={16} className="hacker-zap-icon" />
@@ -166,7 +166,7 @@ export default function HackingCircuitHUD({
       </div>
 
       {/* 3. TACTICAL 2D MINIMAP RADAR */}
-      <div className="hacker-minimap-card" pointerEvents="auto">
+      <div className="hacker-minimap-card" style={{ pointerEvents: 'auto' }}>
         <div className="minimap-header">
           <Activity size={12} className="minimap-icon" />
           <span>CIRCUIT TOPOLOGY</span>
@@ -212,7 +212,7 @@ export default function HackingCircuitHUD({
       </div>
 
       {/* 4. TACTICAL SURVEILLANCE CAMERA SWITCHER */}
-      <div className="hacker-cam-switcher" pointerEvents="auto">
+      <div className="hacker-cam-switcher" style={{ pointerEvents: 'auto' }}>
         <div className="cam-switcher-label">
           <Camera size={12} />
           <span>VANTAGE FEED</span>
@@ -233,7 +233,7 @@ export default function HackingCircuitHUD({
       </div>
 
       {/* 5. BOTTOM CONTEXTUAL INTERACTION CARD */}
-      <footer className="hacker-hud-footer" pointerEvents="auto">
+      <footer className="hacker-hud-footer" style={{ pointerEvents: 'auto' }}>
         {selectedNode ? (
           <div className="node-control-card">
             <div className="node-control-info">
@@ -281,7 +281,7 @@ export default function HackingCircuitHUD({
 
       {/* 6. MODAL: PAUSE OVERLAY */}
       {isPaused && (
-        <div className="hacker-modal-backdrop" pointerEvents="auto">
+        <div className="hacker-modal-backdrop" style={{ pointerEvents: 'auto' }}>
           <div className="hacker-dialog-card">
             <div className="dialog-badge">
               <Zap size={14} />
@@ -326,8 +326,8 @@ export default function HackingCircuitHUD({
 
       {/* 7. MODAL: STAGE VICTORY (Between Stages 1 -> 2 -> 3) */}
       {isVictory && stageIndex < totalStages - 1 && (
-        <div className="hacker-modal-backdrop" pointerEvents="auto">
-          <div className="hacker-dialog-card victory-card">
+        <div className="hacker-modal-backdrop" style={{ pointerEvents: 'auto' }}>
+          <div className="hacker-dialog-card victory-card" style={{ pointerEvents: 'auto' }}>
             <div className="dialog-badge victory-badge">
               <ShieldCheck size={14} />
               <span>SECTOR BREACHED</span>
@@ -340,6 +340,7 @@ export default function HackingCircuitHUD({
               type="button"
               className="dialog-btn-primary victory-next-btn"
               onClick={onNextStage}
+              style={{ pointerEvents: 'auto', cursor: 'pointer' }}
             >
               <Zap size={16} />
               <span>INITIATE STAGE 0{stageIndex + 2}</span>
@@ -350,7 +351,7 @@ export default function HackingCircuitHUD({
 
       {/* 8. MODAL: STAGE 3 COUNTDOWN FAILURE */}
       {isGameOver && (
-        <div className="hacker-modal-backdrop" pointerEvents="auto">
+        <div className="hacker-modal-backdrop" style={{ pointerEvents: 'auto' }}>
           <div className="hacker-dialog-card danger-card">
             <div className="dialog-badge danger-badge">
               <AlertTriangle size={14} />
@@ -383,7 +384,7 @@ export default function HackingCircuitHUD({
 
       {/* 9. MODAL: FINAL SYSTEM OVERRIDE VICTORY */}
       {isVictory && stageIndex === totalStages - 1 && (
-        <div className="hacker-modal-backdrop" pointerEvents="auto">
+        <div className="hacker-modal-backdrop" style={{ pointerEvents: 'auto' }}>
           <div className="hacker-dialog-card final-victory-card">
             <div className="dialog-badge final-badge">
               <Trophy size={14} />

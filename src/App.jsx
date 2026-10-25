@@ -355,8 +355,14 @@ export default function App() {
 
       if (e.key === 'Escape') {
         setHackerIsPaused((prev) => !prev);
-      } else if (e.key === 'e' || e.key === 'E' || e.key === 'Enter') {
-        if (hackerSelectedNodeId) {
+      } else if (e.key === 'e' || e.key === 'E' || e.key === 'Enter' || e.key === ' ') {
+        if (hackerIsVictory) {
+          if (hackerStageIndex < STAGES.length - 1) {
+            handleNextHackerStage();
+          } else {
+            handleExitHackerMode();
+          }
+        } else if (hackerSelectedNodeId) {
           handleRotateHackerNode(hackerSelectedNodeId);
         }
       } else if (e.key === 'r' || e.key === 'R') {
@@ -374,7 +380,16 @@ export default function App() {
 
     window.addEventListener('keydown', onHackerKey);
     return () => window.removeEventListener('keydown', onHackerKey);
-  }, [gameState, hackerSelectedNodeId, handleRotateHackerNode, handleResetHackerStage]);
+  }, [
+    gameState,
+    hackerSelectedNodeId,
+    hackerIsVictory,
+    hackerStageIndex,
+    handleRotateHackerNode,
+    handleResetHackerStage,
+    handleNextHackerStage,
+    handleExitHackerMode,
+  ]);
 
 
   const handleOpenRecruiter = useCallback(() => {

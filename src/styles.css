@@ -10628,6 +10628,7 @@ body.is-pseudo-fullscreen .portfolio-container {
   padding: 10px;
   display: flex;
   flex-direction: column;
+  pointer-events: auto !important;
 }
 
 .minimap-header {
@@ -10668,6 +10669,7 @@ body.is-pseudo-fullscreen .portfolio-container {
   transform: translate(-50%, -50%);
   border: 1px solid #ffffff;
   cursor: pointer;
+  pointer-events: auto !important;
   transition: transform 0.15s ease;
 }
 
@@ -10687,6 +10689,7 @@ body.is-pseudo-fullscreen .portfolio-container {
   border: 1px solid rgba(0, 240, 255, 0.25);
   border-radius: 12px;
   padding: 10px 14px;
+  pointer-events: auto !important;
 }
 
 .cam-switcher-label {
@@ -10719,6 +10722,8 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-size: 11px;
   font-weight: 700;
   color: #94a3b8;
+  cursor: pointer;
+  pointer-events: auto !important;
   transition: all 0.2s ease;
 }
 
@@ -10871,9 +10876,10 @@ body.is-pseudo-fullscreen .portfolio-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(2, 6, 18, 0.85);
-  backdrop-filter: blur(16px);
+  background: rgba(2, 6, 18, 0.65);
+  backdrop-filter: blur(8px);
   padding: 20px;
+  pointer-events: auto !important;
 }
 
 .hacker-dialog-card {
@@ -10885,6 +10891,7 @@ body.is-pseudo-fullscreen .portfolio-container {
   box-shadow: 0 0 50px rgba(0, 240, 255, 0.2);
   padding: 28px;
   animation: hackerFadeIn 0.3s ease forwards;
+  pointer-events: auto !important;
 }
 
 .dialog-badge {
@@ -10922,6 +10929,7 @@ body.is-pseudo-fullscreen .portfolio-container {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  pointer-events: auto !important;
 }
 
 .dialog-btn-primary {
@@ -10939,6 +10947,8 @@ body.is-pseudo-fullscreen .portfolio-container {
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
   transition: all 0.2s ease;
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
 .dialog-btn-primary:hover {
@@ -10960,6 +10970,8 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-weight: 700;
   border-radius: 8px;
   transition: all 0.2s ease;
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
 .dialog-btn-secondary:hover {
@@ -10977,6 +10989,8 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-weight: 700;
   border-radius: 8px;
   transition: all 0.2s ease;
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
 .dialog-btn-danger:hover {
