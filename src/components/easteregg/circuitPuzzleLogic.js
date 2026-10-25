@@ -248,12 +248,12 @@ export const STAGES = [
     id: 'stage_3',
     stageNumber: 3,
     title: 'STAGE 03 // SYSTEM OVERRIDE',
-    objective: 'Complete Facility Overdrive before Trace Alarm Triggers (60s Limit)',
+    objective: 'Complete Facility Overdrive before Trace Alarm Triggers (3 Min Limit)',
     targetName: 'CYBER SENTINEL DRONE ROOT CORE',
-    timeLimit: 60, // 60 seconds countdown
-    cameraPreset: 'CORNER_DRONE',
-    camPos: [-1.6, 2.3, -1.8],
-    camTarget: [-3.9, 1.7, -3.9],
+    timeLimit: 180, // 180 seconds countdown (3 minutes)
+    cameraPreset: 'ROOM_OVERVIEW',
+    camPos: [2.8, 3.4, 2.8],
+    camTarget: [-1.4, 1.3, -1.8],
     nodes: [
       {
         id: 's3_n0',

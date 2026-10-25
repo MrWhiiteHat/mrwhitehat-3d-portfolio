@@ -54,6 +54,8 @@ export default function HackingCircuitHUD({
   onToggleFullscreen,
   onExitHackerMode,
   onNextStage,
+  onRetryUnlimited,
+  onAddExtraTime,
 }) {
   const selectedNode = currentStage.nodes.find((n) => n.id === selectedNodeId);
   const isSelectedRotatable =
@@ -115,12 +117,28 @@ export default function HackingCircuitHUD({
             <div className="timer-wd2-track">
               <div
                 className="timer-wd2-fill"
-                style={{ width: `${Math.max(0, Math.min(100, (timeLeft / 60) * 100))}%` }}
+                style={{
+                  width: `${Math.max(
+                    0,
+                    Math.min(100, (timeLeft / (currentStage.timeLimit || 180)) * 100)
+                  )}%`,
+                }}
               />
             </div>
             <strong className="timer-wd2-val">
-              00:{String(timeLeft).padStart(2, '0')}
+              {String(Math.floor(timeLeft / 60)).padStart(2, '0')}:
+              {String(timeLeft % 60).padStart(2, '0')}
             </strong>
+            {onAddExtraTime && (
+              <button
+                type="button"
+                className="btn-add-time"
+                onClick={onAddExtraTime}
+                title="Add +60 seconds bypass"
+              >
+                +60s
+              </button>
+            )}
           </div>
         )}
 
@@ -387,8 +405,19 @@ export default function HackingCircuitHUD({
                 onClick={onResetStage}
               >
                 <RotateCcw size={16} />
-                <span>RETRY OVERRIDE (R)</span>
+                <span>RETRY OVERRIDE (3:00) [R]</span>
               </button>
+              {onRetryUnlimited && (
+                <button
+                  type="button"
+                  className="dialog-btn-secondary"
+                  style={{ borderColor: 'rgba(0, 240, 255, 0.45)', color: '#00f0ff' }}
+                  onClick={onRetryUnlimited}
+                >
+                  <ShieldCheck size={16} />
+                  <span>OVERRIDE WITH UNLIMITED TIME</span>
+                </button>
+              )}
               <button
                 type="button"
                 className="dialog-btn-secondary"

@@ -165,6 +165,7 @@ export default function App() {
   const hasSeenAnnouncementRef = useRef(false);
   const prevPoweredCountRef = useRef(1);
   const prevUnlockedSetRef = useRef(new Set());
+  const prevHostileTriggeredRef = useRef(false);
 
   const currentHackerStage = STAGES[hackerStageIndex] || STAGES[0];
   const hackerEvaluation = useMemo(() => {
@@ -190,6 +191,7 @@ export default function App() {
     setHackerIsGameOver(false);
     prevPoweredCountRef.current = 1;
     prevUnlockedSetRef.current = new Set();
+    prevHostileTriggeredRef.current = false;
   }, []);
 
   const handleInvestigateEasterEgg = useCallback(() => {
@@ -263,10 +265,14 @@ export default function App() {
         }
       });
 
-      if (ev.isHostileTriggered) {
+      // Hostile IDS Intrusion Sensor Trigger (Edge-triggered to prevent continuous drain on every click)
+      const wasHostile = prevHostileTriggeredRef.current;
+      prevHostileTriggeredRef.current = ev.isHostileTriggered;
+
+      if (ev.isHostileTriggered && !wasHostile) {
         playHostileShock();
         if (stage.timeLimit) {
-          setHackerTimeLeft((t) => (typeof t === 'number' ? Math.max(0, t - 10) : t));
+          setHackerTimeLeft((t) => (typeof t === 'number' ? Math.max(5, t - 5) : t));
         }
       }
 
@@ -293,6 +299,15 @@ export default function App() {
   const handleResetHackerStage = useCallback(() => {
     initHackerStage(hackerStageIndex);
   }, [hackerStageIndex, initHackerStage]);
+
+  const handleRetryUnlimited = useCallback(() => {
+    initHackerStage(hackerStageIndex);
+    setHackerTimeLeft(null); // Unlimited exploration mode
+  }, [hackerStageIndex, initHackerStage]);
+
+  const handleAddExtraTime = useCallback(() => {
+    setHackerTimeLeft((prev) => (typeof prev === 'number' ? prev + 60 : prev));
+  }, []);
 
   // Auto-trigger announcement when all stations are genuinely breached
   useEffect(() => {
@@ -1143,6 +1158,8 @@ export default function App() {
           onToggleFullscreen={toggleFullscreen}
           onExitHackerMode={handleExitHackerMode}
           onNextStage={handleNextHackerStage}
+          onRetryUnlimited={handleRetryUnlimited}
+          onAddExtraTime={handleAddExtraTime}
         />
       )}
     </div>

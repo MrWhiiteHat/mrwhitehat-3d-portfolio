@@ -10670,7 +10670,28 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-size: 13px;
   font-weight: 900;
   color: #ffffff;
-  min-width: 44px;
+  min-width: 48px;
+}
+
+.btn-add-time {
+  background: rgba(0, 240, 255, 0.14);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 4px;
+  color: #00f0ff;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  pointer-events: auto !important;
+}
+
+.btn-add-time:hover {
+  background: rgba(0, 240, 255, 0.3);
+  border-color: #00f0ff;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
 }
 
 .hacker-timer-wd2.is-urgent .timer-wd2-val {
