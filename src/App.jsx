@@ -117,7 +117,41 @@ export default function App() {
   const [isGateOpen, setIsGateOpen] = useState(false);
   const [activeProximity, setActiveProximity] = useState(null);
   const [unlockedStations, setUnlockedStations] = useState(() => new Set(getCompletedStations()));
-  // Watch Dogs 2 3D Hacking Circuit State Machine
+  const mobileInputRef = useRef({ x: 0, y: 0 });
+  const handleMobileMove = useCallback((pos) => {
+    mobileInputRef.current = pos;
+  }, []);
+
+  // Persistent Visitor Logs & Wall Counter Telemetry
+  const [visitorLogs, setVisitorLogs] = useState(() => getVisitorLogs());
+  const [visitorCount, setVisitorCount] = useState(() => getVisitorCount());
+
+  // Synchronize genuine cloud visitor count and real check-ins on mount
+  useEffect(() => {
+    syncRemoteVisitorData()
+      .then((data) => {
+        if (data) {
+          if (typeof data.count === 'number') setVisitorCount(data.count);
+          if (Array.isArray(data.logs) && data.logs.length > 0) setVisitorLogs(data.logs);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Station inspect & theme state
+  const [section, setSection] = useState(null);
+  const [hovered, setHovered] = useState(null);
+  const [themeKey, setThemeKey] = useState('CYBER_NEON_NOIR');
+  const [muted, setAudioMuted] = useState(false);
+  const [droneActive, setDroneActive] = useState(false);
+  const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isGadgetInspectorOpen, setIsGadgetInspectorOpen] = useState(false);
+  const [selectedGadgetId, setSelectedGadgetId] = useState('flipper');
+  const [isRecruiterOpen, setIsRecruiterOpen] = useState(false);
+  const stationMenuRef = useRef(null);
+
+// Watch Dogs 2 3D Hacking Circuit State Machine
   const [hackerStageIndex, setHackerStageIndex] = useState(0);
   const [hackerNodeStates, setHackerNodeStates] = useState({});
   const [hackerSelectedNodeId, setHackerSelectedNodeId] = useState('s1_n1');
@@ -331,39 +365,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', onHackerKey);
   }, [gameState, hackerSelectedNodeId, handleRotateHackerNode, handleResetHackerStage]);
 
-  const mobileInputRef = useRef({ x: 0, y: 0 });
-  const handleMobileMove = useCallback((pos) => {
-    mobileInputRef.current = pos;
-  }, []);
-
-  // Persistent Visitor Logs & Wall Counter Telemetry
-  const [visitorLogs, setVisitorLogs] = useState(() => getVisitorLogs());
-  const [visitorCount, setVisitorCount] = useState(() => getVisitorCount());
-
-  // Synchronize genuine cloud visitor count and real check-ins on mount
-  useEffect(() => {
-    syncRemoteVisitorData()
-      .then((data) => {
-        if (data) {
-          if (typeof data.count === 'number') setVisitorCount(data.count);
-          if (Array.isArray(data.logs) && data.logs.length > 0) setVisitorLogs(data.logs);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  // Station inspect & theme state
-  const [section, setSection] = useState(null);
-  const [hovered, setHovered] = useState(null);
-  const [themeKey, setThemeKey] = useState('CYBER_NEON_NOIR');
-  const [muted, setAudioMuted] = useState(false);
-  const [droneActive, setDroneActive] = useState(false);
-  const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
-  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
-  const [isGadgetInspectorOpen, setIsGadgetInspectorOpen] = useState(false);
-  const [selectedGadgetId, setSelectedGadgetId] = useState('flipper');
-  const [isRecruiterOpen, setIsRecruiterOpen] = useState(false);
-  const stationMenuRef = useRef(null);
 
   const handleOpenRecruiter = useCallback(() => {
     playClickSound(1000);
