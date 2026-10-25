@@ -615,50 +615,6 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
           decay={2}
         />
       </group>
-
-      {/* ========================================================================= */}
-      {/* 8. HORIZONTAL ELECTRIC CYAN LED STRIP BARS (Directly from Image 1)        */}
-      {/* Mounted on the wall/shelves casting crisp electric cyan rim glow          */}
-      {/* ========================================================================= */}
-      <group position={[1.9, 3.3, -4.92]}>
-        {/* Dual Horizontal Neon Runner Strips */}
-        {[-0.18, 0.18].map((sy, idx) => (
-          <group key={`cyan-strip-${idx}`} position={[0, sy, 0]}>
-            {/* Sleek Aluminum Mounting Track Bar */}
-            <mesh>
-              <boxGeometry args={[2.8, 0.04, 0.025]} />
-              <meshStandardMaterial color="#0f172a" metalness={0.9} roughness={0.2} />
-            </mesh>
-            {/* Diffused Neon Cyan Strip Lens */}
-            <mesh position={[0, 0, 0.014]}>
-              <boxGeometry args={[2.76, 0.024, 0.008]} />
-              <meshStandardMaterial
-                color={theme.accentColor || '#00f0ff'}
-                emissive={theme.accentColor || '#00f0ff'}
-                emissiveIntensity={3.2}
-                roughness={0.15}
-                toneMapped={false}
-              />
-            </mesh>
-            {/* Aluminum End Caps */}
-            {[-1.4, 1.4].map((ex, ci) => (
-              <mesh key={`cap-${ci}`} position={[ex, 0, 0.005]}>
-                <boxGeometry args={[0.02, 0.046, 0.03]} />
-                <meshStandardMaterial color="#334155" metalness={0.9} />
-              </mesh>
-            ))}
-          </group>
-        ))}
-
-        {/* Crisp Electric Cyan Wash Point Light */}
-        <pointLight
-          position={[0, 0, 0.25]}
-          color={theme.accentColor || '#00f0ff'}
-          intensity={14}
-          distance={6.5}
-          decay={2}
-        />
-      </group>
     </group>
   );
 }
