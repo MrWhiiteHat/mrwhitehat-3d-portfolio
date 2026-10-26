@@ -360,7 +360,7 @@ export default function App() {
 
   const handleInteractTerminal = useCallback(() => {
     playCorporateClick();
-    setBetrayalPhase('CORPORATE_REJECTION');
+    setBetrayalPhase('MOM_REVEAL');
   }, []);
 
   const handleReturnFromBetrayal = useCallback(() => {

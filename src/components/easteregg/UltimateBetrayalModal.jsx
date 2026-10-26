@@ -1,40 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  AlertCircle,
-  Briefcase,
-  CheckCircle,
-  Clock,
-  ExternalLink,
-  FileText,
-  Loader2,
-  RefreshCw,
+  AlertTriangle,
+  Award,
+  CheckCircle2,
+  ChevronRight,
+  Flame,
+  MessageSquare,
   RotateCcw,
   ShieldAlert,
   ShieldCheck,
+  Sparkles,
   Terminal,
-  UserCheck,
+  Volume2,
+  VolumeX,
   X,
-  XCircle,
   Zap,
 } from 'lucide-react';
 import {
+  playRecordScratch,
+  playSlipperWhoosh,
+  playMomGong,
+  playDhaniyaFanfare,
   playCorporateClick,
-  playLoadingProgressBeep,
-  playRejectionBuzzer,
   playSadPunchline,
 } from './easterEggAudio.js';
 
 /**
- * Betrayal Sequence Phases:
- * - 'VAULT_OPENING': Cinematic banner & instruction while 3D vault opens
- * - 'TERMINAL_INTERACTIVE': Prompt to press E / click to access computer
- * - 'CORPORATE_REJECTION': Realistic enterprise HR recruitment rejection portal
- * - 'LOADING_TROLL': Progress bar climbs to 99% and freezes for 6s with cycling HR status messages
- * - 'REJECTED_SLAM': The 99% rejection stamp drops ("The hiring manager was an AI")
- * - 'APPEAL_PENDING': 1.5s appeal submission animation
- * - 'APPEAL_REJECTED': Appeal rejected + punchline ("Anyway, thanks for testing my portfolio for free")
- * - 'FADE_BLACK': Cinematic fade to black
- * - 'FINAL_REALITY': The dark screen punchline with "Return to Portfolio" or "Do It Again?"
+ * Text-to-speech helper with safe fallback
+ */
+function speakDialogue(text) {
+  if (typeof window === 'undefined' || !window.speechSynthesis) return;
+  try {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.05;
+    utterance.pitch = 1.15;
+    // Prefer Indian English voice if available in system
+    const voices = window.speechSynthesis.getVoices();
+    const indVoice = voices.find(
+      (v) => v.lang.includes('en-IN') || v.name.includes('India')
+    );
+    if (indVoice) utterance.voice = indVoice;
+    window.speechSynthesis.speak(utterance);
+  } catch (e) {}
+}
+
+/**
+ * The Ultimate Betrayal 💀
+ * "The 4th-Wall Reality Check / Mom Calling & Coriander Errand"
  */
 export default function UltimateBetrayalModal({
   phase,
@@ -42,114 +55,50 @@ export default function UltimateBetrayalModal({
   onInteractTerminal,
   onReturnToPortfolio,
   onRestartEasterEgg,
-  onSkipCinematic,
 }) {
-  const [loadPercent, setLoadPercent] = useState(0);
-  const [statusMessageIndex, setStatusMessageIndex] = useState(0);
-  const [appealStep, setAppealStep] = useState('initial'); // 'initial' | 'pending' | 'rejected' | 'punchline'
-  const trollTimerRef = useRef(null);
-  const messageIntervalRef = useRef(null);
+  const [selectedResponse, setSelectedResponse] = useState(null);
+  const [roastStep, setRoastStep] = useState('initial'); // 'initial' | 'slipper' | 'narrator'
+  const dialogueSpokenRef = useRef(false);
 
-  const HR_STATUS_MESSAGES = [
-    'Reviewing technical qualifications...',
-    'Verifying security clearance and credentials...',
-    'Consulting the hiring manager...',
-    'Checking your professional experience...',
-    'Evaluating cultural synergy and corporate alignment...',
-  ];
-
-  // Clean up all timers on unmount
+  // Clean up speech synthesis on unmount
   useEffect(() => {
     return () => {
-      if (trollTimerRef.current) clearTimeout(trollTimerRef.current);
-      if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
     };
   }, []);
 
-  // Handle the 99% loading troll sequence
+  // When Mom Reveal triggers, play scratch & speak dialogue
   useEffect(() => {
-    if (phase !== 'LOADING_TROLL') return;
-
-    setLoadPercent(0);
-    setStatusMessageIndex(0);
-
-    // Fast climb to 99% over 1.6 seconds
-    const start = Date.now();
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - start;
-      if (elapsed < 300) {
-        setLoadPercent(18);
-        playLoadingProgressBeep();
-      } else if (elapsed < 700) {
-        setLoadPercent(47);
-        playLoadingProgressBeep();
-      } else if (elapsed < 1100) {
-        setLoadPercent(82);
-        playLoadingProgressBeep();
-      } else if (elapsed < 1600) {
-        setLoadPercent(99);
-        playLoadingProgressBeep();
-        clearInterval(interval);
-      }
-    }, 120);
-
-    // Cycle through corporate HR status messages while stuck at 99%
-    messageIntervalRef.current = setInterval(() => {
-      setStatusMessageIndex((prev) => (prev + 1) % HR_STATUS_MESSAGES.length);
-    }, 1200);
-
-    // Freeze at 99% for ~6.2 seconds, then SLAM with rejection!
-    trollTimerRef.current = setTimeout(() => {
-      clearInterval(messageIntervalRef.current);
-      playRejectionBuzzer();
-      onPhaseChange('REJECTED_SLAM');
-    }, 6200);
-
-    return () => {
-      clearInterval(interval);
-      if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
-      if (trollTimerRef.current) clearTimeout(trollTimerRef.current);
-    };
-  }, [phase, onPhaseChange]);
-
-  // Handle Appeal Submission Flow
-  const handleStartAppeal = () => {
-    playCorporateClick();
-    setAppealStep('pending');
-    onPhaseChange('APPEAL_PENDING');
-
-    // 1.8s serious appeal verification spinner
-    setTimeout(() => {
-      playRejectionBuzzer();
-      setAppealStep('rejected');
-      onPhaseChange('APPEAL_REJECTED');
-
-      // 1.4s later: reveal the hilarious punchline
+    if (phase === 'MOM_REVEAL' && !dialogueSpokenRef.current) {
+      dialogueSpokenRef.current = true;
+      playRecordScratch();
       setTimeout(() => {
-        playSadPunchline();
-        setAppealStep('punchline');
+        playMomGong();
+        speakDialogue(
+          'Oye hero! Stop clicking random lines on computer and pretending to be in Matrix! Go to market and bring 10 rupees dhaniya right now!'
+        );
+      }, 350);
+    }
+  }, [phase]);
 
-        // 3.2s later: fade to black
-        setTimeout(() => {
-          onPhaseChange('FADE_BLACK');
-          setTimeout(() => {
-            onPhaseChange('FINAL_REALITY');
-          }, 1200);
-        }, 3200);
-      }, 1400);
-    }, 1800);
-  };
-
-  const handleApplyClick = () => {
+  // Handle player dialogue selection
+  const handlePlayerChoice = (choiceText) => {
     playCorporateClick();
-    onPhaseChange('LOADING_TROLL');
+    setSelectedResponse(choiceText);
+    setRoastStep('slipper');
+    playSlipperWhoosh();
+
+    setTimeout(() => {
+      setRoastStep('narrator');
+      playSadPunchline();
+    }, 1400);
   };
 
-  const handleSkipLoadingTroll = () => {
-    if (trollTimerRef.current) clearTimeout(trollTimerRef.current);
-    if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
-    playRejectionBuzzer();
-    onPhaseChange('REJECTED_SLAM');
+  const handleProceedToCertificate = () => {
+    playDhaniyaFanfare();
+    onPhaseChange('CERTIFICATE_ROAST');
   };
 
   // Keyboard shortcut listener
@@ -174,11 +123,11 @@ export default function UltimateBetrayalModal({
         <div className="betrayal-announcement-card">
           <div className="betrayal-announcement-badge">
             <Zap size={14} className="hacker-zap-icon" />
-            <span>FACILITY ROOT ACCESS GRANTED</span>
+            <span>CORE MAINFRAME BREACHED</span>
           </div>
-          <h2 className="betrayal-announcement-title">CLASSIFIED VAULT UNLOCKED</h2>
+          <h2 className="betrayal-announcement-title">THE VEIL IS LIFTED</h2>
           <p className="betrayal-announcement-quote">
-            “You have breached a system that remained inaccessible for decades. You are now authorized to access the ultimate secret.”
+            “You have breached a system that remained inaccessible for decades. Decrypting the true identity of the Master Architect...”
           </p>
           <div className="betrayal-vault-status-row">
             <span className="vault-pulse-dot" />
@@ -196,21 +145,26 @@ export default function UltimateBetrayalModal({
     return (
       <div className="betrayal-prompt-layer">
         <div className="betrayal-terminal-prompt-card" onClick={onInteractTerminal}>
-          <div className="terminal-badge">
+          <div className="terminal-badge" style={{ color: '#22c55e' }}>
             <Terminal size={14} />
-            <span>CLASSIFIED TERMINAL DETECTED</span>
+            <span>ANOMALOUS SANCTUM DETECTED</span>
           </div>
-          <h3 className="terminal-prompt-heading">THE SECRET CHAMBER</h3>
+          <h3 className="terminal-prompt-heading">THE INNER SANCTUM</h3>
           <p className="terminal-prompt-desc">
-            Inside the legendary vault sits a solitary wooden folding table, an ordinary chair, and a single desktop monitor.
+            Inside the legendary vault sits an unmade bed, a pile of laundry, cold Maggi noodles, and an eerie silence.
           </p>
           <button
             type="button"
             className="terminal-interact-btn"
+            style={{
+              background: 'linear-gradient(135deg, #15803d, #166534)',
+              borderColor: '#22c55e',
+              boxShadow: '0 0 25px rgba(34, 197, 94, 0.45)',
+            }}
             onClick={onInteractTerminal}
           >
             <Zap size={16} />
-            <span>ACCESS TERMINAL [PRESS E]</span>
+            <span>CONFRONT REALITY [PRESS E]</span>
           </button>
         </div>
       </div>
@@ -218,249 +172,229 @@ export default function UltimateBetrayalModal({
   }
 
   // -------------------------------------------------------------
-  // PHASE 3-6: THE CORPORATE REJECTION & 99% LOADING TROLL
+  // PHASE 3-4: MOM CALLING & DEADPAN CINEMATIC ROAST
   // -------------------------------------------------------------
-  if (
-    phase === 'CORPORATE_REJECTION' ||
-    phase === 'LOADING_TROLL' ||
-    phase === 'REJECTED_SLAM' ||
-    phase === 'APPEAL_PENDING' ||
-    phase === 'APPEAL_REJECTED'
-  ) {
+  if (phase === 'MOM_REVEAL') {
     return (
-      <div className="corporate-portal-overlay">
-        <div className="corporate-window-card">
-          {/* Top Corporate Browser Bar */}
-          <div className="corporate-window-header">
-            <div className="corporate-window-dots">
-              <span className="dot dot-red" />
-              <span className="dot dot-yellow" />
-              <span className="dot dot-green" />
-            </div>
-            <div className="corporate-url-bar">
-              <span className="url-lock">🔒</span>
-              <span className="url-text">https://careers.global-synergy-dynamics.corp/internal/portal/applicant/ref-9411</span>
-            </div>
-            <div className="corporate-branding">GLOBAL SYNERGY HR</div>
+      <div className="mom-cinematic-overlay">
+        {/* Hollywood Cinematic Letterbox Bars */}
+        <div className="cinematic-bar bar-top" />
+        <div className="cinematic-bar bar-bottom" />
+
+        <div className="mom-dialogue-stage">
+          {/* Audio Indicator */}
+          <div className="mom-audio-indicator">
+            <Volume2 size={15} color="#ef4444" className="pulse-icon" />
+            <span>INCOMING HIGH-PRIORITY TRANSMISSION // KITCHEN INTERCOM</span>
           </div>
 
-          {/* Corporate ATS Portal Header */}
-          <div className="corporate-portal-nav">
-            <div className="corp-logo-wrap">
-              <Briefcase size={20} color="#0f766e" />
-              <div>
-                <strong className="corp-name">GLOBAL SYNERGY DYNAMICS CORP.</strong>
-                <span className="corp-tagline">Automated Enterprise Talent Acquisition</span>
-              </div>
+          {/* Mom's Shouting Dialogue Card */}
+          <div className="mom-shout-card">
+            <div className="mom-speaker-badge">
+              <span className="mom-avatar">👵🏽</span>
+              <strong className="mom-name">MOM (SHOUTING FROM THE KITCHEN):</strong>
             </div>
-            <div className="corp-candidate-pill">
-              <UserCheck size={14} />
-              <span>CANDIDATE ID: #4792-HAX</span>
-            </div>
+
+            <p className="mom-shout-text">
+              “OYE HERO! Stop clicking the mouse like a maniac and pretending to be in Matrix! The dal is boiling on the stove! Go to the market and bring ₹10 DHANIYA (Coriander) right now! And don't forget to ask for extra free green chillies (mirchi)!”
+            </p>
           </div>
 
-          {/* Main Body */}
-          <div className="corporate-portal-body">
-            {/* Mission Complete Heading */}
-            <div className="corp-mission-header">
-              <span className="corp-kicker">MISSION DE-BRIEFING // CTOS OVERRIDE</span>
-              <h1 className="corp-mission-title">FINAL MISSION COMPLETE</h1>
-            </div>
-
-            {/* Congratulatory Text */}
-            <div className="corp-congrats-box">
-              <p className="corp-congrats-lead">
-                <strong>Congratulations, Hacker.</strong>
-              </p>
-              <p className="corp-congrats-text">
-                You've bypassed 47 security nodes, defeated an advanced AI, and infiltrated a highly classified facility.
-              </p>
-              <p className="corp-congrats-twist">
-                Unfortunately, you have no professional experience.
-              </p>
-            </div>
-
-            {/* Initial Rejection Card */}
-            <div className="corp-status-card rejected-card">
-              <div className="status-indicator-badge">
-                <XCircle size={16} />
-                <span>APPLICATION STATUS: REJECTED</span>
-              </div>
-              <div className="status-reason-box">
-                <span className="reason-label">REASON FOR DISQUALIFICATION:</span>
-                <p className="reason-text">
-                  “We require 3–5 years of experience with this exact Easter egg.”
-                </p>
-              </div>
-            </div>
-
-            {/* 99% Loading Progress Section */}
-            {phase === 'LOADING_TROLL' && (
-              <div className="corp-loading-section">
-                <div className="loading-header-row">
-                  <div className="loading-label-group">
-                    <Loader2 size={16} className="spin-icon" />
-                    <span className="loading-status-text">
-                      {HR_STATUS_MESSAGES[statusMessageIndex]}
-                    </span>
-                  </div>
-                  <strong className="loading-percent-number">{loadPercent}%</strong>
-                </div>
-
-                <div className="corp-progress-bar-track">
-                  <div
-                    className="corp-progress-bar-fill"
-                    style={{ width: `${loadPercent}%` }}
-                  />
-                </div>
-
-                <div className="loading-footer-row">
-                  <span className="loading-frozen-notice">
-                    {loadPercent === 99
-                      ? '⚠️ System paused: Conducting mandatory multi-departmental committee review...'
-                      : 'Syncing encrypted telemetry with internal hiring matrix...'}
-                  </span>
-                  <button
-                    type="button"
-                    className="btn-skip-loading"
-                    onClick={handleSkipLoadingTroll}
-                  >
-                    Skip waiting →
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Rejection Slam Section */}
-            {(phase === 'REJECTED_SLAM' || phase === 'APPEAL_PENDING' || phase === 'APPEAL_REJECTED') && (
-              <div className="corp-ai-rejection-alert">
-                <div className="ai-rejection-stamp">
-                  <ShieldAlert size={28} />
-                  <div>
-                    <h3 className="ai-rejection-heading">APPLICATION REJECTED.</h3>
-                    <p className="ai-rejection-sub">
-                      <strong>Reason:</strong> The hiring manager was an AI.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Appeal Section */}
-                {appealStep === 'initial' && (
-                  <div className="appeal-action-box">
-                    <p className="appeal-prompt">
-                      Do you disagree with the algorithmic assessment?
-                    </p>
-                    <button
-                      type="button"
-                      className="btn-corporate-appeal"
-                      onClick={handleStartAppeal}
-                    >
-                      <RotateCcw size={15} />
-                      <span>APPEAL DECISION</span>
-                    </button>
-                  </div>
-                )}
-
-                {appealStep === 'pending' && (
-                  <div className="appeal-pending-box">
-                    <Loader2 size={18} className="spin-icon" />
-                    <span>Appeal submitted successfully. Reviewing appeal under Protocol 7-B...</span>
-                  </div>
-                )}
-
-                {(appealStep === 'rejected' || appealStep === 'punchline') && (
-                  <div className="appeal-rejected-box">
-                    <div className="appeal-rejected-header">
-                      <XCircle size={18} color="#dc2626" />
-                      <span>Appeal rejected. The hiring manager has reviewed your appeal.</span>
-                    </div>
-
-                    {appealStep === 'punchline' && (
-                      <div className="ultimate-betrayal-punchline-card">
-                        <p className="punchline-text">
-                          “Anyway, thanks for testing my portfolio for free.”
-                        </p>
-                        <span className="punchline-signature">— Mr. White Hat 💀</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Action Bar (Apply button) */}
-            {phase === 'CORPORATE_REJECTION' && (
-              <div className="corp-action-footer">
+          {/* Step 1: Interactive Player Responses */}
+          {roastStep === 'initial' && (
+            <div className="player-response-section">
+              <span className="player-prompt-label">SELECT YOUR RESPONSE:</span>
+              <div className="player-choices-stack">
                 <button
                   type="button"
-                  className="btn-corporate-apply"
-                  onClick={handleApplyClick}
+                  className="player-choice-btn"
+                  onClick={() =>
+                    handlePlayerChoice(
+                      'Mom, wait! I literally just bypassed a military-grade neural firewall!'
+                    )
+                  }
                 >
-                  <FileText size={16} />
-                  <span>APPLY FOR THE POSITION</span>
+                  <ChevronRight size={16} />
+                  <span>“Mom, wait! I literally just bypassed a military-grade neural firewall!”</span>
                 </button>
-                <span className="corp-footnote">
-                  Application reference code #CTOS-PORTFOLIO-2026. All decisions are final and binding.
-                </span>
+
+                <button
+                  type="button"
+                  className="player-choice-btn"
+                  onClick={() =>
+                    handlePlayerChoice(
+                      'Can I finish this Easter egg first? I’m almost at the secret ending!'
+                    )
+                  }
+                >
+                  <ChevronRight size={16} />
+                  <span>“Can I finish this Easter egg first? I’m almost at the secret ending!”</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="player-choice-btn"
+                  onClick={() =>
+                    handlePlayerChoice(
+                      'Did you say ₹10 or ₹20 dhaniya? And what if the vendor charges for mirchi?'
+                    )
+                  }
+                >
+                  <ChevronRight size={16} />
+                  <span>“Did you say ₹10 or ₹20 dhaniya? And what if the vendor charges for mirchi?”</span>
+                </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+
+          {/* Step 2: Flying Slipper Alert */}
+          {roastStep === 'slipper' && (
+            <div className="flying-slipper-alert">
+              <span className="slipper-emoji">🩴💨</span>
+              <div className="slipper-alert-text">
+                <strong>TACTICAL FLYING CHAPPAL LAUNCHED</strong>
+                <span>Velocity: Mach 3.4 • Heat-Seeking Guidance • Target: Back of Your Head</span>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Deadpan Hollywood Narrator Roast */}
+          {roastStep === 'narrator' && (
+            <div className="narrator-roast-card">
+              <div className="narrator-badge">
+                <Terminal size={14} />
+                <span>NARRATOR // DEADPAN REALITY CHECK</span>
+              </div>
+
+              <blockquote className="narrator-quote">
+                “You rotated 14 high-voltage spatial conduits.<br />
+                You calculated complex Manhattan network topologies.<br />
+                You spent 15 minutes feeling like an untouchable cyber ghost operative...<br /><br />
+                <strong style={{ color: '#fef08a' }}>
+                  ...and yet, you still haven't bought the coriander. The dal is ruined. The chappal has achieved supersonic speed.
+                </strong>”
+              </blockquote>
+
+              <div className="narrator-action-row">
+                <button
+                  type="button"
+                  className="btn-view-certificate"
+                  onClick={handleProceedToCertificate}
+                >
+                  <Award size={18} />
+                  <span>VIEW OFFICIAL PERFORMANCE EVALUATION</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
   }
 
   // -------------------------------------------------------------
-  // PHASE 7: FADE TO BLACK
+  // PHASE 5: THE SARCASM CERTIFICATE OF CORIANDER PROCUREMENT
   // -------------------------------------------------------------
-  if (phase === 'FADE_BLACK') {
-    return <div className="betrayal-fade-to-black is-active" />;
-  }
-
-  // -------------------------------------------------------------
-  // PHASE 8: FINAL RETURN TO REALITY
-  // -------------------------------------------------------------
-  if (phase === 'FINAL_REALITY') {
+  if (phase === 'CERTIFICATE_ROAST') {
     return (
-      <div className="betrayal-reality-screen">
-        <div className="reality-content-card">
-          <div className="reality-icon-header">
-            <span className="reality-skull">💀</span>
+      <div className="certificate-modal-overlay">
+        <div className="certificate-frame-card">
+          {/* Certificate Header Banner */}
+          <div className="certificate-top-banner">
+            <span className="cert-crest">🌿🩴🌿</span>
+            <span className="cert-dept">
+              DEPARTMENT OF DOMESTIC HOUSEHOLD OPERATIONS & CYBER ERBITRAGE
+            </span>
+            <h1 className="cert-main-title">
+              CERTIFICATE OF ERRAND DISOBEDIENCE
+            </h1>
+            <span className="cert-sub">
+              FOR DISTINGUISHED CYBER PROCRASTINATION UNDER EXTREME CIRCUMSTANCES
+            </span>
           </div>
 
-          <h1 className="reality-quote-lead">
-            “You explored an entire virtual universe, defeated an advanced security network, and completed a top-secret mission...
-          </h1>
-          <h2 className="reality-quote-punchline">
-            ...to get rejected by a recruitment portal.”
-          </h2>
+          {/* Main Certificate Body */}
+          <div className="certificate-body">
+            <p className="cert-intro">This highly un-prestigious recognition is formally awarded to:</p>
 
-          <div className="reality-badge-row">
-            <div className="reality-chip">
-              <ShieldCheck size={14} color="#10b981" />
-              <span>THE ULTIMATE BETRAYAL UNLOCKED</span>
+            <div className="cert-recipient-name">
+              THE "ELITE HACKER" WHO FORGOT THE DHANIYA
             </div>
-            <div className="reality-chip">
-              <CheckCircle size={14} color="#38bdf8" />
-              <span>100% PORTFOLIO QA TESTER CERTIFIED</span>
+
+            <p className="cert-citation">
+              For spending fifteen consecutive minutes rotating three-dimensional laser switches,
+              bypassing fictional cTOS military servers, and feeling like Mr. Robot...
+              while completely neglecting a simple five-minute grocery trip to buy fresh coriander.
+            </p>
+
+            {/* Hilarious Stats Grid */}
+            <div className="cert-stats-grid">
+              <div className="cert-stat-box">
+                <span className="stat-label">HACKING APTITUDE</span>
+                <strong className="stat-val" style={{ color: '#00f0ff' }}>LEVEL 99 CYBER GHOST</strong>
+              </div>
+
+              <div className="cert-stat-box">
+                <span className="stat-label">MOTHER'S APPROVAL</span>
+                <strong className="stat-val" style={{ color: '#ef4444' }}>-9,999 RESPECT</strong>
+              </div>
+
+              <div className="cert-stat-box">
+                <span className="stat-label">CORIANDER SECURED</span>
+                <strong className="stat-val" style={{ color: '#f59e0b' }}>0 / 1 BUNCH</strong>
+              </div>
+
+              <div className="cert-stat-box">
+                <span className="stat-label">FREE GREEN CHILLIES</span>
+                <strong className="stat-val" style={{ color: '#ef4444' }}>0 / 4 MIRCHI</strong>
+              </div>
+
+              <div className="cert-stat-box">
+                <span className="stat-label">SABZI STATUS</span>
+                <strong className="stat-val" style={{ color: '#ef4444' }}>BURNED TO ASH</strong>
+              </div>
+
+              <div className="cert-stat-box">
+                <span className="stat-label">CHAPPAL THREAT LEVEL</span>
+                <strong className="stat-val" style={{ color: '#dc2626' }}>DEFCON 1 (INBOUND)</strong>
+              </div>
+            </div>
+
+            {/* Official Rubber Stamp */}
+            <div className="cert-rubber-stamp">
+              <span>CERTIFIED DHANIYA PROCRASTINATOR</span>
+              <small>AUTHORIZED BY MOM 🩴</small>
+            </div>
+
+            {/* Signature Row */}
+            <div className="cert-signature-row">
+              <div className="cert-signature">
+                <span className="sig-line">Mr. White Hat 💀</span>
+                <span className="sig-role">Lead Portfolio Developer & Survivor</span>
+              </div>
+              <div className="cert-signature">
+                <span className="sig-line">Mummy Ji 🩴</span>
+                <span className="sig-role">Supreme Kitchen Commander</span>
+              </div>
             </div>
           </div>
 
-          <div className="reality-button-group">
+          {/* Action Buttons */}
+          <div className="cert-action-footer">
             <button
               type="button"
-              className="btn-reality-primary"
+              className="btn-cert-primary"
               onClick={onReturnToPortfolio}
             >
-              <span>RETURN TO PORTFOLIO</span>
+              <span>RETURN TO PORTFOLIO (BEFORE THE CHAPPAL HITS 🩴)</span>
             </button>
             <button
               type="button"
-              className="btn-reality-secondary"
+              className="btn-cert-secondary"
               onClick={onRestartEasterEgg}
             >
               <RotateCcw size={16} />
-              <span>DO IT AGAIN? 💀</span>
+              <span>DO IT AGAIN? (RISK MOTHER'S WRATH)</span>
             </button>
           </div>
         </div>

@@ -522,3 +522,115 @@ export function playSadPunchline() {
     });
   } catch (e) {}
 }
+
+// 16. Record Scratch (Instant anticlimax / music freeze)
+export function playRecordScratch() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const bufferSize = ctx.sampleRate * 0.28;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufferSize) * Math.PI);
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(2400, ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.28);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start();
+  } catch (e) {}
+}
+
+// 17. Flying Chappal / Slipper Sonic Whoosh
+export function playSlipperWhoosh() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(200, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.12);
+    osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.25);
+
+    gain.gain.setValueAtTime(0.16, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.25);
+  } catch (e) {}
+}
+
+// 18. Indian Temple Bell / Mom Warning Gong
+export function playMomGong() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    [587.33, 880, 1174.66].forEach((freq) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.8);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 1.8);
+    });
+  } catch (e) {}
+}
+
+// 19. Comedic Dhaniya Victory Trumpet Fanfare
+export function playDhaniyaFanfare() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const notes = [
+      { f: 523.25, t: 0.0, d: 0.14 }, // C5
+      { f: 659.25, t: 0.14, d: 0.14 }, // E5
+      { f: 783.99, t: 0.28, d: 0.14 }, // G5
+      { f: 1046.50, t: 0.44, d: 0.5 }, // C6
+    ];
+
+    notes.forEach(({ f, t, d }) => {
+      const startTime = ctx.currentTime + t;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, startTime);
+
+      gain.gain.setValueAtTime(0.12, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + d);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(startTime);
+      osc.stop(startTime + d);
+    });
+  } catch (e) {}
+}

@@ -1380,7 +1380,7 @@ function SecretVault3D({
         </mesh>
       )}
 
-      {/* 4. THE RIDICULOUS DISCOVERY: Simple Folding Table, Chair & Computer */}
+      {/* 4. THE RIDICULOUS DISCOVERY: Messy Room, Cup Noodles, Laundry, Dhaniya & Mom's Slipper */}
       {isOpen && (
         <group position={[0, -0.45, -0.7]}>
           {/* Cheap Utility Folding Table */}
@@ -1399,57 +1399,110 @@ function SecretVault3D({
             ))
           )}
 
-          {/* Simple Office Desk Chair */}
+          {/* Chair with Unfolded Laundry Pile */}
           <group position={[0, -0.15, 0.35]}>
             {/* Seat */}
             <mesh position={[0, 0, 0]}>
               <boxGeometry args={[0.42, 0.05, 0.4]} />
-              <meshStandardMaterial color="#1e293b" roughness={0.8} />
+              <meshStandardMaterial color="#3b82f6" roughness={0.9} />
             </mesh>
             {/* Backrest */}
             <mesh position={[0, 0.22, 0.18]}>
               <boxGeometry args={[0.38, 0.35, 0.04]} />
-              <meshStandardMaterial color="#1e293b" roughness={0.8} />
+              <meshStandardMaterial color="#3b82f6" roughness={0.9} />
             </mesh>
-            {/* Stem & Base */}
-            <mesh position={[0, -0.2, 0]}>
-              <cylinderGeometry args={[0.03, 0.03, 0.35, 8]} />
-              <meshStandardMaterial color="#475569" metalness={0.7} />
+            {/* The Famous Chair Pile of Clean-ish Clothes */}
+            <mesh position={[-0.05, 0.12, 0.02]} rotation={[0.1, 0.2, -0.1]}>
+              <boxGeometry args={[0.32, 0.16, 0.28]} />
+              <meshStandardMaterial color="#ef4444" roughness={0.9} />
+            </mesh>
+            <mesh position={[0.08, 0.18, 0.06]} rotation={[-0.2, 0.3, 0.1]}>
+              <boxGeometry args={[0.26, 0.12, 0.22]} />
+              <meshStandardMaterial color="#eab308" roughness={0.9} />
             </mesh>
           </group>
 
-          {/* Single Corporate Computer Setup on Table */}
+          {/* Table Items: Laptop, Maggi Noodles, Energy Drink & The Legendary Coriander */}
           <group position={[0, 0.02, -0.05]}>
-            {/* Monitor Stand */}
-            <mesh position={[0, 0.08, 0]}>
-              <boxGeometry args={[0.12, 0.14, 0.08]} />
-              <meshStandardMaterial color="#334155" />
+            {/* Laptop Base */}
+            <mesh position={[-0.1, 0.015, 0.04]}>
+              <boxGeometry args={[0.38, 0.015, 0.26]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.8} />
             </mesh>
-            {/* Monitor Bezel */}
-            <mesh position={[0, 0.22, 0.02]}>
-              <boxGeometry args={[0.46, 0.32, 0.03]} />
-              <meshStandardMaterial color="#1e293b" roughness={0.5} />
+            {/* Laptop Screen (Open at 110 deg) */}
+            <mesh position={[-0.1, 0.14, -0.09]} rotation={[-0.32, 0, 0]}>
+              <boxGeometry args={[0.38, 0.25, 0.015]} />
+              <meshStandardMaterial color="#0f172a" metalness={0.8} />
             </mesh>
-            {/* Glowing Blue Corporate Portal Screen */}
-            <mesh position={[0, 0.22, 0.038]}>
-              <planeGeometry args={[0.42, 0.28]} />
+            {/* Glowing Laptop Screen (Displaying Stack Overflow / 73 Tabs) */}
+            <mesh position={[-0.1, 0.14, -0.08]} rotation={[-0.32, 0, 0]}>
+              <planeGeometry args={[0.35, 0.22]} />
               <meshStandardMaterial
-                color="#0284c7"
-                emissive="#0284c7"
-                emissiveIntensity={2.5}
-                roughness={0.2}
+                color="#00f0ff"
+                emissive="#00f0ff"
+                emissiveIntensity={2.8}
+                roughness={0.1}
               />
             </mesh>
 
-            {/* Keyboard & Mouse on table */}
-            <mesh position={[0, 0.02, 0.14]}>
-              <boxGeometry args={[0.36, 0.015, 0.12]} />
-              <meshStandardMaterial color="#334155" />
+            {/* Bowl of Maggi / Instant Cup Noodles */}
+            <group position={[0.28, 0.04, 0.05]}>
+              {/* Bowl */}
+              <mesh>
+                <cylinderGeometry args={[0.07, 0.05, 0.07, 16]} />
+                <meshStandardMaterial color="#f8fafc" />
+              </mesh>
+              {/* Steaming Noodles Inside */}
+              <mesh position={[0, 0.03, 0]}>
+                <cylinderGeometry args={[0.065, 0.065, 0.01, 16]} />
+                <meshStandardMaterial color="#f59e0b" roughness={0.6} />
+              </mesh>
+              {/* Fork Sticking Out */}
+              <mesh position={[0.02, 0.07, 0]} rotation={[0.4, 0, -0.2]}>
+                <boxGeometry args={[0.008, 0.12, 0.004]} />
+                <meshStandardMaterial color="#94a3b8" metalness={0.9} />
+              </mesh>
+            </group>
+
+            {/* THE HOLY BUNCH OF CORIANDER (DHANIYA) ON THE TABLE 🌿 */}
+            <group position={[-0.36, 0.03, 0.1]}>
+              {/* Green Stems */}
+              <mesh rotation={[0, 0.4, Math.PI / 2]}>
+                <cylinderGeometry args={[0.012, 0.012, 0.14, 8]} />
+                <meshStandardMaterial color="#15803d" />
+              </mesh>
+              {/* Leaf Clusters */}
+              {[-0.04, 0, 0.04].map((lx, i) => (
+                <mesh key={`dhaniya-${i}`} position={[lx, 0.02, 0.04]}>
+                  <sphereGeometry args={[0.035, 8, 8]} />
+                  <meshStandardMaterial
+                    color="#22c55e"
+                    emissive="#16a34a"
+                    emissiveIntensity={0.6}
+                  />
+                </mesh>
+              ))}
+            </group>
+
+            {/* Empty Energy Drink Can */}
+            <mesh position={[0.38, 0.05, -0.14]}>
+              <cylinderGeometry args={[0.025, 0.025, 0.09, 12]} />
+              <meshStandardMaterial color="#06b6d4" metalness={0.9} />
             </mesh>
-            <mesh position={[0.24, 0.02, 0.14]}>
-              <boxGeometry args={[0.06, 0.018, 0.09]} />
-              <meshStandardMaterial color="#1e293b" />
-            </mesh>
+
+            {/* OMINOUS FLYING INDIAN SLIPPER (CHAPPAL) HOVERING NEAR CEILING 🩴 */}
+            <group position={[0.35, 1.1, 0.2]} rotation={[0.6, 0.8, -0.4]}>
+              {/* Slipper Sole */}
+              <mesh>
+                <boxGeometry args={[0.1, 0.018, 0.24]} />
+                <meshStandardMaterial color="#ea580c" roughness={0.8} />
+              </mesh>
+              {/* Slipper Strap */}
+              <mesh position={[0, 0.025, 0.03]}>
+                <torusGeometry args={[0.04, 0.008, 8, 16, Math.PI]} />
+                <meshStandardMaterial color="#1e293b" />
+              </mesh>
+            </group>
 
             {/* Single Flickering Fluorescent Bulb Overhead */}
             <mesh position={[0, 0.9, 0]}>
@@ -1461,7 +1514,7 @@ function SecretVault3D({
               />
             </mesh>
 
-            {/* 3D INTERACTIVE BEACON ABOVE COMPUTER */}
+            {/* 3D INTERACTIVE BEACON: CONFRONT REALITY */}
             <group
               ref={beaconRef}
               position={[0, 0.52, 0.05]}
@@ -1482,23 +1535,23 @@ function SecretVault3D({
             >
               {/* Rotating Diamond Ring */}
               <mesh rotation={[0, 0, Math.PI / 4]}>
-                <ringGeometry args={[0.16, 0.19, 4]} />
+                <ringGeometry args={[0.18, 0.22, 4]} />
                 <meshBasicMaterial
-                  color={isHovered ? '#38bdf8' : '#fbbf24'}
+                  color={isHovered ? '#22c55e' : '#fbbf24'}
                   side={THREE.DoubleSide}
                 />
               </mesh>
               <mesh>
-                <octahedronGeometry args={[0.08, 0]} />
+                <octahedronGeometry args={[0.09, 0]} />
                 <meshStandardMaterial
                   color="#ffffff"
-                  emissive={isHovered ? '#38bdf8' : '#f59e0b'}
-                  emissiveIntensity={3.5}
+                  emissive={isHovered ? '#22c55e' : '#f59e0b'}
+                  emissiveIntensity={3.8}
                 />
               </mesh>
               {/* Invisible Hit Sphere */}
               <mesh>
-                <sphereGeometry args={[0.35, 12, 12]} />
+                <sphereGeometry args={[0.4, 12, 12]} />
                 <meshBasicMaterial transparent opacity={0.001} />
               </mesh>
             </group>
