@@ -43,7 +43,7 @@ Test your offensive and defensive cybersecurity skills directly inside the 3D te
 8. **Brute-Force Pin Breaker**: Execute timed brute-force routines against encrypted vaults.
 9. **Exploit Payload Generator**: Construct reverse shells and buffer overflow test strings.
 
-### 🕵️‍♂️ Watch Dogs 2 3D Circuit Hacking Easter Egg & Secret Bunker
+### 🕵️‍♂️ 3D Circuit Hacking Easter Egg & Secret Bunker
 Unlocks after completing portfolio stations or discovering the classified air-gap breach:
 - **3D Spatial Circuit Network**: Inspired by *Watch Dogs 2*, features high-voltage power conduits mapped to the room's walls, ceiling, and floor with strictly orthogonal Manhattan-grid topology. Features interactive rotatable switch junctions (straight, elbow, T-splitter), security padlocks, hostile IDS nodes, and synchronized directional flow chevrons.
 - **3 Progressive Hacker Stages**: Escalating network complexity with interactive stage selectors, camera vantage presets, and quick auto-solve controls (`[F]`).
