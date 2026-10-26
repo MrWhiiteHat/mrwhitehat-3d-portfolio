@@ -306,3 +306,219 @@ export function playSelectNode() {
     osc.stop(ctx.currentTime + 0.04);
   } catch (e) {}
 }
+
+// 10. Heavy Hydraulic Vault Door Opening (Hiss + Metallic Groan + Sub-Bass)
+export function playVaultDoorOpening() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    // Sub-bass heavy pneumatic rumble
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    subOsc.type = 'sawtooth';
+    subOsc.frequency.setValueAtTime(80, ctx.currentTime);
+    subOsc.frequency.exponentialRampToValueAtTime(32, ctx.currentTime + 2.4);
+
+    const subFilter = ctx.createBiquadFilter();
+    subFilter.type = 'lowpass';
+    subFilter.frequency.setValueAtTime(160, ctx.currentTime);
+    subFilter.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 2.4);
+
+    subGain.gain.setValueAtTime(0.2, ctx.currentTime);
+    subGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.5);
+
+    subOsc.connect(subFilter);
+    subFilter.connect(subGain);
+    subGain.connect(ctx.destination);
+    subOsc.start();
+    subOsc.stop(ctx.currentTime + 2.5);
+
+    // Steam / Hydraulic release noise hiss
+    const bufferSize = ctx.sampleRate * 1.5;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.setValueAtTime(900, ctx.currentTime);
+    noiseFilter.frequency.exponentialRampToValueAtTime(250, ctx.currentTime + 1.5);
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.12, ctx.currentTime);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start();
+  } catch (e) {}
+}
+
+// 11. Epic Cinematic Golden Vault Fanfare
+export function playVaultFanfare() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const chords = [
+      { f: 220, t: 0.0, d: 2.2 }, // A3
+      { f: 329.63, t: 0.2, d: 2.0 }, // E4
+      { f: 440, t: 0.4, d: 2.5 }, // A4
+      { f: 554.37, t: 0.7, d: 2.2 }, // C#5
+      { f: 659.25, t: 1.0, d: 2.8 }, // E5
+      { f: 880, t: 1.3, d: 3.2 }, // A5
+    ];
+
+    chords.forEach(({ f, t, d }) => {
+      const startTime = ctx.currentTime + t;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, startTime);
+
+      gain.gain.setValueAtTime(0.08, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + d);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + d);
+    });
+  } catch (e) {}
+}
+
+// 12. Sterile Corporate UI Click / Tick
+export function playCorporateClick() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(950, ctx.currentTime);
+    osc.frequency.setValueAtTime(1400, ctx.currentTime + 0.02);
+
+    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.04);
+  } catch (e) {}
+}
+
+// 13. Progress Bar Step Beep
+export function playLoadingProgressBeep() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(600, ctx.currentTime);
+
+    gain.gain.setValueAtTime(0.025, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.03);
+  } catch (e) {}
+}
+
+// 14. Loud Comedic Corporate Rejection Slam & Buzzer
+export function playRejectionBuzzer() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    // Heavy rubber stamp impact thud
+    const thud = ctx.createOscillator();
+    const thudGain = ctx.createGain();
+    thud.type = 'triangle';
+    thud.frequency.setValueAtTime(140, ctx.currentTime);
+    thud.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.15);
+
+    thudGain.gain.setValueAtTime(0.25, ctx.currentTime);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+
+    thud.connect(thudGain);
+    thudGain.connect(ctx.destination);
+    thud.start();
+    thud.stop(ctx.currentTime + 0.18);
+
+    // Double rejection buzzer "BU-BUZZ"
+    [0.08, 0.28].forEach((timeOffset) => {
+      const buzzer = ctx.createOscillator();
+      const buzzerGain = ctx.createGain();
+
+      buzzer.type = 'sawtooth';
+      buzzer.frequency.setValueAtTime(130, ctx.currentTime + timeOffset);
+      buzzer.frequency.setValueAtTime(110, ctx.currentTime + timeOffset + 0.12);
+
+      buzzerGain.gain.setValueAtTime(0.14, ctx.currentTime + timeOffset);
+      buzzerGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + timeOffset + 0.14);
+
+      buzzer.connect(buzzerGain);
+      buzzerGain.connect(ctx.destination);
+
+      buzzer.start(ctx.currentTime + timeOffset);
+      buzzer.stop(ctx.currentTime + timeOffset + 0.14);
+    });
+  } catch (e) {}
+}
+
+// 15. Comedic Deadpan Punchline Tone
+export function playSadPunchline() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const notes = [
+      { f: 311.13, t: 0.0, d: 0.3 }, // Eb4
+      { f: 293.66, t: 0.32, d: 0.3 }, // D4
+      { f: 277.18, t: 0.64, d: 0.3 }, // Db4
+      { f: 261.63, t: 0.96, d: 0.8 }, // C4 (held)
+    ];
+
+    notes.forEach(({ f, t, d }) => {
+      const startTime = ctx.currentTime + t;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, startTime);
+
+      gain.gain.setValueAtTime(0.1, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + d);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + d);
+    });
+  } catch (e) {}
+}

@@ -56,6 +56,8 @@ export default function HackingCircuitHUD({
   onNextStage,
   onSelectStage,
   onAutoSolve,
+  onUnlockVault,
+  betrayalPhase,
   onRetryUnlimited,
   onAddExtraTime,
 }) {
@@ -560,33 +562,33 @@ export default function HackingCircuitHUD({
       )}
 
       {/* 9. MODAL: FINAL SYSTEM OVERRIDE VICTORY */}
-      {isVictory && stageIndex === totalStages - 1 && (
+      {isVictory && stageIndex === totalStages - 1 && (!betrayalPhase || betrayalPhase === 'NONE') && (
         <div className="hacker-modal-backdrop" style={{ pointerEvents: 'auto' }}>
           <div className="hacker-dialog-card final-victory-card">
-            <div className="dialog-badge final-badge">
-              <Trophy size={14} />
-              <span>DEDSEC // ROOT OVERRIDE GRANTED</span>
+            <div className="dialog-badge final-badge" style={{ borderColor: '#f59e0b', color: '#fbbf24' }}>
+              <Zap size={14} />
+              <span>CLASSIFIED VAULT SIGNAL DETECTED</span>
             </div>
-            <h2 className="dialog-title final-title">FACILITY ROOT COMPLETED</h2>
+            <h2 className="dialog-title final-title">FACILITY OVERRIDE ACHIEVED</h2>
 
-            <div className="hacker-clearance-badge">
+            <div className="hacker-clearance-badge" style={{ borderColor: '#f59e0b', background: 'rgba(245, 158, 11, 0.12)' }}>
               <div className="clearance-hex-icon">
-                <ShieldCheck size={32} color="#10b981" />
+                <ShieldCheck size={32} color="#fbbf24" />
               </div>
               <div className="clearance-details">
-                <span className="clearance-rank">SECURITY CLEARANCE: LEVEL 5 ROOT</span>
-                <strong className="clearance-code">0x_DEDSEC_GHOST_ROOT</strong>
-                <span className="clearance-sub">PORTFOLIO EASTER EGG UNLOCKED</span>
+                <span className="clearance-rank" style={{ color: '#fde68a' }}>ULTIMATE CLEARANCE UNLOCKED</span>
+                <strong className="clearance-code" style={{ color: '#fbbf24' }}>THE ULTIMATE SECRET</strong>
+                <span className="clearance-sub">CLASSIFIED SYSTEM VAULT IS READY FOR BREACH</span>
               </div>
             </div>
 
-            <div className="secret-transmission-box">
-              <div className="transmission-header">
+            <div className="secret-transmission-box" style={{ borderColor: 'rgba(245, 158, 11, 0.4)' }}>
+              <div className="transmission-header" style={{ color: '#fbbf24' }}>
                 <Terminal size={12} />
-                <span>ENCRYPTED TRANSMISSION // MR. WHITE HAT</span>
+                <span>SECURE TRANSMISSION // ACCESS AUTHORIZATION</span>
               </div>
-              <p className="transmission-text">
-                "You cracked the internal CTOS mesh network across the entire studio architecture. Most visitors only see the surface—few delve into the physical conduits. Keep this clearance code. Welcome to the inner circle."
+              <p className="transmission-text" style={{ color: '#fef08a' }}>
+                “You have breached a system that remained inaccessible for decades. You are now authorized to access the ultimate secret.”
               </p>
             </div>
 
@@ -601,7 +603,7 @@ export default function HackingCircuitHUD({
               </div>
               <div className="stat-chip">
                 <span className="stat-label">STATUS</span>
-                <strong className="stat-val" style={{ color: '#10b981' }}>UNRESTRICTED</strong>
+                <strong className="stat-val" style={{ color: '#fbbf24' }}>VAULT READY</strong>
               </div>
             </div>
 
@@ -609,6 +611,23 @@ export default function HackingCircuitHUD({
               <button
                 type="button"
                 className="dialog-btn-primary"
+                style={{
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  borderColor: '#fbbf24',
+                  boxShadow: '0 0 25px rgba(245, 158, 11, 0.5)',
+                  fontSize: '13px',
+                  fontWeight: '800',
+                  letterSpacing: '0.06em',
+                }}
+                onClick={onUnlockVault}
+              >
+                <Zap size={16} />
+                <span>BREACH THE FINAL SECRET VAULT 💀</span>
+              </button>
+
+              <button
+                type="button"
+                className="dialog-btn-secondary"
                 onClick={handleCopyCode}
               >
                 <Code2 size={16} />
@@ -619,7 +638,7 @@ export default function HackingCircuitHUD({
                 className="dialog-btn-secondary"
                 onClick={onExitHackerMode}
               >
-                <span>RETURN TO PORTFOLIO [ROOT BADGE APPLIED]</span>
+                <span>RETURN TO PORTFOLIO</span>
               </button>
             </div>
           </div>

@@ -493,6 +493,8 @@ function SceneContents({
             onSelectNode={hackerModeData.onSelectNode}
             onRotateNode={hackerModeData.onRotateNode}
             controlsRef={controlsRef}
+            isVaultOpen={hackerModeData.isVaultOpen}
+            onInteractTerminal={hackerModeData.onInteractTerminal}
           />
         </group>
       )}

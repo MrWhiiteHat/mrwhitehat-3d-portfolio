@@ -1,5 +1,6 @@
 import HackingCircuitAnnouncement from './components/easteregg/HackingCircuitAnnouncement.jsx';
 import HackingCircuitHUD from './components/easteregg/HackingCircuitHUD.jsx';
+import UltimateBetrayalModal from './components/easteregg/UltimateBetrayalModal.jsx';
 import { STAGES, evaluateCircuit, NODE_TYPES } from './components/easteregg/circuitPuzzleLogic.js';
 import {
   getCompletedStations,
@@ -21,6 +22,9 @@ import {
   playFinalOverrideVictory,
   playTimerTick,
   playGlitchTransition,
+  playVaultDoorOpening,
+  playVaultFanfare,
+  playCorporateClick,
 } from './components/easteregg/easterEggAudio.js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -161,6 +165,7 @@ export default function App() {
   const [hackerIsVictory, setHackerIsVictory] = useState(false);
   const [hackerIsGameOver, setHackerIsGameOver] = useState(false);
   const [hackerTotalElapsed, setHackerTotalElapsed] = useState(0);
+  const [betrayalPhase, setBetrayalPhase] = useState('NONE');
   const preHackerStateRef = useRef({ themeKey: 'CYBER_NEON_NOIR', gameState: 'EXPLORE' });
   const hasSeenAnnouncementRef = useRef(false);
   const prevPoweredCountRef = useRef(1);
@@ -189,6 +194,7 @@ export default function App() {
     setHackerIsPaused(false);
     setHackerIsVictory(false);
     setHackerIsGameOver(false);
+    setBetrayalPhase('NONE');
     prevPoweredCountRef.current = 1;
     prevUnlockedSetRef.current = new Set();
     prevHostileTriggeredRef.current = false;
@@ -337,6 +343,36 @@ export default function App() {
     setHackerTimeLeft((prev) => (typeof prev === 'number' ? prev + 60 : prev));
   }, []);
 
+  // -------------------------------------------------------------
+  // THE ULTIMATE BETRAYAL 💀 — SECRET VAULT & REJECTION HANDLERS
+  // -------------------------------------------------------------
+  const handleUnlockVault = useCallback(() => {
+    playVaultDoorOpening();
+    setTimeout(() => playVaultFanfare(), 350);
+    setBetrayalPhase('VAULT_OPENING');
+    setHackerActiveVantageId('VAULT_CHAMBER');
+
+    // After 3.8s of dramatic door opening, let player interact with terminal
+    setTimeout(() => {
+      setBetrayalPhase('TERMINAL_INTERACTIVE');
+    }, 3800);
+  }, []);
+
+  const handleInteractTerminal = useCallback(() => {
+    playCorporateClick();
+    setBetrayalPhase('CORPORATE_REJECTION');
+  }, []);
+
+  const handleReturnFromBetrayal = useCallback(() => {
+    setBetrayalPhase('NONE');
+    handleExitHackerMode();
+  }, [handleExitHackerMode]);
+
+  const handleRestartEasterEgg = useCallback(() => {
+    setBetrayalPhase('NONE');
+    initHackerStage(0);
+  }, [initHackerStage]);
+
   // Auto-trigger announcement when all stations are genuinely breached
   useEffect(() => {
     if (hasCompletedAllStations(unlockedStations) && !hasSeenAnnouncementRef.current) {
@@ -401,7 +437,9 @@ export default function App() {
       if (e.key === 'Escape') {
         setHackerIsPaused((prev) => !prev);
       } else if (e.key === 'e' || e.key === 'E' || e.key === 'Enter' || e.key === ' ') {
-        if (hackerIsVictory) {
+        if (betrayalPhase === 'TERMINAL_INTERACTIVE') {
+          handleInteractTerminal();
+        } else if (hackerIsVictory) {
           if (hackerStageIndex < STAGES.length - 1) {
             handleNextHackerStage();
           } else {
@@ -422,6 +460,8 @@ export default function App() {
         setHackerActiveVantageId('CORNER_DRONE');
       } else if (e.key === '4') {
         setHackerActiveVantageId('ROOM_OVERVIEW');
+      } else if (e.key === '5') {
+        setHackerActiveVantageId('VAULT_CHAMBER');
       }
     };
 
@@ -432,6 +472,8 @@ export default function App() {
     hackerSelectedNodeId,
     hackerIsVictory,
     hackerStageIndex,
+    betrayalPhase,
+    handleInteractTerminal,
     handleRotateHackerNode,
     handleResetHackerStage,
     handleAutoSolveHackerStage,
@@ -836,6 +878,8 @@ export default function App() {
           activeVantageId: hackerActiveVantageId,
           onSelectNode: (id) => setHackerSelectedNodeId(id),
           onRotateNode: handleRotateHackerNode,
+          isVaultOpen: betrayalPhase !== 'NONE',
+          onInteractTerminal: handleInteractTerminal,
         }}
         onStationBreached={handleStationBreached}
       />
@@ -1191,8 +1235,22 @@ export default function App() {
           onNextStage={handleNextHackerStage}
           onSelectStage={handleSelectHackerStage}
           onAutoSolve={handleAutoSolveHackerStage}
+          onUnlockVault={handleUnlockVault}
+          betrayalPhase={betrayalPhase}
           onRetryUnlimited={handleRetryUnlimited}
           onAddExtraTime={handleAddExtraTime}
+        />
+      )}
+
+      {/* The Ultimate Betrayal Secret Ending Sequence Modal & Overlays */}
+      {gameState === 'HACKING' && betrayalPhase !== 'NONE' && (
+        <UltimateBetrayalModal
+          phase={betrayalPhase}
+          onPhaseChange={(newPhase) => setBetrayalPhase(newPhase)}
+          onInteractTerminal={handleInteractTerminal}
+          onReturnToPortfolio={handleReturnFromBetrayal}
+          onRestartEasterEgg={handleRestartEasterEgg}
+          onSkipCinematic={() => setBetrayalPhase('TERMINAL_INTERACTIVE')}
         />
       )}
     </div>
