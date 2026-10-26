@@ -282,6 +282,42 @@ export function playGlitchTransition() {
   } catch (e) {}
 }
 
+// Quantum Teleportation Warp Sound Effect
+export function playTeleportWarp() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    // 1. Deep Sub-bass Charge
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(65, ctx.currentTime);
+    subOsc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.5);
+    subGain.gain.setValueAtTime(0.15, ctx.currentTime);
+    subGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.65);
+    subOsc.connect(subGain);
+    subGain.connect(ctx.destination);
+    subOsc.start();
+    subOsc.stop(ctx.currentTime + 0.65);
+
+    // 2. High-Frequency Quantum Shimmer Laser
+    const shimmer = ctx.createOscillator();
+    const shimmerGain = ctx.createGain();
+    shimmer.type = 'sawtooth';
+    shimmer.frequency.setValueAtTime(450, ctx.currentTime);
+    shimmer.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.4);
+    shimmer.frequency.exponentialRampToValueAtTime(320, ctx.currentTime + 0.8);
+    shimmerGain.gain.setValueAtTime(0.08, ctx.currentTime);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.85);
+    shimmer.connect(shimmerGain);
+    shimmerGain.connect(ctx.destination);
+    shimmer.start();
+    shimmer.stop(ctx.currentTime + 0.85);
+  } catch (e) {}
+}
+
 // 9. Node Hover / Selection Click
 export function playSelectNode() {
   if (isMuted()) return;

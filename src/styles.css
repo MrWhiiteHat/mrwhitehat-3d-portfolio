@@ -12418,4 +12418,201 @@ body.is-pseudo-fullscreen .portfolio-container {
   flex-wrap: wrap;
 }
 
+/* ==========================================================================
+   QUANTUM TELEPORTATION WARP SEQUENCE (FULLSCREEN SCI-FI FX)
+   ========================================================================== */
+
+.quantum-teleport-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: rgba(2, 6, 18, 0.4);
+  transition: all 0.3s ease-out;
+}
+
+.quantum-teleport-overlay.charging {
+  background: radial-gradient(circle at center, rgba(0, 240, 255, 0.45) 0%, rgba(2, 6, 23, 0.95) 75%);
+  animation: teleportShake 0.35s infinite ease-in-out;
+}
+
+.quantum-teleport-overlay.flash {
+  background: radial-gradient(circle at center, #ffffff 0%, rgba(0, 240, 255, 0.95) 40%, rgba(2, 6, 23, 0.98) 100%);
+}
+
+.quantum-teleport-overlay.dissolving {
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes teleportShake {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-4px, 3px) scale(1.01); }
+  50% { transform: translate(4px, -3px) scale(0.99); }
+  75% { transform: translate(-3px, -2px) scale(1.01); }
+}
+
+/* Hyperspace Warp Rings */
+.teleport-warp-rings {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.warp-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 240, 255, 0.8);
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.6);
+  opacity: 0;
+  animation: warpRingBurst 1.2s infinite ease-out;
+}
+
+.ring-1 { width: 150px; height: 150px; animation-delay: 0s; }
+.ring-2 { width: 300px; height: 300px; animation-delay: 0.25s; }
+.ring-3 { width: 600px; height: 600px; animation-delay: 0.5s; }
+.ring-4 { width: 1000px; height: 1000px; animation-delay: 0.75s; }
+
+@keyframes warpRingBurst {
+  0% { transform: scale(0.1); opacity: 1; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* Scanlines and chromatic noise */
+.teleport-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  pointer-events: none;
+}
+
+.teleport-noise-layer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 60%, rgba(0, 240, 255, 0.25) 100%);
+  pointer-events: none;
+}
+
+/* Telemetry Card */
+.teleport-hud-card {
+  position: relative;
+  z-index: 20;
+  background: rgba(6, 12, 28, 0.94);
+  border: 1.5px solid #00f0ff;
+  box-shadow: 0 0 60px rgba(0, 240, 255, 0.6), inset 0 0 30px rgba(0, 240, 255, 0.15);
+  border-radius: 16px;
+  padding: 26px 36px;
+  text-align: center;
+  max-width: 580px;
+  backdrop-filter: blur(20px);
+  animation: bounceIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.teleport-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.6);
+  color: #00f0ff;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+
+.teleport-zap-pulse {
+  animation: pulseBeacon 0.8s infinite;
+}
+
+.teleport-main-message {
+  font-family: var(--mono, monospace);
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px 0;
+  text-shadow: 0 0 18px rgba(0, 240, 255, 0.8);
+}
+
+.teleport-coordinates-sub {
+  font-family: var(--mono, monospace);
+  font-size: 11.5px;
+  color: #93c5fd;
+  margin: 0 0 20px 0;
+  letter-spacing: 0.04em;
+}
+
+.teleport-hex-readouts {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.hex-metric {
+  text-align: center;
+}
+
+.metric-lbl {
+  display: block;
+  font-family: var(--mono, monospace);
+  font-size: 9px;
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.metric-val {
+  font-family: var(--mono, monospace);
+  font-size: 12px;
+  font-weight: 900;
+  color: #fbbf24;
+}
+
+.teleport-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.teleport-progress-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7, #00f0ff, #38bdf8);
+  box-shadow: 0 0 15px #00f0ff;
+  animation: teleportFill 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes teleportFill {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+
 

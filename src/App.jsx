@@ -1,5 +1,6 @@
 import HackingCircuitAnnouncement from './components/easteregg/HackingCircuitAnnouncement.jsx';
 import HackingCircuitHUD from './components/easteregg/HackingCircuitHUD.jsx';
+import QuantumTeleportOverlay from './components/easteregg/QuantumTeleportOverlay.jsx';
 import { STAGES, evaluateCircuit, NODE_TYPES } from './components/easteregg/circuitPuzzleLogic.js';
 import {
   getCompletedStations,
@@ -24,6 +25,7 @@ import {
   playVaultDoorOpening,
   playVaultFanfare,
   playCorporateClick,
+  playTeleportWarp,
 } from './components/easteregg/easterEggAudio.js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -165,6 +167,12 @@ export default function App() {
   const [hackerIsGameOver, setHackerIsGameOver] = useState(false);
   const [hackerTotalElapsed, setHackerTotalElapsed] = useState(0);
   const [betrayalPhase, setBetrayalPhase] = useState('NONE');
+  const [teleportState, setTeleportState] = useState({
+    isActive: false,
+    title: '',
+    message: '',
+    subMessage: '',
+  });
   const preHackerStateRef = useRef({ themeKey: 'CYBER_NEON_NOIR', gameState: 'EXPLORE' });
   const hasSeenAnnouncementRef = useRef(false);
   const prevPoweredCountRef = useRef(1);
@@ -346,15 +354,31 @@ export default function App() {
   // THE ULTIMATE BETRAYAL 💀 — SECRET VAULT & REJECTION HANDLERS
   // -------------------------------------------------------------
   const handleUnlockVault = useCallback(() => {
-    playVaultDoorOpening();
-    setTimeout(() => playVaultFanfare(), 350);
-    setBetrayalPhase('VAULT_OPENING');
-    setHackerActiveVantageId('VAULT_CHAMBER');
+    playTeleportWarp();
+    setTeleportState({
+      isActive: true,
+      title: 'QUANTUM TUNNELING INITIATED // AIR-GAP SECTOR',
+      message: 'WARPING TO CLASSIFIED UNDERGROUND FACILITY...',
+      subMessage: 'COORDINATES: LAT 37.7749° N, LONG 122.4194° W • ELEVATION: -42.8M (SUB-LEVEL 03)',
+    });
 
-    // After 3.8s of dramatic door opening, let player interact with terminal
+    // At peak of quantum teleport warp (450ms)
+    setTimeout(() => {
+      playVaultDoorOpening();
+      setTimeout(() => playVaultFanfare(), 300);
+      setBetrayalPhase('VAULT_OPENING');
+      setHackerActiveVantageId('VAULT_CHAMBER');
+    }, 450);
+
+    // Teleport warp clears
+    setTimeout(() => {
+      setTeleportState((prev) => ({ ...prev, isActive: false }));
+    }, 1100);
+
+    // After 3.2s of entering the bunker, activate the interactive terminal prompt
     setTimeout(() => {
       setBetrayalPhase('TERMINAL_INTERACTIVE');
-    }, 3800);
+    }, 3200);
   }, []);
 
   const handleInteractTerminal = useCallback(() => {
@@ -363,13 +387,45 @@ export default function App() {
   }, []);
 
   const handleReturnFromBetrayal = useCallback(() => {
-    setBetrayalPhase('NONE');
-    handleExitHackerMode();
+    playTeleportWarp();
+    setTeleportState({
+      isActive: true,
+      title: 'DISENGAGING AIR-GAP LINK // RESTORING TIMELINE',
+      message: 'WARPING BACK TO WORKSPACE SECTOR 01...',
+      subMessage: 'RESTORING NORMAL SYSTEM FREQUENCY • SEC-01 RE-ESTABLISHED',
+    });
+
+    // At peak of quantum warp (450ms)
+    setTimeout(() => {
+      setBetrayalPhase('NONE');
+      handleExitHackerMode();
+    }, 450);
+
+    // Clear teleport overlay
+    setTimeout(() => {
+      setTeleportState((prev) => ({ ...prev, isActive: false }));
+    }, 1100);
   }, [handleExitHackerMode]);
 
   const handleRestartEasterEgg = useCallback(() => {
-    setBetrayalPhase('NONE');
-    initHackerStage(0);
+    playTeleportWarp();
+    setTeleportState({
+      isActive: true,
+      title: 'RE-INITIALIZING NETWORK FIREWALL',
+      message: 'WARPING TO CIRCUIT GRID 01...',
+      subMessage: 'RESETTING ACCESS TOKENS • LEVEL 1 ENGAGED',
+    });
+
+    // At peak of quantum warp (450ms)
+    setTimeout(() => {
+      setBetrayalPhase('NONE');
+      initHackerStage(0);
+    }, 450);
+
+    // Clear teleport overlay
+    setTimeout(() => {
+      setTeleportState((prev) => ({ ...prev, isActive: false }));
+    }, 1100);
   }, [initHackerStage]);
 
   // Auto-trigger announcement when all stations are genuinely breached
@@ -1244,6 +1300,14 @@ export default function App() {
           onAddExtraTime={handleAddExtraTime}
         />
       )}
+
+      {/* Sci-Fi Quantum Teleportation Warp Overlay */}
+      <QuantumTeleportOverlay
+        isActive={teleportState.isActive}
+        title={teleportState.title}
+        message={teleportState.message}
+        subMessage={teleportState.subMessage}
+      />
     </div>
   );
 }

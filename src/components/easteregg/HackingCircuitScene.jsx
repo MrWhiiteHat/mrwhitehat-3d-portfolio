@@ -47,8 +47,8 @@ export const CAMERA_VANTAGES = {
   VAULT_CHAMBER: {
     id: 'VAULT_CHAMBER',
     label: 'CAM 05: CLASSIFIED VAULT',
-    pos: [-1.8, 1.45, -1.8],
-    target: [-1.8, 1.25, -4.6],
+    pos: [0, 1.55, 2.55],
+    target: [0, 0.95, 0],
   },
 };
 
@@ -1265,64 +1265,68 @@ export default function HackingCircuitScene({
         color="#00f0ff"
       />
 
-      {/* The 3D Classified Secret Vault Room & In-World Spatial Interface */}
-      <SecretVaultRoom3D
-        isOpen={isVaultOpen}
-        betrayalPhase={betrayalPhase}
-        onPhaseChange={onPhaseChange}
-        onInteractTerminal={onInteractTerminal}
-        onReturnToPortfolio={onReturnToPortfolio}
-        onRestartEasterEgg={onRestartEasterEgg}
-      />
+      {/* 1. When in Secret Bunker Mode: Render the Standalone Dedicated 360° Bunker World */}
+      {betrayalPhase && betrayalPhase !== 'NONE' ? (
+        <SecretVaultRoom3D
+          isOpen={isVaultOpen}
+          betrayalPhase={betrayalPhase}
+          onPhaseChange={onPhaseChange}
+          onInteractTerminal={onInteractTerminal}
+          onReturnToPortfolio={onReturnToPortfolio}
+          onRestartEasterEgg={onRestartEasterEgg}
+        />
+      ) : (
+        <>
+          {/* 2. When in Circuit Puzzle Mode: Render Conduits with Directional Flow Arrows */}
+          {currentStage.connections.map((conn, idx) => {
+            const fromNode = currentStage.nodes.find((n) => n.id === conn.from);
+            const toNode = currentStage.nodes.find((n) => n.id === conn.to);
+            if (!fromNode || !toNode) return null;
 
-      {/* Render 3D Circuit Conduits with Directional Flow Arrows */}
-      {currentStage.connections.map((conn, idx) => {
-        const fromNode = currentStage.nodes.find((n) => n.id === conn.from);
-        const toNode = currentStage.nodes.find((n) => n.id === conn.to);
-        if (!fromNode || !toNode) return null;
+            const isPowered = poweredConnectionIndices.has(idx);
+            const isHostile =
+              fromNode.type === NODE_TYPES.HOSTILE_IDS ||
+              toNode.type === NODE_TYPES.HOSTILE_IDS;
+            const flowDirection = evaluation?.flowDirections?.get(idx);
 
-        const isPowered = poweredConnectionIndices.has(idx);
-        const isHostile =
-          fromNode.type === NODE_TYPES.HOSTILE_IDS ||
-          toNode.type === NODE_TYPES.HOSTILE_IDS;
-        const flowDirection = evaluation?.flowDirections?.get(idx);
+            return (
+              <CircuitConduit
+                key={`${conn.from}-${conn.to}-${idx}`}
+                from={fromNode.position}
+                to={toNode.position}
+                waypoints={conn.waypoints}
+                isPowered={isPowered}
+                isHostile={isHostile && isPowered}
+                isCompleted={isTargetPowered}
+                flowDirection={flowDirection}
+              />
+            );
+          })}
 
-        return (
-          <CircuitConduit
-            key={`${conn.from}-${conn.to}-${idx}`}
-            from={fromNode.position}
-            to={toNode.position}
-            waypoints={conn.waypoints}
-            isPowered={isPowered}
-            isHostile={isHostile && isPowered}
-            isCompleted={isTargetPowered}
-            flowDirection={flowDirection}
-          />
-        );
-      })}
+          {/* Render 3D Circuit Nodes */}
+          {currentStage.nodes.map((node) => {
+            const state = nodeStates[node.id] || {};
+            const isPowered = poweredNodeIds.has(node.id);
+            const isSelected = selectedNodeId === node.id;
 
-      {/* Render 3D Circuit Nodes */}
-      {currentStage.nodes.map((node) => {
-        const state = nodeStates[node.id] || {};
-        const isPowered = poweredNodeIds.has(node.id);
-        const isSelected = selectedNodeId === node.id;
-
-        return (
-          <CircuitNode
-            key={node.id}
-            node={{
-              ...node,
-              rotationIndex: state.rotationIndex !== undefined ? state.rotationIndex : node.rotationIndex,
-              isLocked: state.isLocked !== undefined ? state.isLocked : node.isLocked,
-            }}
-            isPowered={isPowered}
-            isSelected={isSelected}
-            isTargetPowered={isTargetPowered}
-            onSelect={onSelectNode}
-            onRotate={onRotateNode}
-          />
-        );
-      })}
+            return (
+              <CircuitNode
+                key={node.id}
+                node={{
+                  ...node,
+                  rotationIndex: state.rotationIndex !== undefined ? state.rotationIndex : node.rotationIndex,
+                  isLocked: state.isLocked !== undefined ? state.isLocked : node.isLocked,
+                }}
+                isPowered={isPowered}
+                isSelected={isSelected}
+                isTargetPowered={isTargetPowered}
+                onSelect={onSelectNode}
+                onRotate={onRotateNode}
+              />
+            );
+          })}
+        </>
+      )}
     </group>
   );
 }

@@ -372,19 +372,28 @@ function SceneContents({
     }
   }, [controlsRef, gameState]);
 
+  const isBunkerMode = Boolean(
+    hackerModeData?.isActive &&
+      hackerModeData?.betrayalPhase &&
+      hackerModeData.betrayalPhase !== 'NONE'
+  );
+
   return (
     <>
-      <color attach="background" args={[hackerModeData?.isActive ? '#040813' : '#070a08']} />
-      <HackerModelOpacityController isHackerActive={hackerModeData?.isActive} />
+      <color attach="background" args={[isBunkerMode ? '#020612' : hackerModeData?.isActive ? '#040813' : '#070a08']} />
+      <HackerModelOpacityController isHackerActive={hackerModeData?.isActive && !isBunkerMode} />
       <ShadowController themeKey={themeKey} isGateOpen={isGateOpen} gameState={gameState} />
       <ScenePrewarmer onSceneReady={onReady} />
 
-      {/* Dynamic Cyber Atmosphere: Lights, Motes, Ceiling Fan, Clock, Hologram Core */}
-      <CyberAtmosphere currentThemeKey={themeKey} onCycleTheme={onCycleTheme} />
+      {/* Dynamic Cyber Atmosphere: Lights, Motes, Ceiling Fan, Clock (Hidden in Bunker Mode) */}
+      {!isBunkerMode && (
+        <CyberAtmosphere currentThemeKey={themeKey} onCycleTheme={onCycleTheme} />
+      )}
 
-      {/* Handcrafted 3D Studio Architecture & Stations */}
-      <group name="CyberCommandStudio">
-        <StudioArchitecture currentThemeKey={themeKey} />
+      {/* Handcrafted 3D Studio Architecture & Stations (Completely Hidden when in Secret Bunker!) */}
+      {!isBunkerMode && (
+        <group name="CyberCommandStudio">
+          <StudioArchitecture currentThemeKey={themeKey} />
         <WorkstationStation
           onSelect={hackerModeData?.isActive ? undefined : onSelect}
           onHover={hackerModeData?.isActive ? undefined : onHover}
@@ -480,6 +489,7 @@ function SceneContents({
           frames={1}
         />
       </group>
+      )}
 
       {/* Watch Dogs 2 Inspired 3D Hacking Circuit Network (TOP LEVEL - OUTSIDE CyberCommandStudio) */}
       {hackerModeData?.isActive && (
@@ -514,10 +524,10 @@ function SceneContents({
         panSpeed={0.85}
         enablePan={true}
         screenSpacePanning={true}
-        minDistance={gameState === 'HACKING' ? 0.2 : 2.0}
-        maxDistance={gameState === 'HACKING' ? 25.0 : 22}
+        minDistance={isBunkerMode ? 1.0 : gameState === 'HACKING' ? 0.2 : 2.0}
+        maxDistance={isBunkerMode ? 4.8 : gameState === 'HACKING' ? 25.0 : 22}
         minPolarAngle={0.05}
-        maxPolarAngle={gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
+        maxPolarAngle={isBunkerMode ? Math.PI / 2.05 : gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
       />
       <CameraDirector
         gameState={gameState}
