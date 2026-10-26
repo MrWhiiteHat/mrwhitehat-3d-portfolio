@@ -43,6 +43,18 @@ Test your offensive and defensive cybersecurity skills directly inside the 3D te
 8. **Brute-Force Pin Breaker**: Execute timed brute-force routines against encrypted vaults.
 9. **Exploit Payload Generator**: Construct reverse shells and buffer overflow test strings.
 
+### 🕵️‍♂️ Watch Dogs 2 3D Circuit Hacking Easter Egg & Secret Bunker
+Unlocks after completing portfolio stations or discovering the classified air-gap breach:
+- **3D Spatial Circuit Network**: Inspired by *Watch Dogs 2*, features high-voltage power conduits mapped to the room's walls, ceiling, and floor with strictly orthogonal Manhattan-grid topology. Features interactive rotatable switch junctions (straight, elbow, T-splitter), security padlocks, hostile IDS nodes, and synchronized directional flow chevrons.
+- **3 Progressive Hacker Stages**: Escalating network complexity with interactive stage selectors, camera vantage presets, and quick auto-solve controls (`[F]`).
+- **Cinematic Quantum Teleportation Warp Engine**: Fullscreen sci-fi hyperspace warp sequence with radiating energy rings, digital glitch scanlines, telemetry HUD, and synthesized sub-bass & laser shimmer audio (`playTeleportWarp()`) that transports the operative away from the office studio into an isolated underground facility.
+- **Dedicated Standalone 360° Secret Bunker Room**:
+  - Completely isolated underground chamber with zero office clipping: 7m × 7m heavy steel plating, perimeter safety hazard stripes, emerald green LED sub-floor ventilation grates (`#10b981`), recessed server racks with blinking LEDs, and an overhead dangling tungsten cage lamp (`#fef08a`).
+- **The Ridiculous Discovery & In-World 3D Holographic Ending**:
+  - Detailed 3D assets: Cheap folding utility table, blue swivel chair draped with an authentic pile of unfolded laundry, open 3D gaming laptop with backlit chiclet keyboard & glowing matrix code, steaming Maggi ramen bowl with **live rising 3D steam particles**, holy bunch of fresh dhaniya (coriander) with red rubber band, two fresh glossy green chillies (mirchi), and shiny golden ₹10 coin.
+  - **3D Tactical Flying Indian Chappal (Hawai Slipper 🩴)**: Programmed with **real 3D supersonic Bezier ballistic trajectory physics** that swoops right past the camera at Mach 3.4 when Mom's wrath is provoked!
+  - **In-World Spatial 3D Holographic Interface**: Rendered directly in 3D world space (`<Html transform center>`) featuring a live animated audio equalizer waveform, voice-synthesized dialogue from Mom shouting about the dhaniya errand, interactive 3D dialogue response chips, deadpan sarcastic narrator reality check, and the **3D Holographic Certificate of Errand Disobedience** with seamless quantum teleportation back to the portfolio workspace.
+
 ### 📋 Executive Recruiter Quick-Access Dossier (`Key: R`)
 - Press **`R`** on the keyboard or tap the floating **Executive Dossier** badge for an instant 2D recruiter-optimized modal.
 - Provides immediate access to resume highlights, candidate summary, flagship project case studies, verified achievements, and direct communication channels—ideal for recruiters who need high-signal information without navigating 3D space.
@@ -67,6 +79,9 @@ Test your offensive and defensive cybersecurity skills directly inside the 3D te
 | **`Shift`** | Sprint / Tactical Rush |
 | **`Mouse Move`** | Look Around (click canvas to lock cursor) |
 | **`Left Click`** / **`E`** | Interact / Hack / Inspect targeted terminal |
+| **`Left Click` (in Hacker Mode)** | Select and rotate 3D spatial circuit switches |
+| **`F` (in Hacker Mode)** | Instant auto-solve / bypass circuit puzzle stage |
+| **`E` / `Enter` (in Secret Bunker)** | Confront Reality at laptop / interact with 3D hologram |
 | **`R`** | Open Executive Recruiter Dossier |
 | **`M`** | Toggle Procedural Audio Synthesis |
 | **`Esc`** | Unlock Cursor / Close Modal / Open Main Menu |
@@ -80,9 +95,10 @@ Test your offensive and defensive cybersecurity skills directly inside the 3D te
 Frontend Architecture      React 18.3 · Modern ESNext · HTML5 / CSS3
 3D Scene & Rendering       Three.js (r172) · React Three Fiber (@react-three/fiber)
 3D Helpers & Shaders       React Three Drei (@react-three/drei)
-Motion & Transitions       Framer Motion 11
+Physics & Particles        AABB Collision Physics · Bezier Ballistics · Procedural 3D Steam Particles
+Motion & Transitions       Framer Motion 11 · Quantum Warp Glitch Shaders
 Iconography & UI           Lucide React · Tailwind CSS
-Audio Engine               Web Audio API (Procedural Synthesizer)
+Audio Engine               Web Audio API (Procedural Synthesizer & Teleport Warp)
 Build & Bundler            Vite 6.0
 Hosting & Deployment       GitHub Pages (Automated via gh-pages)
 ```
