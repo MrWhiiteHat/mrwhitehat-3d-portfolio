@@ -11925,3 +11925,497 @@ body.is-pseudo-fullscreen .portfolio-container {
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* ==========================================================================
+   IN-WORLD 3D HOLOGRAPHIC DISPLAY SYSTEM (SPATIAL THREE.JS INTERFACE)
+   ========================================================================== */
+
+.holographic-vault-interface {
+  width: 680px;
+  max-width: 90vw;
+  user-select: none;
+  pointer-events: auto;
+  font-family: var(--font, sans-serif);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+}
+
+/* Generic Holo Badge */
+.holo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+.holo-badge.amber {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.6);
+  color: #fbbf24;
+}
+.holo-badge.green {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  color: #4ade80;
+}
+.holo-badge.red {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.7);
+  color: #f87171;
+}
+
+/* Phase 1: 3D Holo Breach Banner */
+.holo-banner-card {
+  background: rgba(6, 12, 26, 0.94);
+  border: 1.5px solid #fbbf24;
+  box-shadow: 0 0 45px rgba(245, 158, 11, 0.4), inset 0 0 25px rgba(245, 158, 11, 0.1);
+  border-radius: 14px;
+  padding: 22px 30px;
+  text-align: center;
+  backdrop-filter: blur(16px);
+  animation: bounceIn 0.4s ease-out;
+}
+.holo-title-lg {
+  font-family: var(--mono, monospace);
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 16px rgba(251, 191, 36, 0.6);
+  margin: 10px 0 6px 0;
+}
+.holo-quote {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #fde68a;
+  font-style: italic;
+  margin: 0 0 14px 0;
+}
+.holo-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.06em;
+}
+.holo-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+  animation: pulseBeacon 1s infinite ease-in-out;
+}
+
+/* Phase 2: 3D Holo Prompt Card */
+.holo-prompt-card {
+  background: rgba(7, 14, 28, 0.95);
+  border: 1.5px solid #22c55e;
+  box-shadow: 0 0 45px rgba(34, 197, 94, 0.4), inset 0 0 25px rgba(34, 197, 94, 0.1);
+  border-radius: 14px;
+  padding: 22px 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(16px);
+  animation: bounceIn 0.35s ease-out;
+}
+.holo-prompt-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 55px rgba(34, 197, 94, 0.6);
+}
+.holo-heading {
+  font-family: var(--mono, monospace);
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 8px 0 6px 0;
+  letter-spacing: 0.06em;
+}
+.holo-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.45;
+  margin: 0 0 16px 0;
+}
+
+/* Action Buttons */
+.holo-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 11px 22px;
+  font-family: var(--mono, monospace);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.holo-action-btn.green-glow {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #ffffff;
+  border: 1px solid #4ade80;
+  box-shadow: 0 0 22px rgba(34, 197, 94, 0.45);
+}
+.holo-action-btn.green-glow:hover {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  transform: scale(1.03);
+  box-shadow: 0 0 32px rgba(34, 197, 94, 0.7);
+}
+.holo-action-btn.amber-glow {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #000000;
+  border: 1px solid #fbbf24;
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.45);
+}
+.holo-action-btn.amber-glow:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  transform: scale(1.03);
+  box-shadow: 0 0 32px rgba(251, 191, 36, 0.7);
+}
+.holo-action-btn.secondary {
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+.holo-action-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: #cbd5e1;
+}
+
+/* Phase 3: Mom Transmission Card */
+.holo-dialogue-card {
+  width: 100%;
+  background: rgba(6, 12, 24, 0.96);
+  border: 1.5px solid rgba(239, 68, 68, 0.65);
+  box-shadow: 0 0 45px rgba(239, 68, 68, 0.35), inset 0 0 25px rgba(239, 68, 68, 0.1);
+  border-radius: 14px;
+  padding: 20px 24px;
+  backdrop-filter: blur(16px);
+  animation: bounceIn 0.35s ease-out;
+}
+.holo-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.holo-pulse-icon {
+  animation: pulseBeacon 1s infinite;
+}
+.holo-audio-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+}
+.eq-bar {
+  width: 3px;
+  background: #ef4444;
+  border-radius: 2px;
+  animation: eqBounce 0.8s infinite ease-in-out alternate;
+}
+.bar-1 { height: 60%; animation-delay: 0.1s; }
+.bar-2 { height: 100%; animation-delay: 0.3s; }
+.bar-3 { height: 40%; animation-delay: 0.2s; }
+.bar-4 { height: 80%; animation-delay: 0.4s; }
+
+@keyframes eqBounce {
+  0% { height: 20%; }
+  100% { height: 100%; }
+}
+
+.holo-shout-box {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+.holo-speaker-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  font-weight: 800;
+  color: #fca5a5;
+  margin-bottom: 6px;
+}
+.speaker-avatar {
+  font-size: 18px;
+}
+.holo-shout-text {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #ffffff;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Dialogue Choices */
+.holo-choices-box {
+  margin-top: 12px;
+}
+.holo-choice-label {
+  display: block;
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.holo-choices-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.holo-choice-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #e2e8f0;
+  font-family: var(--font, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.holo-choice-chip:hover {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: #00f0ff;
+  color: #ffffff;
+  transform: translateX(4px);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+/* Supersonic Slipper Inbound Alert */
+.holo-slipper-alert {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(234, 88, 12, 0.25);
+  border: 1.5px solid #ea580c;
+  box-shadow: 0 0 35px rgba(234, 88, 12, 0.4);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 12px 0;
+  animation: shakeAlert 0.3s infinite;
+}
+.holo-slipper-icon {
+  font-size: 32px;
+}
+.holo-slipper-title {
+  display: block;
+  font-family: var(--mono, monospace);
+  font-size: 13px;
+  font-weight: 800;
+  color: #fed7aa;
+  letter-spacing: 0.06em;
+}
+.holo-slipper-sub {
+  font-size: 11.5px;
+  color: #ffedd5;
+}
+
+/* Narrator Reality Check */
+.holo-narrator-box {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid #fbbf24;
+  box-shadow: 0 0 30px rgba(251, 191, 36, 0.25);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-top: 12px;
+  animation: bounceIn 0.35s ease-out;
+}
+.holo-narrator-quote {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  font-style: italic;
+  margin: 10px 0 16px 0;
+}
+.holo-narrator-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Phase 4: 3D Holographic Certificate of Errand Disobedience Plaque */
+.holo-certificate-plaque {
+  width: 100%;
+  background: rgba(8, 15, 30, 0.97);
+  border: 3px double #22c55e;
+  box-shadow: 0 0 50px rgba(34, 197, 94, 0.35), inset 0 0 30px rgba(0, 0, 0, 0.85);
+  border-radius: 14px;
+  padding: 22px 26px;
+  text-align: center;
+  color: #e2e8f0;
+  backdrop-filter: blur(16px);
+  animation: bounceIn 0.4s ease-out;
+}
+.holo-cert-top {
+  border-bottom: 1.5px dashed rgba(34, 197, 94, 0.35);
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+.holo-cert-crest {
+  display: block;
+  font-size: 26px;
+  margin-bottom: 4px;
+}
+.holo-cert-dept {
+  display: block;
+  font-family: var(--mono, monospace);
+  font-size: 9px;
+  font-weight: 800;
+  color: #86efac;
+  letter-spacing: 0.12em;
+  margin-bottom: 4px;
+}
+.holo-cert-title {
+  font-family: var(--mono, monospace);
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 14px rgba(34, 197, 94, 0.6);
+  margin: 0 0 4px 0;
+}
+.holo-cert-sub {
+  font-size: 10.5px;
+  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.holo-cert-intro {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0 0 4px 0;
+}
+.holo-cert-recipient {
+  font-family: var(--mono, monospace);
+  font-size: 16px;
+  font-weight: 900;
+  color: #fef08a;
+  text-shadow: 0 0 12px rgba(254, 240, 138, 0.4);
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.holo-cert-citation {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #cbd5e1;
+  max-width: 580px;
+  margin: 0 auto 14px auto;
+}
+
+/* 6-Card Stat Grid */
+.holo-cert-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.holo-stat-tile {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+.holo-stat-tile .stat-label {
+  display: block;
+  font-family: var(--mono, monospace);
+  font-size: 8.5px;
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+.holo-stat-tile .stat-val {
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Rubber Stamp of Disapproval */
+.holo-cert-stamp {
+  border: 2.5px solid #dc2626;
+  border-radius: 6px;
+  display: inline-block;
+  padding: 4px 14px;
+  color: #dc2626;
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  transform: rotate(-3deg);
+  margin-bottom: 14px;
+  box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+}
+.holo-cert-stamp small {
+  display: block;
+  font-size: 8px;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+/* Signatures */
+.holo-cert-signatures {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  padding-top: 10px;
+  margin-bottom: 16px;
+}
+.holo-sig-block {
+  text-align: center;
+}
+.sig-name {
+  display: block;
+  font-family: cursive, var(--mono);
+  font-size: 14px;
+  color: #f1f5f9;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 2px;
+  margin-bottom: 2px;
+}
+.sig-role {
+  display: block;
+  font-size: 9px;
+  color: #64748b;
+  font-family: var(--mono, monospace);
+}
+
+/* Certificate Actions */
+.holo-cert-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+

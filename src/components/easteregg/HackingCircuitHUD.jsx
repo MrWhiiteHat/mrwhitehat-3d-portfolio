@@ -79,6 +79,11 @@ export default function HackingCircuitHUD({
     }
   };
 
+  // Hide 2D HUD during in-world 3D secret vault betrayal sequence
+  if (betrayalPhase && betrayalPhase !== 'NONE') {
+    return null;
+  }
+
   return (
     <div className="hacker-hud-layer" style={{ pointerEvents: 'none' }}>
       {/* 1. TOP STATUS BAR */}

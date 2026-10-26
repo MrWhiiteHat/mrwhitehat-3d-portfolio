@@ -1,6 +1,5 @@
 import HackingCircuitAnnouncement from './components/easteregg/HackingCircuitAnnouncement.jsx';
 import HackingCircuitHUD from './components/easteregg/HackingCircuitHUD.jsx';
-import UltimateBetrayalModal from './components/easteregg/UltimateBetrayalModal.jsx';
 import { STAGES, evaluateCircuit, NODE_TYPES } from './components/easteregg/circuitPuzzleLogic.js';
 import {
   getCompletedStations,
@@ -879,7 +878,11 @@ export default function App() {
           onSelectNode: (id) => setHackerSelectedNodeId(id),
           onRotateNode: handleRotateHackerNode,
           isVaultOpen: betrayalPhase !== 'NONE',
+          betrayalPhase: betrayalPhase,
+          onPhaseChange: (p) => setBetrayalPhase(p),
           onInteractTerminal: handleInteractTerminal,
+          onReturnToPortfolio: handleReturnFromBetrayal,
+          onRestartEasterEgg: handleRestartEasterEgg,
         }}
         onStationBreached={handleStationBreached}
       />
@@ -1239,18 +1242,6 @@ export default function App() {
           betrayalPhase={betrayalPhase}
           onRetryUnlimited={handleRetryUnlimited}
           onAddExtraTime={handleAddExtraTime}
-        />
-      )}
-
-      {/* The Ultimate Betrayal Secret Ending Sequence Modal & Overlays */}
-      {gameState === 'HACKING' && betrayalPhase !== 'NONE' && (
-        <UltimateBetrayalModal
-          phase={betrayalPhase}
-          onPhaseChange={(newPhase) => setBetrayalPhase(newPhase)}
-          onInteractTerminal={handleInteractTerminal}
-          onReturnToPortfolio={handleReturnFromBetrayal}
-          onRestartEasterEgg={handleRestartEasterEgg}
-          onSkipCinematic={() => setBetrayalPhase('TERMINAL_INTERACTIVE')}
         />
       )}
     </div>

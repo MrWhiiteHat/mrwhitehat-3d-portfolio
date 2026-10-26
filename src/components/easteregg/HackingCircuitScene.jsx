@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { NODE_TYPES, getActivePorts } from './circuitPuzzleLogic.js';
+import SecretVaultRoom3D from './UltimateBetrayal3D.jsx';
 import {
   playCircuitRotate,
   playSelectNode,
@@ -1231,338 +1232,6 @@ function HackerCameraDirector({ activeVantageId, controlsRef }) {
 }
 
 /**
- * Secret Vault 3D Component:
- * - Reinforced blast bulkhead on the back wall
- * - Dual hydraulic armored sliding doors with central rotary wheel
- * - Golden volumetric light spill and dust
- * - The Ridiculous Discovery: A humble gray folding table, an ordinary office chair, and a single desktop monitor
- * - Interactive 3D beacon to approach and press E or click
- */
-function SecretVault3D({
-  isOpen,
-  onInteractTerminal,
-}) {
-  const leftDoorRef = useRef();
-  const rightDoorRef = useRef();
-  const wheelRef = useRef();
-  const goldenLightRef = useRef();
-  const beaconRef = useRef();
-  const [isHovered, setIsHovered] = useState(false);
-
-  useFrame((state, delta) => {
-    const time = state.clock.getElapsedTime();
-    // Smooth door slide animation
-    const targetLeft = isOpen ? -1.35 : -0.52;
-    const targetRight = isOpen ? 1.35 : 0.52;
-
-    if (leftDoorRef.current) {
-      leftDoorRef.current.position.x = THREE.MathUtils.damp(
-        leftDoorRef.current.position.x,
-        targetLeft,
-        2.5,
-        delta
-      );
-    }
-    if (rightDoorRef.current) {
-      rightDoorRef.current.position.x = THREE.MathUtils.damp(
-        rightDoorRef.current.position.x,
-        targetRight,
-        2.5,
-        delta
-      );
-    }
-    if (wheelRef.current) {
-      if (isOpen) {
-        wheelRef.current.rotation.z += delta * 1.5;
-      }
-    }
-    if (goldenLightRef.current) {
-      const targetIntensity = isOpen ? 4.5 : 0;
-      goldenLightRef.current.intensity = THREE.MathUtils.damp(
-        goldenLightRef.current.intensity,
-        targetIntensity,
-        3.0,
-        delta
-      );
-    }
-    if (beaconRef.current) {
-      beaconRef.current.rotation.y += delta * 1.2;
-      beaconRef.current.position.y = 0.28 + Math.sin(time * 3) * 0.03;
-    }
-  });
-
-  return (
-    <group position={[-1.8, 1.4, -3.92]}>
-      {/* 1. Heavy Outer Steel Bulkhead Frame */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[2.5, 2.3, 0.12]} />
-        <meshStandardMaterial
-          color="#0f172a"
-          roughness={0.4}
-          metalness={0.85}
-        />
-      </mesh>
-
-      {/* Frame Chamfer Border with Hazard Stripes */}
-      <mesh position={[0, 1.15, 0.07]}>
-        <boxGeometry args={[2.5, 0.12, 0.05]} />
-        <meshStandardMaterial color="#f59e0b" roughness={0.3} metalness={0.7} />
-      </mesh>
-      <mesh position={[0, -1.15, 0.07]}>
-        <boxGeometry args={[2.5, 0.12, 0.05]} />
-        <meshStandardMaterial color="#f59e0b" roughness={0.3} metalness={0.7} />
-      </mesh>
-
-      {/* Vault Archway Opening Cavity */}
-      <mesh position={[0, 0, -0.6]}>
-        <boxGeometry args={[2.1, 2.05, 1.4]} />
-        <meshStandardMaterial
-          color="#1e293b"
-          roughness={0.9}
-          metalness={0.1}
-          side={THREE.BackSide}
-        />
-      </mesh>
-
-      {/* 2. Dual Armored Blast Doors */}
-      {/* Left Blast Door */}
-      <mesh ref={leftDoorRef} position={[-0.52, 0, 0.02]}>
-        <boxGeometry args={[1.05, 2.0, 0.1]} />
-        <meshStandardMaterial
-          color="#1e293b"
-          roughness={0.3}
-          metalness={0.9}
-        />
-      </mesh>
-
-      {/* Right Blast Door */}
-      <mesh ref={rightDoorRef} position={[0.52, 0, 0.02]}>
-        <boxGeometry args={[1.05, 2.0, 0.1]} />
-        <meshStandardMaterial
-          color="#1e293b"
-          roughness={0.3}
-          metalness={0.9}
-        />
-      </mesh>
-
-      {/* Central Rotary Locking Wheel */}
-      <group ref={wheelRef} position={[0, 0, 0.09]}>
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[0.22, 0.035, 16, 32]} />
-          <meshStandardMaterial
-            color={isOpen ? '#f59e0b' : '#64748b'}
-            emissive={isOpen ? '#f59e0b' : '#000000'}
-            emissiveIntensity={isOpen ? 1.5 : 0}
-            metalness={0.9}
-          />
-        </mesh>
-      </group>
-
-      {/* 3. Golden Light Spill when Open */}
-      <pointLight
-        ref={goldenLightRef}
-        position={[0, 0.2, -0.4]}
-        color="#fbbf24"
-        distance={6.5}
-        intensity={0}
-      />
-
-      {/* Golden Floor Light Spill Cone */}
-      {isOpen && (
-        <mesh position={[0, -1.0, 0.6]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[2.4, 2.0]} />
-          <meshBasicMaterial
-            color="#fbbf24"
-            transparent
-            opacity={0.22}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-      )}
-
-      {/* 4. THE RIDICULOUS DISCOVERY: Messy Room, Cup Noodles, Laundry, Dhaniya & Mom's Slipper */}
-      {isOpen && (
-        <group position={[0, -0.45, -0.7]}>
-          {/* Cheap Utility Folding Table */}
-          {/* Table Top */}
-          <mesh position={[0, 0, 0]}>
-            <boxGeometry args={[1.1, 0.035, 0.6]} />
-            <meshStandardMaterial color="#cbd5e1" roughness={0.7} />
-          </mesh>
-          {/* 4 Thin Table Legs */}
-          {[-0.48, 0.48].map((lx) =>
-            [-0.24, 0.24].map((lz) => (
-              <mesh key={`leg-${lx}-${lz}`} position={[lx, -0.28, lz]}>
-                <boxGeometry args={[0.03, 0.54, 0.03]} />
-                <meshStandardMaterial color="#64748b" metalness={0.8} />
-              </mesh>
-            ))
-          )}
-
-          {/* Chair with Unfolded Laundry Pile */}
-          <group position={[0, -0.15, 0.35]}>
-            {/* Seat */}
-            <mesh position={[0, 0, 0]}>
-              <boxGeometry args={[0.42, 0.05, 0.4]} />
-              <meshStandardMaterial color="#3b82f6" roughness={0.9} />
-            </mesh>
-            {/* Backrest */}
-            <mesh position={[0, 0.22, 0.18]}>
-              <boxGeometry args={[0.38, 0.35, 0.04]} />
-              <meshStandardMaterial color="#3b82f6" roughness={0.9} />
-            </mesh>
-            {/* The Famous Chair Pile of Clean-ish Clothes */}
-            <mesh position={[-0.05, 0.12, 0.02]} rotation={[0.1, 0.2, -0.1]}>
-              <boxGeometry args={[0.32, 0.16, 0.28]} />
-              <meshStandardMaterial color="#ef4444" roughness={0.9} />
-            </mesh>
-            <mesh position={[0.08, 0.18, 0.06]} rotation={[-0.2, 0.3, 0.1]}>
-              <boxGeometry args={[0.26, 0.12, 0.22]} />
-              <meshStandardMaterial color="#eab308" roughness={0.9} />
-            </mesh>
-          </group>
-
-          {/* Table Items: Laptop, Maggi Noodles, Energy Drink & The Legendary Coriander */}
-          <group position={[0, 0.02, -0.05]}>
-            {/* Laptop Base */}
-            <mesh position={[-0.1, 0.015, 0.04]}>
-              <boxGeometry args={[0.38, 0.015, 0.26]} />
-              <meshStandardMaterial color="#1e293b" metalness={0.8} />
-            </mesh>
-            {/* Laptop Screen (Open at 110 deg) */}
-            <mesh position={[-0.1, 0.14, -0.09]} rotation={[-0.32, 0, 0]}>
-              <boxGeometry args={[0.38, 0.25, 0.015]} />
-              <meshStandardMaterial color="#0f172a" metalness={0.8} />
-            </mesh>
-            {/* Glowing Laptop Screen (Displaying Stack Overflow / 73 Tabs) */}
-            <mesh position={[-0.1, 0.14, -0.08]} rotation={[-0.32, 0, 0]}>
-              <planeGeometry args={[0.35, 0.22]} />
-              <meshStandardMaterial
-                color="#00f0ff"
-                emissive="#00f0ff"
-                emissiveIntensity={2.8}
-                roughness={0.1}
-              />
-            </mesh>
-
-            {/* Bowl of Maggi / Instant Cup Noodles */}
-            <group position={[0.28, 0.04, 0.05]}>
-              {/* Bowl */}
-              <mesh>
-                <cylinderGeometry args={[0.07, 0.05, 0.07, 16]} />
-                <meshStandardMaterial color="#f8fafc" />
-              </mesh>
-              {/* Steaming Noodles Inside */}
-              <mesh position={[0, 0.03, 0]}>
-                <cylinderGeometry args={[0.065, 0.065, 0.01, 16]} />
-                <meshStandardMaterial color="#f59e0b" roughness={0.6} />
-              </mesh>
-              {/* Fork Sticking Out */}
-              <mesh position={[0.02, 0.07, 0]} rotation={[0.4, 0, -0.2]}>
-                <boxGeometry args={[0.008, 0.12, 0.004]} />
-                <meshStandardMaterial color="#94a3b8" metalness={0.9} />
-              </mesh>
-            </group>
-
-            {/* THE HOLY BUNCH OF CORIANDER (DHANIYA) ON THE TABLE 🌿 */}
-            <group position={[-0.36, 0.03, 0.1]}>
-              {/* Green Stems */}
-              <mesh rotation={[0, 0.4, Math.PI / 2]}>
-                <cylinderGeometry args={[0.012, 0.012, 0.14, 8]} />
-                <meshStandardMaterial color="#15803d" />
-              </mesh>
-              {/* Leaf Clusters */}
-              {[-0.04, 0, 0.04].map((lx, i) => (
-                <mesh key={`dhaniya-${i}`} position={[lx, 0.02, 0.04]}>
-                  <sphereGeometry args={[0.035, 8, 8]} />
-                  <meshStandardMaterial
-                    color="#22c55e"
-                    emissive="#16a34a"
-                    emissiveIntensity={0.6}
-                  />
-                </mesh>
-              ))}
-            </group>
-
-            {/* Empty Energy Drink Can */}
-            <mesh position={[0.38, 0.05, -0.14]}>
-              <cylinderGeometry args={[0.025, 0.025, 0.09, 12]} />
-              <meshStandardMaterial color="#06b6d4" metalness={0.9} />
-            </mesh>
-
-            {/* OMINOUS FLYING INDIAN SLIPPER (CHAPPAL) HOVERING NEAR CEILING 🩴 */}
-            <group position={[0.35, 1.1, 0.2]} rotation={[0.6, 0.8, -0.4]}>
-              {/* Slipper Sole */}
-              <mesh>
-                <boxGeometry args={[0.1, 0.018, 0.24]} />
-                <meshStandardMaterial color="#ea580c" roughness={0.8} />
-              </mesh>
-              {/* Slipper Strap */}
-              <mesh position={[0, 0.025, 0.03]}>
-                <torusGeometry args={[0.04, 0.008, 8, 16, Math.PI]} />
-                <meshStandardMaterial color="#1e293b" />
-              </mesh>
-            </group>
-
-            {/* Single Flickering Fluorescent Bulb Overhead */}
-            <mesh position={[0, 0.9, 0]}>
-              <cylinderGeometry args={[0.015, 0.015, 0.3, 8]} />
-              <meshStandardMaterial
-                color="#fef08a"
-                emissive="#fef08a"
-                emissiveIntensity={3.5}
-              />
-            </mesh>
-
-            {/* 3D INTERACTIVE BEACON: CONFRONT REALITY */}
-            <group
-              ref={beaconRef}
-              position={[0, 0.52, 0.05]}
-              onClick={(e) => {
-                e.stopPropagation();
-                onInteractTerminal?.();
-              }}
-              onPointerOver={(e) => {
-                e.stopPropagation();
-                setIsHovered(true);
-                document.body.style.cursor = 'pointer';
-              }}
-              onPointerOut={(e) => {
-                e.stopPropagation();
-                setIsHovered(false);
-                document.body.style.cursor = 'default';
-              }}
-            >
-              {/* Rotating Diamond Ring */}
-              <mesh rotation={[0, 0, Math.PI / 4]}>
-                <ringGeometry args={[0.18, 0.22, 4]} />
-                <meshBasicMaterial
-                  color={isHovered ? '#22c55e' : '#fbbf24'}
-                  side={THREE.DoubleSide}
-                />
-              </mesh>
-              <mesh>
-                <octahedronGeometry args={[0.09, 0]} />
-                <meshStandardMaterial
-                  color="#ffffff"
-                  emissive={isHovered ? '#22c55e' : '#f59e0b'}
-                  emissiveIntensity={3.8}
-                />
-              </mesh>
-              {/* Invisible Hit Sphere */}
-              <mesh>
-                <sphereGeometry args={[0.4, 12, 12]} />
-                <meshBasicMaterial transparent opacity={0.001} />
-              </mesh>
-            </group>
-          </group>
-        </group>
-      )}
-    </group>
-  );
-}
-
-/**
  * Main 3D Hacking Circuit Component (R3F)
  */
 export default function HackingCircuitScene({
@@ -1575,7 +1244,11 @@ export default function HackingCircuitScene({
   onRotateNode,
   controlsRef,
   isVaultOpen = false,
+  betrayalPhase = 'NONE',
+  onPhaseChange,
   onInteractTerminal,
+  onReturnToPortfolio,
+  onRestartEasterEgg,
 }) {
   const { isTargetPowered, poweredNodeIds, poweredConnectionIndices } = evaluation;
 
@@ -1592,10 +1265,14 @@ export default function HackingCircuitScene({
         color="#00f0ff"
       />
 
-      {/* The Classified Secret Vault (Back Wall) */}
-      <SecretVault3D
+      {/* The 3D Classified Secret Vault Room & In-World Spatial Interface */}
+      <SecretVaultRoom3D
         isOpen={isVaultOpen}
+        betrayalPhase={betrayalPhase}
+        onPhaseChange={onPhaseChange}
         onInteractTerminal={onInteractTerminal}
+        onReturnToPortfolio={onReturnToPortfolio}
+        onRestartEasterEgg={onRestartEasterEgg}
       />
 
       {/* Render 3D Circuit Conduits with Directional Flow Arrows */}

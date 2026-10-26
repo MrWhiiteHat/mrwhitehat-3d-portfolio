@@ -494,7 +494,11 @@ function SceneContents({
             onRotateNode={hackerModeData.onRotateNode}
             controlsRef={controlsRef}
             isVaultOpen={hackerModeData.isVaultOpen}
+            betrayalPhase={hackerModeData.betrayalPhase}
+            onPhaseChange={hackerModeData.onPhaseChange}
             onInteractTerminal={hackerModeData.onInteractTerminal}
+            onReturnToPortfolio={hackerModeData.onReturnToPortfolio}
+            onRestartEasterEgg={hackerModeData.onRestartEasterEgg}
           />
         </group>
       )}
