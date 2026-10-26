@@ -221,6 +221,7 @@ export const STAGES = [
         id: 's2_n8',
         type: NODE_TYPES.TARGET,
         position: [-2.85, 1.55, -4.15],
+        orientation: 'wall_z',
         basePorts: [3], // Input from West
         rotationIndex: 0,
         solutionRotation: 0,
@@ -279,6 +280,7 @@ export const STAGES = [
         id: 's3_n2',
         type: NODE_TYPES.SWITCH_ELBOW,
         position: [0.60, 3.00, -4.15],
+        orientation: 'wall_z',
         basePorts: [3, 2],
         rotationIndex: 2, // Scrambled
         solutionRotation: 0,
@@ -289,6 +291,7 @@ export const STAGES = [
         id: 's3_n3',
         type: NODE_TYPES.SWITCH_STRAIGHT,
         position: [0.60, 2.10, -4.15],
+        orientation: 'wall_z',
         basePorts: [0, 2],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -299,6 +302,7 @@ export const STAGES = [
         id: 's3_n4',
         type: NODE_TYPES.KEY_NODE,
         position: [0.60, 1.20, -4.15],
+        orientation: 'wall_z',
         basePorts: [0],
         unlocksNodeId: 's3_n6',
         rotationIndex: 0,
@@ -320,6 +324,7 @@ export const STAGES = [
         id: 's3_n6',
         type: NODE_TYPES.LOCKED_ROUTER,
         position: [-2.85, 2.40, -3.85],
+        orientation: 'wall_z',
         basePorts: [0, 2],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -331,6 +336,7 @@ export const STAGES = [
         id: 's3_n7',
         type: NODE_TYPES.SWITCH_T,
         position: [-2.85, 1.70, -3.85],
+        orientation: 'wall_z',
         basePorts: [0, 2, 3],
         rotationIndex: 2, // Scrambled
         solutionRotation: 0,
@@ -341,6 +347,7 @@ export const STAGES = [
         id: 's3_n8',
         type: NODE_TYPES.KEY_NODE,
         position: [-2.85, 0.90, -3.85],
+        orientation: 'wall_z',
         basePorts: [0],
         unlocksNodeId: 's3_n10',
         rotationIndex: 0,
@@ -362,6 +369,7 @@ export const STAGES = [
         id: 's3_n10',
         type: NODE_TYPES.LOCKED_ROUTER,
         position: [-3.60, 1.70, -3.95],
+        orientation: 'wall_z',
         basePorts: [1, 3],
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
@@ -373,6 +381,7 @@ export const STAGES = [
         id: 's3_n11',
         type: NODE_TYPES.SWITCH_ELBOW,
         position: [-4.20, 1.80, -3.95],
+        orientation: 'wall_z',
         basePorts: [2, 0],
         rotationIndex: 3, // Scrambled
         solutionRotation: 0,
@@ -383,6 +392,7 @@ export const STAGES = [
         id: 's3_n12',
         type: NODE_TYPES.TARGET,
         position: [-4.20, 2.25, -3.95],
+        orientation: 'wall_z',
         basePorts: [2], // Input from bottom
         rotationIndex: 0,
         solutionRotation: 0,

@@ -310,6 +310,10 @@ function CircuitConduit({
 /**
  * 3D Interactive Node Component (Watch Dogs 2 NetHack aesthetic)
  */
+/**
+ * 3D Interactive Node Component (Watch Dogs 2 NetHack aesthetic)
+ * Fully synchronized with conduit flow and neighbor node arrow directions.
+ */
 function CircuitNode({
   node,
   isPowered,
@@ -323,7 +327,8 @@ function CircuitNode({
   const diamondLockRef = useRef();
   const hostileAuraRef = useRef();
   const targetWaypointRef = useRef();
-  const targetRotationY = useRef((node.rotationIndex || 0) * (Math.PI / 2));
+  const isWallZ = node.orientation === 'wall_z';
+  const targetRotation = useRef((node.rotationIndex || 0) * (Math.PI / 2));
 
   // Local state for instant, rock-solid cursor and hover feedback
   const [isLocalHovered, setIsLocalHovered] = useState(false);
@@ -339,25 +344,38 @@ function CircuitNode({
 
   // Smooth visual rotation animation when switch turns
   useEffect(() => {
-    targetRotationY.current = (node.rotationIndex || 0) * (Math.PI / 2);
+    targetRotation.current = (node.rotationIndex || 0) * (Math.PI / 2);
   }, [node.rotationIndex]);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
     if (meshGroupRef.current) {
-      meshGroupRef.current.rotation.y = THREE.MathUtils.damp(
-        meshGroupRef.current.rotation.y,
-        targetRotationY.current,
-        14,
-        delta
-      );
+      if (isWallZ) {
+        meshGroupRef.current.rotation.z = THREE.MathUtils.damp(
+          meshGroupRef.current.rotation.z,
+          -targetRotation.current,
+          14,
+          delta
+        );
+      } else {
+        meshGroupRef.current.rotation.y = THREE.MathUtils.damp(
+          meshGroupRef.current.rotation.y,
+          targetRotation.current,
+          14,
+          delta
+        );
+      }
     }
 
     // Watch Dogs 2 Rotating Diamond Lock Animation
     if (diamondLockRef.current) {
       diamondLockRef.current.rotation.z += delta * 0.75;
-      diamondLockRef.current.position.y = 0.32 + Math.sin(time * 2.4) * 0.02;
+      if (isWallZ) {
+        diamondLockRef.current.position.z = 0.32 + Math.sin(time * 2.4) * 0.02;
+      } else {
+        diamondLockRef.current.position.y = 0.32 + Math.sin(time * 2.4) * 0.02;
+      }
     }
 
     // Watch Dogs 2 Hostile Red Radial Aura Pulse
@@ -371,7 +389,11 @@ function CircuitNode({
     // Watch Dogs 2 Objective Waypoint Beacon Animation
     if (targetWaypointRef.current) {
       targetWaypointRef.current.rotation.z += delta * 0.6;
-      targetWaypointRef.current.position.y = 0.36 + Math.sin(time * 2.2) * 0.025;
+      if (isWallZ) {
+        targetWaypointRef.current.position.z = 0.36 + Math.sin(time * 2.2) * 0.025;
+      } else {
+        targetWaypointRef.current.position.y = 0.36 + Math.sin(time * 2.2) * 0.025;
+      }
     }
   });
 
@@ -453,13 +475,24 @@ function CircuitNode({
     ? '#00f0ff'
     : '#0088cc';
 
+  const portArrowColor = isTargetPowered
+    ? '#10b981'
+    : isHostile
+    ? '#ff1744'
+    : isPowered
+    ? '#00f0ff'
+    : '#00a3e0';
+
   return (
     <group position={node.position}>
       {/* 1. Watch Dogs 2 Selection Square Reticle Bracket */}
       {(isSelected || isHovered || isLocalHovered) && (
         <group>
           {/* Outer Square Reticle Frame */}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, 0]}>
+          <mesh
+            rotation={isWallZ ? [0, 0, 0] : [-Math.PI / 2, 0, 0]}
+            position={isWallZ ? [0, 0, 0.015] : [0, 0.015, 0]}
+          >
             <ringGeometry args={[0.30, 0.33, 4]} />
             <meshBasicMaterial
               color={isHostile ? '#ff1744' : isTargetPowered ? '#10b981' : '#ffffff'}
@@ -471,16 +504,21 @@ function CircuitNode({
 
           {/* Corner Tick Marks */}
           {[-0.27, 0.27].map((tx) =>
-            [-0.27, 0.27].map((tz) => (
-              <mesh key={`tick-${tx}-${tz}`} position={[tx, 0.02, tz]}>
-                <boxGeometry args={[0.05, 0.012, 0.05]} />
+            [-0.27, 0.27].map((tyz) => (
+              <mesh
+                key={`tick-${tx}-${tyz}`}
+                position={isWallZ ? [tx, tyz, 0.02] : [tx, 0.02, tyz]}
+              >
+                <boxGeometry
+                  args={isWallZ ? [0.05, 0.05, 0.012] : [0.05, 0.012, 0.05]}
+                />
                 <meshBasicMaterial color="#00f0ff" />
               </mesh>
             ))
           )}
 
           {/* Floating Waypoint Pip */}
-          <mesh position={[0, 0.48, 0]}>
+          <mesh position={isWallZ ? [0, 0, 0.48] : [0, 0.48, 0]}>
             <octahedronGeometry args={[0.05, 0]} />
             <meshBasicMaterial color={isHostile ? '#ff1744' : '#ffffff'} />
           </mesh>
@@ -503,7 +541,10 @@ function CircuitNode({
           node.type === NODE_TYPES.LOCKED_ROUTER) && (
           <group>
             {/* Dark Base Hub Disc */}
-            <mesh position={[0, 0.02, 0]}>
+            <mesh
+              position={isWallZ ? [0, 0, 0.02] : [0, 0.02, 0]}
+              rotation={isWallZ ? [Math.PI / 2, 0, 0] : [0, 0, 0]}
+            >
               <cylinderGeometry args={[0.22, 0.24, 0.045, 32]} />
               <meshStandardMaterial
                 color="#040a16"
@@ -513,7 +554,10 @@ function CircuitNode({
             </mesh>
 
             {/* Glowing White/Cyan Outer Rim */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.044, 0]}>
+            <mesh
+              position={isWallZ ? [0, 0, 0.044] : [0, 0.044, 0]}
+              rotation={isWallZ ? [0, 0, 0] : [-Math.PI / 2, 0, 0]}
+            >
               <ringGeometry args={[0.20, 0.23, 32]} />
               <meshBasicMaterial
                 color={isPowered ? '#00f0ff' : '#ffffff'}
@@ -524,7 +568,10 @@ function CircuitNode({
             </mesh>
 
             {/* Glowing Face Plate */}
-            <mesh position={[0, 0.04, 0]}>
+            <mesh
+              position={isWallZ ? [0, 0, 0.04] : [0, 0.04, 0]}
+              rotation={isWallZ ? [Math.PI / 2, 0, 0] : [0, 0, 0]}
+            >
               <cylinderGeometry args={[0.18, 0.18, 0.012, 32]} />
               <meshStandardMaterial
                 color={nodeColor}
@@ -534,15 +581,91 @@ function CircuitNode({
               />
             </mesh>
 
-            {/* Directional Circuit Port Neon Traces */}
+            {/* DIRECTIONAL CIRCUIT PORT ARROWS & CHEVRONS */}
             {(node.basePorts || [0, 2]).map((port) => {
+              if (isWallZ) {
+                // Wall Z plane: 0=Up(+Y), 1=Right(+X), 2=Down(-Y), 3=Left(-X)
+                const angle = (-port * Math.PI) / 2;
+                return (
+                  <group key={port} rotation={[0, 0, angle]}>
+                    {/* Neon Centerline Runner */}
+                    <mesh position={[0, 0.09, 0.048]}>
+                      <boxGeometry args={[0.035, 0.12, 0.016]} />
+                      <meshStandardMaterial
+                        color={portArrowColor}
+                        emissive={portArrowColor}
+                        emissiveIntensity={isPowered ? 3.5 : 0.6}
+                        roughness={0.2}
+                        transparent
+                        opacity={isPowered ? 0.95 : 0.45}
+                      />
+                    </mesh>
+
+                    {/* Sharp 3D Directional Arrowhead pointing radially outward */}
+                    <mesh position={[0, 0.17, 0.052]} rotation={[0, 0, 0]}>
+                      <coneGeometry args={[0.048, 0.085, 4]} />
+                      <meshStandardMaterial
+                        color={isPowered ? '#ffffff' : '#38bdf8'}
+                        emissive={portArrowColor}
+                        emissiveIntensity={isPowered ? 4.5 : 0.8}
+                        roughness={0.15}
+                        transparent
+                        opacity={isPowered ? 1.0 : 0.55}
+                      />
+                    </mesh>
+
+                    {/* Outer Chevron Wing Ring */}
+                    <mesh position={[0, 0.14, 0.048]} rotation={[0, 0, 0]}>
+                      <ringGeometry args={[0.035, 0.055, 3]} />
+                      <meshBasicMaterial
+                        color={portArrowColor}
+                        transparent
+                        opacity={isPowered ? 0.85 : 0.35}
+                        side={THREE.DoubleSide}
+                      />
+                    </mesh>
+                  </group>
+                );
+              }
+
+              // Horizontal (Floor / Table): 0=North(+Z), 1=East(+X), 2=South(-Z), 3=West(-X)
               const angle = (port * Math.PI) / 2;
               return (
-                <group key={port} rotation={[0, -angle, 0]}>
-                  <mesh position={[0, 0.048, 0.13]}>
-                    <boxGeometry args={[0.05, 0.016, 0.11]} />
+                <group key={port} rotation={[0, angle, 0]}>
+                  {/* Neon Centerline Runner */}
+                  <mesh position={[0, 0.048, 0.09]}>
+                    <boxGeometry args={[0.035, 0.016, 0.12]} />
+                    <meshStandardMaterial
+                      color={portArrowColor}
+                      emissive={portArrowColor}
+                      emissiveIntensity={isPowered ? 3.5 : 0.6}
+                      roughness={0.2}
+                      transparent
+                      opacity={isPowered ? 0.95 : 0.45}
+                    />
+                  </mesh>
+
+                  {/* Sharp 3D Directional Arrowhead pointing radially outward */}
+                  <mesh position={[0, 0.052, 0.17]} rotation={[Math.PI / 2, 0, 0]}>
+                    <coneGeometry args={[0.048, 0.085, 4]} />
+                    <meshStandardMaterial
+                      color={isPowered ? '#ffffff' : '#38bdf8'}
+                      emissive={portArrowColor}
+                      emissiveIntensity={isPowered ? 4.5 : 0.8}
+                      roughness={0.15}
+                      transparent
+                      opacity={isPowered ? 1.0 : 0.55}
+                    />
+                  </mesh>
+
+                  {/* Outer Chevron Wing Ring */}
+                  <mesh position={[0, 0.048, 0.14]} rotation={[-Math.PI / 2, 0, 0]}>
+                    <ringGeometry args={[0.035, 0.055, 3]} />
                     <meshBasicMaterial
-                      color={isPowered ? '#ffffff' : '#e2e8f0'}
+                      color={portArrowColor}
+                      transparent
+                      opacity={isPowered ? 0.85 : 0.35}
+                      side={THREE.DoubleSide}
                     />
                   </mesh>
                 </group>
@@ -553,7 +676,10 @@ function CircuitNode({
 
         {/* 3. Watch Dogs 2 Iconic Holographic Rotating Diamond Lock */}
         {isLocked && (
-          <group ref={diamondLockRef} position={[0, 0.32, 0]}>
+          <group
+            ref={diamondLockRef}
+            position={isWallZ ? [0, 0, 0.32] : [0, 0.32, 0]}
+          >
             {/* Outer Diamond Frame */}
             <mesh rotation={[0, 0, Math.PI / 4]}>
               <ringGeometry args={[0.26, 0.30, 4]} />
@@ -605,7 +731,11 @@ function CircuitNode({
         {node.type === NODE_TYPES.HOSTILE_IDS && (
           <group>
             {/* Large Diffused Red Radial Glow Aura Halo on surface */}
-            <mesh ref={hostileAuraRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+            <mesh
+              ref={hostileAuraRef}
+              rotation={isWallZ ? [0, 0, 0] : [-Math.PI / 2, 0, 0]}
+              position={isWallZ ? [0, 0, 0.005] : [0, 0.005, 0]}
+            >
               <ringGeometry args={[0.06, 0.72, 32]} />
               <meshBasicMaterial
                 color="#ff1744"
@@ -616,7 +746,10 @@ function CircuitNode({
             </mesh>
 
             {/* Pulsing Outer Warning Ring */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.008, 0]}>
+            <mesh
+              rotation={isWallZ ? [0, 0, 0] : [-Math.PI / 2, 0, 0]}
+              position={isWallZ ? [0, 0, 0.008] : [0, 0.008, 0]}
+            >
               <ringGeometry args={[0.68, 0.72, 32]} />
               <meshBasicMaterial
                 color="#ff1744"
@@ -627,7 +760,10 @@ function CircuitNode({
             </mesh>
 
             {/* Central Red Threat Core Puck */}
-            <mesh position={[0, 0.04, 0]}>
+            <mesh
+              position={isWallZ ? [0, 0, 0.04] : [0, 0.04, 0]}
+              rotation={isWallZ ? [Math.PI / 2, 0, 0] : [0, 0, 0]}
+            >
               <cylinderGeometry args={[0.16, 0.18, 0.05, 24]} />
               <meshStandardMaterial
                 color="#ff1744"
@@ -637,7 +773,7 @@ function CircuitNode({
             </mesh>
 
             {/* Threat Diamond Marker */}
-            <mesh position={[0, 0.24, 0]}>
+            <mesh position={isWallZ ? [0, 0, 0.24] : [0, 0.24, 0]}>
               <octahedronGeometry args={[0.09, 0]} />
               <meshStandardMaterial
                 color="#ff1744"
@@ -645,6 +781,38 @@ function CircuitNode({
                 emissiveIntensity={3.8}
               />
             </mesh>
+
+            {/* Hostile Sensor Tripwire Port Arrow */}
+            {(node.basePorts || [1]).map((port) => {
+              if (isWallZ) {
+                const angle = (-port * Math.PI) / 2;
+                return (
+                  <group key={`hostile-arrow-${port}`} rotation={[0, 0, angle]}>
+                    <mesh position={[0, 0.20, 0.048]} rotation={[Math.PI, 0, 0]}>
+                      <coneGeometry args={[0.048, 0.09, 4]} />
+                      <meshStandardMaterial
+                        color="#ff1744"
+                        emissive="#ff1744"
+                        emissiveIntensity={4.2}
+                      />
+                    </mesh>
+                  </group>
+                );
+              }
+              const angle = (port * Math.PI) / 2;
+              return (
+                <group key={`hostile-arrow-${port}`} rotation={[0, angle, 0]}>
+                  <mesh position={[0, 0.048, 0.20]} rotation={[-Math.PI / 2, 0, 0]}>
+                    <coneGeometry args={[0.048, 0.09, 4]} />
+                    <meshStandardMaterial
+                      color="#ff1744"
+                      emissive="#ff1744"
+                      emissiveIntensity={4.2}
+                    />
+                  </mesh>
+                </group>
+              );
+            })}
           </group>
         )}
 
@@ -652,7 +820,10 @@ function CircuitNode({
         {node.type === NODE_TYPES.TARGET && (
           <group>
             {/* Base Gateway Cylinder */}
-            <mesh position={[0, 0.04, 0]}>
+            <mesh
+              position={isWallZ ? [0, 0, 0.04] : [0, 0.04, 0]}
+              rotation={isWallZ ? [Math.PI / 2, 0, 0] : [0, 0, 0]}
+            >
               <cylinderGeometry args={[0.24, 0.26, 0.07, 6]} />
               <meshStandardMaterial
                 color={isTargetPowered ? '#10b981' : '#f59e0b'}
@@ -662,7 +833,10 @@ function CircuitNode({
             </mesh>
 
             {/* Floating Waypoint Diamond Marker */}
-            <group ref={targetWaypointRef} position={[0, 0.36, 0]}>
+            <group
+              ref={targetWaypointRef}
+              position={isWallZ ? [0, 0, 0.36] : [0, 0.36, 0]}
+            >
               <mesh rotation={[0, 0, Math.PI / 4]}>
                 <ringGeometry args={[0.20, 0.24, 4]} />
                 <meshBasicMaterial
@@ -686,6 +860,40 @@ function CircuitNode({
                 <meshBasicMaterial color={isTargetPowered ? '#ffffff' : '#fed7aa'} />
               </mesh>
             </group>
+
+            {/* Target Incoming Receiving Port Arrow */}
+            {(node.basePorts || [2]).map((port) => {
+              if (isWallZ) {
+                const angle = (-port * Math.PI) / 2;
+                return (
+                  <group key={`tgt-arrow-${port}`} rotation={[0, 0, angle]}>
+                    {/* Inward pointing arrowhead toward gateway */}
+                    <mesh position={[0, 0.22, 0.048]} rotation={[Math.PI, 0, 0]}>
+                      <coneGeometry args={[0.055, 0.10, 4]} />
+                      <meshStandardMaterial
+                        color={isTargetPowered ? '#ffffff' : '#fed7aa'}
+                        emissive={isTargetPowered ? '#10b981' : '#f59e0b'}
+                        emissiveIntensity={isTargetPowered ? 4.5 : 2.5}
+                      />
+                    </mesh>
+                  </group>
+                );
+              }
+              const angle = (port * Math.PI) / 2;
+              return (
+                <group key={`tgt-arrow-${port}`} rotation={[0, angle, 0]}>
+                  {/* Inward pointing arrowhead toward gateway */}
+                  <mesh position={[0, 0.048, 0.22]} rotation={[-Math.PI / 2, 0, 0]}>
+                    <coneGeometry args={[0.055, 0.10, 4]} />
+                    <meshStandardMaterial
+                      color={isTargetPowered ? '#ffffff' : '#fed7aa'}
+                      emissive={isTargetPowered ? '#10b981' : '#f59e0b'}
+                      emissiveIntensity={isTargetPowered ? 4.5 : 2.5}
+                    />
+                  </mesh>
+                </group>
+              );
+            })}
           </group>
         )}
 
@@ -705,13 +913,30 @@ function CircuitNode({
               <torusGeometry args={[0.28, 0.024, 8, 24]} />
               <meshBasicMaterial color="#ffffff" transparent opacity={0.85} />
             </mesh>
+
+            {/* Outgoing Carrier Signal Arrow */}
+            {(node.basePorts || [3]).map((port) => {
+              const angle = (port * Math.PI) / 2;
+              return (
+                <group key={`src-arrow-${port}`} rotation={[0, angle, 0]}>
+                  <mesh position={[0, 0.048, 0.22]} rotation={[Math.PI / 2, 0, 0]}>
+                    <coneGeometry args={[0.055, 0.10, 4]} />
+                    <meshStandardMaterial
+                      color="#ffffff"
+                      emissive="#00f0ff"
+                      emissiveIntensity={4.8}
+                    />
+                  </mesh>
+                </group>
+              );
+            })}
           </group>
         )}
 
         {/* 7. Key / Sub-routine Decryption Node */}
         {node.type === NODE_TYPES.KEY_NODE && (
           <group>
-            <mesh position={[0, 0.14, 0]}>
+            <mesh position={isWallZ ? [0, 0, 0.14] : [0, 0.14, 0]}>
               <octahedronGeometry args={[0.18, 0]} />
               <meshStandardMaterial
                 color={isPowered ? '#34d399' : '#fbbf24'}
@@ -720,7 +945,10 @@ function CircuitNode({
                 wireframe={!isPowered}
               />
             </mesh>
-            <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.14, 0]}>
+            <mesh
+              rotation={isWallZ ? [0, 0, 0] : [Math.PI / 2, 0, 0]}
+              position={isWallZ ? [0, 0, 0.14] : [0, 0.14, 0]}
+            >
               <ringGeometry args={[0.24, 0.28, 6]} />
               <meshBasicMaterial
                 color={isPowered ? '#34d399' : '#fbbf24'}
@@ -729,11 +957,46 @@ function CircuitNode({
                 side={THREE.DoubleSide}
               />
             </mesh>
+
+            {/* Key Sub-Routine Input Receiving Arrow */}
+            {(node.basePorts || [0]).map((port) => {
+              if (isWallZ) {
+                const angle = (-port * Math.PI) / 2;
+                return (
+                  <group key={`key-arrow-${port}`} rotation={[0, 0, angle]}>
+                    <mesh position={[0, 0.22, 0.048]} rotation={[Math.PI, 0, 0]}>
+                      <coneGeometry args={[0.045, 0.08, 4]} />
+                      <meshStandardMaterial
+                        color={isPowered ? '#ffffff' : '#fde68a'}
+                        emissive={isPowered ? '#34d399' : '#fbbf24'}
+                        emissiveIntensity={isPowered ? 4.0 : 1.8}
+                      />
+                    </mesh>
+                  </group>
+                );
+              }
+              const angle = (port * Math.PI) / 2;
+              return (
+                <group key={`key-arrow-${port}`} rotation={[0, angle, 0]}>
+                  <mesh position={[0, 0.048, 0.22]} rotation={[-Math.PI / 2, 0, 0]}>
+                    <coneGeometry args={[0.045, 0.08, 4]} />
+                    <meshStandardMaterial
+                      color={isPowered ? '#ffffff' : '#fde68a'}
+                      emissive={isPowered ? '#34d399' : '#fbbf24'}
+                      emissiveIntensity={isPowered ? 4.0 : 1.8}
+                    />
+                  </mesh>
+                </group>
+              );
+            })}
           </group>
         )}
 
-        {/* Generous invisible raycast hit cylinder volume for effortless clicking/tapping */}
-        <mesh position={[0, 0.16, 0]}>
+        {/* Generous invisible raycast hit cylinder volume */}
+        <mesh
+          position={isWallZ ? [0, 0, 0.16] : [0, 0.16, 0]}
+          rotation={isWallZ ? [Math.PI / 2, 0, 0] : [0, 0, 0]}
+        >
           <cylinderGeometry args={[0.44, 0.44, 0.42, 24]} />
           <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
         </mesh>
