@@ -296,6 +296,34 @@ export default function App() {
     }
   }, [hackerStageIndex, initHackerStage]);
 
+  const handleSelectHackerStage = useCallback((stageIdx) => {
+    playClickSound(800);
+    initHackerStage(stageIdx);
+  }, [initHackerStage]);
+
+  const handleAutoSolveHackerStage = useCallback(() => {
+    const stage = STAGES[hackerStageIndex];
+    if (!stage) return;
+    playCircuitPowerUp();
+
+    const solvedStates = {};
+    stage.nodes.forEach((n) => {
+      solvedStates[n.id] = {
+        rotationIndex: n.solutionRotation,
+        isLocked: false,
+      };
+    });
+    setHackerNodeStates(solvedStates);
+
+    if (hackerStageIndex < STAGES.length - 1) {
+      playStageVictory();
+    } else {
+      playFinalOverrideVictory();
+      markEasterEggCompleted();
+    }
+    setHackerIsVictory(true);
+  }, [hackerStageIndex]);
+
   const handleResetHackerStage = useCallback(() => {
     initHackerStage(hackerStageIndex);
   }, [hackerStageIndex, initHackerStage]);
@@ -384,6 +412,8 @@ export default function App() {
         }
       } else if (e.key === 'r' || e.key === 'R') {
         handleResetHackerStage();
+      } else if (e.key === 'f' || e.key === 'F') {
+        handleAutoSolveHackerStage();
       } else if (e.key === '1') {
         setHackerActiveVantageId('DESK_VIEW');
       } else if (e.key === '2') {
@@ -404,6 +434,7 @@ export default function App() {
     hackerStageIndex,
     handleRotateHackerNode,
     handleResetHackerStage,
+    handleAutoSolveHackerStage,
     handleNextHackerStage,
     handleExitHackerMode,
   ]);
@@ -1158,6 +1189,8 @@ export default function App() {
           onToggleFullscreen={toggleFullscreen}
           onExitHackerMode={handleExitHackerMode}
           onNextStage={handleNextHackerStage}
+          onSelectStage={handleSelectHackerStage}
+          onAutoSolve={handleAutoSolveHackerStage}
           onRetryUnlimited={handleRetryUnlimited}
           onAddExtraTime={handleAddExtraTime}
         />

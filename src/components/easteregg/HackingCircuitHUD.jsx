@@ -54,6 +54,8 @@ export default function HackingCircuitHUD({
   onToggleFullscreen,
   onExitHackerMode,
   onNextStage,
+  onSelectStage,
+  onAutoSolve,
   onRetryUnlimited,
   onAddExtraTime,
 }) {
@@ -87,11 +89,12 @@ export default function HackingCircuitHUD({
           <span className="hacker-stage-tag">{currentStage.title}</span>
         </div>
 
-        {/* Stage Progress Tracker */}
+        {/* Stage Progress Tracker (Clickable to switch stages) */}
         <div className="hacker-stage-tracker">
           {Array.from({ length: totalStages }).map((_, i) => (
-            <div
+            <button
               key={i}
+              type="button"
               className={`stage-step-pill ${
                 i < stageIndex
                   ? 'is-completed'
@@ -99,10 +102,19 @@ export default function HackingCircuitHUD({
                   ? 'is-active'
                   : 'is-pending'
               }`}
+              onClick={() => onSelectStage && onSelectStage(i)}
+              title={`Switch to Stage 0${i + 1}`}
+              style={{
+                cursor: 'pointer',
+                background: 'transparent',
+                border: 'none',
+                padding: '4px 8px',
+                fontFamily: 'inherit',
+              }}
             >
               <span className="stage-step-dot" />
               <span>STAGE 0{i + 1}</span>
-            </div>
+            </button>
           ))}
         </div>
 
@@ -144,6 +156,32 @@ export default function HackingCircuitHUD({
 
         {/* Quick Utility Buttons */}
         <div className="hacker-header-actions">
+          {/* Instant Auto-Solve / Bypass Button */}
+          {onAutoSolve && !isVictory && (
+            <button
+              type="button"
+              className="hacker-action-btn hacker-btn-solve"
+              onClick={onAutoSolve}
+              title="Instant Solve / Bypass Stage [F]"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '0 12px',
+                background: 'rgba(0, 240, 255, 0.18)',
+                borderColor: '#00f0ff',
+                color: '#ffffff',
+                fontWeight: '700',
+                fontSize: '11px',
+                letterSpacing: '0.05em',
+                cursor: 'pointer',
+              }}
+            >
+              <Sparkles size={14} color="#00f0ff" />
+              <span>SOLVE [F]</span>
+            </button>
+          )}
+
           <button
             type="button"
             className="hacker-action-btn"
@@ -395,6 +433,8 @@ export default function HackingCircuitHUD({
             <span>[CLICK NODE] SELECT</span>
             <span>•</span>
             <span>[E] ROTATE SWITCH</span>
+            <span>•</span>
+            <span>[F] AUTO-SOLVE</span>
             <span>•</span>
             <span>[CAM 01–04] VANTAGE</span>
             <span>•</span>

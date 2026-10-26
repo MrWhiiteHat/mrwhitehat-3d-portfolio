@@ -48,14 +48,14 @@ export const STAGES = [
     targetName: 'DUAL-MONITOR WORKSTATION',
     timeLimit: null, // Relaxed tutorial
     cameraPreset: 'DESK_VIEW',
-    camPos: [1.8, 2.1, 2.4],
-    camTarget: [0.1, 0.75, 0.4],
+    camPos: [1.8, 2.0, 2.2],
+    camTarget: [0.1, 0.55, 0.5],
     nodes: [
       {
         id: 's1_n0',
         type: NODE_TYPES.SOURCE,
-        position: [2.00, 0.58, 0.95],
-        basePorts: [3], // West
+        position: [1.80, 0.55, 0.95],
+        basePorts: [3], // West (-X)
         rotationIndex: 0,
         solutionRotation: 0,
         label: 'Coffee Table Terminal',
@@ -64,8 +64,8 @@ export const STAGES = [
       {
         id: 's1_n1',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [1.00, 0.45, 0.95],
-        basePorts: [1, 2],
+        position: [0.80, 0.55, 0.95],
+        basePorts: [1, 2], // East (+X), South (-Z)
         rotationIndex: 2, // Scrambled
         solutionRotation: 0,
         label: 'Floor Conduit A',
@@ -74,8 +74,8 @@ export const STAGES = [
       {
         id: 's1_n2',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [1.00, 0.45, 0.15],
-        basePorts: [0, 3],
+        position: [0.80, 0.55, 0.15],
+        basePorts: [0, 3], // North (+Z), West (-X)
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         label: 'Floor Conduit B',
@@ -84,8 +84,8 @@ export const STAGES = [
       {
         id: 's1_n3',
         type: NODE_TYPES.SWITCH_STRAIGHT,
-        position: [-0.15, 0.55, 0.15],
-        basePorts: [1, 3],
+        position: [-0.10, 0.55, 0.15],
+        basePorts: [1, 3], // East (+X), West (-X)
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         label: 'Under-Desk Bus',
@@ -93,19 +93,19 @@ export const STAGES = [
       },
       {
         id: 's1_n4',
-        type: NODE_TYPES.SWITCH_ELBOW,
-        position: [-0.85, 0.88, 0.15],
-        basePorts: [1, 0],
-        rotationIndex: 3, // Scrambled
+        type: NODE_TYPES.SWITCH_STRAIGHT,
+        position: [-0.90, 0.55, 0.15],
+        basePorts: [1, 3], // East (+X), West (-X)
+        rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         label: 'Desk Riser Relay',
-        desc: '90° Elevation Router',
+        desc: '180° In-Line Bridge',
       },
       {
         id: 's1_n5',
         type: NODE_TYPES.TARGET,
-        position: [-1.20, 1.28, 0.15],
-        basePorts: [2], // Input from bottom
+        position: [-1.55, 0.55, 0.15],
+        basePorts: [1], // East (+X)
         rotationIndex: 0,
         solutionRotation: 0,
         label: 'Workstation Gateway',
@@ -117,7 +117,7 @@ export const STAGES = [
       { from: 's1_n1', fromPort: 2, to: 's1_n2', toPort: 0 },
       { from: 's1_n2', fromPort: 3, to: 's1_n3', toPort: 1 },
       { from: 's1_n3', fromPort: 3, to: 's1_n4', toPort: 1 },
-      { from: 's1_n4', fromPort: 0, to: 's1_n5', toPort: 2 },
+      { from: 's1_n4', fromPort: 3, to: 's1_n5', toPort: 1 },
     ],
   },
 
@@ -132,14 +132,15 @@ export const STAGES = [
     targetName: '42U HARDENED SERVER RACK',
     timeLimit: null,
     cameraPreset: 'SERVER_WALL',
-    camPos: [-1.2, 2.2, -0.6],
-    camTarget: [-3.6, 1.4, -2.6],
+    camPos: [-2.6, 2.0, 0.4],
+    camTarget: [-2.9, 2.0, -3.85],
     nodes: [
       {
         id: 's2_n0',
         type: NODE_TYPES.SOURCE,
-        position: [-4.50, 2.10, 1.25],
-        basePorts: [2], // South along wall
+        position: [-1.40, 2.40, -3.85],
+        orientation: 'wall_z',
+        basePorts: [3], // Left (-X)
         rotationIndex: 0,
         solutionRotation: 0,
         label: 'Tactical Arsenal Bus',
@@ -148,8 +149,9 @@ export const STAGES = [
       {
         id: 's2_n1',
         type: NODE_TYPES.SWITCH_T,
-        position: [-4.50, 2.10, -0.40],
-        basePorts: [0, 1, 2],
+        position: [-2.40, 2.40, -3.85],
+        orientation: 'wall_z',
+        basePorts: [1, 2, 3], // Right from Source, Down to Key, Left to Router
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         label: 'Wall Master Splitter',
@@ -158,8 +160,9 @@ export const STAGES = [
       {
         id: 's2_n2',
         type: NODE_TYPES.HOSTILE_IDS,
-        position: [-4.50, 3.10, -0.40],
-        basePorts: [0],
+        position: [-2.40, 3.20, -3.85],
+        orientation: 'wall_z',
+        basePorts: [2], // Down (-Y)
         rotationIndex: 0,
         solutionRotation: 0,
         label: 'CTOS Perimeter Alarm',
@@ -168,8 +171,9 @@ export const STAGES = [
       {
         id: 's2_n3',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [-3.40, 1.05, -0.40],
-        basePorts: [3, 2],
+        position: [-2.40, 1.40, -3.85],
+        orientation: 'wall_z',
+        basePorts: [0, 1], // Up from Splitter, Right to Key
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         label: 'Briefing Table Bus A',
@@ -178,8 +182,9 @@ export const STAGES = [
       {
         id: 's2_n4',
         type: NODE_TYPES.KEY_NODE,
-        position: [-3.40, 1.05, -2.00],
-        basePorts: [0],
+        position: [-1.40, 1.40, -3.85],
+        orientation: 'wall_z',
+        basePorts: [3], // Left from Elbow
         unlocksNodeId: 's2_n6',
         rotationIndex: 0,
         solutionRotation: 0,
@@ -189,8 +194,9 @@ export const STAGES = [
       {
         id: 's2_n5',
         type: NODE_TYPES.SWITCH_STRAIGHT,
-        position: [-4.50, 1.15, -2.00],
-        basePorts: [0, 2],
+        position: [-3.20, 2.40, -3.85],
+        orientation: 'wall_z',
+        basePorts: [1, 3], // Right from Splitter, Left to Router
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         label: 'Lower Conduit Line',
@@ -199,8 +205,9 @@ export const STAGES = [
       {
         id: 's2_n6',
         type: NODE_TYPES.LOCKED_ROUTER,
-        position: [-3.60, 1.10, -3.30],
-        basePorts: [3, 1],
+        position: [-3.90, 2.40, -3.85],
+        orientation: 'wall_z',
+        basePorts: [1, 3], // Right from Straight, Left to Elbow
         rotationIndex: 2, // Scrambled
         solutionRotation: 0,
         isLocked: true,
@@ -210,8 +217,9 @@ export const STAGES = [
       {
         id: 's2_n7',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [-3.10, 1.10, -4.10],
-        basePorts: [3, 1],
+        position: [-4.50, 2.40, -3.85],
+        orientation: 'wall_z',
+        basePorts: [1, 2], // Right from Router, Down to Target
         rotationIndex: 3, // Scrambled
         solutionRotation: 0,
         label: 'Server Rack Intake Switch',
@@ -220,9 +228,9 @@ export const STAGES = [
       {
         id: 's2_n8',
         type: NODE_TYPES.TARGET,
-        position: [-2.85, 1.55, -4.15],
+        position: [-4.50, 1.40, -3.85],
         orientation: 'wall_z',
-        basePorts: [3], // Input from West
+        basePorts: [0], // Up from Elbow
         rotationIndex: 0,
         solutionRotation: 0,
         label: '42U Mainframe Interface',
@@ -230,20 +238,20 @@ export const STAGES = [
       },
     ],
     connections: [
-      { from: 's2_n0', fromPort: 2, to: 's2_n1', toPort: 0 },
-      { from: 's2_n1', fromPort: 1, to: 's2_n3', toPort: 3 },
-      { from: 's2_n3', fromPort: 2, to: 's2_n4', toPort: 0 },
-      { from: 's2_n1', fromPort: 2, to: 's2_n5', toPort: 0 },
-      { from: 's2_n5', fromPort: 2, to: 's2_n6', toPort: 3 },
-      { from: 's2_n6', fromPort: 1, to: 's2_n7', toPort: 3 },
-      { from: 's2_n7', fromPort: 1, to: 's2_n8', toPort: 3 },
-      // Hostile trap: if s2_n1 rotated by 1, its port 3 connects to s2_n2
-      { from: 's2_n1', fromPort: 3, to: 's2_n2', toPort: 0 },
+      { from: 's2_n0', fromPort: 3, to: 's2_n1', toPort: 1 },
+      { from: 's2_n1', fromPort: 2, to: 's2_n3', toPort: 0 },
+      { from: 's2_n3', fromPort: 1, to: 's2_n4', toPort: 3 },
+      { from: 's2_n1', fromPort: 3, to: 's2_n5', toPort: 1 },
+      { from: 's2_n5', fromPort: 3, to: 's2_n6', toPort: 1 },
+      { from: 's2_n6', fromPort: 3, to: 's2_n7', toPort: 1 },
+      { from: 's2_n7', fromPort: 2, to: 's2_n8', toPort: 0 },
+      // Hostile trap: if s2_n1 rotated by 1 (port 0 points Up to s2_n2)
+      { from: 's2_n1', fromPort: 0, to: 's2_n2', toPort: 2 },
     ],
   },
 
   // -----------------------------------------------------------
-  // STAGE 3: SYSTEM OVERRIDE (Full-Room Overdrive, 60s Countdown, 2 Locks, 2 Hostiles)
+  // STAGE 3: SYSTEM OVERRIDE (Facility Master Grid)
   // -----------------------------------------------------------
   {
     id: 'stage_3',
@@ -253,14 +261,15 @@ export const STAGES = [
     targetName: 'CYBER SENTINEL DRONE ROOT CORE',
     timeLimit: 180, // 180 seconds countdown (3 minutes)
     cameraPreset: 'ROOM_OVERVIEW',
-    camPos: [2.8, 3.4, 2.8],
-    camTarget: [-1.4, 1.3, -1.8],
+    camPos: [-1.8, 1.6, 2.0],
+    camTarget: [-1.8, 1.4, -3.85],
     nodes: [
       {
         id: 's3_n0',
         type: NODE_TYPES.SOURCE,
-        position: [0.00, 3.00, -2.50],
-        basePorts: [3], // West
+        position: [-1.00, 2.50, -3.85],
+        orientation: 'wall_z',
+        basePorts: [2], // Down (-Y)
         rotationIndex: 0,
         solutionRotation: 0,
         label: 'Ceiling Grid Main Bus',
@@ -269,9 +278,10 @@ export const STAGES = [
       {
         id: 's3_n1',
         type: NODE_TYPES.SWITCH_T,
-        position: [-1.20, 3.00, -2.50],
-        basePorts: [1, 0, 3],
-        rotationIndex: 3, // Scrambled
+        position: [-1.00, 1.70, -3.85],
+        orientation: 'wall_z',
+        basePorts: [0, 1, 3], // Up from Source, Right to Bookcase, Left to Server
+        rotationIndex: 2, // Scrambled
         solutionRotation: 0,
         label: 'Overhead Bridge Router',
         desc: '3-Way Junction Router',
@@ -279,10 +289,10 @@ export const STAGES = [
       {
         id: 's3_n2',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [0.60, 3.00, -4.15],
+        position: [0.60, 1.70, -3.85],
         orientation: 'wall_z',
-        basePorts: [3, 2],
-        rotationIndex: 2, // Scrambled
+        basePorts: [3, 2], // Left from Splitter, Down to Mid-Relay
+        rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         label: 'Bookcase High Conduit',
         desc: '90° Directional Switch',
@@ -290,9 +300,9 @@ export const STAGES = [
       {
         id: 's3_n3',
         type: NODE_TYPES.SWITCH_STRAIGHT,
-        position: [0.60, 2.10, -4.15],
+        position: [0.60, 1.10, -3.85],
         orientation: 'wall_z',
-        basePorts: [0, 2],
+        basePorts: [0, 2], // Up from High Conduit, Down to Key
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         label: 'Bookcase Mid-Relay',
@@ -301,9 +311,9 @@ export const STAGES = [
       {
         id: 's3_n4',
         type: NODE_TYPES.KEY_NODE,
-        position: [0.60, 1.20, -4.15],
+        position: [0.60, 0.50, -3.85],
         orientation: 'wall_z',
-        basePorts: [0],
+        basePorts: [0], // Up from Mid-Relay
         unlocksNodeId: 's3_n6',
         rotationIndex: 0,
         solutionRotation: 0,
@@ -313,19 +323,20 @@ export const STAGES = [
       {
         id: 's3_n5',
         type: NODE_TYPES.HOSTILE_IDS,
-        position: [-1.80, 3.00, -3.80],
-        basePorts: [1],
+        position: [-1.00, 0.90, -3.85],
+        orientation: 'wall_z',
+        basePorts: [0], // Up from Splitter Down
         rotationIndex: 0,
         solutionRotation: 0,
         label: 'Hostile Sensor A',
-        desc: 'HOSTILE: Deducts 10s From Clock!',
+        desc: 'HOSTILE: Deducts 5s From Clock!',
       },
       {
         id: 's3_n6',
         type: NODE_TYPES.LOCKED_ROUTER,
-        position: [-2.85, 2.40, -3.85],
+        position: [-2.20, 1.70, -3.85],
         orientation: 'wall_z',
-        basePorts: [0, 2],
+        basePorts: [1, 2], // Right from Splitter, Down to Distributor
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         isLocked: true,
@@ -335,10 +346,10 @@ export const STAGES = [
       {
         id: 's3_n7',
         type: NODE_TYPES.SWITCH_T,
-        position: [-2.85, 1.70, -3.85],
+        position: [-2.20, 1.00, -3.85],
         orientation: 'wall_z',
-        basePorts: [0, 2, 3],
-        rotationIndex: 2, // Scrambled
+        basePorts: [0, 2, 3], // Up from Router Alpha, Down to Key Beta, Left to Router Beta
+        rotationIndex: 3, // Scrambled
         solutionRotation: 0,
         label: 'Server Rack Distributor',
         desc: '3-Way Junction Router',
@@ -346,9 +357,9 @@ export const STAGES = [
       {
         id: 's3_n8',
         type: NODE_TYPES.KEY_NODE,
-        position: [-2.85, 0.90, -3.85],
+        position: [-2.20, 0.35, -3.85],
         orientation: 'wall_z',
-        basePorts: [0],
+        basePorts: [0], // Up from Distributor
         unlocksNodeId: 's3_n10',
         rotationIndex: 0,
         solutionRotation: 0,
@@ -358,19 +369,20 @@ export const STAGES = [
       {
         id: 's3_n9',
         type: NODE_TYPES.HOSTILE_IDS,
-        position: [-3.80, 0.90, -3.80],
-        basePorts: [1],
+        position: [-1.60, 1.00, -3.85],
+        orientation: 'wall_z',
+        basePorts: [3], // Left from Distributor Right
         rotationIndex: 0,
         solutionRotation: 0,
         label: 'Hostile Sensor B',
-        desc: 'HOSTILE: Deducts 10s From Clock!',
+        desc: 'HOSTILE: Deducts 5s From Clock!',
       },
       {
         id: 's3_n10',
         type: NODE_TYPES.LOCKED_ROUTER,
-        position: [-3.60, 1.70, -3.95],
+        position: [-3.30, 1.00, -3.85],
         orientation: 'wall_z',
-        basePorts: [1, 3],
+        basePorts: [1, 3], // Right from Distributor, Left to Drone Uplink
         rotationIndex: 1, // Scrambled
         solutionRotation: 0,
         isLocked: true,
@@ -380,10 +392,10 @@ export const STAGES = [
       {
         id: 's3_n11',
         type: NODE_TYPES.SWITCH_ELBOW,
-        position: [-4.20, 1.80, -3.95],
+        position: [-4.20, 1.00, -3.85],
         orientation: 'wall_z',
-        basePorts: [2, 0],
-        rotationIndex: 3, // Scrambled
+        basePorts: [1, 0], // Right from Router Beta, Up to Target
+        rotationIndex: 2, // Scrambled
         solutionRotation: 0,
         label: 'Corner Drone Uplink',
         desc: '90° Directional Switch',
@@ -391,9 +403,9 @@ export const STAGES = [
       {
         id: 's3_n12',
         type: NODE_TYPES.TARGET,
-        position: [-4.20, 2.25, -3.95],
+        position: [-4.20, 2.00, -3.85],
         orientation: 'wall_z',
-        basePorts: [2], // Input from bottom
+        basePorts: [2], // Down from Uplink
         rotationIndex: 0,
         solutionRotation: 0,
         label: 'Sentinel Drone Root Gateway',
@@ -401,19 +413,19 @@ export const STAGES = [
       },
     ],
     connections: [
-      { from: 's3_n0', fromPort: 3, to: 's3_n1', toPort: 1 },
-      { from: 's3_n1', fromPort: 0, to: 's3_n2', toPort: 3 },
+      { from: 's3_n0', fromPort: 2, to: 's3_n1', toPort: 0 },
+      { from: 's3_n1', fromPort: 1, to: 's3_n2', toPort: 3 },
       { from: 's3_n2', fromPort: 2, to: 's3_n3', toPort: 0 },
       { from: 's3_n3', fromPort: 2, to: 's3_n4', toPort: 0 },
-      { from: 's3_n1', fromPort: 3, to: 's3_n6', toPort: 0 },
+      { from: 's3_n1', fromPort: 3, to: 's3_n6', toPort: 1 },
       { from: 's3_n6', fromPort: 2, to: 's3_n7', toPort: 0 },
       { from: 's3_n7', fromPort: 2, to: 's3_n8', toPort: 0 },
       { from: 's3_n7', fromPort: 3, to: 's3_n10', toPort: 1 },
-      { from: 's3_n10', fromPort: 3, to: 's3_n11', toPort: 2 },
+      { from: 's3_n10', fromPort: 3, to: 's3_n11', toPort: 1 },
       { from: 's3_n11', fromPort: 0, to: 's3_n12', toPort: 2 },
       // Hostile branches
-      { from: 's3_n1', fromPort: 2, to: 's3_n5', toPort: 1 },
-      { from: 's3_n7', fromPort: 1, to: 's3_n9', toPort: 1 },
+      { from: 's3_n1', fromPort: 2, to: 's3_n5', toPort: 0 },
+      { from: 's3_n7', fromPort: 1, to: 's3_n9', toPort: 3 },
     ],
   },
 ];

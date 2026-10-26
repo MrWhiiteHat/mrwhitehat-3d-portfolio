@@ -22,26 +22,26 @@ export const CAMERA_VANTAGES = {
   DESK_VIEW: {
     id: 'DESK_VIEW',
     label: 'CAM 01: DESK',
-    pos: [2.5, 2.6, 2.3],
-    target: [0.3, 0.65, 0.4],
+    pos: [1.8, 2.0, 2.2],
+    target: [0.1, 0.55, 0.5],
   },
   SERVER_WALL: {
     id: 'SERVER_WALL',
     label: 'CAM 02: SERVER WALL',
-    pos: [-1.2, 2.2, -0.6],
-    target: [-3.6, 1.4, -2.6],
+    pos: [-2.6, 2.0, 0.4],
+    target: [-2.9, 2.0, -3.85],
   },
   CORNER_DRONE: {
     id: 'CORNER_DRONE',
     label: 'CAM 03: DRONE CORNER',
-    pos: [-1.6, 2.3, -1.8],
-    target: [-3.9, 1.7, -3.9],
+    pos: [-3.8, 1.8, -1.2],
+    target: [-3.8, 1.7, -3.85],
   },
   ROOM_OVERVIEW: {
     id: 'ROOM_OVERVIEW',
     label: 'CAM 04: OVERVIEW',
-    pos: [2.8, 3.4, 2.8],
-    target: [-1.4, 1.3, -1.8],
+    pos: [-1.8, 1.6, 2.0],
+    target: [-1.8, 1.4, -3.85],
   },
 };
 
@@ -399,7 +399,7 @@ function CircuitNode({
 
   const triggerNodeAction = () => {
     const now = Date.now();
-    if (now - lastTriggerTimeRef.current < 160) return; // Debounce rapid multi-clicks
+    if (now - lastTriggerTimeRef.current < 260) return; // Debounce rapid double-triggers
     lastTriggerTimeRef.current = now;
 
     onSelect?.(node.id);
@@ -429,15 +429,10 @@ function CircuitNode({
     const dist = Math.sqrt(dx * dx + dy * dy);
     const duration = Date.now() - downPosRef.current.time;
 
-    // Generous movement tolerance: up to 25px leeway and held for <800ms
-    if (dist < 25 && duration < 800) {
+    // Movement tolerance: up to 20px leeway and held for <600ms distinguishes click from drag
+    if (dist < 20 && duration < 600) {
       triggerNodeAction();
     }
-  };
-
-  const handleClick = (e) => {
-    e.stopPropagation();
-    triggerNodeAction();
   };
 
   const handlePointerOver = (e) => {
@@ -528,7 +523,6 @@ function CircuitNode({
       {/* 2. Main Interactive Node Body */}
       <group
         ref={meshGroupRef}
-        onClick={handleClick}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerOver={handlePointerOver}
@@ -997,7 +991,7 @@ function CircuitNode({
           position={isWallZ ? [0, 0, 0.16] : [0, 0.16, 0]}
           rotation={isWallZ ? [Math.PI / 2, 0, 0] : [0, 0, 0]}
         >
-          <cylinderGeometry args={[0.44, 0.44, 0.42, 24]} />
+          <cylinderGeometry args={[0.55, 0.55, 0.50, 24]} />
           <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
         </mesh>
       </group>
