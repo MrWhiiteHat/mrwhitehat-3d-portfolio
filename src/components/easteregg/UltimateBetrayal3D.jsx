@@ -27,6 +27,8 @@ import {
   playMomRetortFirewall,
   playMomRetortBlinkit,
   playMomRetortMirchi,
+  playMomRetortLinkedIn,
+  playMomRetortBulk,
   playNarratorPunchline,
   playMomScoldingReplay,
   stopAllSpeech,
@@ -374,7 +376,46 @@ function LaptopScreenOS({
   const [roastStep, setRoastStep] = useState('initial'); // 'initial' | 'mom_retort' | 'slipper' | 'narrator'
   const [activeDesktopApp, setActiveDesktopApp] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+  const [memeIndex, setMemeIndex] = useState(0);
   const dialogueSpokenRef = useRef(false);
+
+  const MEME_COLLECTION = [
+    {
+      title: "EXPECTATION VS REALITY",
+      top: "WHEN YOU SPEND 3 HOURS INFILTRATING A CLASSIFIED FACILITY",
+      expected: "🕶️ What you thought: Hollywood cyber ghost sipping black coffee in the dark",
+      reality: "🩴 What actually happened: Mother chasing you around dining table with Hawai slipper",
+      punchline: "TASK FAILED: ₹10 Coriander Not Secured"
+    },
+    {
+      title: "CYBERSECURITY SEVERITY MATRIX",
+      top: "THREAT LEVEL ASSESSMENT AT HOME",
+      expected: "🟢 Level 1: Foreign state-sponsored DDoS (Ignored)",
+      reality: "🔴 Level 99: Mom shouting your legal full name from the kitchen (IMMEDIATE CARDIAC ARREST)",
+      punchline: "Encryption Bypassed by 100dB Voice Decibels"
+    },
+    {
+      title: "THE SACRED DHANIYA PROTOCOL",
+      top: "THE 4 PILLARS OF INDIAN GROCERY ARBITRAGE",
+      expected: "Step 1: Hand ₹10 note with cyber precision\nStep 2: Demand fresh cilantro",
+      reality: "Step 3: Stare into vendor's soul until 4 FREE GREEN CHILLIES are deposited\nStep 4: Return victorious",
+      punchline: "If you pay for mirchi, family disownment is automatic"
+    },
+    {
+      title: "COLD MAGGI FORENSIC LOG",
+      top: "THERMODYNAMICS OF HACKER NOODLES",
+      expected: "Minute 0: Warm, spicy, aromatic comfort food",
+      reality: "Minute 25: Solidified into reinforced titanium brick that bent your stainless steel fork",
+      punchline: "Now classified as Military-Grade Ballistic Armor"
+    },
+    {
+      title: "SHARMA JI KA BETA BENCHMARK",
+      top: "COMPARATIVE PERFORMANCE REVIEW",
+      expected: "Sharma Ji's Son: Cracked Google, woke up at 4 AM, brought ₹10 dhaniya + 6 free chillies",
+      reality: "You: Rotated 14 glowing laser lines in dark room, cold Maggi on desk, grounded for 3 weeks",
+      punchline: "Mother's Rating: F- (Extreme Disappointment)"
+    }
+  ];
 
   useEffect(() => {
     return () => {
@@ -424,6 +465,10 @@ function LaptopScreenOS({
       playMomRetortBlinkit(onMomDone);
     } else if (choiceKey === 'mirchi') {
       playMomRetortMirchi(onMomDone);
+    } else if (choiceKey === 'linkedin') {
+      playMomRetortLinkedIn(onMomDone);
+    } else if (choiceKey === 'bulk') {
+      playMomRetortBulk(onMomDone);
     } else {
       onMomDone();
     }
@@ -519,6 +564,39 @@ function LaptopScreenOS({
           <span className="icon-glyph">🍜</span>
           <span className="icon-name">Cold_Maggi.log</span>
         </div>
+        <div
+          className="desktop-icon-item"
+          onClick={() => {
+            playCorporateClick();
+            setActiveDesktopApp('memes');
+          }}
+          title="Click to view Hilarious Sarcasm Memes"
+        >
+          <span className="icon-glyph">🖼️</span>
+          <span className="icon-name">Desi_Memes.exe</span>
+        </div>
+        <div
+          className="desktop-icon-item"
+          onClick={() => {
+            playCorporateClick();
+            setActiveDesktopApp('sharma');
+          }}
+          title="Click to view Sharma Ji Ka Beta comparison report"
+        >
+          <span className="icon-glyph">📉</span>
+          <span className="icon-name">Sharma_Beta.pdf</span>
+        </div>
+        <div
+          className="desktop-icon-item"
+          onClick={() => {
+            playCorporateClick();
+            setActiveDesktopApp('dictionary');
+          }}
+          title="Click to view Decrypted Indian Mom Dictionary"
+        >
+          <span className="icon-glyph">📖</span>
+          <span className="icon-name">Mom_Dict.txt</span>
+        </div>
       </div>
 
       {/* 2. OPTIONAL DESKTOP APP MODAL POPUP (When shortcut icon is clicked) */}
@@ -604,6 +682,116 @@ function LaptopScreenOS({
                   <p style={{ margin: '2px 0', color: '#38bdf8' }}>[13:32:15] Player: "Let me just solve this one last 3D circuit."</p>
                   <p style={{ margin: '2px 0', color: '#fbbf24' }}>[13:45:00] Player still rotating laser mirrors.</p>
                   <p style={{ margin: '2px 0', color: '#ef4444' }}>[14:02:10] CRITICAL: Maggi noodles have calcified into reinforced concrete. Fork stuck permanently.</p>
+                </div>
+              )}
+
+              {/* HILARIOUS SARCASM MEME VIEWER MODAL */}
+              {activeDesktopApp === 'memes' && (
+                <div className="meme-modal-container">
+                  <div className="meme-card-frame">
+                    <span className="meme-category-badge">🔥 VIRAL DESI HACKER MEME #{memeIndex + 1} OF 5</span>
+                    <h3 className="meme-headline">{MEME_COLLECTION[memeIndex].top}</h3>
+                    <div className="meme-split-box">
+                      <div className="meme-split-side left">
+                        <span className="split-label">EXPECTATION</span>
+                        <p>{MEME_COLLECTION[memeIndex].expected}</p>
+                      </div>
+                      <div className="meme-split-divider">VS</div>
+                      <div className="meme-split-side right">
+                        <span className="split-label">REALITY</span>
+                        <p>{MEME_COLLECTION[memeIndex].reality}</p>
+                      </div>
+                    </div>
+                    <div className="meme-bottom-punchline">
+                      💀 {MEME_COLLECTION[memeIndex].punchline} 🩴
+                    </div>
+                  </div>
+                  <div className="meme-nav-controls">
+                    <button
+                      type="button"
+                      className="meme-nav-btn"
+                      onClick={() => setMemeIndex((prev) => (prev > 0 ? prev - 1 : MEME_COLLECTION.length - 1))}
+                    >
+                      ◀ PREVIOUS MEME
+                    </button>
+                    <span className="meme-counter">{memeIndex + 1} / {MEME_COLLECTION.length}</span>
+                    <button
+                      type="button"
+                      className="meme-nav-btn primary"
+                      onClick={() => setMemeIndex((prev) => (prev + 1) % MEME_COLLECTION.length)}
+                    >
+                      NEXT MEME ▶
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* SHARMA JI KA BETA COMPARISON REPORT */}
+              {activeDesktopApp === 'sharma' && (
+                <div className="modal-app-text" style={{ fontSize: '9px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '4px', marginBottom: '6px' }}>
+                    <strong style={{ color: '#fbbf24' }}>📋 PERFORMANCE BENCHMARK AUDIT (CONFIDENTIAL)</strong>
+                    <span style={{ color: '#ef4444', fontWeight: 800 }}>GRADE: DISOWNMENT</span>
+                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8.5px' }}>
+                    <thead>
+                      <tr style={{ background: '#1e293b', color: '#38bdf8' }}>
+                        <th style={{ padding: '3px', textAlign: 'left' }}>METRIC</th>
+                        <th style={{ padding: '3px', color: '#4ade80' }}>SHARMA JI'S SON</th>
+                        <th style={{ padding: '3px', color: '#f87171' }}>YOU (THE "HACKER")</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid #1e293b' }}>
+                        <td style={{ padding: '3px' }}>Morning Wakeup</td>
+                        <td style={{ padding: '3px', color: '#4ade80' }}>4:30 AM (Brahma Muhurta)</td>
+                        <td style={{ padding: '3px', color: '#f87171' }}>1:45 PM (After 14 alarms)</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #1e293b' }}>
+                        <td style={{ padding: '3px' }}>Grocery Execution</td>
+                        <td style={{ padding: '3px', color: '#4ade80' }}>Gets ₹10 dhaniya + 5 free mirchi + lemon</td>
+                        <td style={{ padding: '3px', color: '#f87171' }}>Forgot coriander, buys ₹250 cold coffee</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #1e293b' }}>
+                        <td style={{ padding: '3px' }}>Career Achievement</td>
+                        <td style={{ padding: '3px', color: '#4ade80' }}>Senior Staff Engineer @ Google</td>
+                        <td style={{ padding: '3px', color: '#f87171' }}>Rotates 3D laser switches in a bunker</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '3px' }}>Household Utility</td>
+                        <td style={{ padding: '3px', color: '#4ade80' }}>Repairs microwave, AC & family honor</td>
+                        <td style={{ padding: '3px', color: '#f87171' }}>Solidifies Maggi noodles into concrete</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style={{ marginTop: '6px', padding: '4px', background: 'rgba(239, 68, 68, 0.15)', borderLeft: '2px solid #ef4444', color: '#fca5a5' }}>
+                    AUDITOR VERDICT: "We recommend trading this child for 2 bunches of fresh coriander and a pressure cooker gasket."
+                  </div>
+                </div>
+              )}
+
+              {/* INDIAN MOM DICTIONARY */}
+              {activeDesktopApp === 'dictionary' && (
+                <div className="modal-app-text" style={{ fontSize: '9px' }}>
+                  <strong style={{ color: '#38bdf8' }}>📖 DECRYPTED INDIAN MOM VOCABULARY DATABASE</strong>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '6px' }}>
+                    <div className="dict-entry">
+                      <strong style={{ color: '#fbbf24' }}>“Bas 2 minute ruko”</strong>
+                      <span style={{ color: '#cbd5e1' }}> → Actual Duration: 45 to 90 minutes. Do not leave the room.</span>
+                    </div>
+                    <div className="dict-entry">
+                      <strong style={{ color: '#fbbf24' }}>“Kuch nahi chahiye market se”</strong>
+                      <span style={{ color: '#cbd5e1' }}> → Trap detected. If you do not return with ginger, garlic and coriander, dinner is canceled.</span>
+                    </div>
+                    <div className="dict-entry">
+                      <strong style={{ color: '#fbbf24' }}>“Yeh sab uss computer ki wajah se hai”</strong>
+                      <span style={{ color: '#cbd5e1' }}> → Universal Root Cause: Explains global inflation, bad wifi, headaches, and burned dal.</span>
+                    </div>
+                    <div className="dict-entry">
+                      <strong style={{ color: '#fbbf24' }}>“Apne baap se bolo”</strong>
+                      <span style={{ color: '#cbd5e1' }}> → High Court appeal rejected. Matter referred to Chief Justice of the Household.</span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -868,6 +1056,34 @@ function LaptopScreenOS({
                 <div className="stat-card">
                   <span className="stat-lbl">CHAPPAL THREAT LEVEL</span>
                   <strong className="stat-num" style={{ color: '#dc2626' }}>DEFCON 1 (INBOUND)</strong>
+                </div>
+              </div>
+
+              {/* MISSION SARCASM MEME OF THE YEAR CARD */}
+              <div className="cert-meme-showcase-box">
+                <div className="cert-meme-top-bar">
+                  <span className="cert-meme-badge">🏆 MISSION SARCASM MEME #{memeIndex + 1}</span>
+                  <button
+                    type="button"
+                    className="cert-meme-shuffle-btn"
+                    onClick={() => setMemeIndex((prev) => (prev + 1) % MEME_COLLECTION.length)}
+                  >
+                    🔄 SHUFFLE MEME ({memeIndex + 1}/5)
+                  </button>
+                </div>
+                <div className="cert-meme-body">
+                  <strong className="cert-meme-text-top">{MEME_COLLECTION[memeIndex].top}</strong>
+                  <div className="cert-meme-visual-split">
+                    <div className="cert-meme-col exp">
+                      <span className="tag">EXPECTATION</span>
+                      <p>{MEME_COLLECTION[memeIndex].expected}</p>
+                    </div>
+                    <div className="cert-meme-col real">
+                      <span className="tag">REALITY</span>
+                      <p>{MEME_COLLECTION[memeIndex].reality}</p>
+                    </div>
+                  </div>
+                  <span className="cert-meme-text-bottom">💀 {MEME_COLLECTION[memeIndex].punchline} 🩴</span>
                 </div>
               </div>
 

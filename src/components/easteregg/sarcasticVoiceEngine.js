@@ -29,8 +29,8 @@ export function stopAllSpeech() {
 
 /**
  * Play Studio Voice Clip with Cascading Fallback:
- * 1. Gemini 3.8 Flash TTS WAV (studio acting with theatrical sarcasm & Indian Mom fury)
- * 2. Neural Expressive MP3 (crisp compressed fallback)
+ * 1. ElevenLabs / Studio WAV / MP3
+ * 2. Secondary audio format
  * 3. Browser Speech Synthesis fallback (if audio blocked by policy)
  */
 export function playRealVoiceClip(baseName, onComplete, fallbackText = '') {
@@ -55,8 +55,8 @@ export function playRealVoiceClip(baseName, onComplete, fallbackText = '') {
 
       audio.onerror = (e) => {
         console.warn(`[RealVoiceEngine] ${baseName}.${ext} failed, falling back...`, e);
-        if (ext === 'wav') {
-          tryPlay('mp3');
+        if (ext === 'mp3') {
+          tryPlay('wav');
         } else {
           if (currentAudio === audio) currentAudio = null;
           if (fallbackText && typeof window !== 'undefined' && window.speechSynthesis) {
@@ -71,8 +71,8 @@ export function playRealVoiceClip(baseName, onComplete, fallbackText = '') {
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
           console.warn(`[RealVoiceEngine] Play error for ${ext}:`, err);
-          if (ext === 'wav') {
-            tryPlay('mp3');
+          if (ext === 'mp3') {
+            tryPlay('wav');
           } else {
             if (fallbackText && typeof window !== 'undefined' && window.speechSynthesis) {
               speakFallback(fallbackText, onComplete);
@@ -83,15 +83,15 @@ export function playRealVoiceClip(baseName, onComplete, fallbackText = '') {
         });
       }
     } catch (err) {
-      if (ext === 'wav') {
-        tryPlay('mp3');
+      if (ext === 'mp3') {
+        tryPlay('wav');
       } else {
         onComplete?.();
       }
     }
   };
 
-  tryPlay('wav');
+  tryPlay('mp3');
 }
 
 function speakFallback(text, onComplete) {
@@ -143,7 +143,25 @@ export function playMomRetortMirchi(onComplete) {
   );
 }
 
-// 5. Narrator's Deadpan BBC Punchline
+// 5. Mom's Retort to "Put it on LinkedIn"
+export function playMomRetortLinkedIn(onComplete) {
+  playRealVoiceClip(
+    'mom_retort_linkedin',
+    onComplete,
+    "LinkedIn?! Write on LinkedIn: 'Master of staring at glowing cubes while mother's dal burns to ash'! First learn how to chop onions without crying, Mr. Senior Cyber Architect!"
+  );
+}
+
+// 6. Mom's Retort to "Buy ₹50 in Bulk"
+export function playMomRetortBulk(onComplete) {
+  playRealVoiceClip(
+    'mom_retort_bulk',
+    onComplete,
+    'Fifty rupees dhaniya?! It will rot in the fridge and turn into black soup in three days! Then who will eat it?! Your father?! Go get ten rupees, not one paise more!'
+  );
+}
+
+// 7. Narrator's Deadpan BBC Punchline
 export function playNarratorPunchline(onComplete) {
   playRealVoiceClip(
     'narrator_punchline',
@@ -152,7 +170,7 @@ export function playNarratorPunchline(onComplete) {
   );
 }
 
-// 6. Mom's Replay Scolding on Certificate Soundboard
+// 8. Mom's Replay Scolding on Certificate Soundboard
 export function playMomScoldingReplay(onComplete) {
   playRealVoiceClip(
     'mom_scolding_replay',
