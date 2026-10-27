@@ -377,14 +377,19 @@ function SceneContents({
       hackerModeData?.betrayalPhase &&
       hackerModeData.betrayalPhase !== 'NONE'
   );
+  const isLaptopZoomed = Boolean(hackerModeData?.isLaptopZoomed);
 
-  // Lock camera target directly onto the seated terminal when entering secret bunker
+  // Dynamically calibrate OrbitControls target for seated chair vs focused laptop screen
   useEffect(() => {
     if (isBunkerMode && controlsRef.current) {
-      controlsRef.current.target.set(0, 0.98, -0.08);
+      if (isLaptopZoomed) {
+        controlsRef.current.target.set(0, 0.86, -0.14);
+      } else {
+        controlsRef.current.target.set(0, 0.82, -0.05);
+      }
       controlsRef.current.update();
     }
-  }, [isBunkerMode, controlsRef]);
+  }, [isBunkerMode, isLaptopZoomed, controlsRef]);
 
   return (
     <>
@@ -512,6 +517,8 @@ function SceneContents({
             onRotateNode={hackerModeData.onRotateNode}
             controlsRef={controlsRef}
             isVaultOpen={hackerModeData.isVaultOpen}
+            isLaptopZoomed={hackerModeData.isLaptopZoomed}
+            onToggleLaptopZoom={hackerModeData.onToggleLaptopZoom}
             betrayalPhase={hackerModeData.betrayalPhase}
             onPhaseChange={hackerModeData.onPhaseChange}
             onInteractTerminal={hackerModeData.onInteractTerminal}
@@ -532,12 +539,12 @@ function SceneContents({
         panSpeed={0.85}
         enablePan={!isBunkerMode}
         screenSpacePanning={true}
-        minDistance={isBunkerMode ? 0.58 : gameState === 'HACKING' ? 0.2 : 2.0}
-        maxDistance={isBunkerMode ? 0.64 : gameState === 'HACKING' ? 25.0 : 22}
-        minPolarAngle={isBunkerMode ? 1.20 : 0.05}
-        maxPolarAngle={isBunkerMode ? 1.55 : gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
-        minAzimuthAngle={isBunkerMode ? -0.45 : -Infinity}
-        maxAzimuthAngle={isBunkerMode ? 0.45 : Infinity}
+        minDistance={isBunkerMode ? (isLaptopZoomed ? 0.28 : 0.75) : gameState === 'HACKING' ? 0.2 : 2.0}
+        maxDistance={isBunkerMode ? (isLaptopZoomed ? 0.40 : 1.15) : gameState === 'HACKING' ? 25.0 : 22}
+        minPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.25 : 1.10) : 0.05}
+        maxPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.48 : 1.55) : gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
+        minAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? -0.25 : -0.55) : -Infinity}
+        maxAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? 0.25 : 0.55) : Infinity}
       />
       <CameraDirector
         gameState={gameState}

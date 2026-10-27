@@ -167,6 +167,7 @@ export default function App() {
   const [hackerIsGameOver, setHackerIsGameOver] = useState(false);
   const [hackerTotalElapsed, setHackerTotalElapsed] = useState(0);
   const [betrayalPhase, setBetrayalPhase] = useState('NONE');
+  const [isLaptopZoomed, setIsLaptopZoomed] = useState(false);
   const [teleportState, setTeleportState] = useState({
     isActive: false,
     title: '',
@@ -367,6 +368,7 @@ export default function App() {
       playVaultDoorOpening();
       setTimeout(() => playVaultFanfare(), 300);
       setBetrayalPhase('VAULT_OPENING');
+      setIsLaptopZoomed(false);
       setHackerActiveVantageId('VAULT_CHAMBER');
     }, 450);
 
@@ -381,7 +383,17 @@ export default function App() {
     }, 3200);
   }, []);
 
+  const handleToggleLaptopZoom = useCallback(() => {
+    setIsLaptopZoomed((prev) => {
+      const next = !prev;
+      setHackerActiveVantageId(next ? 'VAULT_LAPTOP_FOCUS' : 'VAULT_CHAMBER');
+      return next;
+    });
+  }, []);
+
   const handleInteractTerminal = useCallback(() => {
+    setIsLaptopZoomed(true);
+    setHackerActiveVantageId('VAULT_LAPTOP_FOCUS');
     playCorporateClick();
     setBetrayalPhase('MOM_REVEAL');
   }, []);
@@ -398,6 +410,7 @@ export default function App() {
     // At peak of quantum warp (450ms)
     setTimeout(() => {
       setBetrayalPhase('NONE');
+      setIsLaptopZoomed(false);
       handleExitHackerMode();
     }, 450);
 
@@ -419,6 +432,7 @@ export default function App() {
     // At peak of quantum warp (450ms)
     setTimeout(() => {
       setBetrayalPhase('NONE');
+      setIsLaptopZoomed(false);
       initHackerStage(0);
     }, 450);
 
@@ -943,6 +957,8 @@ export default function App() {
           onRotateNode: handleRotateHackerNode,
           isVaultOpen: betrayalPhase !== 'NONE',
           betrayalPhase: betrayalPhase,
+          isLaptopZoomed: isLaptopZoomed,
+          onToggleLaptopZoom: handleToggleLaptopZoom,
           onPhaseChange: (p) => setBetrayalPhase(p),
           onInteractTerminal: handleInteractTerminal,
           onReturnToPortfolio: handleReturnFromBetrayal,

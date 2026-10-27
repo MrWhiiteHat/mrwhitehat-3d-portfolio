@@ -46,9 +46,15 @@ export const CAMERA_VANTAGES = {
   },
   VAULT_CHAMBER: {
     id: 'VAULT_CHAMBER',
-    label: 'CAM 05: SEATED AT TERMINAL',
-    pos: [0, 1.10, 0.52],
-    target: [0, 0.98, -0.08],
+    label: 'CAM 05: SEATED CHAIR VIEW',
+    pos: [0, 1.22, 0.85],
+    target: [0, 0.82, -0.05],
+  },
+  VAULT_LAPTOP_FOCUS: {
+    id: 'VAULT_LAPTOP_FOCUS',
+    label: 'CAM 06: LAPTOP MONITOR',
+    pos: [0, 0.98, 0.16],
+    target: [0, 0.86, -0.14],
   },
 };
 
@@ -1068,7 +1074,7 @@ function HackerCameraDirector({ activeVantageId, controlsRef }) {
     if (!dom) return;
 
     const stopFlight = () => {
-      if (activeVantageId === 'VAULT_CHAMBER') return;
+      if (activeVantageId === 'VAULT_CHAMBER' || activeVantageId === 'VAULT_LAPTOP_FOCUS') return;
       isTransitioning.current = false;
     };
 
@@ -1176,7 +1182,7 @@ function HackerCameraDirector({ activeVantageId, controlsRef }) {
     }
 
     // 2. Free flight camera movement via WASD / Arrows (disabled in seated bunker chamber)
-    if (activeVantageId === 'VAULT_CHAMBER') return;
+    if (activeVantageId === 'VAULT_CHAMBER' || activeVantageId === 'VAULT_LAPTOP_FOCUS') return;
 
     const k = keysDown.current;
     if (k.forward || k.backward || k.left || k.right || k.up || k.down) {
@@ -1272,6 +1278,8 @@ export default function HackingCircuitScene({
       {betrayalPhase && betrayalPhase !== 'NONE' ? (
         <SecretVaultRoom3D
           isOpen={isVaultOpen}
+          isLaptopZoomed={isLaptopZoomed}
+          onToggleLaptopZoom={onToggleLaptopZoom}
           betrayalPhase={betrayalPhase}
           onPhaseChange={onPhaseChange}
           onInteractTerminal={onInteractTerminal}
