@@ -4,12 +4,13 @@
 [![Three.js](https://img.shields.io/badge/Three.js-r172-black?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![React](https://img.shields.io/badge/React-18.3-61dafb?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![React Three Fiber](https://img.shields.io/badge/R3F-8.17-white?style=for-the-badge&logo=three.js&logoColor=black)](https://docs.pmnd.rs/react-three-fiber)
+[![ElevenLabs](https://img.shields.io/badge/ElevenLabs-Neural%20Audio-orange?style=for-the-badge&logo=soundcharts&logoColor=white)](https://elevenlabs.io/)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646cff?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
 
 > **Live Production URL:** 🌐 [https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/](https://mrwhiitehat.github.io/mrwhitehat-3d-portfolio/)
 
-An immersive, production-grade **3D Cybersecurity Operations Studio** and developer portfolio engineered by **Sadashiba Sarangi (MrWhiteHat)**. Built with **Three.js, React Three Fiber, and WebGL**, this experience fuses offensive red-teaming aesthetics with a fully interactive cyber command environment, tactile first-person locomotion, live CTF mini-games, and an instant Executive Recruiter Dossier.
+An immersive, production-grade **3D Cybersecurity Operations Studio** and developer portfolio engineered by **Sadashiba Sarangi (MrWhiteHat)**. Built with **Three.js, React Three Fiber, and WebGL**, this experience fuses offensive red-teaming aesthetics with a fully interactive cyber command environment, tactile first-person locomotion, live CTF mini-games, a dual-persona ElevenLabs sarcastic voice engine, and an instant Executive Recruiter Dossier.
 
 ---
 
@@ -43,6 +44,21 @@ Test your offensive and defensive cybersecurity skills directly inside the 3D te
 8. **Brute-Force Pin Breaker**: Execute timed brute-force routines against encrypted vaults.
 9. **Exploit Payload Generator**: Construct reverse shells and buffer overflow test strings.
 
+---
+
+### 🎙️ Dual-Persona Studio Voice Engine & ElevenLabs Neural TTS
+Upgraded from robotic browser speech to ultra-realistic, studio-grade neural voice acting powered by **ElevenLabs**:
+- **Desi Mom Persona (`Sarah` - Hyper-Expressive Neural Voice)**:
+  - Hilarious, high-strung, sarcastic Indian mother roasting the operative for bypassing mainframes while failing basic vegetable errands.
+  - Authentic Hinglish delivery with dynamic emotional range: scolding phone calls, WhatsApp voice notes, and threat escalations.
+- **Deadpan BBC Narrator (`Daniel` - Authoritative British Voice)**:
+  - Documentary-style voiceover delivering dry, serious, comedic contrast to Mom's furious outbursts.
+  - Officially recites evaluation findings, telemetry breakdowns, and tactical advice.
+- **Procedural Web Audio SFX Suite**:
+  - Integrated custom sound effects: Dhaniya fanfare trumpets, cash register dings, pressure cooker whistles, sad sarcastic trombones, digital hostile shock chimes, rejection buzzers, retro ringtones, and aerodynamic slipper whooshes.
+
+---
+
 ### 🕵️‍♂️ 3D Circuit Hacking Easter Egg & Secret Bunker
 Unlocks after completing portfolio stations or discovering the classified air-gap breach:
 - **3D Spatial Circuit Network**: Inspired by *Watch Dogs 2*, features high-voltage power conduits mapped to the room's walls, ceiling, and floor with strictly orthogonal Manhattan-grid topology. Features interactive rotatable switch junctions (straight, elbow, T-splitter), security padlocks, hostile IDS nodes, and synchronized directional flow chevrons.
@@ -50,21 +66,34 @@ Unlocks after completing portfolio stations or discovering the classified air-ga
 - **Cinematic Quantum Teleportation Warp Engine**: Fullscreen sci-fi hyperspace warp sequence with radiating energy rings, digital glitch scanlines, telemetry HUD, and synthesized sub-bass & laser shimmer audio (`playTeleportWarp()`) that transports the operative away from the office studio into an isolated underground facility.
 - **Dedicated Standalone 360° Secret Bunker Room**:
   - Completely isolated underground chamber with zero office clipping: 7m × 7m heavy steel plating, perimeter safety hazard stripes, emerald green LED sub-floor ventilation grates (`#10b981`), recessed server racks with blinking LEDs, and an overhead dangling tungsten cage lamp (`#fef08a`).
-- **The Ridiculous Discovery & In-World 3D Holographic Ending**:
+- **The Ridiculous Discovery & In-Laptop Window Operating System**:
   - Detailed 3D assets: Cheap folding utility table, blue swivel chair draped with an authentic pile of unfolded laundry, open 3D gaming laptop with backlit chiclet keyboard & glowing matrix code, steaming Maggi ramen bowl with **live rising 3D steam particles**, holy bunch of fresh dhaniya (coriander) with red rubber band, two fresh glossy green chillies (mirchi), and shiny golden ₹10 coin.
+  - **In-Laptop Window Manager**: All confrontation phases operate inside a clean, responsive retro window OS with titlebar audio replay controls, maximize/close buttons, and tab navigation.
+  - **Phase 1: Incoming Satellite Emergency Call**: Urgent retro phone call from Mom demanding why you haven't bought coriander yet.
+  - **Phase 2: Terminal Reality Check**: BBC Narrator roasting the hacker's priorities with interactive dialogue chips.
+  - **Phase 3: Leaked WhatsApp Audio Notes**: Interactive audio player featuring 3 voicemail dispatches from Mom (*Emergency Sabzi*, *DEFCON 1 Chappal*, *Sharma Ji's Son*).
+  - **Phase 4: Official Evaluation Report (`Official_Evaluation_Report.pdf`)**:
+    - **Narrator Auto-Read**: Automated deadpan BBC Narrator recitation of the complete evaluation report.
+    - **Interactive Stat Cards Soundboard**: Every single stat card is a clickable soundboard triggering sound effects and custom voice commentary:
+      - ⚡ *HACKING APTITUDE (`LEVEL 99 CYBER GHOST`)*: Shock SFX + Narrator on bypassing firewalls vs 5-rupee chores.
+      - 💔 *MOTHER'S APPROVAL (`-9,999 RESPECT`)*: Buzzer + Mom asking if the keyboard cooks roti.
+      - 🌿 *CORIANDER SECURED (`0 / 1 BUNCH`)*: Cash register chime + Narrator Dhaniya audit.
+      - 🌶️ *FREE GREEN CHILLIES (`0 / 4 MIRCHI`)*: Sarcastic trombone + Mom scolding lack of negotiation skills.
+      - 🍲 *SABZI STATUS (`BURNED TO ASH`)*: Pressure cooker whistle + Narrator reporting total carbonization.
+      - 🩴 *CHAPPAL THREAT LEVEL (`DEFCON 1 INBOUND`)*: Slipper swoosh + triggers a **live 3D tactical flying chappal** across the bunker!
+    - **Sarcastic Meme Gallery**: Dynamic 5-meme carousel (*Cyber Hacker vs Mom*, *Matrix vs Sabzi*, *Sharma Ji's Son*, *Dhaniya vs Pudina Crisis*, *DEFCON 1 Radar*) with interactive shuffle and sound effects.
   - **3D Tactical Flying Indian Chappal (Hawai Slipper 🩴)**: Programmed with **real 3D supersonic Bezier ballistic trajectory physics** that swoops right past the camera at Mach 3.4 when Mom's wrath is provoked!
-  - **In-World Spatial 3D Holographic Interface**: Rendered directly in 3D world space (`<Html transform center>`) featuring a live animated audio equalizer waveform, voice-synthesized dialogue from Mom shouting about the dhaniya errand, interactive 3D dialogue response chips, deadpan sarcastic narrator reality check, and the **3D Holographic Certificate of Errand Disobedience** with seamless quantum teleportation back to the portfolio workspace.
+
+---
 
 ### 📋 Executive Recruiter Quick-Access Dossier (`Key: R`)
 - Press **`R`** on the keyboard or tap the floating **Executive Dossier** badge for an instant 2D recruiter-optimized modal.
 - Provides immediate access to resume highlights, candidate summary, flagship project case studies, verified achievements, and direct communication channels—ideal for recruiters who need high-signal information without navigating 3D space.
 
-### 🔊 Procedural Web Audio Engine
-- Built-in Web Audio API synthesizer generating real-time ambient computer room hums, mechanical keyboard clicks, radar telemetry pings, and access granted/denied chimes with an on-screen mute toggle.
-
-### 🚀 Optimized 60 FPS Performance
-- **Zero Heavy Model Bloat**: Replaced legacy 20MB+ single-mesh models with modular, procedurally instanced geometry and optimized materials.
+### 🚀 60 FPS Performance & Mobile Responsiveness
+- **Zero Heavy Model Bloat**: Modular, procedurally instanced geometry and optimized materials for sub-second load times.
 - **Adaptive DPR & Dynamic Shadows**: Automatically adjusts device pixel ratio and shadow-map resolution based on device hardware and mobile viewport.
+- **Touch-Friendly Controls**: Seamless virtual d-pad, responsive modals, and touch-optimized soundboards for mobile and tablet visitors.
 
 ---
 
@@ -81,7 +110,8 @@ Unlocks after completing portfolio stations or discovering the classified air-ga
 | **`Left Click`** / **`E`** | Interact / Hack / Inspect targeted terminal |
 | **`Left Click` (in Hacker Mode)** | Select and rotate 3D spatial circuit switches |
 | **`F` (in Hacker Mode)** | Instant auto-solve / bypass circuit puzzle stage |
-| **`E` / `Enter` (in Secret Bunker)** | Confront Reality at laptop / interact with 3D hologram |
+| **`E` / `Enter` (in Secret Bunker)** | Confront Reality at laptop / interact with secret window OS |
+| **`Click Stat Card` (in Evaluation)** | Play custom sound effect & voice line soundboard |
 | **`R`** | Open Executive Recruiter Dossier |
 | **`M`** | Toggle Procedural Audio Synthesis |
 | **`Esc`** | Unlock Cursor / Close Modal / Open Main Menu |
@@ -97,8 +127,8 @@ Frontend Architecture      React 18.3 · Modern ESNext · HTML5 / CSS3
 3D Helpers & Shaders       React Three Drei (@react-three/drei)
 Physics & Particles        AABB Collision Physics · Bezier Ballistics · Procedural 3D Steam Particles
 Motion & Transitions       Framer Motion 11 · Quantum Warp Glitch Shaders
+Voice & Audio Synthesis    ElevenLabs Neural Voice (Sarah & Daniel) · Web Audio API · HTML5 Audio
 Iconography & UI           Lucide React · Tailwind CSS
-Audio Engine               Web Audio API (Procedural Synthesizer & Teleport Warp)
 Build & Bundler            Vite 6.0
 Hosting & Deployment       GitHub Pages (Automated via gh-pages)
 ```
