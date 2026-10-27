@@ -44,6 +44,13 @@ import {
   playIconMemesAudio,
   playIconSharmaAudio,
   playIconDictAudio,
+  playCertOfficialReading,
+  playCertStatHack,
+  playCertStatRespect,
+  playCertStatCoriander,
+  playCertStatMirchi,
+  playCertStatSabzi,
+  playCertStatChappal,
   stopAllSpeech,
 } from './sarcasticVoiceEngine.js';
 import { playClickSound } from '../../utils/audio.js';
@@ -572,10 +579,25 @@ function LaptopScreenOS({
     }
   };
 
+  const certSpokenRef = useRef(false);
+
+  useEffect(() => {
+    if (phase === 'CERTIFICATE_ROAST' && !certSpokenRef.current) {
+      certSpokenRef.current = true;
+      playDhaniyaFanfare();
+      setTimeout(() => {
+        playCertOfficialReading();
+      }, 600);
+    }
+  }, [phase]);
+
   const handleProceedToCertificate = () => {
     stopAllSpeech();
     playDhaniyaFanfare();
     onPhaseChange?.('CERTIFICATE_ROAST');
+    setTimeout(() => {
+      playCertOfficialReading();
+    }, 600);
   };
 
   const showToast = (msg) => {
@@ -908,6 +930,21 @@ function LaptopScreenOS({
             <span className="window-title-text">{getWindowTitle()}</span>
           </div>
           <div className="window-controls">
+            {phase === 'CERTIFICATE_ROAST' && (
+              <button
+                type="button"
+                className="modal-replay-voice-btn"
+                style={{ marginRight: '6px' }}
+                onClick={() => {
+                  stopAllSpeech();
+                  playDhaniyaFanfare();
+                  setTimeout(() => playCertOfficialReading(), 400);
+                }}
+                title="Play Official BBC Narrator Certificate Evaluation"
+              >
+                🔊 Read Evaluation
+              </button>
+            )}
             <span className="win-btn win-min">―</span>
             <span className="win-btn win-max">◻</span>
             <span className="win-btn win-close">✕</span>
@@ -1121,6 +1158,18 @@ function LaptopScreenOS({
                 <span className="cert-subtitle">
                   FOR DISTINGUISHED CYBER PROCRASTINATION UNDER EXTREME CIRCUMSTANCES
                 </span>
+                <button
+                  type="button"
+                  className="cert-listen-badge-btn"
+                  onClick={() => {
+                    stopAllSpeech();
+                    playDhaniyaFanfare();
+                    setTimeout(() => playCertOfficialReading(), 400);
+                  }}
+                  title="Play Official BBC Narrator Certificate Evaluation"
+                >
+                  🔊 PLAY OFFICIAL EVALUATION (BBC NARRATOR)
+                </button>
               </div>
 
               <div className="cert-recipient-tag">
@@ -1133,28 +1182,77 @@ function LaptopScreenOS({
               </p>
 
               <div className="cert-stats-grid">
-                <div className="stat-card">
-                  <span className="stat-lbl">HACKING APTITUDE</span>
+                <div
+                  className="stat-card clickable-stat"
+                  onClick={() => {
+                    stopAllSpeech();
+                    playHostileShock();
+                    playCertStatHack();
+                  }}
+                  title="Click to hear Hacking Aptitude assessment"
+                >
+                  <span className="stat-lbl">HACKING APTITUDE 🔊</span>
                   <strong className="stat-num" style={{ color: '#00f0ff' }}>LEVEL 99 CYBER GHOST</strong>
                 </div>
-                <div className="stat-card">
-                  <span className="stat-lbl">MOTHER'S APPROVAL</span>
+                <div
+                  className="stat-card clickable-stat"
+                  onClick={() => {
+                    stopAllSpeech();
+                    playRejectionBuzzer();
+                    playCertStatRespect();
+                  }}
+                  title="Click to hear Mother's Approval rating"
+                >
+                  <span className="stat-lbl">MOTHER'S APPROVAL 🔊</span>
                   <strong className="stat-num" style={{ color: '#ef4444' }}>-9,999 RESPECT</strong>
                 </div>
-                <div className="stat-card">
-                  <span className="stat-lbl">CORIANDER SECURED</span>
+                <div
+                  className="stat-card clickable-stat"
+                  onClick={() => {
+                    stopAllSpeech();
+                    playCashRegister();
+                    playCertStatCoriander();
+                  }}
+                  title="Click to hear Coriander audit"
+                >
+                  <span className="stat-lbl">CORIANDER SECURED 🔊</span>
                   <strong className="stat-num" style={{ color: '#f59e0b' }}>0 / 1 BUNCH</strong>
                 </div>
-                <div className="stat-card">
-                  <span className="stat-lbl">FREE GREEN CHILLIES</span>
+                <div
+                  className="stat-card clickable-stat"
+                  onClick={() => {
+                    stopAllSpeech();
+                    playSarcasticTrombone();
+                    playCertStatMirchi();
+                  }}
+                  title="Click to hear Mirchi negotiation failure"
+                >
+                  <span className="stat-lbl">FREE GREEN CHILLIES 🔊</span>
                   <strong className="stat-num" style={{ color: '#ef4444' }}>0 / 4 MIRCHI</strong>
                 </div>
-                <div className="stat-card">
-                  <span className="stat-lbl">SABZI STATUS</span>
+                <div
+                  className="stat-card clickable-stat"
+                  onClick={() => {
+                    stopAllSpeech();
+                    playPressureCookerWhistle();
+                    playCertStatSabzi();
+                  }}
+                  title="Click to hear Sabzi forensic status"
+                >
+                  <span className="stat-lbl">SABZI STATUS 🔊</span>
                   <strong className="stat-num" style={{ color: '#ef4444' }}>BURNED TO ASH</strong>
                 </div>
-                <div className="stat-card">
-                  <span className="stat-lbl">CHAPPAL THREAT LEVEL</span>
+                <div
+                  className="stat-card clickable-stat"
+                  onClick={() => {
+                    stopAllSpeech();
+                    onTriggerChappalFlight?.();
+                    playSlipperWhoosh();
+                    playCertStatChappal();
+                  }}
+                  title="Click to hear Chappal threat radar"
+                >
+                  <span className="stat-lbl">CHAPPAL THREAT LEVEL 🔊</span>
                   <strong className="stat-num" style={{ color: '#dc2626' }}>DEFCON 1 (INBOUND)</strong>
                 </div>
               </div>
@@ -1166,7 +1264,11 @@ function LaptopScreenOS({
                   <button
                     type="button"
                     className="cert-meme-shuffle-btn"
-                    onClick={() => setMemeIndex((prev) => (prev + 1) % MEME_COLLECTION.length)}
+                    onClick={() => {
+                      playMemeSwitchSound();
+                      setMemeIndex((prev) => (prev + 1) % MEME_COLLECTION.length);
+                    }}
+                    title="Shuffle to next sarcastic meme"
                   >
                     🔄 SHUFFLE MEME ({memeIndex + 1}/5)
                   </button>

@@ -13362,3 +13362,42 @@ body.is-pseudo-fullscreen .portfolio-container {
     font-size: 8.5px;
   }
 }
+
+/* Interactive Stat Cards and Certificate Audio Badge */
+.clickable-stat {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+.clickable-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.45);
+  border-color: #00f0ff;
+}
+.clickable-stat:active {
+  transform: scale(0.97);
+}
+.cert-listen-badge-btn {
+  margin-top: 6px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.3));
+  border: 1.5px solid #fbbf24;
+  color: #fef08a;
+  font-family: var(--mono, monospace);
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.25);
+  touch-action: manipulation;
+}
+.cert-listen-badge-btn:hover {
+  background: #fbbf24;
+  color: #020617;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.6);
+  transform: translateY(-1px);
+}

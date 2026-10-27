@@ -241,3 +241,66 @@ export function playIconDictAudio(onComplete) {
     'Section four of the Indian Mother Vocabulary: When she says, Bas do minute ruko, mathematical laws dictate you have exactly zero seconds to comply.'
   );
 }
+
+// 16. Official Certificate of Errand Disobedience - BBC Narrator Reading
+export function playCertOfficialReading(onComplete) {
+  playRealVoiceClip(
+    'cert_official_reading',
+    onComplete,
+    "Official evaluation report. Department of Domestic Household Operations and Cyber Arbitrage. Certificate of Errand Disobedience, awarded to the elite hacker who spent twenty minutes rotating 3D laser switches, yet completely neglected a five minute trip to buy coriander. Final verdict: Sabzi burned to ash, Mother's approval negative nine thousand nine hundred, and tactical Hawai chappal locked on target at Defcon One."
+  );
+}
+
+// 17. Stat Card: Hacking Aptitude
+export function playCertStatHack(onComplete) {
+  playRealVoiceClip(
+    'cert_stat_hack',
+    onComplete,
+    'Hacking aptitude: Level 99 Cyber Ghost. Capable of penetrating Pentagon firewalls, yet unable to locate the vegetable stall across the street.'
+  );
+}
+
+// 18. Stat Card: Mother's Approval
+export function playCertStatRespect(onComplete) {
+  playRealVoiceClip(
+    'cert_stat_respect',
+    onComplete,
+    'Arey Nalayak! Minus nine thousand nine hundred respect! Sharma ji ka beta respects his mother, aur tu din bhar laser ghuma raha hai!'
+  );
+}
+
+// 19. Stat Card: Coriander Secured
+export function playCertStatCoriander(onComplete) {
+  playRealVoiceClip(
+    'cert_stat_coriander',
+    onComplete,
+    'Zero bunches of coriander secured! Das rupaye ka dhaniya nahi laya, ab sookhi roti khao!'
+  );
+}
+
+// 20. Stat Card: Free Green Chillies
+export function playCertStatMirchi(onComplete) {
+  playRealVoiceClip(
+    'cert_stat_mirchi',
+    onComplete,
+    'Char free mirchi kahan hai?! Agar ek mirchi ke bhi paise diye na, family WhatsApp group se nikaal dungi!'
+  );
+}
+
+// 21. Stat Card: Sabzi Status
+export function playCertStatSabzi(onComplete) {
+  playRealVoiceClip(
+    'cert_stat_sabzi',
+    onComplete,
+    'Sabzi jal ke poori kaali koyla ban gayi! Pressure cooker seetiyan maar raha hai aur tu yahan certificate dekh raha hai!'
+  );
+}
+
+// 22. Stat Card: Chappal Threat Level
+export function playCertStatChappal(onComplete) {
+  playRealVoiceClip(
+    'cert_stat_chappal',
+    onComplete,
+    'Warning: Chappal threat level elevated to Defcon One. Supersonic Hawai slipper air raid initiated. Seek immediate domestic cover.'
+  );
+}
