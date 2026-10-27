@@ -23,8 +23,12 @@ import {
   playMomSlipperSmack,
 } from './easterEggAudio.js';
 import {
-  speakExpressiveDialogue,
-  speakNarratorDialogue,
+  playMomInitialCall,
+  playMomRetortFirewall,
+  playMomRetortBlinkit,
+  playMomRetortMirchi,
+  playNarratorPunchline,
+  playMomScoldingReplay,
   stopAllSpeech,
 } from './sarcasticVoiceEngine.js';
 import { playClickSound } from '../../utils/audio.js';
@@ -378,7 +382,7 @@ function LaptopScreenOS({
     };
   }, []);
 
-  // When Entering MOM_REVEAL, start domestic panic sequence
+  // When Entering MOM_REVEAL, start domestic panic sequence with real human voice!
   useEffect(() => {
     if (phase === 'MOM_REVEAL' && !dialogueSpokenRef.current) {
       dialogueSpokenRef.current = true;
@@ -386,25 +390,19 @@ function LaptopScreenOS({
       setTimeout(() => {
         playRecordScratch();
         playMomGong();
-        speakExpressiveDialogue([
-          { text: "Arey Nalayak Oye Hero!", pitch: 1.45, rate: 1.15, pauseAfter: 180 },
-          { text: "Dal poori jal gayi stove pe aur pressure cooker phatne waala hai!", pitch: 1.35, rate: 1.12, pauseAfter: 220 },
-          { text: "Stop clicking click-click in fake Matrix! Go to market and bring ₹10 DHANIYA right now!", pitch: 1.25, rate: 1.1, pauseAfter: 220 },
-          { text: "Aur sun! Agar sabzi-wale se free mirchi nahi li, toh ghar ke andar mat aana!", pitch: 1.4, rate: 1.18 }
-        ]);
+        playMomInitialCall();
       }, 500);
     }
   }, [phase]);
 
-  const handlePlayerChoice = (choiceKey, playerText, momRetort, voiceChunks) => {
+  const handlePlayerChoice = (choiceKey, playerText, momRetort) => {
     playCorporateClick();
     setSelectedResponse(playerText);
     setMomRetortText(momRetort);
     setRoastStep('mom_retort');
 
-    // Mom immediately fires back her voiced retort
-    speakExpressiveDialogue(voiceChunks, () => {
-      // After retort finishes, launch the supersonic slipper!
+    // Callback after Mom finishes her authentic human retort
+    const onMomDone = () => {
       setRoastStep('slipper');
       onTriggerChappalFlight?.();
       playSlipperWhoosh();
@@ -413,15 +411,22 @@ function LaptopScreenOS({
         setRoastStep('narrator');
         playDramaticVineBoom();
         setTimeout(() => {
-          speakNarratorDialogue(
-            "You spent 20 minutes rotating 3D laser nodes and feeling like an invincible cyber operator. And yet, your mother dismantled your entire clandestine operation with one single Hawaiian slipper and a demand for coriander. The dal is ruined. The chappal is supersonic.",
-            () => {
-              playSarcasticTrombone();
-            }
-          );
-        }, 350);
+          playNarratorPunchline(() => {
+            playSarcasticTrombone();
+          });
+        }, 400);
       }, 1600);
-    });
+    };
+
+    if (choiceKey === 'firewall') {
+      playMomRetortFirewall(onMomDone);
+    } else if (choiceKey === 'blinkit') {
+      playMomRetortBlinkit(onMomDone);
+    } else if (choiceKey === 'mirchi') {
+      playMomRetortMirchi(onMomDone);
+    } else {
+      onMomDone();
+    }
   };
 
   const handleProceedToCertificate = () => {
@@ -875,10 +880,7 @@ function LaptopScreenOS({
                     className="soundboard-btn"
                     onClick={() => {
                       playPressureCookerWhistle();
-                      speakExpressiveDialogue([
-                        { text: "OYE HERO!", pitch: 1.45, rate: 1.15, pauseAfter: 150 },
-                        { text: "Did you buy the coriander yet?! Put down the computer!", pitch: 1.3, rate: 1.15 }
-                      ]);
+                      playMomScoldingReplay();
                     }}
                   >
                     👵🏽 Arey Nalayak! (Replay Scolding)

@@ -1,186 +1,147 @@
 import { isMuted } from '../../utils/audio.js';
 
-let cachedVoices = [];
-let voicesLoaded = false;
+const getAssetUrl = (path) => {
+  const base = import.meta.env.BASE_URL || './';
+  const cleanBase = base.endsWith('/') ? base : base + '/';
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${cleanBase}${cleanPath}`;
+};
 
-function loadVoices() {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return [];
-  const voices = window.speechSynthesis.getVoices();
-  if (voices && voices.length > 0) {
-    cachedVoices = voices;
-    voicesLoaded = true;
-  }
-  return cachedVoices;
-}
-
-if (typeof window !== 'undefined' && window.speechSynthesis) {
-  loadVoices();
-  window.speechSynthesis.onvoiceschanged = () => {
-    loadVoices();
-  };
-}
+let currentAudio = null;
 
 /**
- * Find the most realistic, expressive voice for Mother
- * Prioritizes natural Indian English / Hindi voices, then natural female voices
- */
-export function getMomVoice() {
-  const voices = cachedVoices.length > 0 ? cachedVoices : loadVoices();
-  if (!voices || voices.length === 0) return null;
-
-  // 1. Exact Indian English matches (Heera, Neerja, Veena, Google en-IN, etc.)
-  const indVoice = voices.find(
-    (v) =>
-      (v.lang.includes('en-IN') || v.lang.includes('hi-IN') || v.name.toLowerCase().includes('india')) &&
-      !v.name.toLowerCase().includes('male') &&
-      !v.name.toLowerCase().includes('david') &&
-      !v.name.toLowerCase().includes('ravi')
-  );
-  if (indVoice) return indVoice;
-
-  // 2. Any Indian voice fallback
-  const anyInd = voices.find(
-    (v) => v.lang.includes('en-IN') || v.name.toLowerCase().includes('india')
-  );
-  if (anyInd) return anyInd;
-
-  // 3. Natural / neural female voices
-  const femaleVoice = voices.find(
-    (v) =>
-      (v.name.toLowerCase().includes('female') ||
-        v.name.toLowerCase().includes('zira') ||
-        v.name.toLowerCase().includes('natural') ||
-        v.name.toLowerCase().includes('samantha')) &&
-      !v.name.toLowerCase().includes('male')
-  );
-  if (femaleVoice) return femaleVoice;
-
-  return voices[0] || null;
-}
-
-/**
- * Find the most dry, sarcastic, deadpan voice for the Narrator
- * Prioritizes British English / deep male voices (BBC documentary style)
- */
-export function getNarratorVoice() {
-  const voices = cachedVoices.length > 0 ? cachedVoices : loadVoices();
-  if (!voices || voices.length === 0) return null;
-
-  // 1. British male voice (George, Daniel, Oliver, Google UK English Male, en-GB)
-  const britMale = voices.find(
-    (v) =>
-      v.lang.includes('en-GB') &&
-      (v.name.toLowerCase().includes('male') ||
-        v.name.toLowerCase().includes('george') ||
-        v.name.toLowerCase().includes('daniel') ||
-        v.name.toLowerCase().includes('oliver'))
-  );
-  if (britMale) return britMale;
-
-  // 2. Any British voice
-  const brit = voices.find((v) => v.lang.includes('en-GB'));
-  if (brit) return brit;
-
-  // 3. Deep male voice
-  const deepMale = voices.find(
-    (v) =>
-      v.name.toLowerCase().includes('male') ||
-      v.name.toLowerCase().includes('david') ||
-      v.name.toLowerCase().includes('mark')
-  );
-  if (deepMale) return deepMale;
-
-  return voices[0] || null;
-}
-
-/**
- * Cancel and stop any active speech synthesis
+ * Cancel and stop any active real voice audio or fallback speech synthesis
  */
 export function stopAllSpeech() {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return;
-  try {
-    window.speechSynthesis.cancel();
-  } catch (e) {}
+  if (currentAudio) {
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    } catch (e) {}
+    currentAudio = null;
+  }
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
+  }
 }
 
 /**
- * Speak multi-segment expressive sarcastic dialogue with natural human cadence,
- * dynamic pitch shifts, variable rate, and comedic pauses!
- *
- * @param {Array<{ text: string, pitch?: number, rate?: number, volume?: number, pauseAfter?: number }>} segments
+ * Play Real Human Studio Voice Audio Clip
+ * @param {string} audioFileName - filename in public/audio/easteregg/
  * @param {Function} [onComplete]
+ * @param {string} [fallbackText] - fallback text for speech synthesis if audio blocked
  */
-export function speakExpressiveDialogue(segments, onComplete) {
-  if (typeof window === 'undefined' || !window.speechSynthesis || isMuted()) {
+export function playRealVoiceClip(audioFileName, onComplete, fallbackText = '') {
+  if (isMuted()) {
     onComplete?.();
     return;
   }
 
   stopAllSpeech();
 
-  if (!Array.isArray(segments) || segments.length === 0) {
-    onComplete?.();
-    return;
-  }
+  try {
+    const audioUrl = getAssetUrl(`audio/easteregg/${audioFileName}`);
+    const audio = new Audio(audioUrl);
+    audio.volume = 1.0;
+    currentAudio = audio;
 
-  const voice = getMomVoice();
-  let currentIndex = 0;
-
-  function speakNextSegment() {
-    if (currentIndex >= segments.length) {
+    audio.onended = () => {
+      if (currentAudio === audio) currentAudio = null;
       onComplete?.();
-      return;
-    }
+    };
 
-    const seg = segments[currentIndex];
-    const utterance = new SpeechSynthesisUtterance(seg.text);
-
-    if (voice) utterance.voice = voice;
-    utterance.pitch = seg.pitch !== undefined ? seg.pitch : 1.2;
-    utterance.rate = seg.rate !== undefined ? seg.rate : 1.05;
-    utterance.volume = seg.volume !== undefined ? seg.volume : 1.0;
-
-    utterance.onend = () => {
-      currentIndex++;
-      if (seg.pauseAfter && seg.pauseAfter > 0) {
-        setTimeout(speakNextSegment, seg.pauseAfter);
+    audio.onerror = (e) => {
+      console.warn(`[RealVoiceEngine] Audio file error (${audioFileName}), using fallback:`, e);
+      if (currentAudio === audio) currentAudio = null;
+      if (fallbackText && typeof window !== 'undefined' && window.speechSynthesis) {
+        speakFallback(fallbackText, onComplete);
       } else {
-        speakNextSegment();
+        onComplete?.();
       }
     };
 
-    utterance.onerror = () => {
-      currentIndex++;
-      speakNextSegment();
-    };
-
-    window.speechSynthesis.speak(utterance);
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        console.warn('[RealVoiceEngine] Audio play prevented, using fallback:', err);
+        if (fallbackText && typeof window !== 'undefined' && window.speechSynthesis) {
+          speakFallback(fallbackText, onComplete);
+        } else {
+          onComplete?.();
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('[RealVoiceEngine] Exception playing audio:', err);
+    onComplete?.();
   }
-
-  speakNextSegment();
 }
 
-/**
- * Speak in deadpan sarcastic Narrator style (low pitch, slow, ultra dry)
- */
-export function speakNarratorDialogue(text, onComplete) {
-  if (typeof window === 'undefined' || !window.speechSynthesis || isMuted()) {
+function speakFallback(text, onComplete) {
+  try {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.1;
+    utterance.pitch = 1.25;
+    utterance.onend = () => onComplete?.();
+    utterance.onerror = () => onComplete?.();
+    window.speechSynthesis.speak(utterance);
+  } catch (e) {
     onComplete?.();
-    return;
   }
+}
 
-  stopAllSpeech();
+// 1. Mom's Initial Furious Calling Transmission
+export function playMomInitialCall(onComplete) {
+  playRealVoiceClip(
+    'mom_initial_call.mp3',
+    onComplete,
+    'AREY NALAYAK! OYE HERO! Dal poori jal gayi stove pe aur pressure cooker seetiyan maar raha hai! Stop clicking click-click in fake Matrix! Go to market and bring ₹10 DHANIYA right now!'
+  );
+}
 
-  const voice = getNarratorVoice();
-  const utterance = new SpeechSynthesisUtterance(text);
+// 2. Mom's Retort to "Bypassed Military Firewall"
+export function playMomRetortFirewall(onComplete) {
+  playRealVoiceClip(
+    'mom_retort_firewall.mp3',
+    onComplete,
+    "Military firewall?! Arey wah, Nalayak! Last week you couldn't even fix bathroom ka door latch! Go get the dhaniya before I disconnect your Wi-Fi router forever!"
+  );
+}
 
-  if (voice) utterance.voice = voice;
-  utterance.pitch = 0.85; // Low deadpan pitch
-  utterance.rate = 0.92; // Deliberate, dry sarcastic tempo
-  utterance.volume = 1.0;
+// 3. Mom's Retort to "Order on Blinkit / Zepto"
+export function playMomRetortBlinkit(onComplete) {
+  playRealVoiceClip(
+    'mom_retort_blinkit.mp3',
+    onComplete,
+    'Blinkit?! You want to pay 40 rupees delivery fee for 10 rupees dhaniya?! Kya main yahan paise ka ped uga rahi hoon?! Wear your slippers and RUN!'
+  );
+}
 
-  utterance.onend = () => onComplete?.();
-  utterance.onerror = () => onComplete?.();
+// 4. Mom's Retort to "What if vendor refuses free mirchi?"
+export function playMomRetortMirchi(onComplete) {
+  playRealVoiceClip(
+    'mom_retort_mirchi.mp3',
+    onComplete,
+    'Negotiate?! Agar ek mirchi ke bhi paise diye na, family WhatsApp group se nikaal dungi! Stare into his soul until he gives free mirchi! Now move!'
+  );
+}
 
-  window.speechSynthesis.speak(utterance);
+// 5. Narrator's Deadpan BBC Punchline
+export function playNarratorPunchline(onComplete) {
+  playRealVoiceClip(
+    'narrator_punchline.mp3',
+    onComplete,
+    'You spent 20 minutes rotating 3D laser switches and feeling like Mr. Robot. And yet, your mother dismantled your entire clandestine operation with one whistling Hawkins pressure cooker, a supersonic Hawai chappal and Belan air raid, and a demand for coriander. The dal is burned to ash. The chappal is supersonic.'
+  );
+}
+
+// 6. Mom's Replay Scolding on Certificate Soundboard
+export function playMomScoldingReplay(onComplete) {
+  playRealVoiceClip(
+    'mom_scolding_replay.mp3',
+    onComplete,
+    'Arey Nalayak! Did you buy the dhaniya yet?! Put down the computer and run to the market before I launch another chappal!'
+  );
 }
