@@ -1254,6 +1254,8 @@ export default function HackingCircuitScene({
   controlsRef,
   isVaultOpen = false,
   betrayalPhase = 'NONE',
+  isLaptopZoomed = false,
+  onToggleLaptopZoom,
   onPhaseChange,
   onInteractTerminal,
   onReturnToPortfolio,
