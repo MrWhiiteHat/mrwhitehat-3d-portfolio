@@ -1049,7 +1049,16 @@ function HackerCameraDirector({ activeVantageId, controlsRef }) {
     if (lastVantageRef.current !== activeVantageId) {
       lastVantageRef.current = activeVantageId;
       const v = CAMERA_VANTAGES[activeVantageId] || CAMERA_VANTAGES.DESK_VIEW;
-      targetCamPos.current.set(...v.pos);
+      let pos = [...v.pos];
+      const isMobilePortrait = typeof window !== 'undefined' && window.innerWidth < 768;
+      if (isMobilePortrait) {
+        if (activeVantageId === 'VAULT_LAPTOP_FOCUS') {
+          pos = [0, 1.14, 0.52];
+        } else if (activeVantageId === 'VAULT_CHAMBER') {
+          pos = [0, 1.25, 0.85];
+        }
+      }
+      targetCamPos.current.set(...pos);
       targetCamLook.current.set(...v.target);
       isTransitioning.current = true;
 

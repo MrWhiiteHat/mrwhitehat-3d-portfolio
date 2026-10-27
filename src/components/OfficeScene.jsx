@@ -535,12 +535,12 @@ function SceneContents({
         panSpeed={0.85}
         enablePan={!isBunkerMode}
         screenSpacePanning={true}
-        minDistance={isBunkerMode ? (isLaptopZoomed ? 0.45 : 0.75) : gameState === 'HACKING' ? 0.2 : 2.0}
-        maxDistance={isBunkerMode ? (isLaptopZoomed ? 0.65 : 1.15) : gameState === 'HACKING' ? 25.0 : 22}
-        minPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.15 : 1.10) : 0.05}
-        maxPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.45 : 1.50) : gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
-        minAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? -0.30 : -0.45) : -Infinity}
-        maxAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? 0.30 : 0.45) : Infinity}
+        minDistance={isBunkerMode ? (isLaptopZoomed ? 0.30 : 0.55) : gameState === 'HACKING' ? 0.2 : 2.0}
+        maxDistance={isBunkerMode ? (isLaptopZoomed ? 0.95 : 1.45) : gameState === 'HACKING' ? 25.0 : 22}
+        minPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.00 : 0.95) : 0.05}
+        maxPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.55 : 1.55) : gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
+        minAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? -0.45 : -0.65) : -Infinity}
+        maxAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? 0.45 : 0.65) : Infinity}
       />
       <CameraDirector
         gameState={gameState}
@@ -614,11 +614,11 @@ export default function OfficeScene({
         dpr={[
           1,
           typeof window !== 'undefined'
-            ? Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.0 : 1.5)
+            ? Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.2 : 1.5)
             : 1.0,
         ]}
         gl={{
-          powerPreference: typeof window !== 'undefined' && window.innerWidth < 768 ? 'low-power' : 'high-performance',
+          powerPreference: 'high-performance',
           antialias: typeof window !== 'undefined' ? window.innerWidth >= 768 : true,
           stencil: false,
           depth: true,

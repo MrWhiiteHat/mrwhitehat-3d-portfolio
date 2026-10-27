@@ -561,6 +561,7 @@ export default function GameHUD({
           <div
             className="hud-joystick-pad"
             ref={joystickBaseRef}
+            style={{ touchAction: 'none' }}
             onTouchStart={handleJoystickTouchStart}
             onTouchMove={handleJoystickTouchMove}
             onTouchEnd={handleJoystickTouchEnd}

@@ -48,21 +48,30 @@ import {
 } from './sarcasticVoiceEngine.js';
 import { playClickSound } from '../../utils/audio.js';
 
+// Pre-allocated single geometries & materials for 60FPS lock & zero memory churn
+const _sharedDustGeo = new THREE.SphereGeometry(0.012, 6, 6);
+const _sharedDustMat = new THREE.MeshBasicMaterial({ color: '#38bdf8', transparent: true, opacity: 0.35 });
+
+const _sharedSteamGeo = new THREE.SphereGeometry(1, 8, 8);
+const _sharedSteamMat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.25, depthWrite: false });
+
 /**
- * 3D Floating Dust Motes in the Bunker Air
+ * 3D Floating Dust Motes in the Bunker Air (60FPS Optimized)
  */
 function BunkerAtmosphericDust3D({ count = 25 }) {
   const pointsRef = useRef();
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const effectiveCount = isMobile ? 12 : count;
 
   const particles = useMemo(() => {
-    return Array.from({ length: count }).map(() => ({
+    return Array.from({ length: effectiveCount }).map(() => ({
       x: (Math.random() - 0.5) * 5.5,
       y: 0.4 + Math.random() * 2.5,
       z: (Math.random() - 0.5) * 5.5,
       speedY: 0.02 + Math.random() * 0.03,
       swirl: Math.random() * Math.PI * 2,
     }));
-  }, [count]);
+  }, [effectiveCount]);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -84,10 +93,12 @@ function BunkerAtmosphericDust3D({ count = 25 }) {
   return (
     <group ref={pointsRef}>
       {particles.map((p, i) => (
-        <mesh key={`dust-${i}`} position={[p.x, p.y, p.z]}>
-          <sphereGeometry args={[0.012, 6, 6]} />
-          <meshBasicMaterial color="#38bdf8" transparent opacity={0.35} />
-        </mesh>
+        <mesh
+          key={`dust-${i}`}
+          position={[p.x, p.y, p.z]}
+          geometry={_sharedDustGeo}
+          material={_sharedDustMat}
+        />
       ))}
     </group>
   );
@@ -98,9 +109,11 @@ function BunkerAtmosphericDust3D({ count = 25 }) {
  */
 function SteamParticles3D({ count = 12 }) {
   const particlesRef = useRef([]);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const effectiveCount = isMobile ? 6 : count;
 
   const particles = useMemo(() => {
-    return Array.from({ length: count }).map(() => ({
+    return Array.from({ length: effectiveCount }).map(() => ({
       x: (Math.random() - 0.5) * 0.08,
       y: 0.04 + Math.random() * 0.16,
       z: (Math.random() - 0.5) * 0.08,
@@ -109,7 +122,7 @@ function SteamParticles3D({ count = 12 }) {
       phase: Math.random() * Math.PI * 2,
       scale: 0.012 + Math.random() * 0.015,
     }));
-  }, [count]);
+  }, [effectiveCount]);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -141,15 +154,9 @@ function SteamParticles3D({ count = 12 }) {
         <mesh
           key={`steam-${i}`}
           ref={(el) => (particlesRef.current[i] = el)}
-        >
-          <sphereGeometry args={[1, 8, 8]} />
-          <meshBasicMaterial
-            color="#ffffff"
-            transparent
-            opacity={0.25}
-            depthWrite={false}
-          />
-        </mesh>
+          geometry={_sharedSteamGeo}
+          material={_sharedSteamMat}
+        />
       ))}
     </group>
   );
@@ -383,6 +390,8 @@ function LaptopScreenOS({
   onReturnToPortfolio,
   onRestartEasterEgg,
   onTriggerChappalFlight,
+  isExpandedView = false,
+  onToggleExpandedView,
 }) {
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [momRetortText, setMomRetortText] = useState('');
@@ -1295,6 +1304,19 @@ function LaptopScreenOS({
           <span>{getWindowTitle()}</span>
         </div>
         <div className="taskbar-tray">
+          {onToggleExpandedView && (
+            <button
+              type="button"
+              className="taskbar-zoom-btn expand-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleExpandedView();
+              }}
+              title={isExpandedView ? "Return to 3D Room" : "Expand to Clean Fullscreen View (Touch / Mobile Friendly)"}
+            >
+              {isExpandedView ? "🖥️ 3D ROOM" : "📱 EXPAND OS"}
+            </button>
+          )}
           <button
             type="button"
             className="taskbar-zoom-btn"
@@ -1304,10 +1326,10 @@ function LaptopScreenOS({
             }}
             title={isZoomed ? "Step back to chair view (Esc)" : "Zoom in on laptop monitor (Z)"}
           >
-            {isZoomed ? "🪑 VIEW ROOM (ESC)" : "🔍 ZOOM SCREEN (Z)"}
+            {isZoomed ? "🪑 VIEW ROOM (ESC)" : "🔍 ZOOM (Z)"}
           </button>
-          <span className="tray-item">AIR-GAPPED</span>
-          <span className="tray-item">⚡ 100%</span>
+          <span className="tray-item hide-on-mobile">AIR-GAPPED</span>
+          <span className="tray-item hide-on-mobile">⚡ 100%</span>
           <span className="tray-clock">13:37</span>
         </div>
       </div>
@@ -1329,6 +1351,8 @@ function HackerLaptop3D({
   onReturnToPortfolio,
   onRestartEasterEgg,
   onTriggerChappalFlight,
+  isExpandedView = false,
+  onToggleExpandedView,
 }) {
   const [hovered, setHovered] = useState(false);
 
@@ -1428,6 +1452,8 @@ function HackerLaptop3D({
                 onReturnToPortfolio={onReturnToPortfolio}
                 onRestartEasterEgg={onRestartEasterEgg}
                 onTriggerChappalFlight={onTriggerChappalFlight}
+                isExpandedView={isExpandedView}
+                onToggleExpandedView={onToggleExpandedView}
               />
             </Html>
           </group>
@@ -1893,6 +1919,7 @@ export default function SecretVaultRoom3D({
   onRestartEasterEgg,
 }) {
   const [isChappalLaunched, setIsChappalLaunched] = useState(false);
+  const [isExpandedOS, setIsExpandedOS] = useState(false);
 
   return (
     <group position={[0, 0, 0]} name="SecretVaultRoom3D">
@@ -2011,7 +2038,83 @@ export default function SecretVaultRoom3D({
           onReturnToPortfolio={onReturnToPortfolio}
           onRestartEasterEgg={onRestartEasterEgg}
           onTriggerChappalFlight={() => setIsChappalLaunched(true)}
+          isExpandedView={isExpandedOS}
+          onToggleExpandedView={() => setIsExpandedOS((p) => !p)}
         />
+
+        {/* 100% User-Friendly Mobile & Desktop Clean Fullscreen Overlay */}
+        {isExpandedOS && (
+          <Html
+            fullscreen
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 999999,
+              pointerEvents: 'auto',
+            }}
+          >
+            <div className="laptop-os-expanded-viewport">
+              <div className="expanded-os-toolbar">
+                <div className="expanded-os-brand">
+                  <span className="expanded-pulse-dot" />
+                  <strong>⚡ ctOS DIRECT TERMINAL INTERFACE</strong>
+                  <span className="expanded-os-subtag">[MOBILE & DESKTOP OPTIMIZED]</span>
+                </div>
+                <div className="expanded-os-actions">
+                  <button
+                    type="button"
+                    className="expanded-mode-toggle-btn"
+                    onClick={() => {
+                      playCorporateClick();
+                      setIsExpandedOS(false);
+                    }}
+                  >
+                    🖥️ Return to 3D Bunker
+                  </button>
+                </div>
+              </div>
+              <div className="expanded-os-content-wrap">
+                <LaptopScreenOS
+                  phase={betrayalPhase}
+                  isZoomed={isLaptopZoomed}
+                  onToggleZoom={onToggleLaptopZoom}
+                  onPhaseChange={onPhaseChange}
+                  onInteractTerminal={onInteractTerminal}
+                  onReturnToPortfolio={onReturnToPortfolio}
+                  onRestartEasterEgg={onRestartEasterEgg}
+                  onTriggerChappalFlight={() => setIsChappalLaunched(true)}
+                  isExpandedView={true}
+                  onToggleExpandedView={() => setIsExpandedOS(false)}
+                />
+              </div>
+            </div>
+          </Html>
+        )}
+
+        {/* Floating Quick Toggle Pill for Touch Screens */}
+        {!isExpandedOS && betrayalPhase && betrayalPhase !== 'NONE' && (
+          <Html
+            style={{
+              position: 'fixed',
+              top: '16px',
+              right: '16px',
+              zIndex: 900,
+              pointerEvents: 'auto',
+            }}
+          >
+            <button
+              type="button"
+              className="mobile-fullscreen-os-float-btn"
+              onClick={() => {
+                playCorporateClick();
+                setIsExpandedOS(true);
+              }}
+              title="Switch to Clean Direct Screen View (Recommended for Mobile Touchscreens)"
+            >
+              📱 {typeof window !== 'undefined' && window.innerWidth < 768 ? 'TAP FOR TOUCH OS' : 'EXPAND OS VIEW'}
+            </button>
+          </Html>
+        )}
 
         {/* 3D Steaming Maggi Ramen Bowl */}
         <SteamingMaggiBowl3D />
