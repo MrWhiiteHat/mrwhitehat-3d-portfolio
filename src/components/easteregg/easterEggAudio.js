@@ -670,3 +670,187 @@ export function playDhaniyaFanfare() {
     });
   } catch (e) {}
 }
+
+// 20. Indian Pressure Cooker Whistle & Steam Eruption
+export function playPressureCookerWhistle() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const startTime = ctx.currentTime;
+    // Dual metallic screech whistles (resonant Hawkins/Prestige cooker whistle)
+    const whistle1 = ctx.createOscillator();
+    const whistle2 = ctx.createOscillator();
+    const whistleGain = ctx.createGain();
+
+    whistle1.type = 'sine';
+    whistle2.type = 'triangle';
+    whistle1.frequency.setValueAtTime(1980, startTime);
+    whistle2.frequency.setValueAtTime(2040, startTime);
+
+    // Subtle pitch jitter for realistic steam pressure variation
+    whistle1.frequency.linearRampToValueAtTime(2120, startTime + 0.6);
+    whistle1.frequency.linearRampToValueAtTime(1950, startTime + 1.2);
+
+    whistleGain.gain.setValueAtTime(0.001, startTime);
+    whistleGain.gain.exponentialRampToValueAtTime(0.12, startTime + 0.15);
+    whistleGain.gain.setValueAtTime(0.12, startTime + 0.9);
+    whistleGain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.3);
+
+    whistle1.connect(whistleGain);
+    whistle2.connect(whistleGain);
+    whistleGain.connect(ctx.destination);
+
+    whistle1.start(startTime);
+    whistle2.start(startTime);
+    whistle1.stop(startTime + 1.3);
+    whistle2.stop(startTime + 1.3);
+
+    // Steam Hiss (Filtered noise burst)
+    const bufferSize = Math.floor(ctx.sampleRate * 1.3);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.setValueAtTime(2800, startTime);
+    noiseFilter.Q.setValueAtTime(3.5, startTime);
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.001, startTime);
+    noiseGain.gain.exponentialRampToValueAtTime(0.16, startTime + 0.2);
+    noiseGain.gain.setValueAtTime(0.16, startTime + 0.85);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.3);
+
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+
+    noise.start(startTime);
+    noise.stop(startTime + 1.3);
+  } catch (e) {}
+}
+
+// 21. Sarcastic Fail Horn / "Wah-wah-wah-waaaah" Trombone
+export function playSarcasticTrombone() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const notes = [
+      { f: 185.0, start: 0.0, dur: 0.28 }, // F#3
+      { f: 174.6, start: 0.30, dur: 0.28 }, // F3
+      { f: 164.8, start: 0.60, dur: 0.28 }, // E3
+      { f: 155.6, endF: 130.8, start: 0.90, dur: 1.1, slide: true }, // Eb3 -> C3 drop
+    ];
+
+    notes.forEach((n) => {
+      const t = ctx.currentTime + n.start;
+      const osc = ctx.createOscillator();
+      const filter = ctx.createBiquadFilter();
+      const gain = ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(n.f, t);
+
+      if (n.slide) {
+        osc.frequency.linearRampToValueAtTime(n.endF, t + n.dur);
+      }
+
+      // Wah formant envelope (lowpass filter sweep)
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(400, t);
+      filter.frequency.exponentialRampToValueAtTime(1400, t + 0.08);
+      filter.frequency.exponentialRampToValueAtTime(450, t + n.dur);
+
+      gain.gain.setValueAtTime(0.15, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + n.dur);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + n.dur);
+    });
+  } catch (e) {}
+}
+
+// 22. Dramatic Comedic Vine Boom Sub-Bass Impact
+export function playDramaticVineBoom() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const t = ctx.currentTime;
+    // Sub bass drop
+    const sub = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(135, t);
+    sub.frequency.exponentialRampToValueAtTime(28, t + 0.75);
+
+    subGain.gain.setValueAtTime(0.38, t);
+    subGain.gain.exponentialRampToValueAtTime(0.001, t + 0.85);
+
+    sub.connect(subGain);
+    subGain.connect(ctx.destination);
+    sub.start(t);
+    sub.stop(t + 0.85);
+
+    // Explosive slap transient
+    const transient = ctx.createOscillator();
+    const transGain = ctx.createGain();
+    transient.type = 'triangle';
+    transient.frequency.setValueAtTime(320, t);
+    transient.frequency.exponentialRampToValueAtTime(45, t + 0.12);
+
+    transGain.gain.setValueAtTime(0.25, t);
+    transGain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+
+    transient.connect(transGain);
+    transGain.connect(ctx.destination);
+    transient.start(t);
+    transient.stop(t + 0.14);
+  } catch (e) {}
+}
+
+// 23. Acoustic Flying Slipper Slap Impact
+export function playMomSlipperSmack() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const t = ctx.currentTime;
+    // Crisp rubber sole slap
+    const slap = ctx.createOscillator();
+    const slapFilter = ctx.createBiquadFilter();
+    const slapGain = ctx.createGain();
+
+    slap.type = 'sawtooth';
+    slap.frequency.setValueAtTime(440, t);
+    slap.frequency.exponentialRampToValueAtTime(80, t + 0.08);
+
+    slapFilter.type = 'bandpass';
+    slapFilter.frequency.setValueAtTime(1200, t);
+
+    slapGain.gain.setValueAtTime(0.24, t);
+    slapGain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+
+    slap.connect(slapFilter);
+    slapFilter.connect(slapGain);
+    slapGain.connect(ctx.destination);
+
+    slap.start(t);
+    slap.stop(t + 0.09);
+  } catch (e) {}
+}

@@ -12753,3 +12753,179 @@ body.is-pseudo-fullscreen .portfolio-container {
 
 
 
+
+/* Desktop Shortcut Icons Hover & Pointer */
+.desktop-shortcuts-column {
+  pointer-events: auto !important;
+}
+.desktop-icon-item {
+  transition: transform 0.15s ease, filter 0.15s ease;
+  padding: 3px;
+  border-radius: 4px;
+}
+.desktop-icon-item:hover {
+  transform: scale(1.1);
+  background: rgba(0, 240, 255, 0.15);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+}
+
+/* Desktop App Modal Window */
+.desktop-app-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(2px);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.desktop-app-modal-window {
+  width: 480px;
+  background: #090f1d;
+  border: 1.5px solid rgba(0, 240, 255, 0.7);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(0, 240, 255, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modal-titlebar {
+  height: 24px;
+  background: linear-gradient(90deg, #0d1e38, #091325);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  color: #38bdf8;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.4);
+}
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.modal-close-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-radius: 3px;
+}
+.modal-content-body {
+  padding: 12px 14px;
+  font-size: 10px;
+  line-height: 1.5;
+  color: #e2e8f0;
+}
+
+/* Mom's Immediate Retort Bubble */
+.mom-retort-bubble {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(220, 38, 38, 0.28));
+  border: 1.5px solid #ef4444;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.35);
+  border-radius: 6px;
+  padding: 9px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  animation: retortPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes retortPop {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.retort-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  color: #f87171;
+}
+.retort-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fef08a;
+  line-height: 1.4;
+  margin: 0;
+}
+.retort-progress-bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+.retort-progress-fill {
+  width: 100%;
+  height: 100%;
+  background: #ef4444;
+  animation: retortTimer 2.4s linear forwards;
+}
+@keyframes retortTimer {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* Certificate Soundboard Strip */
+.cert-soundboard-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(8, 14, 28, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 6px;
+}
+.soundboard-lbl {
+  font-family: var(--mono, monospace);
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+}
+.soundboard-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.soundboard-btn {
+  padding: 3px 8px;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 4px;
+  color: #e0f2fe;
+  font-family: var(--mono, monospace);
+  font-size: 8.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.soundboard-btn:hover {
+  background: rgba(0, 240, 255, 0.3);
+  border-color: #00f0ff;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+.cert-toast-banner {
+  padding: 5px 10px;
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid #22c55e;
+  border-radius: 4px;
+  color: #86efac;
+  font-family: var(--mono, monospace);
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+  animation: fadeIn 0.2s ease;
+}

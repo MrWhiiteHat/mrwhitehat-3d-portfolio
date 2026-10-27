@@ -17,27 +17,17 @@ import {
   playDhaniyaFanfare,
   playCorporateClick,
   playSadPunchline,
+  playPressureCookerWhistle,
+  playSarcasticTrombone,
+  playDramaticVineBoom,
+  playMomSlipperSmack,
 } from './easterEggAudio.js';
+import {
+  speakExpressiveDialogue,
+  speakNarratorDialogue,
+  stopAllSpeech,
+} from './sarcasticVoiceEngine.js';
 import { playClickSound } from '../../utils/audio.js';
-
-/**
- * Text-to-speech helper with safe fallback
- */
-function speakDialogue(text) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return;
-  try {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.05;
-    utterance.pitch = 1.15;
-    const voices = window.speechSynthesis.getVoices();
-    const indVoice = voices.find(
-      (v) => v.lang.includes('en-IN') || v.name.includes('India')
-    );
-    if (indVoice) utterance.voice = indVoice;
-    window.speechSynthesis.speak(utterance);
-  } catch (e) {}
-}
 
 /**
  * 3D Floating Dust Motes in the Bunker Air
@@ -362,7 +352,8 @@ function SteamingMaggiBowl3D() {
 /**
  * In-Screen Laptop Operating System & Terminal Display
  * Embedded directly onto the 3D laptop monitor using @react-three/drei <Html transform center>
- * Displays a realistic cyber OS desktop with shortcut icons, taskbar, and centered application window!
+ * Displays a realistic cyber OS desktop with shortcut icons, taskbar, centered application window,
+ * interactive desktop apps, and peak sarcasm voice acting!
  */
 function LaptopScreenOS({
   phase,
@@ -375,46 +366,84 @@ function LaptopScreenOS({
   onTriggerChappalFlight,
 }) {
   const [selectedResponse, setSelectedResponse] = useState(null);
-  const [roastStep, setRoastStep] = useState('initial'); // 'initial' | 'slipper' | 'narrator'
+  const [momRetortText, setMomRetortText] = useState('');
+  const [roastStep, setRoastStep] = useState('initial'); // 'initial' | 'mom_retort' | 'slipper' | 'narrator'
+  const [activeDesktopApp, setActiveDesktopApp] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
   const dialogueSpokenRef = useRef(false);
 
   useEffect(() => {
     return () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
+      stopAllSpeech();
     };
   }, []);
 
+  // When Entering MOM_REVEAL, start domestic panic sequence
   useEffect(() => {
     if (phase === 'MOM_REVEAL' && !dialogueSpokenRef.current) {
       dialogueSpokenRef.current = true;
-      playRecordScratch();
+      playPressureCookerWhistle();
       setTimeout(() => {
+        playRecordScratch();
         playMomGong();
-        speakDialogue(
-          'Oye hero! Stop clicking random lines on computer and pretending to be in Matrix! Go to market and bring 10 rupees dhaniya right now!'
-        );
-      }, 350);
+        speakExpressiveDialogue([
+          { text: "OYE HERO!", pitch: 1.45, rate: 1.15, pauseAfter: 200 },
+          { text: "Stop clicking the mouse like a maniac and pretending to be in Matrix!", pitch: 1.15, rate: 1.05, pauseAfter: 250 },
+          { text: "The pressure cooker is whistling, the dal is boiling over, and your cold Maggi noodles have solidified into concrete!", pitch: 1.25, rate: 1.1, pauseAfter: 250 },
+          { text: "Go to the market and bring ₹10 DHANIYA right now! And do NOT come back without extra free green chillies!", pitch: 1.35, rate: 1.18 }
+        ]);
+      }, 500);
     }
   }, [phase]);
 
-  const handlePlayerChoice = (choiceText) => {
+  const handlePlayerChoice = (choiceKey, playerText, momRetort, voiceChunks) => {
     playCorporateClick();
-    setSelectedResponse(choiceText);
-    setRoastStep('slipper');
-    onTriggerChappalFlight?.();
-    playSlipperWhoosh();
+    setSelectedResponse(playerText);
+    setMomRetortText(momRetort);
+    setRoastStep('mom_retort');
 
-    setTimeout(() => {
-      setRoastStep('narrator');
-      playSadPunchline();
-    }, 1400);
+    // Mom immediately fires back her voiced retort
+    speakExpressiveDialogue(voiceChunks, () => {
+      // After retort finishes, launch the supersonic slipper!
+      setRoastStep('slipper');
+      onTriggerChappalFlight?.();
+      playSlipperWhoosh();
+
+      setTimeout(() => {
+        setRoastStep('narrator');
+        playDramaticVineBoom();
+        setTimeout(() => {
+          speakNarratorDialogue(
+            "You spent 20 minutes rotating 3D laser nodes and feeling like an invincible cyber operator. And yet, your mother dismantled your entire clandestine operation with one single Hawaiian slipper and a demand for coriander. The dal is ruined. The chappal is supersonic.",
+            () => {
+              playSarcasticTrombone();
+            }
+          );
+        }, 350);
+      }, 1600);
+    });
   };
 
   const handleProceedToCertificate = () => {
+    stopAllSpeech();
     playDhaniyaFanfare();
     onPhaseChange?.('CERTIFICATE_ROAST');
+  };
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const copyExcuseToClipboard = () => {
+    const excuse = "OFFICIAL EXCUSE LETTER FOR MOM:\n\"Dear Mom, I was not wasting time playing with glowing cubes. I was securing our residential IP subnet from rogue cyber adversaries. Please accept this Certificate of Errand Disobedience in lieu of the ₹10 coriander.\"";
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(excuse);
+      showToast("📋 Excuse letter copied to clipboard! Show it to Mom!");
+    } else {
+      showToast("📋 Excuse letter: Show this screen to Mom!");
+    }
+    playCorporateClick();
   };
 
   const getWindowTitle = () => {
@@ -439,27 +468,145 @@ function LaptopScreenOS({
       onPointerDown={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
     >
-      {/* 1. DESKTOP SHORTCUT ICONS ON LEFT */}
+      {/* 1. INTERACTIVE DESKTOP SHORTCUT ICONS ON LEFT */}
       <div className="desktop-shortcuts-column">
-        <div className="desktop-icon-item">
+        <div
+          className="desktop-icon-item"
+          onClick={() => {
+            playCorporateClick();
+            setActiveDesktopApp('root');
+          }}
+          title="Click to inspect Root privileges"
+        >
           <span className="icon-glyph">📁</span>
           <span className="icon-name">System_Root</span>
         </div>
-        <div className="desktop-icon-item">
+        <div
+          className="desktop-icon-item"
+          onClick={() => {
+            playCorporateClick();
+            setActiveDesktopApp('firewall');
+          }}
+          title="Click to view Neural Firewall stats"
+        >
           <span className="icon-glyph">🛡️</span>
           <span className="icon-name">Neural_Firewall</span>
         </div>
-        <div className="desktop-icon-item">
+        <div
+          className="desktop-icon-item"
+          onClick={() => {
+            playCorporateClick();
+            setActiveDesktopApp('dhaniya');
+          }}
+          title="Click to view Dhaniya budget spreadsheet"
+        >
           <span className="icon-glyph">🌿</span>
           <span className="icon-name">Dhaniya_₹10.xlsx</span>
         </div>
-        <div className="desktop-icon-item">
+        <div
+          className="desktop-icon-item"
+          onClick={() => {
+            playCorporateClick();
+            setActiveDesktopApp('maggi');
+          }}
+          title="Click to view Cold Maggi forensics"
+        >
           <span className="icon-glyph">🍜</span>
           <span className="icon-name">Cold_Maggi.log</span>
         </div>
       </div>
 
-      {/* 2. CENTERED APPLICATION WINDOW IN LAPTOP DISPLAY */}
+      {/* 2. OPTIONAL DESKTOP APP MODAL POPUP (When shortcut icon is clicked) */}
+      {activeDesktopApp && (
+        <div className="desktop-app-modal-overlay">
+          <div className="desktop-app-modal-window">
+            <div className="modal-titlebar">
+              <span>
+                {activeDesktopApp === 'root' && '📁 System_Root // Security Audit'}
+                {activeDesktopApp === 'firewall' && '🛡️ Neural_Firewall // Vulnerability Scan'}
+                {activeDesktopApp === 'dhaniya' && '🌿 Dhaniya_₹10.xlsx - Microsoft CyberSheet'}
+                {activeDesktopApp === 'maggi' && '🍜 Cold_Maggi.log // Forensic Incident'}
+              </span>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setActiveDesktopApp(null)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-content-body">
+              {activeDesktopApp === 'root' && (
+                <div className="modal-app-text">
+                  <strong style={{ color: '#ef4444' }}>[ ACCESS DENIED: INSUFFICIENT DOMESTIC RANK ]</strong>
+                  <p>
+                    Root user: <code style={{ color: '#38bdf8' }}>player@cyberdeck</code> (Rank: Errand Boy)<br />
+                    True Root Authority: <strong style={{ color: '#fbbf24' }}>MOTHER (UID: 000, Root of the Universe)</strong>
+                  </p>
+                  <p style={{ color: '#94a3b8', fontSize: '9px' }}>
+                    Note: Executing <code>sudo go_to_market</code> is mandatory.
+                    Attempting to override with <code>--force</code> will spawn an additional flying chappal.
+                  </p>
+                </div>
+              )}
+
+              {activeDesktopApp === 'firewall' && (
+                <div className="modal-app-text">
+                  <strong style={{ color: '#22c55e' }}>[ NEURAL FIREWALL v9.4 STATUS: ONLINE ]</strong>
+                  <p>
+                    • Pentagon Brute-force: <span style={{ color: '#22c55e' }}>BLOCKED (100%)</span><br />
+                    • Dark Web Malware: <span style={{ color: '#22c55e' }}>BLOCKED (100%)</span><br />
+                    • Mom shouting from kitchen: <span style={{ color: '#ef4444', fontWeight: 'bold' }}>PENETRATED (Bypasses 3 walls, 2 doors, and Bose noise-canceling headphones)</span>
+                  </p>
+                </div>
+              )}
+
+              {activeDesktopApp === 'dhaniya' && (
+                <div className="modal-sheet-table">
+                  <table style={{ width: '100%', fontSize: '8.5px', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: '#1e293b', color: '#38bdf8' }}>
+                        <th style={{ padding: '3px', border: '1px solid #334155' }}>ITEM</th>
+                        <th style={{ padding: '3px', border: '1px solid #334155' }}>BUDGET</th>
+                        <th style={{ padding: '3px', border: '1px solid #334155' }}>FREE MIRCHI</th>
+                        <th style={{ padding: '3px', border: '1px solid #334155' }}>STATUS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style={{ padding: '3px', border: '1px solid #334155' }}>Coriander (Dhaniya)</td>
+                        <td style={{ padding: '3px', border: '1px solid #334155' }}>₹10.00</td>
+                        <td style={{ padding: '3px', border: '1px solid #334155', color: '#22c55e' }}>4 pieces (Mandatory)</td>
+                        <td style={{ padding: '3px', border: '1px solid #334155', color: '#ef4444' }}>UNFULFILLED</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '3px', border: '1px solid #334155' }}>Family Respect</td>
+                        <td style={{ padding: '3px', border: '1px solid #334155' }}>PRICELESS</td>
+                        <td style={{ padding: '3px', border: '1px solid #334155' }}>N/A</td>
+                        <td style={{ padding: '3px', border: '1px solid #334155', color: '#ef4444' }}>-9,999 PTS</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style={{ marginTop: '5px', color: '#fbbf24', fontSize: '8px' }}>
+                    Formula Bar: <code>=IF(MIRCHI_FREE=FALSE, "DISOWNED", "DINNER_SERVED")</code>
+                  </div>
+                </div>
+              )}
+
+              {activeDesktopApp === 'maggi' && (
+                <div className="modal-app-text" style={{ fontFamily: 'monospace', fontSize: '8.5px' }}>
+                  <p style={{ margin: '2px 0', color: '#64748b' }}>[13:30:00] Maggi cooked. Steam aromatic and warm.</p>
+                  <p style={{ margin: '2px 0', color: '#38bdf8' }}>[13:32:15] Player: "Let me just solve this one last 3D circuit."</p>
+                  <p style={{ margin: '2px 0', color: '#fbbf24' }}>[13:45:00] Player still rotating laser mirrors.</p>
+                  <p style={{ margin: '2px 0', color: '#ef4444' }}>[14:02:10] CRITICAL: Maggi noodles have calcified into reinforced concrete. Fork stuck permanently.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. CENTERED APPLICATION WINDOW IN LAPTOP DISPLAY */}
       <div className="desktop-window-frame">
         {/* Window Titlebar */}
         <div className="window-titlebar">
@@ -506,8 +653,8 @@ function LaptopScreenOS({
               </div>
               <h2 className="panel-title">THE ULTIMATE SECRET</h2>
               <p className="panel-desc">
-                You bypassed 47 security nodes, rotated high-voltage lasers, and reached the legendary vault.
-                Behind the impenetrable titanium doors sits an unmade bed, laundry, cold Maggi noodles...
+                You bypassed 47 security nodes, rotated high-voltage lasers, and breached the legendary vault.
+                Behind the impenetrable titanium doors sits an unmade bed, unfolded laundry, cold Maggi noodles...
                 and this very computer.
               </p>
               <button
@@ -524,7 +671,7 @@ function LaptopScreenOS({
             </div>
           )}
 
-          {/* PHASE 3: MOM CALLING & DEADPAN REALITY CHECK */}
+          {/* PHASE 3: MOM CALLING & PEAK SARCASM REALITY CHECK */}
           {phase === 'MOM_REVEAL' && (
             <div className="window-dialogue-panel">
               <div className="dialogue-alert-strip">
@@ -540,16 +687,18 @@ function LaptopScreenOS({
                 </div>
               </div>
 
+              {/* Mom's Speech Bubble */}
               <div className="mom-speech-bubble">
                 <div className="speaker-header">
                   <span className="speaker-avatar">👵🏽</span>
                   <strong>MOM (SHOUTING FROM THE KITCHEN):</strong>
                 </div>
                 <p className="speaker-text">
-                  “OYE HERO! Stop clicking the mouse like a maniac and pretending to be in Matrix! The dal is boiling on the stove! Go to the market and bring ₹10 DHANIYA (Coriander) right now! And don't forget to ask for extra free green chillies (mirchi)!”
+                  “OYE HERO! Stop clicking the mouse like a maniac and pretending to be in Matrix! The pressure cooker is whistling and the dal is boiling over! Go to the market and bring ₹10 DHANIYA (Coriander) right now! And do NOT come back without extra free green chillies (mirchi)!”
                 </p>
               </div>
 
+              {/* Step 1: Initial Response Choices */}
               {roastStep === 'initial' && (
                 <div className="dialogue-options-group">
                   <span className="options-label">TRANSMIT YOUR RESPONSE:</span>
@@ -559,7 +708,13 @@ function LaptopScreenOS({
                       className="dialogue-option-chip"
                       onClick={() =>
                         handlePlayerChoice(
-                          'Mom, wait! I literally just bypassed a military-grade neural firewall!'
+                          'firewall',
+                          '“Mom, wait! I literally just bypassed a military-grade neural firewall!”',
+                          "“Military firewall?! Arey wah! Last week you couldn't even fix the bathroom latch! Go get the dhaniya before I disconnect your Wi-Fi router forever!”",
+                          [
+                            { text: "Military firewall?! Arey wah!", pitch: 1.45, rate: 1.15, pauseAfter: 200 },
+                            { text: "Last week you couldn't even fix the bathroom door latch! Go get the dhaniya before I disconnect your Wi-Fi router forever!", pitch: 1.25, rate: 1.15 }
+                          ]
                         )
                       }
                     >
@@ -572,12 +727,18 @@ function LaptopScreenOS({
                       className="dialogue-option-chip"
                       onClick={() =>
                         handlePlayerChoice(
-                          'Can I finish this Easter egg first? I’m almost at the secret ending!'
+                          'blinkit',
+                          '“Can’t we just order it on Blinkit or Zepto in 8 minutes?!”',
+                          '“Blinkit?! You want to pay ₹40 delivery fee for ₹10 dhaniya?! Do I look like the Reserve Bank of India to you?! Wear your slippers and RUN!”',
+                          [
+                            { text: "Blinkit?!", pitch: 1.5, rate: 1.15, pauseAfter: 200 },
+                            { text: "You want to pay forty rupees delivery fee for ten rupees coriander?! Do I look like the Reserve Bank of India to you?! Put on your slippers and run!", pitch: 1.3, rate: 1.2 }
+                          ]
                         )
                       }
                     >
                       <ChevronRight size={14} />
-                      <span>“Can I finish this Easter egg first? I’m almost at the secret ending!”</span>
+                      <span>“Can’t we just order it on Blinkit or Zepto in 8 minutes?!”</span>
                     </button>
 
                     <button
@@ -585,29 +746,51 @@ function LaptopScreenOS({
                       className="dialogue-option-chip"
                       onClick={() =>
                         handlePlayerChoice(
-                          'Did you say ₹10 or ₹20 dhaniya? And what if the vendor charges for mirchi?'
+                          'mirchi',
+                          '“What if the sabzi-wala refuses to give free mirchi? Do I negotiate?!”',
+                          "“If you pay for mirchi, do not come home! A true Indian child stares into the sabzi-wala's soul until he surrenders free chillies! Now move!”",
+                          [
+                            { text: "If you pay for mirchi, do not come home!", pitch: 1.45, rate: 1.2, pauseAfter: 200 },
+                            { text: "A true child stares into the vegetable vendor's soul until he surrenders four green chillies for free! Now move!", pitch: 1.25, rate: 1.15 }
+                          ]
                         )
                       }
                     >
                       <ChevronRight size={14} />
-                      <span>“Did you say ₹10 or ₹20 dhaniya? And what if the vendor charges for mirchi?”</span>
+                      <span>“What if the sabzi-wala refuses free mirchi? Do I negotiate?!”</span>
                     </button>
                   </div>
                 </div>
               )}
 
+              {/* Step 2: Mom's Instant Voiced Sarcastic Retort */}
+              {roastStep === 'mom_retort' && (
+                <div className="mom-retort-bubble">
+                  <div className="retort-header">
+                    <span className="threat-emoji">👵🏽💥</span>
+                    <strong>MOM'S IMMEDIATE RETORT:</strong>
+                  </div>
+                  <p className="retort-text">{momRetortText}</p>
+                  <div className="retort-progress-bar">
+                    <div className="retort-progress-fill" />
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Supersonic Flying Chappal Warning */}
               {roastStep === 'slipper' && (
                 <div className="slipper-threat-banner">
                   <span className="threat-emoji">🩴💨</span>
                   <div>
                     <strong className="threat-title">TACTICAL FLYING CHAPPAL LAUNCHED</strong>
                     <span className="threat-sub">
-                      Velocity: Mach 3.4 • Heat-Seeking Guidance • Target: Back of Your Head
+                      Velocity: Mach 3.4 • Heat-Seeking Trajectory • Target: Back of Your Head
                     </span>
                   </div>
                 </div>
               )}
 
+              {/* Step 4: Sarcastic Narrator Reality Check */}
               {roastStep === 'narrator' && (
                 <div className="narrator-reality-panel">
                   <div className="panel-badge amber">
@@ -615,10 +798,9 @@ function LaptopScreenOS({
                     <span>NARRATOR // DEADPAN REALITY CHECK</span>
                   </div>
                   <p className="narrator-quote-text">
-                    “You rotated 14 high-voltage conduits. You calculated Manhattan network topologies.
-                    You spent 15 minutes feeling like an untouchable cyber ghost...<br />
+                    “You rotated 14 high-voltage laser nodes. You bypassed quantum firewalls. You spent 20 minutes feeling like an untouchable cyber god...<br />
                     <strong style={{ color: '#fef08a' }}>
-                      ...and yet, you still haven't bought the coriander. The dal is ruined. The chappal is supersonic.
+                      ...and yet, your mother just dismantled your entire clandestine operation with one single Hawaiian slipper and a demand for ₹10 coriander. The dal is ruined. The chappal is supersonic.
                     </strong>”
                   </p>
                   <button
@@ -634,7 +816,7 @@ function LaptopScreenOS({
             </div>
           )}
 
-          {/* PHASE 4: OFFICIAL CERTIFICATE */}
+          {/* PHASE 4: OFFICIAL CERTIFICATE OF ERRAND DISOBEDIENCE */}
           {phase === 'CERTIFICATE_ROAST' && (
             <div className="certificate-document-panel">
               <div className="cert-doc-header">
@@ -653,7 +835,7 @@ function LaptopScreenOS({
               </div>
 
               <p className="cert-citation-text">
-                For spending 15 minutes rotating 3D laser switches and feeling like Mr. Robot...
+                For spending 20 minutes rotating 3D laser switches and feeling like Mr. Robot...
                 while completely neglecting a 5-minute grocery trip to buy fresh coriander.
               </p>
 
@@ -683,6 +865,63 @@ function LaptopScreenOS({
                   <strong className="stat-num" style={{ color: '#dc2626' }}>DEFCON 1 (INBOUND)</strong>
                 </div>
               </div>
+
+              {/* Interactive Sarcastic Audio Soundboard */}
+              <div className="cert-soundboard-strip">
+                <span className="soundboard-lbl">INTERACTIVE DOMESTIC SOUNDBOARD:</span>
+                <div className="soundboard-buttons">
+                  <button
+                    type="button"
+                    className="soundboard-btn"
+                    onClick={() => {
+                      playPressureCookerWhistle();
+                      speakExpressiveDialogue([
+                        { text: "OYE HERO!", pitch: 1.45, rate: 1.15, pauseAfter: 150 },
+                        { text: "Did you buy the coriander yet?! Put down the computer!", pitch: 1.3, rate: 1.15 }
+                      ]);
+                    }}
+                  >
+                    👵🏽 Replay Scolding
+                  </button>
+                  <button
+                    type="button"
+                    className="soundboard-btn"
+                    onClick={() => {
+                      onTriggerChappalFlight?.();
+                      playSlipperWhoosh();
+                    }}
+                  >
+                    🩴 Launch Chappal
+                  </button>
+                  <button
+                    type="button"
+                    className="soundboard-btn"
+                    onClick={() => playPressureCookerWhistle()}
+                  >
+                    💨 Cooker Whistle
+                  </button>
+                  <button
+                    type="button"
+                    className="soundboard-btn"
+                    onClick={() => playSarcasticTrombone()}
+                  >
+                    🎺 Sarcastic Trombone
+                  </button>
+                  <button
+                    type="button"
+                    className="soundboard-btn"
+                    onClick={copyExcuseToClipboard}
+                  >
+                    📋 Copy Excuse Letter
+                  </button>
+                </div>
+              </div>
+
+              {toastMessage && (
+                <div className="cert-toast-banner">
+                  {toastMessage}
+                </div>
+              )}
 
               <div className="cert-stamp-badge">
                 <span>CERTIFIED DHANIYA PROCRASTINATOR • AUTHORIZED BY MOM 🩴</span>
@@ -716,7 +955,7 @@ function LaptopScreenOS({
         </div>
       </div>
 
-      {/* 3. DESKTOP BOTTOM TASKBAR */}
+      {/* 4. DESKTOP BOTTOM TASKBAR */}
       <div className="desktop-taskbar">
         <div className="taskbar-start-btn">
           <span>💀</span>
