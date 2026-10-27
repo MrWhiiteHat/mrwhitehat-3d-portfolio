@@ -387,10 +387,10 @@ function LaptopScreenOS({
         playRecordScratch();
         playMomGong();
         speakExpressiveDialogue([
-          { text: "OYE HERO!", pitch: 1.45, rate: 1.15, pauseAfter: 200 },
-          { text: "Stop clicking the mouse like a maniac and pretending to be in Matrix!", pitch: 1.15, rate: 1.05, pauseAfter: 250 },
-          { text: "The pressure cooker is whistling, the dal is boiling over, and your cold Maggi noodles have solidified into concrete!", pitch: 1.25, rate: 1.1, pauseAfter: 250 },
-          { text: "Go to the market and bring ₹10 DHANIYA right now! And do NOT come back without extra free green chillies!", pitch: 1.35, rate: 1.18 }
+          { text: "Arey Nalayak Oye Hero!", pitch: 1.45, rate: 1.15, pauseAfter: 180 },
+          { text: "Dal poori jal gayi stove pe aur pressure cooker phatne waala hai!", pitch: 1.35, rate: 1.12, pauseAfter: 220 },
+          { text: "Stop clicking click-click in fake Matrix! Go to market and bring ₹10 DHANIYA right now!", pitch: 1.25, rate: 1.1, pauseAfter: 220 },
+          { text: "Aur sun! Agar sabzi-wale se free mirchi nahi li, toh ghar ke andar mat aana!", pitch: 1.4, rate: 1.18 }
         ]);
       }, 500);
     }
@@ -694,7 +694,7 @@ function LaptopScreenOS({
                   <strong>MOM (SHOUTING FROM THE KITCHEN):</strong>
                 </div>
                 <p className="speaker-text">
-                  “OYE HERO! Stop clicking the mouse like a maniac and pretending to be in Matrix! The pressure cooker is whistling and the dal is boiling over! Go to the market and bring ₹10 DHANIYA (Coriander) right now! And do NOT come back without extra free green chillies (mirchi)!”
+                  “AREY NALAYAK OYE HERO! Dal poori jal gayi stove pe aur pressure cooker seetiyan maar raha hai! Stop clicking click-click like a maniac in your fake Matrix! Go to the market and bring ₹10 DHANIYA right now! Aur sun... agar sabzi-wale se free green chillies (mirchi) nahi li, toh ghar ke andar kadam mat rakhna!”
                 </p>
               </div>
 
@@ -710,10 +710,10 @@ function LaptopScreenOS({
                         handlePlayerChoice(
                           'firewall',
                           '“Mom, wait! I literally just bypassed a military-grade neural firewall!”',
-                          "“Military firewall?! Arey wah! Last week you couldn't even fix the bathroom latch! Go get the dhaniya before I disconnect your Wi-Fi router forever!”",
+                          "“Military firewall?! Arey wah, Nalayak! Last week you couldn't even fix bathroom ka door latch! Go get the dhaniya before I disconnect your Wi-Fi router forever!”",
                           [
-                            { text: "Military firewall?! Arey wah!", pitch: 1.45, rate: 1.15, pauseAfter: 200 },
-                            { text: "Last week you couldn't even fix the bathroom door latch! Go get the dhaniya before I disconnect your Wi-Fi router forever!", pitch: 1.25, rate: 1.15 }
+                            { text: "Military firewall?! Arey wah, Nalayak!", pitch: 1.45, rate: 1.15, pauseAfter: 200 },
+                            { text: "Last week you couldn't even fix bathroom ka door! Go get the dhaniya before I disconnect your Wi-Fi router forever!", pitch: 1.25, rate: 1.15 }
                           ]
                         )
                       }
@@ -729,10 +729,10 @@ function LaptopScreenOS({
                         handlePlayerChoice(
                           'blinkit',
                           '“Can’t we just order it on Blinkit or Zepto in 8 minutes?!”',
-                          '“Blinkit?! You want to pay ₹40 delivery fee for ₹10 dhaniya?! Do I look like the Reserve Bank of India to you?! Wear your slippers and RUN!”',
+                          '“Blinkit?! ₹40 delivery fee for ₹10 dhaniya?! Kya main yahan paise ka ped uga rahi hoon?! Wear your slippers and RUN!”',
                           [
                             { text: "Blinkit?!", pitch: 1.5, rate: 1.15, pauseAfter: 200 },
-                            { text: "You want to pay forty rupees delivery fee for ten rupees coriander?! Do I look like the Reserve Bank of India to you?! Put on your slippers and run!", pitch: 1.3, rate: 1.2 }
+                            { text: "Forty rupees delivery fee for ten rupees dhaniya?! Kya main yahan paise ka ped uga rahi hoon?! Put on your slippers and run!", pitch: 1.3, rate: 1.2 }
                           ]
                         )
                       }
@@ -748,10 +748,10 @@ function LaptopScreenOS({
                         handlePlayerChoice(
                           'mirchi',
                           '“What if the sabzi-wala refuses to give free mirchi? Do I negotiate?!”',
-                          "“If you pay for mirchi, do not come home! A true Indian child stares into the sabzi-wala's soul until he surrenders free chillies! Now move!”",
+                          "“Negotiate?! Agar ek mirchi ke bhi paise diye na, family WhatsApp group se nikaal dungi! Stare into his soul until he surrenders free chillies! Now move!”",
                           [
-                            { text: "If you pay for mirchi, do not come home!", pitch: 1.45, rate: 1.2, pauseAfter: 200 },
-                            { text: "A true child stares into the vegetable vendor's soul until he surrenders four green chillies for free! Now move!", pitch: 1.25, rate: 1.15 }
+                            { text: "Negotiate?!", pitch: 1.45, rate: 1.2, pauseAfter: 180 },
+                            { text: "Agar ek mirchi ke bhi paise diye na, family WhatsApp group se nikaal dungi! Stare into his soul until he gives free mirchi! Now move!", pitch: 1.25, rate: 1.15 }
                           ]
                         )
                       }
@@ -881,7 +881,7 @@ function LaptopScreenOS({
                       ]);
                     }}
                   >
-                    👵🏽 Replay Scolding
+                    👵🏽 Arey Nalayak! (Replay Scolding)
                   </button>
                   <button
                     type="button"
@@ -891,7 +891,7 @@ function LaptopScreenOS({
                       playSlipperWhoosh();
                     }}
                   >
-                    🩴 Launch Chappal
+                    🩴 Launch Chappal & Belan Air Raid
                   </button>
                   <button
                     type="button"
@@ -1111,6 +1111,188 @@ function HackerLaptop3D({
 /**
  * 3D Holographic Projector Pedestal on the Desk
  */
+
+/**
+ * 3D Indian Hawkins / Prestige Style Pressure Cooker on the Desk
+ * Complete with Bakelite handle, safety valve, and animated steam whistle!
+ */
+function PressureCooker3D({ isWhistling = false }) {
+  const whistleRef = useRef();
+  const steamRef = useRef([]);
+
+  useFrame((state, delta) => {
+    const time = state.clock.getElapsedTime();
+    // Jiggle whistle valve violently when whistling
+    if (whistleRef.current) {
+      if (isWhistling) {
+        whistleRef.current.position.y = 0.17 + Math.sin(time * 35) * 0.006;
+        whistleRef.current.rotation.z = Math.sin(time * 40) * 0.08;
+      } else {
+        whistleRef.current.position.y = 0.17;
+        whistleRef.current.rotation.z = 0;
+      }
+    }
+
+    // Steam particles rising from the whistle nozzle
+    steamRef.current.forEach((m, i) => {
+      if (!m) return;
+      if (isWhistling) {
+        m.visible = true;
+        m.position.y += delta * (0.35 + (i % 3) * 0.1);
+        m.position.x += Math.sin(time * 8 + i) * delta * 0.05;
+        if (m.position.y > 0.42) {
+          m.position.y = 0.18;
+          m.position.x = 0;
+        }
+        const life = 1 - (m.position.y - 0.18) / 0.24;
+        m.scale.setScalar(0.015 * (1 + (1 - life) * 2));
+        if (m.material) m.material.opacity = Math.max(0, life * 0.5);
+      } else {
+        m.visible = false;
+      }
+    });
+  });
+
+  return (
+    <group position={[0.48, 0.74, -0.06]}>
+      {/* Aluminum Pot Body */}
+      <mesh position={[0, 0.075, 0]}>
+        <cylinderGeometry args={[0.075, 0.072, 0.15, 24]} />
+        <meshStandardMaterial color="#cbd5e1" metalness={0.88} roughness={0.25} />
+      </mesh>
+
+      {/* Bakelite Side Handle (Black) */}
+      <group position={[0, 0.11, 0.075]}>
+        <mesh position={[0, 0, 0.05]} rotation={[0, 0, 0]}>
+          <boxGeometry args={[0.024, 0.02, 0.10]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.6} />
+        </mesh>
+      </group>
+
+      {/* Curved Lid */}
+      <mesh position={[0, 0.152, 0]}>
+        <cylinderGeometry args={[0.078, 0.075, 0.012, 24]} />
+        <meshStandardMaterial color="#94a3b8" metalness={0.9} roughness={0.2} />
+      </mesh>
+
+      {/* Black Lid Handle */}
+      <mesh position={[0, 0.158, 0.04]}>
+        <boxGeometry args={[0.022, 0.012, 0.07]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.5} />
+      </mesh>
+
+      {/* Center Steam Pipe / Vent Weight Tube */}
+      <mesh position={[0, 0.162, -0.01]}>
+        <cylinderGeometry args={[0.005, 0.005, 0.016, 12]} />
+        <meshStandardMaterial color="#64748b" metalness={0.9} />
+      </mesh>
+
+      {/* Metallic Whistle / Seeti (Weight Valve) */}
+      <group ref={whistleRef} position={[0, 0.17, -0.01]}>
+        <mesh>
+          <cylinderGeometry args={[0.01, 0.01, 0.022, 12]} />
+          <meshStandardMaterial color="#e2e8f0" metalness={0.95} roughness={0.15} />
+        </mesh>
+        <mesh position={[0, 0.011, 0]}>
+          <cylinderGeometry args={[0.014, 0.014, 0.005, 12]} />
+          <meshStandardMaterial color="#334155" metalness={0.8} />
+        </mesh>
+      </group>
+
+      {/* Steam Particles Emitter */}
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <mesh
+          key={`cooker-steam-${i}`}
+          ref={(el) => (steamRef.current[i] = el)}
+          position={[0, 0.18 + i * 0.04, -0.01]}
+        >
+          <sphereGeometry args={[1, 8, 8]} />
+          <meshBasicMaterial color="#ffffff" transparent opacity={0.35} depthWrite={false} />
+        </mesh>
+      ))}
+
+      {/* Safety Red Valve Dot */}
+      <mesh position={[0.035, 0.158, 0.01]}>
+        <cylinderGeometry args={[0.004, 0.004, 0.005, 8]} />
+        <meshBasicMaterial color="#ef4444" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * 3D Tactical Indian Belan (Rolling Pin) Supersonic Projectile
+ * Flies in tight tactical formation alongside the Hawaiian Slipper!
+ */
+function TacticalBelan3D({ isLaunched }) {
+  const groupRef = useRef();
+  const flightProgress = useRef(0);
+
+  const startPos = useMemo(() => new THREE.Vector3(0.55, 1.95, -0.9), []);
+  const midPos = useMemo(() => new THREE.Vector3(0.25, 1.35, 0.05), []);
+  const endPos = useMemo(() => new THREE.Vector3(0.12, 1.10, 0.62), []);
+
+  useFrame((state, delta) => {
+    const time = state.clock.getElapsedTime();
+    if (!groupRef.current) return;
+
+    if (!isLaunched) {
+      flightProgress.current = 0;
+      groupRef.current.position.set(
+        startPos.x + Math.sin(time * 2.2) * 0.03,
+        startPos.y + Math.cos(time * 2.7) * 0.03,
+        startPos.z
+      );
+      groupRef.current.rotation.set(0.4, 0.6, Math.sin(time * 1.5) * 0.2);
+    } else {
+      flightProgress.current = Math.min(1.0, flightProgress.current + delta * 1.35);
+      const t = flightProgress.current;
+
+      const x = (1 - t) * (1 - t) * startPos.x + 2 * (1 - t) * t * midPos.x + t * t * endPos.x;
+      const y = (1 - t) * (1 - t) * startPos.y + 2 * (1 - t) * t * midPos.y + t * t * endPos.y;
+      const z = (1 - t) * (1 - t) * startPos.z + 2 * (1 - t) * t * midPos.z + t * t * endPos.z;
+
+      groupRef.current.position.set(x, y, z);
+      // High-speed axial rolling pin spin
+      groupRef.current.rotation.x += delta * 36;
+      groupRef.current.rotation.y += delta * 24;
+      groupRef.current.rotation.z += delta * 30;
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={[0.55, 1.95, -0.9]}>
+      {/* Central Rolling Barrel (Classic Sheesham Wood) */}
+      <mesh rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.016, 0.016, 0.22, 16]} />
+        <meshStandardMaterial color="#854d0e" roughness={0.45} />
+      </mesh>
+
+      {/* Left Tapered Handle */}
+      <mesh position={[-0.14, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.007, 0.012, 0.06, 12]} />
+        <meshStandardMaterial color="#713f12" roughness={0.4} />
+      </mesh>
+      {/* Left Handle Knob */}
+      <mesh position={[-0.175, 0, 0]}>
+        <sphereGeometry args={[0.009, 12, 12]} />
+        <meshStandardMaterial color="#581c87" roughness={0.5} />
+      </mesh>
+
+      {/* Right Tapered Handle */}
+      <mesh position={[0.14, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.012, 0.007, 0.06, 12]} />
+        <meshStandardMaterial color="#713f12" roughness={0.4} />
+      </mesh>
+      {/* Right Handle Knob */}
+      <mesh position={[0.175, 0, 0]}>
+        <sphereGeometry args={[0.009, 12, 12]} />
+        <meshStandardMaterial color="#581c87" roughness={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
 function HolographicProjectorPedestal3D() {
   const ring1Ref = useRef();
   const ring2Ref = useRef();
