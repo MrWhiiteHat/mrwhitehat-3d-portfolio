@@ -362,7 +362,7 @@ function SteamingMaggiBowl3D() {
 /**
  * In-Screen Laptop Operating System & Terminal Display
  * Embedded directly onto the 3D laptop monitor using @react-three/drei <Html transform center>
- * Distance factor 0.2105 maps a 760px x 494px viewport onto the 0.40m x 0.26m display plane!
+ * Displays a realistic cyber OS desktop with shortcut icons, taskbar, and centered application window!
  */
 function LaptopScreenOS({
   phase,
@@ -417,257 +417,281 @@ function LaptopScreenOS({
     onPhaseChange?.('CERTIFICATE_ROAST');
   };
 
+  const getWindowTitle = () => {
+    switch (phase) {
+      case 'VAULT_OPENING':
+        return 'ctOS_Bootloader.exe // Air-Gap Secure Link';
+      case 'TERMINAL_INTERACTIVE':
+        return 'Sanctum_Console.exe // Session Active';
+      case 'MOM_REVEAL':
+        return '⚠️ Domestic_Intercom.exe [HIGH PRIORITY OVERRIDE]';
+      case 'CERTIFICATE_ROAST':
+        return 'Official_Evaluation_Report.pdf - Errand Disobedience';
+      default:
+        return 'ctOS_Terminal.exe';
+    }
+  };
+
   return (
     <div
-      className="laptop-screen-viewport"
+      className="laptop-desktop-environment"
       onWheel={(e) => e.stopPropagation()}
       onPointerDown={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
     >
-      {/* 1. TOP OS DESKTOP STATUS BAR */}
-      <div className="laptop-os-topbar">
-        <div className="os-topbar-left">
-          <span className="os-led-green" />
-          <span className="os-title">ctOS AIR-GAP WORKSTATION // ROOT_TERMINAL</span>
+      {/* 1. DESKTOP SHORTCUT ICONS ON LEFT */}
+      <div className="desktop-shortcuts-column">
+        <div className="desktop-icon-item">
+          <span className="icon-glyph">📁</span>
+          <span className="icon-name">System_Root</span>
         </div>
-        <div className="os-topbar-right">
-          <button
-            type="button"
-            className="os-zoom-toggle-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleZoom?.();
-            }}
-            title={isZoomed ? "Step back to chair view (Esc)" : "Zoom in on laptop monitor (Z)"}
-          >
-            {isZoomed ? "🪑 VIEW ROOM (ESC)" : "🔍 ZOOM SCREEN (Z)"}
-          </button>
-          <span className="os-status-item">AIR-GAPPED</span>
-          <span className="os-status-item">⚡ 100%</span>
+        <div className="desktop-icon-item">
+          <span className="icon-glyph">🛡️</span>
+          <span className="icon-name">Neural_Firewall</span>
+        </div>
+        <div className="desktop-icon-item">
+          <span className="icon-glyph">🌿</span>
+          <span className="icon-name">Dhaniya_₹10.xlsx</span>
+        </div>
+        <div className="desktop-icon-item">
+          <span className="icon-glyph">🍜</span>
+          <span className="icon-name">Cold_Maggi.log</span>
         </div>
       </div>
 
-      {/* 2. LAPTOP SCREEN CONTENT AREA */}
-      <div className="laptop-os-content">
-        {/* PHASE 1: BOOTLOADER / VAULT OPENING */}
-        {phase === 'VAULT_OPENING' && (
-          <div className="laptop-boot-view">
-            <div className="laptop-boot-header">
-              <Zap size={14} className="os-pulse-icon" />
-              <span>AIR-GAP HARDWARE INTERFACE INITIALIZED</span>
-            </div>
-            <pre className="laptop-boot-terminal">
+      {/* 2. CENTERED APPLICATION WINDOW IN LAPTOP DISPLAY */}
+      <div className="desktop-window-frame">
+        {/* Window Titlebar */}
+        <div className="window-titlebar">
+          <div className="window-titlebar-left">
+            <span className="window-app-icon">⚡</span>
+            <span className="window-title-text">{getWindowTitle()}</span>
+          </div>
+          <div className="window-controls">
+            <span className="win-btn win-min">―</span>
+            <span className="win-btn win-max">◻</span>
+            <span className="win-btn win-close">✕</span>
+          </div>
+        </div>
+
+        {/* Window Content Body */}
+        <div className="window-body">
+          {/* PHASE 1: BOOTLOADER / VAULT OPENING */}
+          {phase === 'VAULT_OPENING' && (
+            <div className="window-boot-panel">
+              <div className="panel-badge amber">
+                <Zap size={13} />
+                <span>AIR-GAP HARDWARE INTERFACE DETECTED</span>
+              </div>
+              <pre className="terminal-code-block">
 {`> ctOS SECURE BOOTLOADER v4.9.2
 > INFILTRATION LEVEL: DEEPEST SANCTUM (SUB-LEVEL 03)
-> AIR-GAPPED HARDWARE TERMINAL: DETECTED & LINKED
-> DECRYPTING LOCAL TERMINAL SESSION...
-> ACCESSING THE ULTIMATE CORPORATE / FACILITY CLASSIFIED SECRETS...
-> [ OK ] ROOT PRIVILEGES GRANTED. SESSION ACTIVE.`}
-            </pre>
-            <div className="laptop-boot-progress-bar">
-              <div className="laptop-boot-progress-fill" />
-            </div>
-          </div>
-        )}
-
-        {/* PHASE 2: TERMINAL INTERACTIVE PROMPT */}
-        {phase === 'TERMINAL_INTERACTIVE' && (
-          <div className="laptop-interactive-view" onClick={onInteractTerminal}>
-            <div className="laptop-sanctum-banner">
-              <Terminal size={14} />
-              <span>CLASSIFIED SANCTUM BREACH CONFIRMED</span>
-            </div>
-            <h2 className="laptop-screen-title">THE ULTIMATE SECRET</h2>
-            <p className="laptop-screen-desc">
-              You bypassed 47 security nodes, rotated high-voltage lasers, and reached the legendary vault.
-              Behind the impenetrable titanium doors sits an unmade bed, laundry, cold Maggi noodles...
-              and this very computer.
-            </p>
-            <button
-              type="button"
-              className="laptop-screen-action-btn green-pulse"
-              onClick={(e) => {
-                e.stopPropagation();
-                onInteractTerminal?.();
-              }}
-            >
-              <Zap size={15} />
-              <span>ACCESS CLASSIFIED REVELATION [CLICK HERE OR PRESS E]</span>
-            </button>
-            <div className="laptop-zoom-hint">
-              <span>Tip: Click 🔍 ZOOM SCREEN button or press Z to focus up close</span>
-            </div>
-          </div>
-        )}
-
-        {/* PHASE 3: MOM CALLING & DEADPAN REALITY CHECK */}
-        {phase === 'MOM_REVEAL' && (
-          <div className="laptop-dialogue-view">
-            <div className="laptop-alert-bar">
-              <div className="laptop-alert-badge">
-                <Volume2 size={13} className="os-pulse-icon" />
-                <span>INCOMING HIGH-PRIORITY TRANSMISSION // KITCHEN INTERCOM</span>
-              </div>
-              <div className="laptop-audio-eq">
-                <span className="eq-bar bar-1" />
-                <span className="eq-bar bar-2" />
-                <span className="eq-bar bar-3" />
-                <span className="eq-bar bar-4" />
+> HARDWARE TERMINAL: DETECTED & AIR-GAP LINKED
+> DECRYPTING LOCAL HARDWARE SESSION...
+> ACCESSING CLASSIFIED FACILITY DATA...
+> [ OK ] ROOT PRIVILEGES GRANTED.`}
+              </pre>
+              <div className="boot-progress-bar">
+                <div className="boot-progress-fill" />
               </div>
             </div>
+          )}
 
-            <div className="laptop-mom-shout-card">
-              <div className="laptop-speaker-label">
-                <span className="speaker-avatar">👵🏽</span>
-                <strong>MOM (SHOUTING FROM THE KITCHEN):</strong>
+          {/* PHASE 2: TERMINAL INTERACTIVE PROMPT */}
+          {phase === 'TERMINAL_INTERACTIVE' && (
+            <div className="window-interactive-panel" onClick={onInteractTerminal}>
+              <div className="panel-badge green">
+                <Terminal size={13} />
+                <span>SANCTUM ACCESS GRANTED</span>
               </div>
-              <p className="laptop-mom-shout-text">
-                “OYE HERO! Stop clicking the mouse like a maniac and pretending to be in Matrix! The dal is boiling on the stove! Go to the market and bring ₹10 DHANIYA (Coriander) right now! And don't forget to ask for extra free green chillies (mirchi)!”
+              <h2 className="panel-title">THE ULTIMATE SECRET</h2>
+              <p className="panel-desc">
+                You bypassed 47 security nodes, rotated high-voltage lasers, and reached the legendary vault.
+                Behind the impenetrable titanium doors sits an unmade bed, laundry, cold Maggi noodles...
+                and this very computer.
               </p>
+              <button
+                type="button"
+                className="panel-action-btn green-pulse"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onInteractTerminal?.();
+                }}
+              >
+                <Zap size={14} />
+                <span>ACCESS CLASSIFIED REVELATION [CLICK HERE OR PRESS E]</span>
+              </button>
             </div>
+          )}
 
-            {roastStep === 'initial' && (
-              <div className="laptop-choices-section">
-                <span className="laptop-choice-heading">TRANSMIT YOUR RESPONSE:</span>
-                <div className="laptop-choices-list">
-                  <button
-                    type="button"
-                    className="laptop-choice-btn"
-                    onClick={() =>
-                      handlePlayerChoice(
-                        'Mom, wait! I literally just bypassed a military-grade neural firewall!'
-                      )
-                    }
-                  >
-                    <ChevronRight size={14} />
-                    <span>“Mom, wait! I literally just bypassed a military-grade neural firewall!”</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="laptop-choice-btn"
-                    onClick={() =>
-                      handlePlayerChoice(
-                        'Can I finish this Easter egg first? I’m almost at the secret ending!'
-                      )
-                    }
-                  >
-                    <ChevronRight size={14} />
-                    <span>“Can I finish this Easter egg first? I’m almost at the secret ending!”</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="laptop-choice-btn"
-                    onClick={() =>
-                      handlePlayerChoice(
-                        'Did you say ₹10 or ₹20 dhaniya? And what if the vendor charges for mirchi?'
-                      )
-                    }
-                  >
-                    <ChevronRight size={14} />
-                    <span>“Did you say ₹10 or ₹20 dhaniya? And what if the vendor charges for mirchi?”</span>
-                  </button>
+          {/* PHASE 3: MOM CALLING & DEADPAN REALITY CHECK */}
+          {phase === 'MOM_REVEAL' && (
+            <div className="window-dialogue-panel">
+              <div className="dialogue-alert-strip">
+                <div className="alert-strip-badge">
+                  <Volume2 size={13} className="strip-pulse-icon" />
+                  <span>⚠️ INCOMING HIGH-PRIORITY TRANSMISSION // KITCHEN INTERCOM</span>
+                </div>
+                <div className="strip-audio-eq">
+                  <span className="eq-bar bar-1" />
+                  <span className="eq-bar bar-2" />
+                  <span className="eq-bar bar-3" />
+                  <span className="eq-bar bar-4" />
                 </div>
               </div>
-            )}
 
-            {roastStep === 'slipper' && (
-              <div className="laptop-slipper-alert">
-                <span className="laptop-slipper-emoji">🩴💨</span>
-                <div>
-                  <strong className="laptop-slipper-title">TACTICAL FLYING CHAPPAL LAUNCHED</strong>
-                  <span className="laptop-slipper-sub">
-                    Velocity: Mach 3.4 • Heat-Seeking Guidance • Target: Back of Your Head
-                  </span>
+              <div className="mom-speech-bubble">
+                <div className="speaker-header">
+                  <span className="speaker-avatar">👵🏽</span>
+                  <strong>MOM (SHOUTING FROM THE KITCHEN):</strong>
                 </div>
-              </div>
-            )}
-
-            {roastStep === 'narrator' && (
-              <div className="laptop-narrator-card">
-                <div className="laptop-narrator-badge">
-                  <Terminal size={11} />
-                  <span>NARRATOR // DEADPAN REALITY CHECK</span>
-                </div>
-                <p className="laptop-narrator-quote">
-                  “You rotated 14 high-voltage conduits. You calculated Manhattan network topologies.
-                  You spent 15 minutes feeling like an untouchable cyber ghost...<br />
-                  <strong style={{ color: '#fef08a' }}>
-                    ...and yet, you still haven't bought the coriander. The dal is ruined. The chappal is supersonic.
-                  </strong>”
+                <p className="speaker-text">
+                  “OYE HERO! Stop clicking the mouse like a maniac and pretending to be in Matrix! The dal is boiling on the stove! Go to the market and bring ₹10 DHANIYA (Coriander) right now! And don't forget to ask for extra free green chillies (mirchi)!”
                 </p>
-                <button
-                  type="button"
-                  className="laptop-screen-action-btn amber-glow"
-                  onClick={handleProceedToCertificate}
-                >
-                  <Award size={14} />
-                  <span>VIEW OFFICIAL HOLOGRAPHIC EVALUATION 📜</span>
-                </button>
               </div>
-            )}
-          </div>
-        )}
 
-        {/* PHASE 4: OFFICIAL CERTIFICATE */}
-        {phase === 'CERTIFICATE_ROAST' && (
-          <div className="laptop-certificate-view">
-            <div className="laptop-cert-header">
-              <span className="laptop-cert-crest">🌿🩴🌿</span>
-              <span className="laptop-cert-dept">
-                DEPARTMENT OF DOMESTIC HOUSEHOLD OPERATIONS & CYBER ARBITRAGE
-              </span>
-              <h1 className="laptop-cert-title">CERTIFICATE OF ERRAND DISOBEDIENCE</h1>
-              <span className="laptop-cert-sub">
-                FOR DISTINGUISHED CYBER PROCRASTINATION UNDER EXTREME CIRCUMSTANCES
-              </span>
+              {roastStep === 'initial' && (
+                <div className="dialogue-options-group">
+                  <span className="options-label">TRANSMIT YOUR RESPONSE:</span>
+                  <div className="options-stack">
+                    <button
+                      type="button"
+                      className="dialogue-option-chip"
+                      onClick={() =>
+                        handlePlayerChoice(
+                          'Mom, wait! I literally just bypassed a military-grade neural firewall!'
+                        )
+                      }
+                    >
+                      <ChevronRight size={14} />
+                      <span>“Mom, wait! I literally just bypassed a military-grade neural firewall!”</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="dialogue-option-chip"
+                      onClick={() =>
+                        handlePlayerChoice(
+                          'Can I finish this Easter egg first? I’m almost at the secret ending!'
+                        )
+                      }
+                    >
+                      <ChevronRight size={14} />
+                      <span>“Can I finish this Easter egg first? I’m almost at the secret ending!”</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="dialogue-option-chip"
+                      onClick={() =>
+                        handlePlayerChoice(
+                          'Did you say ₹10 or ₹20 dhaniya? And what if the vendor charges for mirchi?'
+                        )
+                      }
+                    >
+                      <ChevronRight size={14} />
+                      <span>“Did you say ₹10 or ₹20 dhaniya? And what if the vendor charges for mirchi?”</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {roastStep === 'slipper' && (
+                <div className="slipper-threat-banner">
+                  <span className="threat-emoji">🩴💨</span>
+                  <div>
+                    <strong className="threat-title">TACTICAL FLYING CHAPPAL LAUNCHED</strong>
+                    <span className="threat-sub">
+                      Velocity: Mach 3.4 • Heat-Seeking Guidance • Target: Back of Your Head
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {roastStep === 'narrator' && (
+                <div className="narrator-reality-panel">
+                  <div className="panel-badge amber">
+                    <Terminal size={11} />
+                    <span>NARRATOR // DEADPAN REALITY CHECK</span>
+                  </div>
+                  <p className="narrator-quote-text">
+                    “You rotated 14 high-voltage conduits. You calculated Manhattan network topologies.
+                    You spent 15 minutes feeling like an untouchable cyber ghost...<br />
+                    <strong style={{ color: '#fef08a' }}>
+                      ...and yet, you still haven't bought the coriander. The dal is ruined. The chappal is supersonic.
+                    </strong>”
+                  </p>
+                  <button
+                    type="button"
+                    className="panel-action-btn amber-glow"
+                    onClick={handleProceedToCertificate}
+                  >
+                    <Award size={14} />
+                    <span>VIEW OFFICIAL HOLOGRAPHIC EVALUATION 📜</span>
+                  </button>
+                </div>
+              )}
             </div>
+          )}
 
-            <div className="laptop-cert-recipient">
-              AWARDED TO: THE "ELITE HACKER" WHO FORGOT THE DHANIYA
-            </div>
+          {/* PHASE 4: OFFICIAL CERTIFICATE */}
+          {phase === 'CERTIFICATE_ROAST' && (
+            <div className="certificate-document-panel">
+              <div className="cert-doc-header">
+                <span className="cert-crest">🌿🩴🌿</span>
+                <span className="cert-dept">
+                  DEPARTMENT OF DOMESTIC HOUSEHOLD OPERATIONS & CYBER ARBITRAGE
+                </span>
+                <h1 className="cert-title">CERTIFICATE OF ERRAND DISOBEDIENCE</h1>
+                <span className="cert-subtitle">
+                  FOR DISTINGUISHED CYBER PROCRASTINATION UNDER EXTREME CIRCUMSTANCES
+                </span>
+              </div>
 
-            <p className="laptop-cert-body">
-              For spending 15 minutes rotating 3D laser switches and feeling like Mr. Robot...
-              while completely neglecting a 5-minute grocery trip to buy fresh coriander.
-            </p>
+              <div className="cert-recipient-tag">
+                AWARDED TO: THE "ELITE HACKER" WHO FORGOT THE DHANIYA
+              </div>
 
-            <div className="laptop-cert-grid">
-              <div className="laptop-stat-cell">
-                <span className="stat-label">HACKING APTITUDE</span>
-                <strong className="stat-val" style={{ color: '#00f0ff' }}>LEVEL 99 CYBER GHOST</strong>
-              </div>
-              <div className="laptop-stat-cell">
-                <span className="stat-label">MOTHER'S APPROVAL</span>
-                <strong className="stat-val" style={{ color: '#ef4444' }}>-9,999 RESPECT</strong>
-              </div>
-              <div className="laptop-stat-cell">
-                <span className="stat-label">CORIANDER SECURED</span>
-                <strong className="stat-val" style={{ color: '#f59e0b' }}>0 / 1 BUNCH</strong>
-              </div>
-              <div className="laptop-stat-cell">
-                <span className="stat-label">FREE GREEN CHILLIES</span>
-                <strong className="stat-val" style={{ color: '#ef4444' }}>0 / 4 MIRCHI</strong>
-              </div>
-              <div className="laptop-stat-cell">
-                <span className="stat-label">SABZI STATUS</span>
-                <strong className="stat-val" style={{ color: '#ef4444' }}>BURNED TO ASH</strong>
-              </div>
-              <div className="laptop-stat-cell">
-                <span className="stat-label">CHAPPAL THREAT LEVEL</span>
-                <strong className="stat-val" style={{ color: '#dc2626' }}>DEFCON 1 (INBOUND)</strong>
-              </div>
-            </div>
+              <p className="cert-citation-text">
+                For spending 15 minutes rotating 3D laser switches and feeling like Mr. Robot...
+                while completely neglecting a 5-minute grocery trip to buy fresh coriander.
+              </p>
 
-            <div className="laptop-cert-footer">
-              <div className="laptop-cert-stamp">
+              <div className="cert-stats-grid">
+                <div className="stat-card">
+                  <span className="stat-lbl">HACKING APTITUDE</span>
+                  <strong className="stat-num" style={{ color: '#00f0ff' }}>LEVEL 99 CYBER GHOST</strong>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-lbl">MOTHER'S APPROVAL</span>
+                  <strong className="stat-num" style={{ color: '#ef4444' }}>-9,999 RESPECT</strong>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-lbl">CORIANDER SECURED</span>
+                  <strong className="stat-num" style={{ color: '#f59e0b' }}>0 / 1 BUNCH</strong>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-lbl">FREE GREEN CHILLIES</span>
+                  <strong className="stat-num" style={{ color: '#ef4444' }}>0 / 4 MIRCHI</strong>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-lbl">SABZI STATUS</span>
+                  <strong className="stat-num" style={{ color: '#ef4444' }}>BURNED TO ASH</strong>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-lbl">CHAPPAL THREAT LEVEL</span>
+                  <strong className="stat-num" style={{ color: '#dc2626' }}>DEFCON 1 (INBOUND)</strong>
+                </div>
+              </div>
+
+              <div className="cert-stamp-badge">
                 <span>CERTIFIED DHANIYA PROCRASTINATOR • AUTHORIZED BY MOM 🩴</span>
               </div>
-              <div className="laptop-cert-actions">
+
+              <div className="cert-buttons-row">
                 <button
                   type="button"
-                  className="laptop-screen-action-btn green-pulse"
+                  className="panel-action-btn green-pulse"
                   onClick={() => {
                     playClickSound(1200);
                     onReturnToPortfolio?.();
@@ -677,7 +701,7 @@ function LaptopScreenOS({
                 </button>
                 <button
                   type="button"
-                  className="laptop-screen-action-btn secondary"
+                  className="panel-action-btn secondary"
                   onClick={() => {
                     playClickSound(1000);
                     onRestartEasterEgg?.();
@@ -688,8 +712,36 @@ function LaptopScreenOS({
                 </button>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
+
+      {/* 3. DESKTOP BOTTOM TASKBAR */}
+      <div className="desktop-taskbar">
+        <div className="taskbar-start-btn">
+          <span>💀</span>
+          <strong>ctOS</strong>
+        </div>
+        <div className="taskbar-open-item">
+          <span className="taskbar-dot" />
+          <span>{getWindowTitle()}</span>
+        </div>
+        <div className="taskbar-tray">
+          <button
+            type="button"
+            className="taskbar-zoom-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleZoom?.();
+            }}
+            title={isZoomed ? "Step back to chair view (Esc)" : "Zoom in on laptop monitor (Z)"}
+          >
+            {isZoomed ? "🪑 VIEW ROOM (ESC)" : "🔍 ZOOM SCREEN (Z)"}
+          </button>
+          <span className="tray-item">AIR-GAPPED</span>
+          <span className="tray-item">⚡ 100%</span>
+          <span className="tray-clock">13:37</span>
+        </div>
       </div>
     </div>
   );
@@ -766,20 +818,30 @@ function HackerLaptop3D({
       <group position={[0, 0.02, -0.145]} rotation={[-0.38, 0, 0]}>
         {/* Outer Bezel Lid */}
         <mesh position={[0, 0.15, 0]}>
-          <boxGeometry args={[0.44, 0.3, 0.014]} />
+          <boxGeometry args={[0.45, 0.31, 0.014]} />
           <meshStandardMaterial color="#090d16" metalness={0.9} roughness={0.2} />
+        </mesh>
+
+        {/* Top Bezel Webcam */}
+        <mesh position={[0, 0.292, 0.008]}>
+          <circleGeometry args={[0.003, 12]} />
+          <meshBasicMaterial color="#1e293b" />
+        </mesh>
+        <mesh position={[0.012, 0.292, 0.008]}>
+          <circleGeometry args={[0.0015, 8]} />
+          <meshBasicMaterial color="#22c55e" />
         </mesh>
 
         {/* Display Backing Surface */}
         <mesh position={[0, 0.15, 0.008]}>
-          <planeGeometry args={[0.4, 0.26]} />
+          <planeGeometry args={[0.40, 0.26]} />
           <meshStandardMaterial
             color="#020617"
             roughness={0.2}
           />
         </mesh>
 
-        {/* Interactive In-Screen OS Rendered Directly on Laptop Monitor */}
+        {/* Interactive In-Screen OS Desktop Rendered Directly on Laptop Monitor */}
         {betrayalPhase && betrayalPhase !== 'NONE' && (
           <group position={[0, 0.15, 0.012]}>
             <Html

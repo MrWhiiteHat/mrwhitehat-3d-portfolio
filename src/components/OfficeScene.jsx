@@ -382,11 +382,7 @@ function SceneContents({
   // Dynamically calibrate OrbitControls target for seated chair vs focused laptop screen
   useEffect(() => {
     if (isBunkerMode && controlsRef.current) {
-      if (isLaptopZoomed) {
-        controlsRef.current.target.set(0, 0.86, -0.14);
-      } else {
-        controlsRef.current.target.set(0, 0.82, -0.05);
-      }
+      controlsRef.current.target.set(0, 0.88, -0.20);
       controlsRef.current.update();
     }
   }, [isBunkerMode, isLaptopZoomed, controlsRef]);
@@ -539,12 +535,12 @@ function SceneContents({
         panSpeed={0.85}
         enablePan={!isBunkerMode}
         screenSpacePanning={true}
-        minDistance={isBunkerMode ? (isLaptopZoomed ? 0.28 : 0.75) : gameState === 'HACKING' ? 0.2 : 2.0}
-        maxDistance={isBunkerMode ? (isLaptopZoomed ? 0.40 : 1.15) : gameState === 'HACKING' ? 25.0 : 22}
-        minPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.25 : 1.10) : 0.05}
-        maxPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.48 : 1.55) : gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
-        minAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? -0.25 : -0.55) : -Infinity}
-        maxAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? 0.25 : 0.55) : Infinity}
+        minDistance={isBunkerMode ? (isLaptopZoomed ? 0.45 : 0.75) : gameState === 'HACKING' ? 0.2 : 2.0}
+        maxDistance={isBunkerMode ? (isLaptopZoomed ? 0.65 : 1.15) : gameState === 'HACKING' ? 25.0 : 22}
+        minPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.15 : 1.10) : 0.05}
+        maxPolarAngle={isBunkerMode ? (isLaptopZoomed ? 1.45 : 1.50) : gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
+        minAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? -0.30 : -0.45) : -Infinity}
+        maxAzimuthAngle={isBunkerMode ? (isLaptopZoomed ? 0.30 : 0.45) : Infinity}
       />
       <CameraDirector
         gameState={gameState}

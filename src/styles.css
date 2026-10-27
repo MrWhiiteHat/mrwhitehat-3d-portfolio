@@ -11926,16 +11926,17 @@ body.is-pseudo-fullscreen .portfolio-container {
 }
 
 /* ==========================================================================
-   LAPTOP MONITOR EMBEDDED OPERATING SYSTEM (ctOS In-Screen Terminal)
+   LAPTOP MONITOR EMBEDDED OPERATING SYSTEM & DESKTOP WINDOW SYSTEM
    ========================================================================== */
-.laptop-screen-viewport {
+.laptop-desktop-environment {
   width: 760px;
   height: 494px;
-  background: #030712;
-  border: 1px solid rgba(0, 240, 255, 0.4);
+  background: #020617 radial-gradient(circle at 50% 40%, #07152d 0%, #020617 100%);
+  border: 1px solid rgba(0, 240, 255, 0.35);
   box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(0, 240, 255, 0.25);
   border-radius: 4px;
   overflow: hidden;
+  position: relative;
   display: flex;
   flex-direction: column;
   color: #e2e8f0;
@@ -11945,508 +11946,613 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-family: var(--font, sans-serif);
 }
 
-/* 1. OS Top Titlebar */
-.laptop-os-topbar {
+/* 1. Desktop Shortcuts Column */
+.desktop-shortcuts-column {
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 2;
+  pointer-events: none;
+}
+.desktop-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 58px;
+  text-align: center;
+  cursor: pointer;
+}
+.icon-glyph {
+  font-size: 22px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
+}
+.icon-name {
+  font-family: var(--mono, monospace);
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.02em;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1px 4px;
+  border-radius: 3px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 2. Centered Application Window Frame */
+.desktop-window-frame {
+  position: absolute;
+  top: 12px;
+  left: 74px;
+  width: 672px;
+  height: 442px;
+  background: rgba(6, 12, 24, 0.97);
+  border: 1.5px solid rgba(0, 240, 255, 0.5);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 240, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 5;
+  box-sizing: border-box;
+}
+
+/* Window Titlebar */
+.window-titlebar {
+  height: 28px;
+  min-height: 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 14px;
-  background: #090e17;
-  border-bottom: 1.5px solid rgba(0, 240, 255, 0.3);
-  font-family: var(--mono, monospace);
-  font-size: 11px;
-}
-.os-topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #38bdf8;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-}
-.os-led-green {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 8px #22c55e;
-  animation: pulseBeacon 1.5s infinite;
-}
-.os-topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.os-zoom-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  background: rgba(0, 240, 255, 0.15);
-  border: 1px solid rgba(0, 240, 255, 0.5);
-  border-radius: 4px;
-  color: #00f0ff;
+  padding: 0 10px;
+  background: linear-gradient(90deg, #091322, #0d1e36);
+  border-bottom: 1.5px solid rgba(0, 240, 255, 0.35);
   font-family: var(--mono, monospace);
   font-size: 10.5px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
-.os-zoom-toggle-btn:hover {
-  background: rgba(0, 240, 255, 0.35);
-  color: #ffffff;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
-}
-.os-status-item {
-  color: #94a3b8;
-  font-size: 10px;
-  font-weight: 600;
+.window-titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #38bdf8;
+  font-weight: 700;
   letter-spacing: 0.04em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
+.window-app-icon {
+  color: #00f0ff;
+  font-size: 12px;
+}
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.win-btn {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7.5px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.win-min { background: #eab308; color: #713f12; }
+.win-max { background: #22c55e; color: #14532d; }
+.win-close { background: #ef4444; color: #7f1d1d; }
 
-/* 2. OS Screen Content Area */
-.laptop-os-content {
+/* Window Body Content */
+.window-body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 18px 22px;
+  padding: 12px 16px;
   overflow-y: auto;
   box-sizing: border-box;
   background: radial-gradient(circle at center, #070e1b 0%, #030712 100%);
 }
-.laptop-os-content::-webkit-scrollbar {
+.window-body::-webkit-scrollbar {
   width: 5px;
 }
-.laptop-os-content::-webkit-scrollbar-thumb {
-  background: rgba(0, 240, 255, 0.35);
+.window-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.4);
   border-radius: 4px;
 }
 
-/* Phase 1: Boot View */
-.laptop-boot-view {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 20px;
-  background: rgba(4, 9, 20, 0.85);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  border-radius: 8px;
-}
-.laptop-boot-header {
-  display: flex;
+/* Generic Panel Badges */
+.panel-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: #fbbf24;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
   font-family: var(--mono, monospace);
-  font-size: 12px;
+  font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.08em;
 }
-.laptop-boot-terminal {
+.panel-badge.amber {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.6);
+  color: #fbbf24;
+}
+.panel-badge.green {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  color: #4ade80;
+}
+
+/* Phase 1: Bootloader */
+.window-boot-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(4, 9, 20, 0.85);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 6px;
+}
+.terminal-code-block {
   font-family: var(--mono, monospace);
-  font-size: 11.5px;
-  line-height: 1.6;
+  font-size: 11px;
+  line-height: 1.55;
   color: #86efac;
   margin: 0;
   white-space: pre-wrap;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 12px;
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 4px;
   border-left: 2px solid #22c55e;
 }
-.laptop-boot-progress-bar {
+.boot-progress-bar {
   width: 100%;
-  height: 6px;
+  height: 5px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
   overflow: hidden;
 }
-.laptop-boot-progress-fill {
+.boot-progress-fill {
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, #22c55e, #00f0ff);
-  animation: bootProgress 2.5s ease-out;
-}
-@keyframes bootProgress {
-  0% { width: 0%; }
-  60% { width: 75%; }
-  100% { width: 100%; }
+  animation: bootProgress 2.2s ease-out;
 }
 
-/* Phase 2: Interactive Prompt View */
-.laptop-interactive-view {
+/* Phase 2: Interactive Prompt */
+.window-interactive-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 12px;
-  padding: 20px 24px;
+  gap: 10px;
+  padding: 16px 20px;
   background: rgba(6, 12, 26, 0.9);
   border: 1.5px solid rgba(34, 197, 94, 0.5);
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.laptop-interactive-view:hover {
+.window-interactive-panel:hover {
   border-color: #22c55e;
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
 }
-.laptop-sanctum-banner {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  background: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.6);
-  border-radius: 999px;
-  color: #4ade80;
+.panel-title {
   font-family: var(--mono, monospace);
-  font-size: 10.5px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-.laptop-screen-title {
-  font-family: var(--mono, monospace);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 900;
   color: #ffffff;
   letter-spacing: 0.08em;
   margin: 0;
-  text-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
+  text-shadow: 0 0 14px rgba(0, 240, 255, 0.5);
 }
-.laptop-screen-desc {
-  font-size: 13px;
-  line-height: 1.5;
+.panel-desc {
+  font-size: 12px;
+  line-height: 1.45;
   color: #cbd5e1;
-  max-width: 580px;
+  max-width: 560px;
   margin: 0;
 }
-.laptop-zoom-hint {
-  font-family: var(--mono, monospace);
-  font-size: 10.5px;
-  color: #38bdf8;
-  opacity: 0.85;
-}
 
-/* Phase 3: Mom Dialogue View */
-.laptop-dialogue-view {
+/* Phase 3: Mom Dialogue */
+.window-dialogue-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
-.laptop-alert-bar {
+.dialogue-alert-strip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 12px;
+  padding: 5px 10px;
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.5);
-  border-radius: 6px;
+  border-radius: 4px;
 }
-.laptop-alert-badge {
+.alert-strip-badge {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: #fca5a5;
   font-family: var(--mono, monospace);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
 }
-.laptop-audio-eq {
+.strip-pulse-icon {
+  animation: pulseBeacon 1s infinite;
+}
+.strip-audio-eq {
   display: flex;
   align-items: flex-end;
-  gap: 3px;
-  height: 14px;
+  gap: 2.5px;
+  height: 12px;
 }
-.laptop-audio-eq .eq-bar {
-  width: 3px;
+.strip-audio-eq .eq-bar {
+  width: 2.5px;
   background: #ef4444;
-  border-radius: 2px;
+  border-radius: 1px;
   animation: eqBounce 0.8s infinite ease-in-out alternate;
 }
-.laptop-mom-shout-card {
+
+.mom-speech-bubble {
   background: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.4);
-  border-radius: 8px;
-  padding: 12px 16px;
+  border-radius: 6px;
+  padding: 10px 14px;
 }
-.laptop-speaker-label {
+.speaker-header {
   display: flex;
   align-items: center;
   gap: 6px;
   font-family: var(--mono, monospace);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
   color: #fca5a5;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 .speaker-avatar {
-  font-size: 16px;
+  font-size: 15px;
 }
-.laptop-mom-shout-text {
-  font-size: 13px;
-  line-height: 1.45;
+.speaker-text {
+  font-size: 12px;
+  line-height: 1.4;
   color: #ffffff;
   font-weight: 600;
   margin: 0;
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 
-/* Choices list */
-.laptop-choices-section {
+.dialogue-options-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
+  margin-top: 2px;
 }
-.laptop-choice-heading {
+.options-label {
   font-family: var(--mono, monospace);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   color: #94a3b8;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
-.laptop-choices-list {
+.options-stack {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
-.laptop-choice-btn {
+.dialogue-option-chip {
   display: flex;
   align-items: center;
   gap: 8px;
   background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(0, 240, 255, 0.35);
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: 5px;
+  padding: 7px 11px;
   color: #e2e8f0;
   font-family: var(--font, sans-serif);
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.laptop-choice-btn:hover {
+.dialogue-option-chip:hover {
   background: rgba(0, 240, 255, 0.18);
   border-color: #00f0ff;
   color: #ffffff;
-  transform: translateX(4px);
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+  transform: translateX(3px);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
-/* Chappal Alert on Screen */
-.laptop-slipper-alert {
+/* Slipper Threat Banner */
+.slipper-threat-banner {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: rgba(234, 88, 12, 0.25);
   border: 1.5px solid #ea580c;
-  box-shadow: 0 0 25px rgba(234, 88, 12, 0.35);
-  border-radius: 8px;
-  padding: 10px 14px;
+  box-shadow: 0 0 20px rgba(234, 88, 12, 0.35);
+  border-radius: 6px;
+  padding: 8px 12px;
   animation: shakeAlert 0.3s infinite;
 }
-.laptop-slipper-emoji {
-  font-size: 26px;
-}
-.laptop-slipper-title {
+.threat-emoji { font-size: 24px; }
+.threat-title {
   display: block;
   font-family: var(--mono, monospace);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   color: #fed7aa;
 }
-.laptop-slipper-sub {
-  font-size: 10.5px;
+.threat-sub {
+  font-size: 10px;
   color: #ffedd5;
 }
 
-/* Narrator on Screen */
-.laptop-narrator-card {
+/* Narrator Reality Panel */
+.narrator-reality-panel {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid #fbbf24;
-  border-radius: 8px;
-  padding: 12px 16px;
+  border-radius: 6px;
+  padding: 10px 14px;
 }
-.laptop-narrator-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #fbbf24;
-  font-family: var(--mono, monospace);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-.laptop-narrator-quote {
-  font-size: 12px;
-  line-height: 1.5;
+.narrator-quote-text {
+  font-size: 11.5px;
+  line-height: 1.45;
   color: #cbd5e1;
   font-style: italic;
   margin: 0;
 }
 
-/* Phase 4: Certificate View on Screen */
-.laptop-certificate-view {
+/* Phase 4: Certificate Document Panel */
+.certificate-document-panel {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   background: rgba(6, 12, 24, 0.95);
   border: 2px double #22c55e;
-  border-radius: 8px;
-  padding: 14px 16px;
+  border-radius: 6px;
+  padding: 10px 14px;
   text-align: center;
 }
-.laptop-cert-header {
+.cert-doc-header {
   border-bottom: 1px dashed rgba(34, 197, 94, 0.3);
-  padding-bottom: 6px;
+  padding-bottom: 4px;
 }
-.laptop-cert-crest {
-  display: block;
-  font-size: 20px;
-  margin-bottom: 2px;
-}
-.laptop-cert-dept {
-  display: block;
-  font-family: var(--mono, monospace);
-  font-size: 8.5px;
-  font-weight: 800;
-  color: #86efac;
-  letter-spacing: 0.1em;
-}
-.laptop-cert-title {
-  font-family: var(--mono, monospace);
-  font-size: 16px;
-  font-weight: 900;
-  color: #ffffff;
-  letter-spacing: 0.06em;
-  margin: 2px 0;
-  text-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
-}
-.laptop-cert-sub {
-  font-size: 9.5px;
-  color: #94a3b8;
-  font-weight: 600;
-}
-.laptop-cert-recipient {
-  font-family: var(--mono, monospace);
-  font-size: 13.5px;
-  font-weight: 900;
-  color: #fef08a;
-  letter-spacing: 0.05em;
-  margin: 4px 0 2px 0;
-}
-.laptop-cert-body {
-  font-size: 11px;
-  line-height: 1.4;
-  color: #cbd5e1;
-  margin: 0 auto;
-  max-width: 540px;
-}
-
-/* 6-cell stat grid on laptop */
-.laptop-cert-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin: 6px 0;
-}
-.laptop-stat-cell {
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  padding: 4px 6px;
-}
-.laptop-stat-cell .stat-label {
+.cert-crest { display: block; font-size: 18px; margin-bottom: 1px; }
+.cert-dept {
   display: block;
   font-family: var(--mono, monospace);
   font-size: 8px;
+  font-weight: 800;
+  color: #86efac;
+  letter-spacing: 0.08em;
+}
+.cert-title {
+  font-family: var(--mono, monospace);
+  font-size: 14.5px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+  margin: 1px 0;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+}
+.cert-subtitle {
+  font-size: 8.5px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+.cert-recipient-tag {
+  font-family: var(--mono, monospace);
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #fef08a;
+  letter-spacing: 0.04em;
+  margin: 2px 0 1px 0;
+}
+.cert-citation-text {
+  font-size: 10px;
+  line-height: 1.35;
+  color: #cbd5e1;
+  margin: 0 auto;
+  max-width: 520px;
+}
+.cert-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin: 4px 0;
+}
+.stat-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 3px 5px;
+}
+.stat-lbl {
+  display: block;
+  font-family: var(--mono, monospace);
+  font-size: 7.5px;
   color: #94a3b8;
   font-weight: 700;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
-.laptop-stat-cell .stat-val {
+.stat-num {
   font-family: var(--mono, monospace);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
 }
-
-.laptop-cert-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin-top: 4px;
-}
-.laptop-cert-stamp {
+.cert-stamp-badge {
   border: 1.5px solid #dc2626;
   border-radius: 4px;
-  padding: 2px 10px;
+  padding: 2px 8px;
   color: #dc2626;
   font-family: var(--mono, monospace);
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 900;
-  letter-spacing: 0.08em;
-  transform: rotate(-2deg);
+  letter-spacing: 0.06em;
+  transform: rotate(-1.5deg);
+  display: inline-block;
+  margin: 0 auto;
 }
-.laptop-cert-actions {
+.cert-buttons-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+  margin-top: 3px;
 }
 
-/* Action Buttons */
-.laptop-screen-action-btn {
+/* Panel Action Buttons */
+.panel-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  border-radius: 6px;
-  padding: 8px 16px;
+  gap: 5px;
+  border-radius: 5px;
+  padding: 7px 14px;
   font-family: var(--mono, monospace);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.laptop-screen-action-btn.green-pulse {
+.panel-action-btn.green-pulse {
   background: linear-gradient(135deg, #16a34a, #15803d);
   color: #ffffff;
   border: 1px solid #4ade80;
-  box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.4);
 }
-.laptop-screen-action-btn.green-pulse:hover {
+.panel-action-btn.green-pulse:hover {
   background: linear-gradient(135deg, #22c55e, #16a34a);
   transform: scale(1.02);
-  box-shadow: 0 0 24px rgba(34, 197, 94, 0.7);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.7);
 }
-.laptop-screen-action-btn.amber-glow {
+.panel-action-btn.amber-glow {
   background: linear-gradient(135deg, #f59e0b, #d97706);
   color: #000000;
   border: 1px solid #fbbf24;
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
 }
-.laptop-screen-action-btn.amber-glow:hover {
+.panel-action-btn.amber-glow:hover {
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
   transform: scale(1.02);
-  box-shadow: 0 0 24px rgba(251, 191, 36, 0.7);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.7);
 }
-.laptop-screen-action-btn.secondary {
+.panel-action-btn.secondary {
   background: transparent;
   color: #94a3b8;
   border: 1px solid rgba(148, 163, 184, 0.4);
 }
-.laptop-screen-action-btn.secondary:hover {
+.panel-action-btn.secondary:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   border-color: #cbd5e1;
+}
+
+/* 3. Desktop Taskbar */
+.desktop-taskbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 26px;
+  background: #090e17;
+  border-top: 1.5px solid rgba(0, 240, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  z-index: 10;
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  box-sizing: border-box;
+}
+.taskbar-start-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  background: rgba(0, 240, 255, 0.18);
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  border-radius: 3px;
+  color: #00f0ff;
+  font-weight: 800;
+  cursor: pointer;
+}
+.taskbar-open-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 3px;
+  padding: 2px 8px;
+  color: #94a3b8;
+  font-size: 9.5px;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.taskbar-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+}
+.taskbar-tray {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.taskbar-zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  border-radius: 3px;
+  color: #00f0ff;
+  font-family: var(--mono, monospace);
+  font-size: 9.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.taskbar-zoom-btn:hover {
+  background: rgba(0, 240, 255, 0.35);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+.tray-item {
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 700;
+}
+.tray-clock {
+  color: #38bdf8;
+  font-weight: 800;
+  font-size: 10px;
 }
 
 /* ==========================================================================

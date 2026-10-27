@@ -47,14 +47,14 @@ export const CAMERA_VANTAGES = {
   VAULT_CHAMBER: {
     id: 'VAULT_CHAMBER',
     label: 'CAM 05: SEATED CHAIR VIEW',
-    pos: [0, 1.22, 0.85],
-    target: [0, 0.82, -0.05],
+    pos: [0, 1.20, 0.65],
+    target: [0, 0.88, -0.20],
   },
   VAULT_LAPTOP_FOCUS: {
     id: 'VAULT_LAPTOP_FOCUS',
     label: 'CAM 06: LAPTOP MONITOR',
-    pos: [0, 0.98, 0.16],
-    target: [0, 0.86, -0.14],
+    pos: [0, 1.08, 0.32],
+    target: [0, 0.88, -0.20],
   },
 };
 
