@@ -12768,6 +12768,10 @@ body.is-pseudo-fullscreen .portfolio-container {
   background: rgba(0, 240, 255, 0.15);
   box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
 }
+.desktop-icon-item.active {
+  background: rgba(0, 240, 255, 0.25);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
 
 /* Desktop App Modal Window */
 .desktop-app-modal-overlay {
@@ -12803,6 +12807,26 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-weight: 700;
   color: #38bdf8;
   border-bottom: 1px solid rgba(0, 240, 255, 0.4);
+}
+.modal-replay-voice-btn {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid #fbbf24;
+  color: #fbbf24;
+  font-size: 8.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 1px 6px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.15s ease;
+}
+.modal-replay-voice-btn:hover {
+  background: #fbbf24;
+  color: #0f172a;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+  transform: translateY(-1px);
 }
 .modal-close-btn {
   background: transparent;

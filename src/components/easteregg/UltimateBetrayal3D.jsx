@@ -21,6 +21,12 @@ import {
   playSarcasticTrombone,
   playDramaticVineBoom,
   playMomSlipperSmack,
+  playRejectionBuzzer,
+  playHostileShock,
+  playCashRegister,
+  playConcreteThud,
+  playMemeSwitchSound,
+  playLockRelease,
 } from './easterEggAudio.js';
 import {
   playMomInitialCall,
@@ -31,6 +37,13 @@ import {
   playMomRetortBulk,
   playNarratorPunchline,
   playMomScoldingReplay,
+  playIconRootAudio,
+  playIconFirewallAudio,
+  playIconDhaniyaAudio,
+  playIconMaggiAudio,
+  playIconMemesAudio,
+  playIconSharmaAudio,
+  playIconDictAudio,
   stopAllSpeech,
 } from './sarcasticVoiceEngine.js';
 import { playClickSound } from '../../utils/audio.js';
@@ -377,6 +390,82 @@ function LaptopScreenOS({
   const [activeDesktopApp, setActiveDesktopApp] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
   const [memeIndex, setMemeIndex] = useState(0);
+
+  // Dedicated handlers for opening desktop shortcut apps with bespoke audio & voice line
+  const handleOpenDesktopApp = (appId) => {
+    stopAllSpeech();
+    setActiveDesktopApp(appId);
+
+    switch (appId) {
+      case 'root':
+        playRejectionBuzzer();
+        playIconRootAudio();
+        break;
+      case 'firewall':
+        playHostileShock();
+        playIconFirewallAudio();
+        break;
+      case 'dhaniya':
+        playCashRegister();
+        playIconDhaniyaAudio();
+        break;
+      case 'maggi':
+        playConcreteThud();
+        playIconMaggiAudio();
+        break;
+      case 'memes':
+        playDramaticVineBoom();
+        playIconMemesAudio();
+        break;
+      case 'sharma':
+        playSarcasticTrombone();
+        playIconSharmaAudio();
+        break;
+      case 'dictionary':
+        playLockRelease();
+        playIconDictAudio();
+        break;
+      default:
+        playCorporateClick();
+        break;
+    }
+  };
+
+  const replayAppVoice = (appId) => {
+    stopAllSpeech();
+    switch (appId) {
+      case 'root':
+        playRejectionBuzzer();
+        playIconRootAudio();
+        break;
+      case 'firewall':
+        playHostileShock();
+        playIconFirewallAudio();
+        break;
+      case 'dhaniya':
+        playCashRegister();
+        playIconDhaniyaAudio();
+        break;
+      case 'maggi':
+        playConcreteThud();
+        playIconMaggiAudio();
+        break;
+      case 'memes':
+        playDramaticVineBoom();
+        playIconMemesAudio();
+        break;
+      case 'sharma':
+        playSarcasticTrombone();
+        playIconSharmaAudio();
+        break;
+      case 'dictionary':
+        playLockRelease();
+        playIconDictAudio();
+        break;
+      default:
+        break;
+    }
+  };
   const dialogueSpokenRef = useRef(false);
 
   const MEME_COLLECTION = [
@@ -518,81 +607,60 @@ function LaptopScreenOS({
       onPointerDown={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
     >
-      {/* 1. INTERACTIVE DESKTOP SHORTCUT ICONS ON LEFT */}
+      {/* 1. INTERACTIVE DESKTOP SHORTCUT ICONS ON LEFT (VOICED) */}
       <div className="desktop-shortcuts-column">
         <div
-          className="desktop-icon-item"
-          onClick={() => {
-            playCorporateClick();
-            setActiveDesktopApp('root');
-          }}
-          title="Click to inspect Root privileges"
+          className={`desktop-icon-item ${activeDesktopApp === 'root' ? 'active' : ''}`}
+          onClick={() => handleOpenDesktopApp('root')}
+          title="Click to inspect Root privileges (Voiced by Mom)"
         >
           <span className="icon-glyph">📁</span>
           <span className="icon-name">System_Root</span>
         </div>
         <div
-          className="desktop-icon-item"
-          onClick={() => {
-            playCorporateClick();
-            setActiveDesktopApp('firewall');
-          }}
-          title="Click to view Neural Firewall stats"
+          className={`desktop-icon-item ${activeDesktopApp === 'firewall' ? 'active' : ''}`}
+          onClick={() => handleOpenDesktopApp('firewall')}
+          title="Click to view Neural Firewall stats (Voiced by Mom)"
         >
           <span className="icon-glyph">🛡️</span>
           <span className="icon-name">Neural_Firewall</span>
         </div>
         <div
-          className="desktop-icon-item"
-          onClick={() => {
-            playCorporateClick();
-            setActiveDesktopApp('dhaniya');
-          }}
-          title="Click to view Dhaniya budget spreadsheet"
+          className={`desktop-icon-item ${activeDesktopApp === 'dhaniya' ? 'active' : ''}`}
+          onClick={() => handleOpenDesktopApp('dhaniya')}
+          title="Click to view Dhaniya budget spreadsheet (Voiced by Mom)"
         >
           <span className="icon-glyph">🌿</span>
           <span className="icon-name">Dhaniya_₹10.xlsx</span>
         </div>
         <div
-          className="desktop-icon-item"
-          onClick={() => {
-            playCorporateClick();
-            setActiveDesktopApp('maggi');
-          }}
-          title="Click to view Cold Maggi forensics"
+          className={`desktop-icon-item ${activeDesktopApp === 'maggi' ? 'active' : ''}`}
+          onClick={() => handleOpenDesktopApp('maggi')}
+          title="Click to view Cold Maggi forensics (Voiced by Mom)"
         >
           <span className="icon-glyph">🍜</span>
           <span className="icon-name">Cold_Maggi.log</span>
         </div>
         <div
-          className="desktop-icon-item"
-          onClick={() => {
-            playCorporateClick();
-            setActiveDesktopApp('memes');
-          }}
-          title="Click to view Hilarious Sarcasm Memes"
+          className={`desktop-icon-item ${activeDesktopApp === 'memes' ? 'active' : ''}`}
+          onClick={() => handleOpenDesktopApp('memes')}
+          title="Click to view Hilarious Sarcasm Memes (Voiced by Narrator)"
         >
           <span className="icon-glyph">🖼️</span>
           <span className="icon-name">Desi_Memes.exe</span>
         </div>
         <div
-          className="desktop-icon-item"
-          onClick={() => {
-            playCorporateClick();
-            setActiveDesktopApp('sharma');
-          }}
-          title="Click to view Sharma Ji Ka Beta comparison report"
+          className={`desktop-icon-item ${activeDesktopApp === 'sharma' ? 'active' : ''}`}
+          onClick={() => handleOpenDesktopApp('sharma')}
+          title="Click to view Sharma Ji Ka Beta comparison report (Voiced by Mom)"
         >
           <span className="icon-glyph">📉</span>
           <span className="icon-name">Sharma_Beta.pdf</span>
         </div>
         <div
-          className="desktop-icon-item"
-          onClick={() => {
-            playCorporateClick();
-            setActiveDesktopApp('dictionary');
-          }}
-          title="Click to view Decrypted Indian Mom Dictionary"
+          className={`desktop-icon-item ${activeDesktopApp === 'dictionary' ? 'active' : ''}`}
+          onClick={() => handleOpenDesktopApp('dictionary')}
+          title="Click to view Decrypted Indian Mom Dictionary (Voiced by Narrator)"
         >
           <span className="icon-glyph">📖</span>
           <span className="icon-name">Mom_Dict.txt</span>
@@ -609,14 +677,31 @@ function LaptopScreenOS({
                 {activeDesktopApp === 'firewall' && '🛡️ Neural_Firewall // Vulnerability Scan'}
                 {activeDesktopApp === 'dhaniya' && '🌿 Dhaniya_₹10.xlsx - Microsoft CyberSheet'}
                 {activeDesktopApp === 'maggi' && '🍜 Cold_Maggi.log // Forensic Incident'}
+                {activeDesktopApp === 'memes' && '🖼️ Desi_Memes.exe // Sarcasm Meme Vault'}
+                {activeDesktopApp === 'sharma' && '📉 Sharma_Beta.pdf // Performance Audit'}
+                {activeDesktopApp === 'dictionary' && '📖 Mom_Dict.txt // Decrypted Mom Dictionary'}
               </span>
-              <button
-                type="button"
-                className="modal-close-btn"
-                onClick={() => setActiveDesktopApp(null)}
-              >
-                ✕
-              </button>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  className="modal-replay-voice-btn"
+                  onClick={() => replayAppVoice(activeDesktopApp)}
+                  title="Replay Voice Audio"
+                >
+                  🔊 Listen
+                </button>
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => {
+                    stopAllSpeech();
+                    setActiveDesktopApp(null);
+                  }}
+                  title="Close Window"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="modal-content-body">
               {activeDesktopApp === 'root' && (
@@ -710,7 +795,10 @@ function LaptopScreenOS({
                     <button
                       type="button"
                       className="meme-nav-btn"
-                      onClick={() => setMemeIndex((prev) => (prev > 0 ? prev - 1 : MEME_COLLECTION.length - 1))}
+                      onClick={() => {
+                        playMemeSwitchSound();
+                        setMemeIndex((prev) => (prev > 0 ? prev - 1 : MEME_COLLECTION.length - 1));
+                      }}
                     >
                       ◀ PREVIOUS MEME
                     </button>
@@ -718,7 +806,10 @@ function LaptopScreenOS({
                     <button
                       type="button"
                       className="meme-nav-btn primary"
-                      onClick={() => setMemeIndex((prev) => (prev + 1) % MEME_COLLECTION.length)}
+                      onClick={() => {
+                        playMemeSwitchSound();
+                        setMemeIndex((prev) => (prev + 1) % MEME_COLLECTION.length);
+                      }}
                     >
                       NEXT MEME ▶
                     </button>
@@ -1124,6 +1215,26 @@ function LaptopScreenOS({
                     onClick={() => playSarcasticTrombone()}
                   >
                     🎺 Sarcastic Trombone
+                  </button>
+                  <button
+                    type="button"
+                    className="soundboard-btn"
+                    onClick={() => {
+                      playCashRegister();
+                      playIconDhaniyaAudio();
+                    }}
+                  >
+                    🌿 ₹10 Dhaniya + Free Mirchi
+                  </button>
+                  <button
+                    type="button"
+                    className="soundboard-btn"
+                    onClick={() => {
+                      playSarcasticTrombone();
+                      playIconSharmaAudio();
+                    }}
+                  >
+                    📉 Sharma Ji Ka Beta Roast
                   </button>
                   <button
                     type="button"

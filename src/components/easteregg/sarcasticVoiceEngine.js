@@ -178,3 +178,66 @@ export function playMomScoldingReplay(onComplete) {
     'Arey Nalayak! Did you buy the dhaniya yet?! Put down the computer and run to the market before I launch another chappal!'
   );
 }
+
+// 9. System_Root Desktop Shortcut Voice Line
+export function playIconRootAudio(onComplete) {
+  playRealVoiceClip(
+    'icon_root',
+    onComplete,
+    'Access denied! Sudo password change kar diya maine! True root authority of this house is Mummy! Pehle room saaf karo!'
+  );
+}
+
+// 10. Neural_Firewall Desktop Shortcut Voice Line
+export function playIconFirewallAudio(onComplete) {
+  playRealVoiceClip(
+    'icon_firewall',
+    onComplete,
+    'Tera neural firewall Pentagon ko rok sakta hai, par meri aawaz seedha tere kaan phadegi! Jaldi market bhaag!'
+  );
+}
+
+// 11. Dhaniya_₹10.xlsx Desktop Shortcut Voice Line
+export function playIconDhaniyaAudio(onComplete) {
+  playRealVoiceClip(
+    'icon_dhaniya',
+    onComplete,
+    'Dhyan se sun! Pure das rupaye ka dhaniya aur saath mein chaar mirchi free lani hai! Ek rupaya bhi extra diya toh dekhna!'
+  );
+}
+
+// 12. Cold_Maggi.log Desktop Shortcut Voice Line
+export function playIconMaggiAudio(onComplete) {
+  playRealVoiceClip(
+    'icon_maggi',
+    onComplete,
+    'Ek ghante pehle Maggi banayi thi! Ab wo concrete ka pathar ban chuki hai! Computer chhod aur bartan dho!'
+  );
+}
+
+// 13. Desi_Memes.exe Desktop Shortcut Voice Line
+export function playIconMemesAudio(onComplete) {
+  playRealVoiceClip(
+    'icon_memes',
+    onComplete,
+    'Behold: the digital coping mechanism of a cyber hacker who commands neural firewalls, yet cannot find coriander at the local grocery stall.'
+  );
+}
+
+// 14. Sharma_Beta.pdf Desktop Shortcut Voice Line
+export function playIconSharmaAudio(onComplete) {
+  playRealVoiceClip(
+    'icon_sharma',
+    onComplete,
+    'Sharma ji ka beta subah chaar baje uthta hai! Google mein Senior Engineer hai! Aur ek tu hai... bunker mein laser ghuma raha hai!'
+  );
+}
+
+// 15. Mom_Dict.txt Desktop Shortcut Voice Line
+export function playIconDictAudio(onComplete) {
+  playRealVoiceClip(
+    'icon_dict',
+    onComplete,
+    'Section four of the Indian Mother Vocabulary: When she says, Bas do minute ruko, mathematical laws dictate you have exactly zero seconds to comply.'
+  );
+}

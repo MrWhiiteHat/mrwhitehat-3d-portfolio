@@ -854,3 +854,96 @@ export function playMomSlipperSmack() {
     slap.stop(t + 0.09);
   } catch (e) {}
 }
+
+// 24. Cash Register Cha-Ching (Dhaniya spreadsheet audio)
+export function playCashRegister() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const t = ctx.currentTime;
+    // Bell 1 (high metallic chime)
+    const bell1 = ctx.createOscillator();
+    const g1 = ctx.createGain();
+    bell1.type = 'sine';
+    bell1.frequency.setValueAtTime(1760, t);
+    g1.gain.setValueAtTime(0.18, t);
+    g1.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    bell1.connect(g1);
+    g1.connect(ctx.destination);
+    bell1.start(t);
+    bell1.stop(t + 0.35);
+
+    // Bell 2 (Ka-ching secondary sparkle slightly delayed)
+    const bell2 = ctx.createOscillator();
+    const g2 = ctx.createGain();
+    bell2.type = 'triangle';
+    bell2.frequency.setValueAtTime(2640, t + 0.09);
+    g2.gain.setValueAtTime(0.001, t);
+    g2.gain.setValueAtTime(0.22, t + 0.09);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    bell2.connect(g2);
+    g2.connect(ctx.destination);
+    bell2.start(t + 0.09);
+    bell2.stop(t + 0.55);
+  } catch (e) {}
+}
+
+// 25. Concrete Thud / Fork Clink (Cold solid Maggi audio)
+export function playConcreteThud() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const t = ctx.currentTime;
+    // Low rock impact thud
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(80, t);
+    osc.frequency.exponentialRampToValueAtTime(24, t + 0.28);
+    gain.gain.setValueAtTime(0.25, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.32);
+
+    // Metallic fork clink on stone
+    const fork = ctx.createOscillator();
+    const fGain = ctx.createGain();
+    fork.type = 'triangle';
+    fork.frequency.setValueAtTime(2400, t);
+    fork.frequency.exponentialRampToValueAtTime(1100, t + 0.07);
+    fGain.gain.setValueAtTime(0.12, t);
+    fGain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+    fork.connect(fGain);
+    fGain.connect(ctx.destination);
+    fork.start(t);
+    fork.stop(t + 0.08);
+  } catch (e) {}
+}
+
+// 26. Meme Switch Spring / Comic Pop
+export function playMemeSwitchSound() {
+  if (isMuted()) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(280, t);
+    osc.frequency.exponentialRampToValueAtTime(750, t + 0.09);
+    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.11);
+  } catch (e) {}
+}
