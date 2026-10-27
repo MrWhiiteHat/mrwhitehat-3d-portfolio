@@ -28,12 +28,12 @@ export function stopAllSpeech() {
 }
 
 /**
- * Play Real Human Studio Voice Audio Clip
- * @param {string} audioFileName - filename in public/audio/easteregg/
- * @param {Function} [onComplete]
- * @param {string} [fallbackText] - fallback text for speech synthesis if audio blocked
+ * Play Studio Voice Clip with Cascading Fallback:
+ * 1. Gemini 3.8 Flash TTS WAV (studio acting with theatrical sarcasm & Indian Mom fury)
+ * 2. Neural Expressive MP3 (crisp compressed fallback)
+ * 3. Browser Speech Synthesis fallback (if audio blocked by policy)
  */
-export function playRealVoiceClip(audioFileName, onComplete, fallbackText = '') {
+export function playRealVoiceClip(baseName, onComplete, fallbackText = '') {
   if (isMuted()) {
     onComplete?.();
     return;
@@ -41,42 +41,57 @@ export function playRealVoiceClip(audioFileName, onComplete, fallbackText = '') 
 
   stopAllSpeech();
 
-  try {
-    const audioUrl = getAssetUrl(`audio/easteregg/${audioFileName}`);
-    const audio = new Audio(audioUrl);
-    audio.volume = 1.0;
-    currentAudio = audio;
+  const tryPlay = (ext) => {
+    try {
+      const audioUrl = getAssetUrl(`audio/easteregg/${baseName}.${ext}`);
+      const audio = new Audio(audioUrl);
+      audio.volume = 1.0;
+      currentAudio = audio;
 
-    audio.onended = () => {
-      if (currentAudio === audio) currentAudio = null;
-      onComplete?.();
-    };
+      audio.onended = () => {
+        if (currentAudio === audio) currentAudio = null;
+        onComplete?.();
+      };
 
-    audio.onerror = (e) => {
-      console.warn(`[RealVoiceEngine] Audio file error (${audioFileName}), using fallback:`, e);
-      if (currentAudio === audio) currentAudio = null;
-      if (fallbackText && typeof window !== 'undefined' && window.speechSynthesis) {
-        speakFallback(fallbackText, onComplete);
+      audio.onerror = (e) => {
+        console.warn(`[RealVoiceEngine] ${baseName}.${ext} failed, falling back...`, e);
+        if (ext === 'wav') {
+          tryPlay('mp3');
+        } else {
+          if (currentAudio === audio) currentAudio = null;
+          if (fallbackText && typeof window !== 'undefined' && window.speechSynthesis) {
+            speakFallback(fallbackText, onComplete);
+          } else {
+            onComplete?.();
+          }
+        }
+      };
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn(`[RealVoiceEngine] Play error for ${ext}:`, err);
+          if (ext === 'wav') {
+            tryPlay('mp3');
+          } else {
+            if (fallbackText && typeof window !== 'undefined' && window.speechSynthesis) {
+              speakFallback(fallbackText, onComplete);
+            } else {
+              onComplete?.();
+            }
+          }
+        });
+      }
+    } catch (err) {
+      if (ext === 'wav') {
+        tryPlay('mp3');
       } else {
         onComplete?.();
       }
-    };
-
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise.catch((err) => {
-        console.warn('[RealVoiceEngine] Audio play prevented, using fallback:', err);
-        if (fallbackText && typeof window !== 'undefined' && window.speechSynthesis) {
-          speakFallback(fallbackText, onComplete);
-        } else {
-          onComplete?.();
-        }
-      });
     }
-  } catch (err) {
-    console.warn('[RealVoiceEngine] Exception playing audio:', err);
-    onComplete?.();
-  }
+  };
+
+  tryPlay('wav');
 }
 
 function speakFallback(text, onComplete) {
@@ -95,7 +110,7 @@ function speakFallback(text, onComplete) {
 // 1. Mom's Initial Furious Calling Transmission
 export function playMomInitialCall(onComplete) {
   playRealVoiceClip(
-    'mom_initial_call.mp3',
+    'mom_initial_call',
     onComplete,
     'AREY NALAYAK! OYE HERO! Dal poori jal gayi stove pe aur pressure cooker seetiyan maar raha hai! Stop clicking click-click in fake Matrix! Go to market and bring ₹10 DHANIYA right now!'
   );
@@ -104,7 +119,7 @@ export function playMomInitialCall(onComplete) {
 // 2. Mom's Retort to "Bypassed Military Firewall"
 export function playMomRetortFirewall(onComplete) {
   playRealVoiceClip(
-    'mom_retort_firewall.mp3',
+    'mom_retort_firewall',
     onComplete,
     "Military firewall?! Arey wah, Nalayak! Last week you couldn't even fix bathroom ka door latch! Go get the dhaniya before I disconnect your Wi-Fi router forever!"
   );
@@ -113,7 +128,7 @@ export function playMomRetortFirewall(onComplete) {
 // 3. Mom's Retort to "Order on Blinkit / Zepto"
 export function playMomRetortBlinkit(onComplete) {
   playRealVoiceClip(
-    'mom_retort_blinkit.mp3',
+    'mom_retort_blinkit',
     onComplete,
     'Blinkit?! You want to pay 40 rupees delivery fee for 10 rupees dhaniya?! Kya main yahan paise ka ped uga rahi hoon?! Wear your slippers and RUN!'
   );
@@ -122,7 +137,7 @@ export function playMomRetortBlinkit(onComplete) {
 // 4. Mom's Retort to "What if vendor refuses free mirchi?"
 export function playMomRetortMirchi(onComplete) {
   playRealVoiceClip(
-    'mom_retort_mirchi.mp3',
+    'mom_retort_mirchi',
     onComplete,
     'Negotiate?! Agar ek mirchi ke bhi paise diye na, family WhatsApp group se nikaal dungi! Stare into his soul until he gives free mirchi! Now move!'
   );
@@ -131,7 +146,7 @@ export function playMomRetortMirchi(onComplete) {
 // 5. Narrator's Deadpan BBC Punchline
 export function playNarratorPunchline(onComplete) {
   playRealVoiceClip(
-    'narrator_punchline.mp3',
+    'narrator_punchline',
     onComplete,
     'You spent 20 minutes rotating 3D laser switches and feeling like Mr. Robot. And yet, your mother dismantled your entire clandestine operation with one whistling Hawkins pressure cooker, a supersonic Hawai chappal and Belan air raid, and a demand for coriander. The dal is burned to ash. The chappal is supersonic.'
   );
@@ -140,7 +155,7 @@ export function playNarratorPunchline(onComplete) {
 // 6. Mom's Replay Scolding on Certificate Soundboard
 export function playMomScoldingReplay(onComplete) {
   playRealVoiceClip(
-    'mom_scolding_replay.mp3',
+    'mom_scolding_replay',
     onComplete,
     'Arey Nalayak! Did you buy the dhaniya yet?! Put down the computer and run to the market before I launch another chappal!'
   );
