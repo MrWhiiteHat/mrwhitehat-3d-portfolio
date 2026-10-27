@@ -156,10 +156,10 @@ function TacticalChappal3D({ isLaunched, onHit }) {
   const flightProgress = useRef(0);
   const hasTriggeredHit = useRef(false);
 
-  // Trajectory points: from rear ceiling of bunker -> swoops over table -> past camera!
-  const startPos = useMemo(() => new THREE.Vector3(0.4, 1.8, -0.6), []);
-  const midPos = useMemo(() => new THREE.Vector3(0.15, 1.35, 0.8), []);
-  const endPos = useMemo(() => new THREE.Vector3(-0.1, 1.5, 2.4), []);
+  // Trajectory points: from rear ceiling of bunker -> swoops over table -> towards player camera!
+  const startPos = useMemo(() => new THREE.Vector3(0.45, 1.85, -1.0), []);
+  const midPos = useMemo(() => new THREE.Vector3(0.18, 1.25, 0.0), []);
+  const endPos = useMemo(() => new THREE.Vector3(-0.05, 1.08, 0.65), []);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -763,11 +763,11 @@ function HolographicDisplay3D({
   }, [phase, onInteractTerminal]);
 
   return (
-    <group position={[0, 1.48, 0]} rotation={[0, 0, 0]}>
+    <group position={[0, 1.12, -0.08]} rotation={[0, 0, 0]}>
       <Html
         center
         transform
-        distanceFactor={0.72}
+        distanceFactor={0.64}
         position={[0, 0, 0]}
         zIndexRange={[300, 0]}
       >
@@ -1095,28 +1095,84 @@ export default function SecretVaultRoom3D({
           ))
         )}
 
-        {/* Swivel Chair with Pile of Unfolded Clothes */}
-        <group position={[0, 0, 0.75]}>
+        {/* First-Person Seated Ergonomic Office Chair */}
+        {/* Player eye camera is positioned directly above seat at [0, 1.10, 0.52] */}
+        <group position={[0, 0, 0.52]}>
+          {/* Hydraulic Gas Lift & Base */}
           <mesh position={[0, 0.22, 0]}>
-            <cylinderGeometry args={[0.02, 0.02, 0.44, 8]} />
-            <meshStandardMaterial color="#94a3b8" metalness={0.9} />
+            <cylinderGeometry args={[0.024, 0.024, 0.44, 8]} />
+            <meshStandardMaterial color="#64748b" metalness={0.9} roughness={0.2} />
           </mesh>
-          <mesh position={[0, 0.44, 0]}>
-            <boxGeometry args={[0.46, 0.06, 0.44]} />
-            <meshStandardMaterial color="#1e40af" roughness={0.9} />
+          {/* 5-Star Caster Spider Base on Floor */}
+          {[0, 1, 2, 3, 4].map((i) => {
+            const angle = (i * Math.PI * 2) / 5;
+            return (
+              <mesh
+                key={`caster-leg-${i}`}
+                position={[Math.sin(angle) * 0.22, 0.035, Math.cos(angle) * 0.22]}
+                rotation={[0, angle, 0]}
+              >
+                <boxGeometry args={[0.035, 0.02, 0.24]} />
+                <meshStandardMaterial color="#1e293b" metalness={0.8} />
+              </mesh>
+            );
+          })}
+
+          {/* Ergonomic Blue Padded Seat Cushion (Under the seated player) */}
+          <mesh position={[0, 0.47, 0]}>
+            <boxGeometry args={[0.50, 0.08, 0.48]} />
+            <meshStandardMaterial color="#1e3a8a" roughness={0.8} />
           </mesh>
-          <mesh position={[0, 0.72, 0.22]}>
-            <boxGeometry args={[0.42, 0.45, 0.04]} />
-            <meshStandardMaterial color="#1e40af" roughness={0.9} />
+
+          {/* Left Armrest (Framing the player's lower-left peripheral view) */}
+          <group position={[-0.28, 0.66, -0.02]}>
+            <mesh position={[0, 0, 0]}>
+              <cylinderGeometry args={[0.014, 0.014, 0.30, 8]} />
+              <meshStandardMaterial color="#475569" metalness={0.85} roughness={0.3} />
+            </mesh>
+            <mesh position={[0, 0.15, 0]}>
+              <boxGeometry args={[0.075, 0.032, 0.26]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.5} />
+            </mesh>
+          </group>
+
+          {/* Right Armrest (Framing the player's lower-right peripheral view) */}
+          <group position={[0.28, 0.66, -0.02]}>
+            <mesh position={[0, 0, 0]}>
+              <cylinderGeometry args={[0.014, 0.014, 0.30, 8]} />
+              <meshStandardMaterial color="#475569" metalness={0.85} roughness={0.3} />
+            </mesh>
+            <mesh position={[0, 0.15, 0]}>
+              <boxGeometry args={[0.075, 0.032, 0.26]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.5} />
+            </mesh>
+          </group>
+
+          {/* Chair Backrest (Positioned BEHIND the seated camera at z = 0.26 relative to chair, i.e. world z = 0.78) */}
+          <mesh position={[0, 0.88, 0.26]}>
+            <boxGeometry args={[0.44, 0.54, 0.045]} />
+            <meshStandardMaterial color="#1e3a8a" roughness={0.8} />
           </mesh>
-          {/* Laundry Clothes Pile */}
-          <mesh position={[-0.06, 0.58, 0.04]} rotation={[0.1, 0.2, -0.1]}>
-            <boxGeometry args={[0.34, 0.16, 0.28]} />
+        </group>
+
+        {/* Unfolded Laundry Pile on Side Stool (Sitting beside the desk on the left) */}
+        <group position={[-0.85, 0, 0.22]}>
+          <mesh position={[0, 0.20, 0]}>
+            <cylinderGeometry args={[0.18, 0.18, 0.40, 16]} />
+            <meshStandardMaterial color="#334155" metalness={0.7} roughness={0.4} />
+          </mesh>
+          {/* Clothes Pile (Red, Yellow, Sky Blue) */}
+          <mesh position={[-0.03, 0.46, 0.02]} rotation={[0.1, 0.3, -0.1]}>
+            <boxGeometry args={[0.32, 0.14, 0.28]} />
             <meshStandardMaterial color="#ef4444" roughness={0.9} />
           </mesh>
-          <mesh position={[0.08, 0.64, 0.08]} rotation={[-0.2, 0.3, 0.1]}>
-            <boxGeometry args={[0.26, 0.12, 0.22]} />
+          <mesh position={[0.04, 0.53, -0.02]} rotation={[-0.2, 0.4, 0.15]}>
+            <boxGeometry args={[0.26, 0.12, 0.24]} />
             <meshStandardMaterial color="#eab308" roughness={0.9} />
+          </mesh>
+          <mesh position={[0, 0.59, 0.03]} rotation={[0.05, -0.2, 0.1]}>
+            <boxGeometry args={[0.20, 0.10, 0.20]} />
+            <meshStandardMaterial color="#38bdf8" roughness={0.9} />
           </mesh>
         </group>
 

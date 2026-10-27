@@ -378,6 +378,14 @@ function SceneContents({
       hackerModeData.betrayalPhase !== 'NONE'
   );
 
+  // Lock camera target directly onto the seated terminal when entering secret bunker
+  useEffect(() => {
+    if (isBunkerMode && controlsRef.current) {
+      controlsRef.current.target.set(0, 0.98, -0.08);
+      controlsRef.current.update();
+    }
+  }, [isBunkerMode, controlsRef]);
+
   return (
     <>
       <color attach="background" args={[isBunkerMode ? '#020612' : hackerModeData?.isActive ? '#040813' : '#070a08']} />
@@ -519,15 +527,17 @@ function SceneContents({
         enabled={gameState === 'CUSTOMIZE' || gameState === 'HACKING'}
         enableDamping
         dampingFactor={0.06}
-        rotateSpeed={0.9}
-        zoomSpeed={0.9}
+        rotateSpeed={isBunkerMode ? 0.45 : 0.9}
+        zoomSpeed={isBunkerMode ? 0.1 : 0.9}
         panSpeed={0.85}
-        enablePan={true}
+        enablePan={!isBunkerMode}
         screenSpacePanning={true}
-        minDistance={isBunkerMode ? 1.0 : gameState === 'HACKING' ? 0.2 : 2.0}
-        maxDistance={isBunkerMode ? 4.8 : gameState === 'HACKING' ? 25.0 : 22}
-        minPolarAngle={0.05}
-        maxPolarAngle={isBunkerMode ? Math.PI / 2.05 : gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
+        minDistance={isBunkerMode ? 0.58 : gameState === 'HACKING' ? 0.2 : 2.0}
+        maxDistance={isBunkerMode ? 0.64 : gameState === 'HACKING' ? 25.0 : 22}
+        minPolarAngle={isBunkerMode ? 1.20 : 0.05}
+        maxPolarAngle={isBunkerMode ? 1.55 : gameState === 'HACKING' ? Math.PI - 0.05 : Math.PI / 2.05}
+        minAzimuthAngle={isBunkerMode ? -0.45 : -Infinity}
+        maxAzimuthAngle={isBunkerMode ? 0.45 : Infinity}
       />
       <CameraDirector
         gameState={gameState}

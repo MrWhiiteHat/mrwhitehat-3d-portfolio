@@ -46,9 +46,9 @@ export const CAMERA_VANTAGES = {
   },
   VAULT_CHAMBER: {
     id: 'VAULT_CHAMBER',
-    label: 'CAM 05: CLASSIFIED VAULT',
-    pos: [0, 1.55, 2.55],
-    target: [0, 0.95, 0],
+    label: 'CAM 05: SEATED AT TERMINAL',
+    pos: [0, 1.10, 0.52],
+    target: [0, 0.98, -0.08],
   },
 };
 
@@ -1068,6 +1068,7 @@ function HackerCameraDirector({ activeVantageId, controlsRef }) {
     if (!dom) return;
 
     const stopFlight = () => {
+      if (activeVantageId === 'VAULT_CHAMBER') return;
       isTransitioning.current = false;
     };
 
@@ -1174,7 +1175,9 @@ function HackerCameraDirector({ activeVantageId, controlsRef }) {
       return;
     }
 
-    // 2. Free flight camera movement via WASD / Arrows
+    // 2. Free flight camera movement via WASD / Arrows (disabled in seated bunker chamber)
+    if (activeVantageId === 'VAULT_CHAMBER') return;
+
     const k = keysDown.current;
     if (k.forward || k.backward || k.left || k.right || k.up || k.down) {
       // Calculate horizontal forward vector from current camera rotation

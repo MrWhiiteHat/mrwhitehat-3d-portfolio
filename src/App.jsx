@@ -489,6 +489,14 @@ export default function App() {
     const onHackerKey = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
+      // When inside secret bunker, keep camera firmly fixed in seated position
+      if (betrayalPhase && betrayalPhase !== 'NONE') {
+        if ((e.key === 'e' || e.key === 'E' || e.key === 'Enter') && betrayalPhase === 'TERMINAL_INTERACTIVE') {
+          handleInteractTerminal();
+        }
+        return;
+      }
+
       if (e.key === 'Escape') {
         setHackerIsPaused((prev) => !prev);
       } else if (e.key === 'e' || e.key === 'E' || e.key === 'Enter' || e.key === ' ') {

@@ -11930,8 +11930,9 @@ body.is-pseudo-fullscreen .portfolio-container {
    ========================================================================== */
 
 .holographic-vault-interface {
-  width: 680px;
-  max-width: 90vw;
+  width: 620px;
+  max-width: 88vw;
+  box-sizing: border-box;
   user-select: none;
   pointer-events: auto;
   font-family: var(--font, sans-serif);
@@ -12100,11 +12101,12 @@ body.is-pseudo-fullscreen .portfolio-container {
 /* Phase 3: Mom Transmission Card */
 .holo-dialogue-card {
   width: 100%;
+  box-sizing: border-box;
   background: rgba(6, 12, 24, 0.96);
   border: 1.5px solid rgba(239, 68, 68, 0.65);
   box-shadow: 0 0 45px rgba(239, 68, 68, 0.35), inset 0 0 25px rgba(239, 68, 68, 0.1);
   border-radius: 14px;
-  padding: 20px 24px;
+  padding: 16px 20px;
   backdrop-filter: blur(16px);
   animation: bounceIn 0.35s ease-out;
 }
@@ -12112,7 +12114,7 @@ body.is-pseudo-fullscreen .portfolio-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 .holo-pulse-icon {
   animation: pulseBeacon 1s infinite;
@@ -12143,8 +12145,8 @@ body.is-pseudo-fullscreen .portfolio-container {
   background: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.4);
   border-radius: 10px;
-  padding: 14px 18px;
-  margin-bottom: 16px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
 }
 .holo-speaker-tag {
   display: flex;
@@ -12154,14 +12156,14 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-size: 11px;
   font-weight: 800;
   color: #fca5a5;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 .speaker-avatar {
   font-size: 18px;
 }
 .holo-shout-text {
-  font-size: 13.5px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.45;
   color: #ffffff;
   font-weight: 600;
   margin: 0;
@@ -12170,7 +12172,7 @@ body.is-pseudo-fullscreen .portfolio-container {
 
 /* Dialogue Choices */
 .holo-choices-box {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 .holo-choice-label {
   display: block;
@@ -12179,12 +12181,12 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-weight: 800;
   color: #94a3b8;
   letter-spacing: 0.08em;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .holo-choices-stack {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 .holo-choice-chip {
   display: flex;
@@ -12193,10 +12195,10 @@ body.is-pseudo-fullscreen .portfolio-container {
   background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(0, 240, 255, 0.35);
   border-radius: 8px;
-  padding: 10px 14px;
+  padding: 9px 13px;
   color: #e2e8f0;
   font-family: var(--font, sans-serif);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
@@ -12264,25 +12266,35 @@ body.is-pseudo-fullscreen .portfolio-container {
 /* Phase 4: 3D Holographic Certificate of Errand Disobedience Plaque */
 .holo-certificate-plaque {
   width: 100%;
+  box-sizing: border-box;
   background: rgba(8, 15, 30, 0.97);
   border: 3px double #22c55e;
   box-shadow: 0 0 50px rgba(34, 197, 94, 0.35), inset 0 0 30px rgba(0, 0, 0, 0.85);
   border-radius: 14px;
-  padding: 22px 26px;
+  padding: 16px 20px;
   text-align: center;
   color: #e2e8f0;
   backdrop-filter: blur(16px);
   animation: bounceIn 0.4s ease-out;
+  max-height: 82vh;
+  overflow-y: auto;
+}
+.holo-certificate-plaque::-webkit-scrollbar {
+  width: 4px;
+}
+.holo-certificate-plaque::-webkit-scrollbar-thumb {
+  background: rgba(34, 197, 94, 0.4);
+  border-radius: 4px;
 }
 .holo-cert-top {
   border-bottom: 1.5px dashed rgba(34, 197, 94, 0.35);
-  padding-bottom: 14px;
-  margin-bottom: 14px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
 }
 .holo-cert-crest {
   display: block;
-  font-size: 26px;
-  margin-bottom: 4px;
+  font-size: 22px;
+  margin-bottom: 2px;
 }
 .holo-cert-dept {
   display: block;
@@ -12291,58 +12303,58 @@ body.is-pseudo-fullscreen .portfolio-container {
   font-weight: 800;
   color: #86efac;
   letter-spacing: 0.12em;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 .holo-cert-title {
   font-family: var(--mono, monospace);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
   color: #ffffff;
   letter-spacing: 0.08em;
   text-shadow: 0 0 14px rgba(34, 197, 94, 0.6);
-  margin: 0 0 4px 0;
+  margin: 0 0 3px 0;
 }
 .holo-cert-sub {
-  font-size: 10.5px;
+  font-size: 10px;
   color: #94a3b8;
   font-weight: 600;
   letter-spacing: 0.04em;
 }
 
 .holo-cert-intro {
-  font-size: 12px;
+  font-size: 11.5px;
   color: #94a3b8;
-  margin: 0 0 4px 0;
+  margin: 0 0 3px 0;
 }
 .holo-cert-recipient {
   font-family: var(--mono, monospace);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
   color: #fef08a;
   text-shadow: 0 0 12px rgba(254, 240, 138, 0.4);
   letter-spacing: 0.06em;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .holo-cert-citation {
-  font-size: 11.5px;
+  font-size: 11px;
   line-height: 1.45;
   color: #cbd5e1;
   max-width: 580px;
-  margin: 0 auto 14px auto;
+  margin: 0 auto 10px auto;
 }
 
 /* 6-Card Stat Grid */
 .holo-cert-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 .holo-stat-tile {
   background: rgba(15, 23, 42, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
-  padding: 6px 8px;
+  padding: 5px 7px;
 }
 .holo-stat-tile .stat-label {
   display: block;
@@ -12361,17 +12373,17 @@ body.is-pseudo-fullscreen .portfolio-container {
 
 /* Rubber Stamp of Disapproval */
 .holo-cert-stamp {
-  border: 2.5px solid #dc2626;
+  border: 2px solid #dc2626;
   border-radius: 6px;
   display: inline-block;
-  padding: 4px 14px;
+  padding: 3px 12px;
   color: #dc2626;
   font-family: var(--mono, monospace);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.1em;
   transform: rotate(-3deg);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
 }
 .holo-cert-stamp small {
