@@ -198,35 +198,9 @@ export default function CharacterSelectModal({
         <div className="char-card-header">
           <div className="char-header-tag">
             <Terminal size={14} />
-            <span>ENTER OFFICE // VISITOR CLEARANCE</span>
+            <span>TERMINAL // 3D WORKSPACE VISITOR CLEARANCE</span>
           </div>
           <div className="char-header-right">
-            {onOpenRecruiter && (
-              <button
-                type="button"
-                className="btn-recruiter-quick"
-                onClick={() => {
-                  playClickSound(1000);
-                  onOpenRecruiter();
-                }}
-                title="Recruiter Fast View: Instant 2D Dossier, Projects & Resume"
-              >
-                <BriefcaseBusiness size={13} />
-                <span>RECRUITER FAST VIEW</span>
-              </button>
-            )}
-            <button
-              type="button"
-              className="char-guide-toggle-btn"
-              onClick={() => {
-                playClickSound(900);
-                setShowGuide(true);
-              }}
-              title="Watch User Guide & Controls Tutorial"
-            >
-              <Play size={12} fill="currentColor" />
-              <span>HOW TO PLAY</span>
-            </button>
             <button
               type="button"
               className={`char-fullscreen-toggle-btn ${isFullscreen ? 'is-active' : ''}`}
@@ -237,7 +211,6 @@ export default function CharacterSelectModal({
               {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
               <span>{isFullscreen ? 'EXIT FULLSCREEN' : 'FULLSCREEN'}</span>
             </button>
-            <span className="char-version-chip">3D WORKSPACE</span>
           </div>
         </div>
 
@@ -254,12 +227,12 @@ export default function CharacterSelectModal({
             </div>
 
             <div className="preview-badge-footer">
-              <span className="badge-agent-title">IDENTIFIED OPERATIVE</span>
+              <span className="badge-agent-title">3D AVATAR PREVIEW</span>
               <strong
                 className="badge-agent-name"
-                style={{ color: isNameEntered ? selectedColor.color : '#ef4444' }}
+                style={{ color: selectedColor.color }}
               >
-                {name.trim() || 'NAME REQUIRED'}
+                {selectedCharacter.name}
               </strong>
               <span className="badge-role-tag">{selectedCharacter.subtitle}</span>
             </div>
@@ -359,15 +332,29 @@ export default function CharacterSelectModal({
             <div className="quick-controls-card">
               <div className="quick-controls-header">
                 <span>🎮 HOW TO EXPLORE</span>
-                <span className="controls-auto-tag">{typeof window !== 'undefined' && window.innerWidth < 768 ? 'MOBILE TOUCH' : 'PC KEYBOARD & MOUSE'}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="controls-auto-tag">{typeof window !== 'undefined' && window.innerWidth < 768 ? 'MOBILE TOUCH' : 'PC KEYBOARD & MOUSE'}</span>
+                  <button
+                    type="button"
+                    className="ctrl-tutorial-link-btn"
+                    onClick={() => {
+                      playClickSound(900);
+                      setShowGuide(true);
+                    }}
+                    title="Watch animated controls & features tutorial"
+                  >
+                    <Play size={10} fill="currentColor" />
+                    <span>TUTORIAL</span>
+                  </button>
+                </div>
               </div>
               <div className="quick-controls-grid">
                 {typeof window !== 'undefined' && window.innerWidth < 768 ? (
                   <>
                     <div className="ctrl-badge-item">🕹️ <strong>Joystick:</strong> Walk 360°</div>
                     <div className="ctrl-badge-item">👆 <strong>Drag Screen:</strong> Look Around</div>
-                    <div className="ctrl-badge-item">⚡ <strong>Tap Station:</strong> Inspect / Hack</div>
-                    <div className="ctrl-badge-item">💼 <strong>Recruiter (R):</strong> Instant 2D Dossier</div>
+                    <div className="ctrl-badge-item">⚡ <strong>Tap Station:</strong> Inspect & Hack</div>
+                    <div className="ctrl-badge-item">💼 <strong>Recruiter:</strong> Instant 2D Dossier</div>
                   </>
                 ) : (
                   <>
@@ -378,29 +365,6 @@ export default function CharacterSelectModal({
                   </>
                 )}
               </div>
-            </div>
-
-            {/* Interactive User Guide Callout Banner */}
-            <div
-              className="char-guide-callout-strip"
-              onClick={() => {
-                playClickSound(900);
-                setShowGuide(true);
-              }}
-              role="button"
-              tabIndex={0}
-              title="Click to watch interactive operational guide & controls video"
-            >
-              <div className="callout-left">
-                <div className="callout-icon-pulse">
-                  <Play size={12} fill="#55f69a" color="#55f69a" />
-                </div>
-                <div className="callout-texts">
-                  <strong className="callout-title">NEW TO THE 3D STUDIO?</strong>
-                  <span className="callout-subtitle">Watch interactive operational guide & controls briefing</span>
-                </div>
-              </div>
-              <span className="callout-action-pill">WATCH GUIDE ▶</span>
             </div>
           </div>
         </div>
@@ -419,18 +383,18 @@ export default function CharacterSelectModal({
               style={{ marginRight: 'auto' }}
             >
               <BriefcaseBusiness size={14} />
-              <span>RECRUITER DOSSIER</span>
+              <span>2D RECRUITER DOSSIER</span>
             </button>
           )}
           <div className="footer-brief">
             <span className="brief-bullet">●</span>
             {isNameEntered ? (
               <span style={{ color: '#34d399' }}>
-                Welcome, <strong>{name.trim()}</strong>! Ready to explore.
+                Welcome, <strong>{name.trim()}</strong>! Ready to enter 3D studio.
               </span>
             ) : (
               <span style={{ color: '#94a3b8' }}>
-                Please enter your name above to enter the office.
+                Ready to explore. Click below to enter immediately.
               </span>
             )}
           </div>
@@ -446,7 +410,7 @@ export default function CharacterSelectModal({
             }}
           >
             <Sparkles size={16} />
-            <span>{isNameEntered ? `ENTER AS ${name.trim().toUpperCase()}` : '⚡ ENTER OFFICE (1-CLICK)'}</span>
+            <span>{isNameEntered ? `ENTER AS ${name.trim().toUpperCase()}` : '⚡ ENTER 3D OFFICE'}</span>
           </button>
         </div>
       </div>

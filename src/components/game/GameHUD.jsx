@@ -22,6 +22,7 @@ import {
   Maximize2,
   Minimize2,
   HelpCircle,
+  Sliders,
   X,
 } from 'lucide-react';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
@@ -51,6 +52,20 @@ export default function GameHUD({
   onLaunchEasterEgg = null,
 }) {
   const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
+  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || window.innerWidth <= 1024);
+  const [showOnScreenControls, setShowOnScreenControls] = useState(() => isTouchDevice);
+  const [isRoomFxOpen, setIsRoomFxOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isRoomFxOpen) return;
+    const handleOutsideClick = (e) => {
+      if (!e.target.closest || !e.target.closest('.hud-room-fx-wrapper')) {
+        setIsRoomFxOpen(false);
+      }
+    };
+    window.addEventListener('click', handleOutsideClick);
+    return () => window.removeEventListener('click', handleOutsideClick);
+  }, [isRoomFxOpen]);
   // Locomotion Mode: 'joystick' on mobile/touch, 'wasd' on desktop (switchable anytime)
   const [controlMode, setControlMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -266,191 +281,108 @@ export default function GameHUD({
 
       {/* 1. Top Operative Identity & Mission Telemetry */}
       <header className="hud-top-bar">
-        <div className="hud-agent-card">
-          <div
-            className="hud-agent-avatar"
-            style={{ borderColor: playerData.accentColor || '#34d399' }}
-          >
-            <Terminal size={14} style={{ color: playerData.accentColor || '#34d399' }} />
-          </div>
-          <div className="hud-agent-info">
-            <div className="agent-name-row">
-              <span className="agent-callsign">{playerData.codename || 'OPERATIVE'}</span>
-              <span
-                className="agent-status-dot"
-                style={{
-                  backgroundColor: playerData.accentColor || '#34d399',
-                  boxShadow: `0 0 10px ${playerData.accentColor || '#34d399'}`,
-                }}
-              />
+        {/* Left Section: Compact Operative Identity & Breach Progress */}
+        <div className="hud-left-group">
+          <div className="hud-agent-card">
+            <div
+              className="hud-agent-avatar"
+              style={{ borderColor: playerData.accentColor || '#34d399' }}
+            >
+              <Terminal size={13} style={{ color: playerData.accentColor || '#34d399' }} />
             </div>
-            <span className="agent-archetype">{playerData.archetypeName || 'Netrunner'}</span>
+            <div className="hud-agent-info">
+              <div className="agent-name-row">
+                <span className="agent-callsign">{playerData.codename || 'OPERATIVE'}</span>
+                <span
+                  className="agent-status-dot"
+                  style={{
+                    backgroundColor: playerData.accentColor || '#34d399',
+                    boxShadow: `0 0 8px ${playerData.accentColor || '#34d399'}`,
+                  }}
+                />
+              </div>
+              <div className="agent-progress-row">
+                <span className="agent-breach-label">BREACHED:</span>
+                <strong
+                  className="agent-breach-count"
+                  style={{ color: playerData.accentColor || '#34d399' }}
+                >
+                  {unlockedCount} / {totalStations}
+                </strong>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Mission Objectives Progress Chip */}
-        <div className="hud-mission-chip">
-          <ShieldAlert size={14} className="mission-icon" />
-          <div className="mission-text">
-            <span className="mission-label">SECURITY TERMINALS BREACHED</span>
-            <div className="mission-bar-wrap">
-              <div
-                className="mission-bar-fill"
-                style={{
-                  width: `${(unlockedCount / totalStations) * 100}%`,
-                  backgroundColor: playerData.accentColor || '#34d399',
-                }}
-              />
-            </div>
-          </div>
-          <strong className="mission-count">
-            {unlockedCount} / {totalStations}
-          </strong>
-        </div>
-
-        {/* Live Wall Visitor Count Pill */}
-        <button
-          type="button"
-          className="hud-visitor-pill"
-          onClick={() => {
-            playClickSound(1000);
-            onInteract?.('visitor_log');
-          }}
-          title="Open CTOS Office Security Visitor Roster & Telemetry Logs"
-        >
-          <Users size={13} style={{ color: playerData.accentColor || '#34d399' }} />
-          <span className="visitor-pill-label">VISITOR COUNT:</span>
-          <strong
-            className="visitor-pill-num"
-            style={{ color: playerData.accentColor || '#34d399' }}
-          >
-            #{visitorCount}
-          </strong>
-        </button>
-
-        {/* Speedrun Leaderboard Pill */}
-        <button
-          type="button"
-          className="hud-leaderboard-pill"
-          onClick={() => {
-            playClickSound(1000);
-            onOpenLeaderboard?.();
-          }}
-          title="Open Global Speedrun Leaderboard (L)"
-        >
-          <Trophy size={13} style={{ color: '#fbbf24' }} />
-          <span className="lb-pill-label">LEADERBOARD</span>
-        </button>
-
-        {/* 3D Hardware Gadgets Inspector Pill */}
-        <button
-          type="button"
-          className="hud-gadgets-pill"
-          onClick={() => {
-            playClickSound(1000);
-            onOpenGadgets?.('flipper');
-          }}
-          title="Inspect 3D Hardware Tools: Flipper Zero & Rubber Ducky (G)"
-        >
-          <Radio size={13} style={{ color: '#fb923c' }} />
-          <span className="gadget-pill-label">3D GADGETS</span>
-        </button>
-
-        {/* Executive Recruiter 2D Dossier Pill */}
-        {onOpenRecruiter && (
+        {/* Center Section: Core 1-Click Quick Actions */}
+        <div className="hud-center-group">
+          {/* 1-Click Fast Station Matrix Directory */}
           <button
             type="button"
-            className="hud-recruiter-pill"
+            className="hud-stations-pill"
             onClick={() => {
               playClickSound(1000);
-              onOpenRecruiter();
+              setIsStationMenuOpen((prev) => !prev);
             }}
-            title="Open Executive Recruiter Dossier & Fast View (R)"
+            title="Direct Station Jump Matrix (1-Click Teleport / Inspect all 11 stations)"
           >
-            <BriefcaseBusiness size={13} style={{ color: '#34d399' }} />
-            <span className="recruiter-pill-label">RECRUITER DOSSIER</span>
-            <span className="recruiter-pill-key">(R)</span>
+            <Terminal size={13} style={{ color: '#00f0ff' }} />
+            <span className="stations-pill-label">⚡ STATIONS ({stations?.length || 11})</span>
           </button>
-        )}
 
-        {/* 1-Click Fast Station Matrix Directory */}
-        <button
-          type="button"
-          className="hud-stations-pill"
-          onClick={() => {
-            playClickSound(1000);
-            setIsStationMenuOpen((prev) => !prev);
-          }}
-          title="Direct Station Jump Matrix (1-Click Teleport / Inspect)"
-        >
-          <Terminal size={13} style={{ color: '#00f0ff' }} />
-          <span className="stations-pill-label">⚡ STATIONS ({stations?.length || 11})</span>
-        </button>
+          {/* Executive Recruiter 2D Dossier Pill */}
+          {onOpenRecruiter && (
+            <button
+              type="button"
+              className="hud-recruiter-pill"
+              onClick={() => {
+                playClickSound(1000);
+                onOpenRecruiter();
+              }}
+              title="Open Executive Recruiter Dossier & Fast View (R)"
+            >
+              <BriefcaseBusiness size={13} style={{ color: '#34d399' }} />
+              <span className="recruiter-pill-label">RECRUITER</span>
+              <span className="recruiter-pill-key">(R)</span>
+            </button>
+          )}
 
-        {/* Interactive How To Play Guide Pill */}
-        {onOpenGuide && (
-          <button
-            type="button"
-            className="hud-guide-pill"
-            onClick={() => {
-              playClickSound(950);
-              onOpenGuide();
-            }}
-            title="Open Interactive How To Play & Controls Guide (H)"
-          >
-            <HelpCircle size={13} style={{ color: '#fbbf24' }} />
-            <span className="guide-pill-label">HOW TO PLAY</span>
-          </button>
-        )}
+          {/* Speedrun Leaderboard Pill */}
+          {onOpenLeaderboard && (
+            <button
+              type="button"
+              className="hud-leaderboard-pill"
+              onClick={() => {
+                playClickSound(1000);
+                onOpenLeaderboard();
+              }}
+              title="Open Global Speedrun Leaderboard (L)"
+            >
+              <Trophy size={13} style={{ color: '#fbbf24' }} />
+              <span className="lb-pill-label">LEADERBOARD</span>
+            </button>
+          )}
 
-                {/* Discreet Watch Dogs 2 Netrun Easter Egg Pill */}
-        {isEasterEggAvailable && (
-          <button
-            type="button"
-            className="hud-netrun-pill"
-            onClick={() => {
-              playClickSound(1200);
-              onLaunchEasterEgg?.();
-            }}
-            title="Launch Watch Dogs 2 3D Circuit Network Bypass (Hidden Easter Egg)"
-          >
-            <Zap size={13} style={{ color: '#00f0ff' }} />
-            <span className="netrun-pill-label">NETRUN [OVERRIDE]</span>
-          </button>
-        )}
+          {/* Discreet Watch Dogs 2 Netrun Easter Egg Pill */}
+          {isEasterEggAvailable && (
+            <button
+              type="button"
+              className="hud-netrun-pill"
+              onClick={() => {
+                playClickSound(1200);
+                onLaunchEasterEgg?.();
+              }}
+              title="Launch Watch Dogs 2 3D Circuit Network Bypass"
+            >
+              <Zap size={13} style={{ color: '#00f0ff' }} />
+              <span className="netrun-pill-label">NETRUN</span>
+            </button>
+          )}
+        </div>
 
-        {/* Quick HUD Controls */}
+        {/* Right Section: Utilities & Studio Controls */}
         <div className="hud-right-actions">
-          {/* Working AC Quick Toggle */}
-          <button
-            type="button"
-            className={`hud-action-btn ${acActive ? 'active-appliance' : 'muted-btn'}`}
-            onClick={handleToggleAc}
-            title={acActive ? 'Air Conditioner [18°C ❄️ ACTIVE] · Click to Toggle' : 'Air Conditioner [OFF] · Click to Turn ON'}
-          >
-            <Snowflake size={15} color={acActive ? '#38bdf8' : '#64748b'} />
-          </button>
-
-          {/* Ceiling Fan Quick Toggle */}
-          <button
-            type="button"
-            className={`hud-action-btn ${fanActive ? 'active-appliance' : 'muted-btn'}`}
-            onClick={handleToggleFan}
-            title={fanActive ? 'Ceiling Fan [SPINNING 🌀] · Click to Turn OFF' : 'Ceiling Fan [OFF] · Click to Turn ON'}
-          >
-            <Fan size={15} color={fanActive ? '#34d399' : '#64748b'} />
-          </button>
-
-          {/* Overhead Crimson Neon Quick Toggle */}
-          <button
-            type="button"
-            className={`hud-action-btn ${neonActive ? 'active-appliance' : 'muted-btn'}`}
-            onClick={handleToggleNeon}
-            title={neonActive ? 'Overhead Crimson Neon [ON 💡] · Click to Turn OFF' : 'Overhead Crimson Neon [OFF] · Click to Turn ON'}
-          >
-            <Lightbulb size={15} color={neonActive ? '#ff1744' : '#64748b'} />
-          </button>
-
+          {/* Lighting Theme Switcher */}
           <button
             type="button"
             className="hud-theme-pill"
@@ -461,23 +393,94 @@ export default function GameHUD({
             <span>{currentThemeName || 'Matrix'}</span>
           </button>
 
+          {/* Consolidated Studio Environment Dropdown (AC, Fan, Neon, Reset Camera) */}
+          <div className="hud-room-fx-wrapper" style={{ position: 'relative' }}>
+            <button
+              type="button"
+              className={`hud-action-btn ${isRoomFxOpen ? 'active-appliance' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsRoomFxOpen((prev) => !prev);
+              }}
+              title="Studio Environment Controls (AC, Fan, Neon, Camera Reset)"
+            >
+              <Sliders size={15} color="#34d399" />
+            </button>
+
+            {isRoomFxOpen && (
+              <div className="hud-room-fx-menu" onClick={(e) => e.stopPropagation()}>
+                <div className="fx-menu-title">STUDIO ENVIRONMENT</div>
+                <button
+                  type="button"
+                  className={`fx-menu-item ${acActive ? 'is-active' : ''}`}
+                  onClick={handleToggleAc}
+                >
+                  <Snowflake size={14} color={acActive ? '#38bdf8' : '#64748b'} />
+                  <span>Air Conditioner [{acActive ? '18°C ❄️' : 'OFF'}]</span>
+                </button>
+                <button
+                  type="button"
+                  className={`fx-menu-item ${fanActive ? 'is-active' : ''}`}
+                  onClick={handleToggleFan}
+                >
+                  <Fan size={14} color={fanActive ? '#34d399' : '#64748b'} />
+                  <span>Ceiling Fan [{fanActive ? 'ON 🌀' : 'OFF'}]</span>
+                </button>
+                <button
+                  type="button"
+                  className={`fx-menu-item ${neonActive ? 'is-active' : ''}`}
+                  onClick={handleToggleNeon}
+                >
+                  <Lightbulb size={14} color={neonActive ? '#ff1744' : '#64748b'} />
+                  <span>Overhead Neon [{neonActive ? 'ON 💡' : 'OFF'}]</span>
+                </button>
+                <button
+                  type="button"
+                  className="fx-menu-item"
+                  onClick={() => {
+                    onResetView?.();
+                    setIsRoomFxOpen(false);
+                  }}
+                >
+                  <RotateCcw size={14} />
+                  <span>Reset Camera View</span>
+                </button>
+                <button
+                  type="button"
+                  className={`fx-menu-item ${showOnScreenControls ? 'is-active' : ''}`}
+                  onClick={() => setShowOnScreenControls((prev) => !prev)}
+                >
+                  <Compass size={14} />
+                  <span>Touch D-Pad [{showOnScreenControls ? 'ON' : 'OFF'}]</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Sound Mute Toggle */}
           <button
             type="button"
             className={`hud-action-btn ${muted ? 'muted-btn' : ''}`}
             onClick={onToggleMute}
-            title={muted ? 'Unmute (M)' : 'Mute (M)'}
+            title={muted ? 'Unmute Audio (M)' : 'Mute Audio (M)'}
           >
             {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
           </button>
 
-          <button
-            type="button"
-            className="hud-action-btn"
-            onClick={onResetView}
-            title="Overview Camera Perspective"
-          >
-            <RotateCcw size={15} />
-          </button>
+          {/* Interactive How To Play Guide Icon */}
+          {onOpenGuide && (
+            <button
+              type="button"
+              className="hud-action-btn"
+              onClick={() => {
+                playClickSound(950);
+                onOpenGuide();
+              }}
+              title="Controls & How to Play Guide (H)"
+            >
+              <HelpCircle size={15} color="#fbbf24" />
+            </button>
+          )}
 
           {/* Fullscreen Option for PC & Mobile */}
           <button
@@ -501,6 +504,7 @@ export default function GameHUD({
                 <Terminal size={16} color="#00f0ff" />
                 <span>TERMINAL MATRIX // DIRECT ACCESS</span>
                 <span className="drawer-subtag">1-TAP FAST INSPECT</span>
+                <span className="drawer-visitor-badge">CTOS VISITOR #{visitorCount}</span>
               </div>
               <button
                 type="button"
@@ -610,7 +614,8 @@ export default function GameHUD({
       )}
 
       {/* 4. Tactical Locomotion Controller (Virtual Analog Joystick for Mobile + Tactical WASD Keypad) */}
-      <div className="hud-locomotion-widget" pointerEvents="auto">
+      {showOnScreenControls && (
+<div className="hud-locomotion-widget" pointerEvents="auto">
         <div className="locomotion-header">
           <div className="locomotion-title">
             <Compass size={12} className="locomotion-icon" style={{ color: playerData.accentColor || '#34d399' }} />
@@ -770,10 +775,12 @@ export default function GameHUD({
         )}
       </div>
 
+      )}
+
       {/* 5. Device-Adaptive Bottom Controls Guide Bar */}
       <footer className="hud-bottom-bar">
         <div className="game-nav-guide">
-          {typeof window !== 'undefined' && window.innerWidth <= 768 ? (
+          {isTouchDevice ? (
             <>
               <span className="guide-chip">🕹️</span>
               <span>Joystick Walk</span>
@@ -784,30 +791,21 @@ export default function GameHUD({
               <span className="guide-chip">⚡</span>
               <span>Tap Stations</span>
               <span className="guide-sep">·</span>
-              <span className="guide-chip">💼 R</span>
-              <span>Recruiter</span>
+              <span className="guide-chip">💼</span>
+              <span>Recruiter (R)</span>
               <span className="guide-sep">·</span>
               <span className="guide-chip">⛶</span>
               <span>Fullscreen</span>
             </>
           ) : (
             <>
-              <span className="guide-chip">W</span>
-              <span>Forward</span>
-              <span className="guide-sep">·</span>
-              <span className="guide-chip">A</span>
-              <span>Left</span>
-              <span className="guide-sep">·</span>
-              <span className="guide-chip">S</span>
-              <span>Back</span>
-              <span className="guide-sep">·</span>
-              <span className="guide-chip">D</span>
-              <span>Right</span>
+              <span className="guide-chip">W A S D</span>
+              <span>Walk</span>
               <span className="guide-sep">·</span>
               <span className="guide-chip">MOUSE</span>
               <span>Look 360°</span>
               <span className="guide-sep">·</span>
-              <span className="guide-chip">CLICK / E</span>
+              <span className="guide-chip">E / CLICK</span>
               <span>Interact</span>
               <span className="guide-sep">·</span>
               <span className="guide-chip">SHIFT</span>

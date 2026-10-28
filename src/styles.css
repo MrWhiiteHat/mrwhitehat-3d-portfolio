@@ -13775,3 +13775,145 @@ canvas {
 .station-drawer-card.is-breached .drawer-card-status {
   color: #4ade80;
 }
+
+
+/* ========================================================================== */
+/* STREAMLINED DUPLICATE-FREE HUD & CONTROLS STYLES                           */
+/* ========================================================================== */
+.ctrl-tutorial-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(85, 246, 154, 0.12);
+  border: 1px solid rgba(85, 246, 154, 0.4);
+  color: #55f69a;
+  font-family: var(--mono, monospace);
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ctrl-tutorial-link-btn:hover {
+  background: #55f69a;
+  color: #020617;
+  box-shadow: 0 0 10px rgba(85, 246, 154, 0.5);
+}
+
+.hud-left-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.hud-center-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.agent-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono, monospace);
+  font-size: 8.5px;
+  margin-top: 1px;
+}
+.agent-breach-label {
+  color: #8fa395;
+  font-size: 8px;
+}
+.agent-breach-count {
+  font-weight: 800;
+  font-size: 9.5px;
+}
+
+.hud-room-fx-wrapper {
+  position: relative;
+}
+.hud-room-fx-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: rgba(8, 14, 24, 0.96);
+  border: 1px solid rgba(85, 246, 154, 0.35);
+  border-radius: 10px;
+  padding: 6px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 20px rgba(85, 246, 154, 0.15);
+  backdrop-filter: blur(16px);
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+}
+.fx-menu-title {
+  font-family: var(--mono, monospace);
+  font-size: 8.5px;
+  color: #8fa395;
+  letter-spacing: 0.06em;
+  padding: 5px 8px;
+  font-weight: 800;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 3px;
+}
+.fx-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #cbd5e1;
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  width: 100%;
+}
+.fx-menu-item:hover {
+  background: rgba(85, 246, 154, 0.12);
+  color: #55f69a;
+  border-color: rgba(85, 246, 154, 0.25);
+}
+.fx-menu-item.is-active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+
+.drawer-visitor-badge {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid #fbbf24;
+  color: #fbbf24;
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+@media (max-width: 640px) {
+  .hud-center-group {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: 4px;
+    gap: 6px;
+  }
+  .hud-stations-pill {
+    padding: 5px 9px;
+    font-size: 10px;
+  }
+  .hud-recruiter-pill {
+    padding: 5px 9px;
+    font-size: 10px;
+  }
+}
