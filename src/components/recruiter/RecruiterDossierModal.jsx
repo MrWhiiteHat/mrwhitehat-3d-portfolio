@@ -183,6 +183,14 @@ export default function RecruiterDossierModal({ isOpen, onClose }) {
           </div>
         </div>
 
+        {/* Helpful Recruiter Tip Bar */}
+        <div className="recruiter-tip-bar">
+          <span className="recruiter-tip-badge">💡 RECRUITER TIP</span>
+          <span className="recruiter-tip-text">
+            Fast evaluation mode · Download the 1-Click PDF Resume or press <strong>[Esc]</strong> to return to the interactive 3D studio anytime.
+          </span>
+        </div>
+
         {/* Tab Switcher Navigation */}
         <div className="recruiter-tabs-nav" role="tablist">
           <button

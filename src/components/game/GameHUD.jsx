@@ -67,6 +67,24 @@ export default function GameHUD({
     }
   }, [isFullscreen, showFsTip]);
 
+  // Cycling in-game pro-tips for free roam
+  const HUD_TIPS = [
+    '💡 TIP: Walk up to any terminal and press [E] or Click to inspect & hack',
+    '💡 TIP: Press [1 - 9] on your keyboard to instantly teleport to any station',
+    '💡 TIP: Press [F] anytime for immersive 60 FPS Fullscreen mode',
+    '💡 TIP: Click 3D Gadgets on the hacker desk to inspect the Flipper Zero in 3D',
+    '💡 TIP: Press [R] anytime for the Executive 2D Recruiter Dossier',
+    '💡 TIP: Adjust the real Air Conditioner ❄️ and Fan 🌀 in Studio FX anytime',
+  ];
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
+
+  useEffect(() => {
+    const tipInterval = setInterval(() => {
+      setCurrentTipIndex((prev) => (prev + 1) % HUD_TIPS.length);
+    }, 9000);
+    return () => clearInterval(tipInterval);
+  }, []);
+
   useEffect(() => {
     if (!isRoomFxOpen) return;
     const handleOutsideClick = (e) => {
@@ -561,6 +579,12 @@ export default function GameHUD({
                 <X size={16} />
               </button>
             </div>
+            <div className="station-drawer-tip-bar">
+              <span className="drawer-tip-badge">💡 PRO TIP</span>
+              <span className="drawer-tip-text">
+                Click any station to teleport & inspect · You can also press keys <strong>[1 - 9]</strong> on your keyboard anytime during free-roam!
+              </span>
+            </div>
             <div className="station-drawer-grid">
               {(stations || []).map((st) => {
                 const IconComp = st.icon || Terminal;
@@ -867,6 +891,9 @@ export default function GameHUD({
               <span>Menu</span>
             </>
           )}
+        </div>
+        <div className="hud-rotating-tip">
+          <span>{HUD_TIPS[currentTipIndex]}</span>
         </div>
       </footer>
 

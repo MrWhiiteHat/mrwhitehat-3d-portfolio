@@ -372,21 +372,9 @@ export default function CharacterSelectModal({
                   </>
                 )}
               </div>
-            </div>
-
-            {/* Fullscreen Immersion Recommendation Tip */}
-            <div className="char-fullscreen-tip-box">
-              <label className="fs-tip-label">
-                <input
-                  type="checkbox"
-                  checked={autoFullscreen}
-                  onChange={(e) => setAutoFullscreen(e.target.checked)}
-                  className="fs-tip-checkbox"
-                />
-                <span className="fs-tip-text">
-                  💡 <strong>Pro Tip:</strong> Enter in <strong>Fullscreen Mode [F]</strong> for distraction-free view & maximum 60 FPS
-                </span>
-              </label>
+              <div className="quick-controls-footer-tip">
+                <span>💡 <strong>Tip:</strong> Press [F] anytime for Fullscreen · [Esc] unlocks mouse · Keys [1-9] jump stations</span>
+              </div>
             </div>
           </div>
         </div>
@@ -409,16 +397,17 @@ export default function CharacterSelectModal({
             </button>
           )}
           <div className="footer-brief">
-            <span className="brief-bullet">●</span>
-            {isNameEntered ? (
-              <span style={{ color: '#34d399' }}>
-                Welcome, <strong>{name.trim()}</strong>! Ready to enter 3D studio.
+            <label className="footer-fullscreen-tip-toggle" title="Automatically requests fullscreen when entering the office for smooth 60 FPS">
+              <input
+                type="checkbox"
+                checked={autoFullscreen}
+                onChange={(e) => setAutoFullscreen(e.target.checked)}
+                className="footer-fs-checkbox"
+              />
+              <span className="footer-fs-text">
+                💡 Launch in <strong>Fullscreen [F]</strong> (60 FPS)
               </span>
-            ) : (
-              <span style={{ color: '#94a3b8' }}>
-                Ready to explore. Click below to enter immediately.
-              </span>
-            )}
+            </label>
           </div>
 
           <button
