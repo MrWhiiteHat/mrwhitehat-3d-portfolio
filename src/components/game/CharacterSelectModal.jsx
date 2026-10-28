@@ -176,17 +176,13 @@ export default function CharacterSelectModal({
     onSetTheme(col.themeKey);
   };
 
-  const handleLaunch = () => {
-    if (!isNameEntered) {
-      playHackingBeep(600);
-      setShowError(true);
-      return;
-    }
+  const handleLaunch = (customName) => {
+    const finalName = (customName || name).trim() || 'Guest Operative';
     playWhooshSound();
     playClickSound(1200);
     onStartGame({
-      name: name.trim(),
-      codename: name.trim(),
+      name: finalName,
+      codename: finalName,
       archetype: selectedCharacter.id,
       archetypeName: selectedCharacter.name,
       visor: selectedCharacter.visor,
@@ -271,35 +267,32 @@ export default function CharacterSelectModal({
 
           {/* Right Column: Clean Simple Controls */}
           <div className="char-config-pane">
-            {/* 1. Name Input (Mandatory, No Suggestions) */}
+            {/* 1. Name Input (Friendly with Quick Guest Option) */}
             <div className="config-group">
               <div className="config-label-row">
                 <label className="config-label">
-                  <span>YOUR NAME *</span>
+                  <span>YOUR NAME</span>
                 </label>
-                {isNameEntered ? (
-                  <span className="badge-validated">
-                    <CheckCircle2 size={12} />
-                    <span>READY</span>
-                  </span>
-                ) : (
-                  <span className="badge-required">
-                    <Lock size={12} />
-                    <span>REQUIRED TO ENTER</span>
-                  </span>
-                )}
+                <button
+                  type="button"
+                  className="quick-guest-btn"
+                  onClick={() => {
+                    playClickSound(950);
+                    setName('Guest Operative');
+                  }}
+                  title="Fill default guest operative name"
+                >
+                  ⚡ Quick Guest
+                </button>
               </div>
 
               <input
                 type="text"
                 maxLength={20}
-                className={`codename-input ${!isNameEntered && showError ? 'input-error-pulse' : ''}`}
+                className="codename-input"
                 value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  if (showError && e.target.value.trim()) setShowError(false);
-                }}
-                placeholder="Enter your name..."
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name or click Enter..."
                 autoFocus
               />
             </div>
@@ -362,6 +355,31 @@ export default function CharacterSelectModal({
               </div>
             </div>
 
+            {/* Quick Controls Cheat Sheet for PC & Mobile */}
+            <div className="quick-controls-card">
+              <div className="quick-controls-header">
+                <span>🎮 HOW TO EXPLORE</span>
+                <span className="controls-auto-tag">{typeof window !== 'undefined' && window.innerWidth < 768 ? 'MOBILE TOUCH' : 'PC KEYBOARD & MOUSE'}</span>
+              </div>
+              <div className="quick-controls-grid">
+                {typeof window !== 'undefined' && window.innerWidth < 768 ? (
+                  <>
+                    <div className="ctrl-badge-item">🕹️ <strong>Joystick:</strong> Walk 360°</div>
+                    <div className="ctrl-badge-item">👆 <strong>Drag Screen:</strong> Look Around</div>
+                    <div className="ctrl-badge-item">⚡ <strong>Tap Station:</strong> Inspect / Hack</div>
+                    <div className="ctrl-badge-item">💼 <strong>Recruiter (R):</strong> Instant 2D Dossier</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="ctrl-badge-item">⌨️ <strong>W A S D:</strong> Walk & Move</div>
+                    <div className="ctrl-badge-item">🖱️ <strong>Mouse:</strong> Look 360° (Click to lock)</div>
+                    <div className="ctrl-badge-item">⚡ <strong>E / Click:</strong> Inspect & Hack</div>
+                    <div className="ctrl-badge-item">💼 <strong>Key R:</strong> Instant Recruiter Dossier</div>
+                  </>
+                )}
+              </div>
+            </div>
+
             {/* Interactive User Guide Callout Banner */}
             <div
               className="char-guide-callout-strip"
@@ -419,17 +437,16 @@ export default function CharacterSelectModal({
 
           <button
             type="button"
-            className={`btn-launch-game ${!isNameEntered ? 'btn-launch-disabled' : ''}`}
-            onClick={handleLaunch}
-            disabled={!isNameEntered}
+            className="btn-launch-game"
+            onClick={() => handleLaunch()}
             style={{
-              borderColor: isNameEntered ? selectedColor.color : 'rgba(255, 255, 255, 0.2)',
-              boxShadow: isNameEntered ? `0 0 25px ${selectedColor.color}40` : 'none',
-              cursor: isNameEntered ? 'pointer' : 'not-allowed',
+              borderColor: selectedColor.color,
+              boxShadow: `0 0 25px ${selectedColor.color}40`,
+              cursor: 'pointer',
             }}
           >
-            {isNameEntered ? <Sparkles size={16} /> : <Lock size={16} />}
-            <span>{isNameEntered ? 'ENTER OFFICE' : 'ENTER NAME TO CONTINUE'}</span>
+            <Sparkles size={16} />
+            <span>{isNameEntered ? `ENTER AS ${name.trim().toUpperCase()}` : '⚡ ENTER OFFICE (1-CLICK)'}</span>
           </button>
         </div>
       </div>

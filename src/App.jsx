@@ -67,6 +67,7 @@ import CyberLoadingScreen from './components/common/CyberLoadingScreen.jsx';
 import LeaderboardModal from './components/leaderboard/LeaderboardModal.jsx';
 import GadgetInspectorModal from './components/gadgets/GadgetInspectorModal.jsx';
 import RecruiterDossierModal from './components/recruiter/RecruiterDossierModal.jsx';
+import UserGuideModal from './components/game/UserGuideModal.jsx';
 import { profile } from './data.js';
 import { useFullscreen } from './utils/useFullscreen.js';
 import {
@@ -154,6 +155,7 @@ export default function App() {
   const [isGadgetInspectorOpen, setIsGadgetInspectorOpen] = useState(false);
   const [selectedGadgetId, setSelectedGadgetId] = useState('flipper');
   const [isRecruiterOpen, setIsRecruiterOpen] = useState(false);
+  const [isUserGuideOpen, setIsUserGuideOpen] = useState(false);
   const stationMenuRef = useRef(null);
 
 // Watch Dogs 2 3D Hacking Circuit State Machine
@@ -855,6 +857,14 @@ export default function App() {
       if (gameState === 'HACKING' || gameState === 'ANNOUNCEMENT') return;
 
       if (e.key === 'Escape') {
+        if (isUserGuideOpen) {
+          setIsUserGuideOpen(false);
+          return;
+        }
+        if (isRecruiterOpen) {
+          setIsRecruiterOpen(false);
+          return;
+        }
         if (isLeaderboardOpen) {
           setIsLeaderboardOpen(false);
           return;
@@ -899,6 +909,8 @@ export default function App() {
 
       } else if (e.key === 'r' || e.key === 'R') {
         handleToggleRecruiter();
+      } else if (e.key === 'h' || e.key === 'H' || e.key === '?') {
+        setIsUserGuideOpen((prev) => !prev);
       }
     };
 
@@ -1029,6 +1041,9 @@ export default function App() {
           onOpenLeaderboard={handleOpenLeaderboard}
           onOpenGadgets={handleOpenGadgets}
           onOpenRecruiter={handleOpenRecruiter}
+          onOpenGuide={() => setIsUserGuideOpen(true)}
+          stations={NAV_STATIONS}
+          unlockedStations={unlockedStations}
         />
       )}
 
@@ -1280,6 +1295,12 @@ export default function App() {
       <RecruiterDossierModal
         isOpen={isRecruiterOpen}
         onClose={handleCloseRecruiter}
+      />
+
+      {/* Universal Interactive User Guide / How To Play Modal */}
+      <UserGuideModal
+        isOpen={isUserGuideOpen}
+        onClose={() => setIsUserGuideOpen(false)}
       />
 
       {/* Cinematic Glitch Announcement Modal */}

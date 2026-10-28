@@ -21,6 +21,8 @@ import {
   Zap,
   Maximize2,
   Minimize2,
+  HelpCircle,
+  X,
 } from 'lucide-react';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
 
@@ -42,9 +44,13 @@ export default function GameHUD({
   onOpenLeaderboard = null,
   onOpenGadgets = null,
   onOpenRecruiter = null,
+  onOpenGuide = null,
+  stations = [],
+  unlockedStations = new Set(),
   isEasterEggAvailable = false,
   onLaunchEasterEgg = null,
 }) {
+  const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
   // Locomotion Mode: 'joystick' on mobile/touch, 'wasd' on desktop (switchable anytime)
   const [controlMode, setControlMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -367,6 +373,36 @@ export default function GameHUD({
           </button>
         )}
 
+        {/* 1-Click Fast Station Matrix Directory */}
+        <button
+          type="button"
+          className="hud-stations-pill"
+          onClick={() => {
+            playClickSound(1000);
+            setIsStationMenuOpen((prev) => !prev);
+          }}
+          title="Direct Station Jump Matrix (1-Click Teleport / Inspect)"
+        >
+          <Terminal size={13} style={{ color: '#00f0ff' }} />
+          <span className="stations-pill-label">⚡ STATIONS ({stations?.length || 11})</span>
+        </button>
+
+        {/* Interactive How To Play Guide Pill */}
+        {onOpenGuide && (
+          <button
+            type="button"
+            className="hud-guide-pill"
+            onClick={() => {
+              playClickSound(950);
+              onOpenGuide();
+            }}
+            title="Open Interactive How To Play & Controls Guide (H)"
+          >
+            <HelpCircle size={13} style={{ color: '#fbbf24' }} />
+            <span className="guide-pill-label">HOW TO PLAY</span>
+          </button>
+        )}
+
                 {/* Discreet Watch Dogs 2 Netrun Easter Egg Pill */}
         {isEasterEggAvailable && (
           <button
@@ -455,6 +491,57 @@ export default function GameHUD({
           </button>
         </div>
       </header>
+
+      {/* 1-Click Fast Station Matrix Quick Jump Drawer */}
+      {isStationMenuOpen && (
+        <div className="hud-fast-station-overlay" onClick={() => setIsStationMenuOpen(false)}>
+          <div className="hud-fast-station-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="station-drawer-header">
+              <div className="drawer-title-left">
+                <Terminal size={16} color="#00f0ff" />
+                <span>TERMINAL MATRIX // DIRECT ACCESS</span>
+                <span className="drawer-subtag">1-TAP FAST INSPECT</span>
+              </div>
+              <button
+                type="button"
+                className="drawer-close-btn"
+                onClick={() => setIsStationMenuOpen(false)}
+                aria-label="Close stations matrix"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="station-drawer-grid">
+              {(stations || []).map((st) => {
+                const IconComp = st.icon || Terminal;
+                const isBreached = unlockedStations?.has?.(st.id);
+                return (
+                  <button
+                    key={st.id}
+                    type="button"
+                    className={`station-drawer-card ${isBreached ? 'is-breached' : ''}`}
+                    onClick={() => {
+                      playWhooshSound();
+                      setIsStationMenuOpen(false);
+                      onInteract(st.id);
+                    }}
+                  >
+                    <div className="drawer-card-top">
+                      <span className="drawer-card-num">{st.num}</span>
+                      <IconComp size={16} className="drawer-card-icon" />
+                      <strong className="drawer-card-name">{st.label}</strong>
+                    </div>
+                    <div className="drawer-card-bottom">
+                      <span className="drawer-card-action">JUMP & INSPECT ▶</span>
+                      <span className="drawer-card-status">{isBreached ? 'BREACHED' : 'ENCRYPTED'}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dedicated Floating Fullscreen Pill for Mobile Touchscreens */}
       <button
@@ -683,35 +770,59 @@ export default function GameHUD({
         )}
       </div>
 
-      {/* 5. Bottom Controls Guide Bar */}
+      {/* 5. Device-Adaptive Bottom Controls Guide Bar */}
       <footer className="hud-bottom-bar">
         <div className="game-nav-guide">
-          <span className="guide-chip">W</span>
-          <span>Forward</span>
-          <span className="guide-sep">·</span>
-          <span className="guide-chip">A</span>
-          <span>Left</span>
-          <span className="guide-sep">·</span>
-          <span className="guide-chip">S</span>
-          <span>Backward</span>
-          <span className="guide-sep">·</span>
-          <span className="guide-chip">D</span>
-          <span>Right</span>
-          <span className="guide-sep">·</span>
-          <span className="guide-chip">MOUSE</span>
-          <span>Look</span>
-          <span className="guide-sep">·</span>
-          <span className="guide-chip">CLICK / E</span>
-          <span>Interact</span>
-          <span className="guide-sep">·</span>
-          <span className="guide-chip">SHIFT</span>
-          <span>Sprint</span>
-          <span className="guide-sep">·</span>
-          <span className="guide-chip">F</span>
-          <span>Fullscreen</span>
-          <span className="guide-sep">·</span>
-          <span className="guide-chip">ESC</span>
-          <span>Menu</span>
+          {typeof window !== 'undefined' && window.innerWidth <= 768 ? (
+            <>
+              <span className="guide-chip">🕹️</span>
+              <span>Joystick Walk</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">👆</span>
+              <span>Drag Look</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">⚡</span>
+              <span>Tap Stations</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">💼 R</span>
+              <span>Recruiter</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">⛶</span>
+              <span>Fullscreen</span>
+            </>
+          ) : (
+            <>
+              <span className="guide-chip">W</span>
+              <span>Forward</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">A</span>
+              <span>Left</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">S</span>
+              <span>Back</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">D</span>
+              <span>Right</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">MOUSE</span>
+              <span>Look 360°</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">CLICK / E</span>
+              <span>Interact</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">SHIFT</span>
+              <span>Sprint</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">R</span>
+              <span>Recruiter</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">F</span>
+              <span>Fullscreen</span>
+              <span className="guide-sep">·</span>
+              <span className="guide-chip">ESC</span>
+              <span>Menu</span>
+            </>
+          )}
         </div>
       </footer>
 

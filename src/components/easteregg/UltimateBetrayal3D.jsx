@@ -2021,7 +2021,7 @@ export default function SecretVaultRoom3D({
   onRestartEasterEgg,
 }) {
   const [isChappalLaunched, setIsChappalLaunched] = useState(false);
-  const [isExpandedOS, setIsExpandedOS] = useState(false);
+  const [isExpandedOS, setIsExpandedOS] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
   return (
     <group position={[0, 0, 0]} name="SecretVaultRoom3D">
