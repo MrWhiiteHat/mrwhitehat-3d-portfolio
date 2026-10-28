@@ -8,6 +8,46 @@ const getAssetUrl = (path) => {
 };
 
 let currentAudio = null;
+const audioCache = new Map();
+
+function getOrCreateAudio(url) {
+  if (audioCache.has(url)) {
+    const cached = audioCache.get(url);
+    try {
+      cached.pause();
+      cached.currentTime = 0;
+    } catch (e) {}
+    return cached;
+  }
+  const audio = new Audio(url);
+  audio.preload = 'auto';
+  audioCache.set(url, audio);
+  return audio;
+}
+
+export function preloadEasterEggVoiceClips() {
+  const clips = [
+    'mom_initial_call',
+    'narrator_punchline',
+    'cert_official_reading',
+    'cert_stat_hack',
+    'cert_stat_respect',
+    'cert_stat_coriander',
+    'cert_stat_mirchi',
+    'cert_stat_sabzi',
+    'cert_stat_chappal',
+  ];
+  clips.forEach((name) => {
+    try {
+      const url = getAssetUrl('audio/easteregg/' + name + '.mp3');
+      if (!audioCache.has(url)) {
+        const a = new Audio(url);
+        a.preload = 'auto';
+        audioCache.set(url, a);
+      }
+    } catch (e) {}
+  });
+}
 
 /**
  * Cancel and stop any active real voice audio or fallback speech synthesis
@@ -43,8 +83,8 @@ export function playRealVoiceClip(baseName, onComplete, fallbackText = '') {
 
   const tryPlay = (ext) => {
     try {
-      const audioUrl = getAssetUrl(`audio/easteregg/${baseName}.${ext}`);
-      const audio = new Audio(audioUrl);
+      const audioUrl = getAssetUrl('audio/easteregg/' + baseName + '.' + ext);
+      const audio = getOrCreateAudio(audioUrl);
       audio.volume = 1.0;
       currentAudio = audio;
 

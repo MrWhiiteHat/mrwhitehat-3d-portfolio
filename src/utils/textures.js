@@ -19,6 +19,7 @@ function createCanvas(width, height) {
  */
 function configureTexture(canvas, repeatX = 1, repeatY = 1, isColor = true) {
   if (!canvas) return null;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
@@ -26,9 +27,9 @@ function configureTexture(canvas, repeatX = 1, repeatY = 1, isColor = true) {
   if (isColor) {
     texture.colorSpace = THREE.SRGBColorSpace;
   }
-  texture.anisotropy = 8;
-  texture.generateMipmaps = true;
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.anisotropy = isMobile ? 1 : 4;
+  texture.generateMipmaps = !isMobile;
+  texture.minFilter = isMobile ? THREE.LinearFilter : THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
   return texture;
 }

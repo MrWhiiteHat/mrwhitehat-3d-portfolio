@@ -496,6 +496,7 @@ function SceneContents({
           blur={1.8}
           far={5}
           frames={1}
+          resolution={typeof window !== 'undefined' && window.innerWidth < 768 ? 256 : 512}
         />
       </group>
       )}

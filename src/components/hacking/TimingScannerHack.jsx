@@ -8,39 +8,59 @@ const TIERS = [
   { tier: 3, label: 'ROOT_AIRGAP // OVERRIDE', targetStart: 310, targetEnd: 360, speed: 4.2 },
 ];
 
+/**
+ * 60 FPS Hardware-Accelerated Radar Scanner Minigame
+ * Uses direct CSS GPU transform for the laser needle, eliminating 60 React
+ * re-render cycles per second for flawless 60 FPS performance on both mobile & desktop.
+ */
 export default function TimingScannerHack({ onSolved, onBypass }) {
   const [currentTierIdx, setCurrentTierIdx] = useState(0);
-  const [needleAngle, setNeedleAngle] = useState(0);
   const [solved, setSolved] = useState(false);
   const [errorFlash, setErrorFlash] = useState(false);
+
+  const needleRef = useRef(null);
+  const needleAngleRef = useRef(0);
   const animRef = useRef(null);
   const lastTimeRef = useRef(null);
+  const currentTierRef = useRef(TIERS[0]);
 
   const currentTier = TIERS[currentTierIdx] || TIERS[0];
+  currentTierRef.current = currentTier;
 
-  // Rotate needle smoothly
+  // Rotate needle smoothly via direct GPU transform (zero React re-renders)
   useEffect(() => {
-    if (solved) return;
+    if (solved) {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      return;
+    }
+
+    lastTimeRef.current = performance.now();
 
     const animate = (time) => {
       if (lastTimeRef.current != null) {
-        const delta = (time - lastTimeRef.current) / 1000;
-        setNeedleAngle((prev) => (prev + currentTier.speed * 85 * delta) % 360);
+        const delta = Math.min(0.05, (time - lastTimeRef.current) / 1000);
+        needleAngleRef.current = (needleAngleRef.current + currentTierRef.current.speed * 85 * delta) % 360;
+
+        if (needleRef.current) {
+          needleRef.current.style.transform = `rotate(${needleAngleRef.current.toFixed(1)}deg)`;
+        }
       }
       lastTimeRef.current = time;
       animRef.current = requestAnimationFrame(animate);
     };
 
     animRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animRef.current);
-  }, [currentTier.speed, solved]);
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, [solved, currentTierIdx]);
 
   const handleInject = () => {
     if (solved) return;
 
-    // Check if needleAngle is within targetStart and targetEnd
-    const angle = needleAngle;
-    const { targetStart, targetEnd } = currentTier;
+    // Check if needle angle is within targetStart and targetEnd
+    const angle = needleAngleRef.current;
+    const { targetStart, targetEnd } = currentTierRef.current;
     const isHit = angle >= targetStart && angle <= targetEnd;
 
     if (isHit) {
@@ -119,10 +139,11 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
             />
           </svg>
 
-          {/* Rotating Scanning Laser Needle */}
+          {/* Rotating Scanning Laser Needle (Direct GPU accelerated transform) */}
           <div
             className="radar-needle"
-            style={{ transform: `rotate(${needleAngle}deg)` }}
+            ref={needleRef}
+            style={{ transform: 'rotate(0deg)', willChange: 'transform' }}
           >
             <div className="needle-line" />
             <div className="needle-sensor" />

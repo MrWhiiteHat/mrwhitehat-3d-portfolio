@@ -346,7 +346,30 @@ function createPlaqueTexture(type) {
 // SUB-COMPONENT: REALISTIC SHELF PLANT (potted_plant_02.glb)
 // =============================================================================
 
-function ConsolePlant({ position = [4.15, 0.88, 4.9], scale = 0.52 }) {
+function ProceduralConsolePlant({ position = [4.15, 0.88, 4.9], scale = 0.52 }) {
+  return (
+    <group position={position} scale={scale}>
+      <mesh position={[0, 0.15, 0]}>
+        <cylinderGeometry args={[0.18, 0.13, 0.30, 16]} />
+        <meshStandardMaterial color="#cbd5e1" roughness={0.5} />
+      </mesh>
+      <mesh position={[0, 0.28, 0]}>
+        <cylinderGeometry args={[0.17, 0.17, 0.04, 16]} />
+        <meshStandardMaterial color="#1c1917" roughness={0.9} />
+      </mesh>
+      {[0, 1.25, 2.5, 3.75, 5.0].map((rotY, i) => (
+        <group key={i} position={[0, 0.28, 0]} rotation={[0.2, rotY, 0.35]}>
+          <mesh position={[0, 0.16, 0]}>
+            <boxGeometry args={[0.04, 0.32, 0.008]} />
+            <meshStandardMaterial color="#15803d" roughness={0.4} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function GLTFConsolePlant({ position = [4.15, 0.88, 4.9], scale = 0.52 }) {
   const modelUrl = getAssetUrl('models/potted_plant_02.glb');
   const { scene } = useGLTF(modelUrl);
   const foliageRef = useRef();
@@ -371,7 +394,6 @@ function ConsolePlant({ position = [4.15, 0.88, 4.9], scale = 0.52 }) {
 
   foliageRef.current = leavesNode;
 
-  // Gentle organic breeze sway on the leaves only (pot stays dead-still on shelf)
   useFrame((state) => {
     if (foliageRef.current) {
       const time = state.clock.getElapsedTime();
@@ -383,6 +405,14 @@ function ConsolePlant({ position = [4.15, 0.88, 4.9], scale = 0.52 }) {
   return (
     <primitive object={plantRoot} position={position} scale={scale} />
   );
+}
+
+function ConsolePlant({ position = [4.15, 0.88, 4.9], scale = 0.52 }) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  if (isMobile) {
+    return <ProceduralConsolePlant position={position} scale={scale} />;
+  }
+  return <GLTFConsolePlant position={position} scale={scale} />;
 }
 
 // =============================================================================
@@ -792,4 +822,4 @@ export default function FrontWallPanoramicFeature({ currentThemeKey = 'CYBER_NEO
   );
 }
 
-useGLTF.preload(getAssetUrl('models/potted_plant_02.glb'));
+if (typeof window !== 'undefined' && window.innerWidth >= 768) { useGLTF.preload(getAssetUrl('models/potted_plant_02.glb')); }

@@ -190,9 +190,11 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
 
   const theme = LIGHTING_THEMES[currentThemeKey] || LIGHTING_THEMES.CYBER_MATRIX;
 
-  // 1. Floating Cyber Ambient Particles (90 data motes)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  // 1. Floating Cyber Ambient Particles (Dynamic count for 60fps on mobile)
   const particleData = useMemo(() => {
-    const count = 55;
+    const count = isMobile ? 22 : 55;
     const positions = new Float32Array(count * 3);
     const speeds = new Float32Array(count);
     const offsets = new Float32Array(count);
@@ -276,9 +278,9 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         position={[9, 14, 8]}
         intensity={theme.dirIntensity}
         color={theme.dirColor}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        castShadow={!isMobile}
+        shadow-mapSize-width={isMobile ? 512 : 1024}
+        shadow-mapSize-height={isMobile ? 512 : 1024}
         shadow-bias={-0.0001}
         shadow-camera-near={2}
         shadow-camera-far={26}
@@ -293,21 +295,25 @@ export default function CyberAtmosphere({ currentThemeKey = 'CYBER_NEON_NOIR', o
         color={theme.windowColor}
       />
 
-      {/* Gentle Fill Lights for Dark Studio Corners (Back-Left & Front-Right) */}
-      <pointLight
-        position={[-3.4, 2.4, -3.2]}
-        color={theme.accentColor || '#38bdf8'}
-        intensity={1.2}
-        distance={7.0}
-        decay={2}
-      />
-      <pointLight
-        position={[3.2, 2.4, 3.2]}
-        color={theme.loungeFillColor || '#f59e0b'}
-        intensity={1.0}
-        distance={6.5}
-        decay={2}
-      />
+      {/* Gentle Fill Lights for Dark Studio Corners (Culled on mobile for 60 FPS lock) */}
+      {!isMobile && (
+        <>
+          <pointLight
+            position={[-3.4, 2.4, -3.2]}
+            color={theme.accentColor || '#38bdf8'}
+            intensity={1.2}
+            distance={7.0}
+            decay={2}
+          />
+          <pointLight
+            position={[3.2, 2.4, 3.2]}
+            color={theme.loungeFillColor || '#f59e0b'}
+            intensity={1.0}
+            distance={6.5}
+            decay={2}
+          />
+        </>
+      )}
 
       {/* 2. Floating Cyber Ambient Particles */}
       <points ref={particlesRef}>

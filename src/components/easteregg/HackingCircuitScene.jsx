@@ -132,8 +132,18 @@ function CircuitConduit({
     ? '#00f0ff'
     : '#0088cc';
 
-  // Animate traveling signal pulses & directional arrows along the centerline
+  const staticPlacedRef = useRef(false);
+
+  useEffect(() => {
+    staticPlacedRef.current = false;
+  }, [from, to, isForward, isBidirectional, isFlowing]);
+
+  // Animate traveling signal pulses & directional arrows along the centerline (60 FPS optimized)
   useFrame((state) => {
+    if (!isFlowing) {
+      if (staticPlacedRef.current) return;
+      staticPlacedRef.current = true;
+    }
     const time = state.clock.getElapsedTime();
 
     // 1. Traveling Data Pulse Particle

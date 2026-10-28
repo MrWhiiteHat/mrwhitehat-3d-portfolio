@@ -44,27 +44,31 @@ export default function WaveformTunerHack({ onSolved, onBypass }) {
     }
   }, [coherence, solved, onSolved]);
 
-  // Generate SVG wave points
+  // Generate SVG wave points (useMemo for 60 FPS slider dragging without string garbage)
   const points = 60;
   const width = 360;
   const height = 110;
   const midY = height / 2;
 
-  const targetPath = Array.from({ length: points })
-    .map((_, i) => {
-      const x = (i / (points - 1)) * width;
-      const y = midY + Math.sin((i / 8) * targetFreq) * (targetAmp * 40);
-      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
-    })
-    .join(' ');
+  const targetPath = useMemo(() => {
+    return Array.from({ length: points })
+      .map((_, i) => {
+        const x = (i / (points - 1)) * width;
+        const y = midY + Math.sin((i / 8) * targetFreq) * (targetAmp * 40);
+        return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+      })
+      .join(' ');
+  }, [points, width, height, midY, targetFreq, targetAmp]);
 
-  const playerPath = Array.from({ length: points })
-    .map((_, i) => {
-      const x = (i / (points - 1)) * width;
-      const y = midY + Math.sin((i / 8) * playerFreq) * (playerAmp * 40);
-      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
-    })
-    .join(' ');
+  const playerPath = useMemo(() => {
+    return Array.from({ length: points })
+      .map((_, i) => {
+        const x = (i / (points - 1)) * width;
+        const y = midY + Math.sin((i / 8) * playerFreq) * (playerAmp * 40);
+        return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+      })
+      .join(' ');
+  }, [points, width, height, midY, playerFreq, playerAmp]);
 
   return (
     <div className="hack-puzzle-container wave-hack">

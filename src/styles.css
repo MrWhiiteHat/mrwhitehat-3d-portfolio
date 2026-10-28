@@ -13401,3 +13401,101 @@ body.is-pseudo-fullscreen .portfolio-container {
   box-shadow: 0 0 18px rgba(251, 191, 36, 0.6);
   transform: translateY(-1px);
 }
+
+/* ========================================================================== */
+/* 60 FPS UNIVERSAL MOBILE & DESKTOP PERFORMANCE ENGINE                       */
+/* Optimized for silky smooth frame rates, zero-lag touch & minimal GPU churn  */
+/* ========================================================================== */
+
+/* 1. Global Canvas & Compositor Optimizations */
+.canvas-wrap,
+canvas {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
+/* 2. Hardware Acceleration for Active Interactive Elements */
+.hud-locomotion-widget,
+.hud-top-bar,
+.hud-bottom-bar,
+.station-inspect-header,
+.hack-puzzle-container,
+.speedrun-timer-badge,
+.radar-needle,
+.clickable-stat,
+.mobile-fullscreen-os-float-btn,
+.quantum-teleport-overlay,
+.desktop-app-modal-window {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}
+
+/* 3. Mobile 60 FPS GPU Optimization: Bypass Costly Backdrop-Blur Passes */
+@media (max-width: 768px) {
+  /* Replace heavy GPU multi-pass gaussian blurs with high-contrast cyber dark layers */
+  .hud-top-bar,
+  .hud-bottom-bar,
+  .hud-locomotion-widget,
+  .hud-action-btn,
+  .station-inspect-header,
+  .station-nav-switcher,
+  .station-nav-dropdown,
+  .hack-puzzle-container,
+  .modal-window-glass,
+  .dossier-card,
+  .recruiter-modal-content,
+  .leaderboard-modal-content,
+  .character-select-modal,
+  .user-guide-modal-content,
+  .laptop-os-expanded-viewport,
+  .desktop-app-modal-window {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: rgba(6, 11, 20, 0.96) !important;
+  }
+
+  /* Universal Touch Optimization: Remove 300ms mobile tap delay */
+  button,
+  .btn,
+  .clickable-stat,
+  .soundboard-btn,
+  .hack-bypass-btn,
+  .hack-action-btn,
+  .station-dropdown-card,
+  .hotspot-pin,
+  .modal-replay-voice-btn,
+  .cert-listen-badge-btn,
+  .cert-meme-shuffle-btn {
+    touch-action: manipulation !important;
+  }
+
+  /* Prevent Mobile Over-scroll rubber-banding inside interactive panels */
+  .desktop-app-modal-window,
+  .hack-puzzle-container,
+  .recruiter-modal-body,
+  .station-nav-dropdown {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure Minigames are compact and 100% playable on small mobile screens */
+  .hack-puzzle-container {
+    padding: 10px !important;
+    max-height: 82vh !important;
+  }
+  .hack-instructions {
+    font-size: 11px !important;
+    margin-bottom: 8px !important;
+  }
+  .radar-circle {
+    width: 170px !important;
+    height: 170px !important;
+  }
+  .radar-needle {
+    height: 85px !important;
+  }
+}
