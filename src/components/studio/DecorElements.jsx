@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import RealisticTree from './RealisticTree.jsx';
 
 /**
  * Helper to compute asset URL based on Vite BASE_URL.

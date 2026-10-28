@@ -40,9 +40,10 @@ export default function RealisticTree({
     const leaves = clone.getObjectByName('potted_plant_01_leaves');
 
     // Configure PBR materials and shadow fidelity
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     clone.traverse((child) => {
       if (child.isMesh) {
-        child.castShadow = true;
+        child.castShadow = !isMobile;
         child.receiveShadow = true;
         if (child.material) {
           child.material = child.material.clone();
