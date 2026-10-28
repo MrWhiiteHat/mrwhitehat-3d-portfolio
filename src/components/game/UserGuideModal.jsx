@@ -43,7 +43,7 @@ const CHAPTERS = [
       { key: 'F', label: 'Toggle Full Screen mode' },
       { key: 'ESC', label: 'Release mouse pointer / Return to menu' },
     ],
-    tips: 'Click anywhere inside the 3D office to lock your pointer for instant 1:1 camera aim. Press [Esc] anytime to release.',
+    tips: '💡 Pro Tip: Press [F] or click Fullscreen for buttery 60 FPS performance and distraction-free immersion. Click anywhere inside the 3D office to lock pointer aim.',
   },
   {
     id: 'mobile_controls',

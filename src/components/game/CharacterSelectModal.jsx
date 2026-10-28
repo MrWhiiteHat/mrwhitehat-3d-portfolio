@@ -176,10 +176,17 @@ export default function CharacterSelectModal({
     onSetTheme(col.themeKey);
   };
 
+  const [autoFullscreen, setAutoFullscreen] = useState(true);
+
   const handleLaunch = (customName) => {
     const finalName = (customName || name).trim() || 'Guest Operative';
     playWhooshSound();
     playClickSound(1200);
+    if (autoFullscreen && !isFullscreen && onToggleFullscreen) {
+      try {
+        onToggleFullscreen();
+      } catch (err) {}
+    }
     onStartGame({
       name: finalName,
       codename: finalName,
@@ -365,6 +372,21 @@ export default function CharacterSelectModal({
                   </>
                 )}
               </div>
+            </div>
+
+            {/* Fullscreen Immersion Recommendation Tip */}
+            <div className="char-fullscreen-tip-box">
+              <label className="fs-tip-label">
+                <input
+                  type="checkbox"
+                  checked={autoFullscreen}
+                  onChange={(e) => setAutoFullscreen(e.target.checked)}
+                  className="fs-tip-checkbox"
+                />
+                <span className="fs-tip-text">
+                  💡 <strong>Pro Tip:</strong> Enter in <strong>Fullscreen Mode [F]</strong> for distraction-free view & maximum 60 FPS
+                </span>
+              </label>
             </div>
           </div>
         </div>

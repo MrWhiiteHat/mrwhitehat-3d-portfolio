@@ -55,6 +55,17 @@ export default function GameHUD({
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || window.innerWidth <= 1024);
   const [showOnScreenControls, setShowOnScreenControls] = useState(() => isTouchDevice);
   const [isRoomFxOpen, setIsRoomFxOpen] = useState(false);
+  const [showFsTip, setShowFsTip] = useState(true);
+
+  // Auto-hide the tip after 12 seconds so it never overstays its welcome
+  useEffect(() => {
+    if (!isFullscreen && showFsTip) {
+      const timer = setTimeout(() => {
+        setShowFsTip(false);
+      }, 12000);
+      return () => clearTimeout(timer);
+    }
+  }, [isFullscreen, showFsTip]);
 
   useEffect(() => {
     if (!isRoomFxOpen) return;
@@ -494,6 +505,41 @@ export default function GameHUD({
           </button>
         </div>
       </header>
+
+      {/* Floating Fullscreen Experience Tip (Shown when in windowed mode, auto-dismissible) */}
+      {!isFullscreen && showFsTip && (
+        <div className="hud-floating-fs-tip">
+          <div className="fs-tip-main">
+            <span className="fs-tip-icon">💡</span>
+            <span className="fs-tip-desc">
+              <strong>Tip:</strong> Press <strong>[F]</strong> or click Fullscreen for buttery 60 FPS & full immersion
+            </span>
+          </div>
+          <div className="fs-tip-btn-group">
+            <button
+              type="button"
+              className="fs-tip-enter-btn"
+              onClick={() => {
+                onToggleFullscreen?.();
+                setShowFsTip(false);
+              }}
+              title="Enter Fullscreen Mode (F)"
+            >
+              <Maximize2 size={12} />
+              <span>GO FULLSCREEN</span>
+            </button>
+            <button
+              type="button"
+              className="fs-tip-dismiss-btn"
+              onClick={() => setShowFsTip(false)}
+              title="Dismiss tip"
+              aria-label="Dismiss tip"
+            >
+              <X size={12} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 1-Click Fast Station Matrix Quick Jump Drawer */}
       {isStationMenuOpen && (
