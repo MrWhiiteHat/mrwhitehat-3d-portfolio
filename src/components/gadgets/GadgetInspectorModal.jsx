@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Center, Float } from '@react-three/drei';
 import {
@@ -17,6 +17,7 @@ import {
 import FlipperZeroModel, { FLIPPER_APPS } from './3d/FlipperZeroModel.jsx';
 import RubberDuckyModel from './3d/RubberDuckyModel.jsx';
 import { playClickSound } from '../../utils/audio.js';
+import { ctfEngine } from '../../utils/ctf/ctfEngine.js';
 
 export default function GadgetInspectorModal({
   isOpen,
@@ -28,6 +29,14 @@ export default function GadgetInspectorModal({
   const [autoRotate, setAutoRotate] = useState(false);
   const [flipperApp, setFlipperApp] = useState(FLIPPER_APPS[0]);
   const [duckyMode, setDuckyMode] = useState('ARMED');
+
+  useEffect(() => {
+    if (selectedGadget === 'ducky') {
+      try {
+        ctfEngine.submitFlag('easteregg-desk-usb', 'FLAG{physical_access_usb_ducky_recovered}');
+      } catch (_) {}
+    }
+  }, [selectedGadget]);
 
   if (!isOpen) return null;
 
@@ -199,6 +208,9 @@ export default function GadgetInspectorModal({
                 <span className="dc-label">INJECTION PAYLOAD</span>
                 <strong className="dc-val text-yellow">DuckyScript 3.0</strong>
                 <p className="dc-desc">STRING powershell -ep bypass -w hidden -c "IEX (New-Object Net.WebClient)..."</p>
+                <div style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)', padding: '4px 8px', borderRadius: '4px', color: '#34d399', fontSize: '10px', fontFamily: 'monospace', marginTop: '4px' }}>
+                  🏆 CTF FLAG RECOVERED: FLAG&#123;physical_access_usb_ducky_recovered&#125; (+100 PTS)
+                </div>
               </div>
 
               <div className="dossier-card">

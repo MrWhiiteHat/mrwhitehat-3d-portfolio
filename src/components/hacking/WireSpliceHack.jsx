@@ -1,26 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, FileText, Printer, Scissors, Zap } from 'lucide-react';
+import { CheckCircle2, Cpu, Zap, Flag, Terminal } from 'lucide-react';
 import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../utils/audio.js';
+import { ctfEngine } from '../../utils/ctf/ctfEngine.js';
+import { getChallengeById } from '../../utils/ctf/ctfChallenges.js';
+
+const CHALLENGE_ID = 'forensics-hardware-uart';
+const REVEALED_FLAG = 'FLAG{uart_baud_115200_logic_analyzed}';
 
 const WIRE_TYPES = [
-  { id: 'ALPHA', label: 'PORT_01 // SEC_AUTH', color: '#ef4444' },
-  { id: 'BETA', label: 'PORT_02 // KERNEL_MEM', color: '#38bdf8' },
-  { id: 'GAMMA', label: 'PORT_03 // CERT_CHAIN', color: '#22c55e' },
-  { id: 'DELTA', label: 'PORT_04 // SPOOL_DATA', color: '#eab308' },
+  { id: 'TX', label: 'SOC_TX (Data Out)', target: 'RX', color: '#ef4444' },
+  { id: 'RX', label: 'SOC_RX (Data In)', target: 'TX', color: '#38bdf8' },
+  { id: 'GND', label: 'CHASSIS_GND (0V)', target: 'GND', color: '#22c55e' },
+  { id: 'VCC', label: 'VCC_LINE (+3.3V)', target: 'VCC', color: '#eab308' },
+];
+
+const RIGHT_TARGETS = [
+  { id: 'RX', label: 'ANALYZER_RX (Probe 1)', matchId: 'TX' },
+  { id: 'VCC', label: 'ANALYZER_VCC (Reference)', matchId: 'VCC' },
+  { id: 'TX', label: 'ANALYZER_TX (Probe 2)', matchId: 'RX' },
+  { id: 'GND', label: 'ANALYZER_GND (Ground)', matchId: 'GND' },
 ];
 
 export default function WireSpliceHack({ onSolved, onBypass }) {
+  const challenge = getChallengeById(CHALLENGE_ID);
   const [selectedLeft, setSelectedLeft] = useState(null);
-  const [connectedWires, setConnectedWires] = useState({}); // { ALPHA: true, ... }
-  const [solved, setSolved] = useState(false);
-
-  // Right ports shuffled
-  const rightPorts = [
-    WIRE_TYPES[2], // GAMMA
-    WIRE_TYPES[0], // ALPHA
-    WIRE_TYPES[3], // DELTA
-    WIRE_TYPES[1], // BETA
-  ];
+  const [connectedWires, setConnectedWires] = useState({});
+  const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
+  const [manualFlag, setManualFlag] = useState('');
+  const [flagFeedback, setFlagFeedback] = useState(null);
 
   const handleLeftClick = (id) => {
     if (solved || connectedWires[id]) return;
@@ -28,28 +35,40 @@ export default function WireSpliceHack({ onSolved, onBypass }) {
     setSelectedLeft(id);
   };
 
-  const handleRightClick = (id) => {
+  const handleRightClick = (target) => {
     if (solved || !selectedLeft) return;
 
-    if (selectedLeft === id) {
-      // Correct connection
+    if (target.matchId === selectedLeft) {
       playHackingBeep(1100);
       setConnectedWires((prev) => {
-        const next = { ...prev, [id]: true };
+        const next = { ...prev, [selectedLeft]: true };
         if (Object.keys(next).length === WIRE_TYPES.length) {
           setSolved(true);
+          ctfEngine.submitFlag(CHALLENGE_ID, REVEALED_FLAG);
           playBreachFanfare();
           setTimeout(() => {
-            onSolved();
-          }, 1100);
+            onSolved?.();
+          }, 1500);
         }
         return next;
       });
       setSelectedLeft(null);
     } else {
-      // Wrong connection feedback
       playClickSound(300, 0.1);
       setSelectedLeft(null);
+    }
+  };
+
+  const handleManualSubmit = (e) => {
+    e.preventDefault();
+    if (!manualFlag.trim()) return;
+    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag);
+    if (res.success || res.duplicate) {
+      setSolved(true);
+      setFlagFeedback({ success: true, text: res.message });
+      setTimeout(() => onSolved?.(), 1200);
+    } else {
+      setFlagFeedback({ success: false, text: res.message });
     }
   };
 
@@ -57,14 +76,12 @@ export default function WireSpliceHack({ onSolved, onBypass }) {
     <div className="hack-puzzle-container wire-hack">
       <div className="hack-header-bar">
         <div className="hack-title">
-          <Printer size={14} className="hack-icon-pulse" />
-          <span>SPOOLER_OVERRIDE // CRYPTO_WIRE_SPLICE.raw</span>
+          <Cpu size={14} className="hack-icon-pulse text-cyan-400" />
+          <span>CTF MISSION // FORENSICS: UART PINOUT & MEMORY DUMP</span>
         </div>
         <div className="hack-actions-right">
-          <span className="hack-status-badge">
-            {solved
-              ? 'SPOOL_DISARMED'
-              : `${Object.keys(connectedWires).length}/4 SPLICED`}
+          <span className="hack-status-badge text-emerald-400">
+            {solved ? '✔ FLAG CAPTURED' : `${challenge?.points || 150} PTS`}
           </span>
           <button
             className="hack-bypass-btn"
@@ -72,24 +89,21 @@ export default function WireSpliceHack({ onSolved, onBypass }) {
               playZapSound();
               onBypass();
             }}
-            title="Instant Reveal"
+            title="Recruiter Fast View"
           >
-            DEV_BYPASS ⚡
+            RECRUITER BYPASS ⚡
           </button>
         </div>
       </div>
 
       <div className="hack-instructions">
-        <p>
-          Select an encrypted port on the <strong className="hl-green">LEFT</strong> and link it to
-          its cryptographic matching terminal on the <strong className="hl-cyan">RIGHT</strong> to
-          clear the print buffer.
+        <p className="text-xs text-slate-300">
+          Bridge the SoC serial pins on the <strong className="text-emerald-400">LEFT</strong> to the logic analyzer channels on the <strong className="text-cyan-400">RIGHT</strong> (TX to RX, RX to TX, GND to GND, VCC to VCC) at 115200 baud to dump SPI flash.
         </p>
       </div>
 
       {/* Splicer Wiring Board */}
       <div className="wire-board">
-        {/* Left Column of Ports */}
         <div className="wire-col left-col">
           {WIRE_TYPES.map((w) => {
             const isConnected = !!connectedWires[w.id];
@@ -101,55 +115,75 @@ export default function WireSpliceHack({ onSolved, onBypass }) {
                 className={`wire-port ${isSelected ? 'port-selected' : ''} ${
                   isConnected ? 'port-connected' : ''
                 }`}
-                style={{ borderColor: isConnected || isSelected ? w.color : undefined }}
                 onClick={() => handleLeftClick(w.id)}
-                disabled={isConnected}
+                disabled={isConnected || solved}
+                style={{ borderColor: isSelected ? w.color : undefined }}
               >
-                <span className="port-dot" style={{ background: w.color }} />
-                <span className="port-label">{w.label}</span>
-                <span className="port-plug">🔌</span>
+                <span className="wire-pin" style={{ background: w.color }} />
+                <span className="wire-label">{w.label}</span>
+                {isConnected && <CheckCircle2 size={12} className="wire-check" />}
               </button>
             );
           })}
         </div>
 
-        {/* Center Connection Indicator */}
-        <div className="wire-center-nexus">
-          <div className="nexus-line" />
-          <span className="nexus-text">{selectedLeft ? 'WIRE PULSE READY' : 'SELECT SOURCE'}</span>
-        </div>
-
-        {/* Right Column of Ports */}
         <div className="wire-col right-col">
-          {rightPorts.map((w) => {
-            const isConnected = !!connectedWires[w.id];
+          {RIGHT_TARGETS.map((target, idx) => {
+            const isConnected = !!connectedWires[target.matchId];
 
             return (
               <button
-                key={`right-${w.id}`}
-                className={`wire-port ${isConnected ? 'port-connected' : ''}`}
-                style={{ borderColor: isConnected ? w.color : undefined }}
-                onClick={() => handleRightClick(w.id)}
-                disabled={isConnected}
+                key={`right-${idx}`}
+                className={`wire-port right-port ${
+                  isConnected ? 'port-connected' : ''
+                }`}
+                onClick={() => handleRightClick(target)}
+                disabled={isConnected || solved || !selectedLeft}
               >
-                <span className="port-plug">⚡</span>
-                <span className="port-label">{w.label}</span>
-                <span className="port-dot" style={{ background: w.color }} />
+                {isConnected && <CheckCircle2 size={12} className="wire-check" />}
+                <span className="wire-label">{target.label}</span>
+                <span className="wire-pin right-pin" />
               </button>
             );
           })}
         </div>
       </div>
 
+      {/* MANUAL FLAG SUBMISSION STRIP */}
+      <form onSubmit={handleManualSubmit} className="mt-3 flex gap-2">
+        <input
+          type="text"
+          value={manualFlag}
+          onChange={(e) => setManualFlag(e.target.value)}
+          placeholder="Or submit flag: FLAG{...}"
+          className="flex-1 bg-black/50 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-emerald-500"
+        />
+        <button
+          type="submit"
+          className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-3 py-1 rounded text-xs transition"
+        >
+          SUBMIT
+        </button>
+      </form>
+
+      {flagFeedback && (
+        <div className={`mt-2 text-xs p-1.5 rounded ${flagFeedback.success ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'}`}>
+          {flagFeedback.text}
+        </div>
+      )}
+
       {solved ? (
-        <div className="hack-success-banner">
-          <CheckCircle2 size={16} />
-          <span>SPOOLER BUFFER CLEARED // RESUME DOCUMENT PRINTING</span>
+        <div className="hack-success-banner mt-3">
+          <CheckCircle2 size={16} className="text-emerald-400" />
+          <div className="flex flex-col">
+            <span className="font-bold text-emerald-300">FLASH DUMP EXFILTRATED // {REVEALED_FLAG}</span>
+            <span className="text-[10px] text-emerald-400/80">+150 CTF PTS Awarded to Profile</span>
+          </div>
         </div>
       ) : (
-        <div className="hack-hint-bar">
+        <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Match matching cryptographic protocols (Auth, Mem, Cert, Spool)</span>
+          <span>Logic Analyzer baud rate: 115200 8-N-1 · TX bridges to RX · GND to GND</span>
         </div>
       )}
     </div>

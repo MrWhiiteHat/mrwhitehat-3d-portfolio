@@ -14,27 +14,33 @@ import {
 import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../utils/audio.js';
 import SpeedrunTimer from '../leaderboard/SpeedrunTimer.jsx';
 import { recordSolveTime } from '../../utils/speedrunLeaderboardService.js';
+import { ctfEngine } from '../../utils/ctf/ctfEngine.js';
+import { getChallengeById } from '../../utils/ctf/ctfChallenges.js';
+
+const CHALLENGE_ID = 'pwn-heap-race-condition';
+const REVEALED_FLAG = 'FLAG{heap_overflow_uaf_zero_day_unlocked}';
 
 const TARGET_RODS = [75, 40, 90, 60];
 
 export default function ZeroDayOverloadHack({ onSolved, onBypass, playerData }) {
+  const challenge = getChallengeById(CHALLENGE_ID);
   const [rods, setRods] = useState([20, 80, 30, 10]);
-  const [entropy, setEntropy] = useState(15);
-  const [solved, setSolved] = useState(false);
+  const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
+  const [manualFlag, setManualFlag] = useState('');
+  const [flagFeedback, setFlagFeedback] = useState(null);
 
-  // Check if rods are close to targets (within +- 6%)
   const isAligned = useMemo(() => {
     return rods.every((val, i) => Math.abs(val - TARGET_RODS[i]) <= 7);
   }, [rods]);
 
-  // Handle victory
   useEffect(() => {
     if (isAligned && !solved) {
       setSolved(true);
+      ctfEngine.submitFlag(CHALLENGE_ID, REVEALED_FLAG);
       playBreachFanfare();
       setTimeout(() => {
-        onSolved();
-      }, 1200);
+        onSolved?.();
+      }, 1500);
     }
   }, [isAligned, solved, onSolved]);
 
@@ -55,12 +61,25 @@ export default function ZeroDayOverloadHack({ onSolved, onBypass, playerData }) 
     recordSolveTime('secret_vault', timeSec, playerData);
   };
 
+  const handleManualSubmit = (e) => {
+    e.preventDefault();
+    if (!manualFlag.trim()) return;
+    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag);
+    if (res.success || res.duplicate) {
+      setSolved(true);
+      setFlagFeedback({ success: true, text: res.message });
+      setTimeout(() => onSolved?.(), 1200);
+    } else {
+      setFlagFeedback({ success: false, text: res.message });
+    }
+  };
+
   return (
     <div className="hack-puzzle-container zero-day-hack">
       <div className="hack-header-bar">
         <div className="hack-title">
-          <Terminal size={14} className="hack-icon-pulse text-red" />
-          <span>BLACK_HAT // ZERO_DAY_CORE_OVERLOAD.sh</span>
+          <Terminal size={14} className="hack-icon-pulse text-red-500" />
+          <span>CTF MISSION // BINARY EXPLOITATION: ZERO-DAY HEAP OVERFLOW & UAF</span>
         </div>
 
         <div className="hack-actions-right">
@@ -70,23 +89,25 @@ export default function ZeroDayOverloadHack({ onSolved, onBypass, playerData }) 
             puzzleId="secret_vault"
             onFinish={handleTimerFinish}
           />
+          <span className="hack-status-badge text-rose-400">
+            {solved ? '✔ FLAG CAPTURED' : `${challenge?.points || 500} PTS`}
+          </span>
           <button
-            className="hack-bypass-btn text-red"
+            className="hack-bypass-btn text-red-400"
             onClick={() => {
               playZapSound();
               onBypass();
             }}
-            title="Instant Reveal"
+            title="Recruiter Fast View"
           >
-            DEV_BYPASS ⚡
+            RECRUITER BYPASS ⚡
           </button>
         </div>
       </div>
 
       <div className="hack-instructions">
-        <p>
-          Critical Zero-Day exploit detected! Calibrate all 4 reactor containment rods to their{' '}
-          <strong className="hl-cyan">HARMONIC TARGETS</strong> to prevent root core overload.
+        <p className="text-xs text-slate-300">
+          Exploit multithreaded Use-After-Free heap race conditions in the Black Hat Vault cache. Calibrate all 4 memory allocator bins to harmonic targets before thread locks synchronize.
         </p>
       </div>
 
@@ -103,11 +124,10 @@ export default function ZeroDayOverloadHack({ onSolved, onBypass, playerData }) 
               className={`rod-channel ${isTargetMatched ? 'matched' : ''}`}
             >
               <div className="rod-header">
-                <span className="rod-tag">ROD_0{idx + 1}</span>
+                <span className="rod-tag">TCACHE_0{idx + 1}</span>
                 <span className="rod-val">{val}%</span>
               </div>
 
-              {/* Vertical Visual Fuel Rod */}
               <div className="rod-track">
                 <div
                   className="rod-target-line"
@@ -125,7 +145,6 @@ export default function ZeroDayOverloadHack({ onSolved, onBypass, playerData }) 
                 />
               </div>
 
-              {/* Tuning Arrow Buttons */}
               <div className="rod-controls">
                 <button
                   type="button"
@@ -149,15 +168,41 @@ export default function ZeroDayOverloadHack({ onSolved, onBypass, playerData }) 
         })}
       </div>
 
+      {/* MANUAL FLAG SUBMISSION STRIP */}
+      <form onSubmit={handleManualSubmit} className="mt-3 flex gap-2">
+        <input
+          type="text"
+          value={manualFlag}
+          onChange={(e) => setManualFlag(e.target.value)}
+          placeholder="Or submit flag: FLAG{...}"
+          className="flex-1 bg-black/50 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-rose-500"
+        />
+        <button
+          type="submit"
+          className="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1 rounded text-xs transition"
+        >
+          SUBMIT
+        </button>
+      </form>
+
+      {flagFeedback && (
+        <div className={`mt-2 text-xs p-1.5 rounded ${flagFeedback.success ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'}`}>
+          {flagFeedback.text}
+        </div>
+      )}
+
       {solved ? (
-        <div className="hack-success-banner zero-day-success">
-          <CheckCircle2 size={16} />
-          <span>ZERO-DAY CONTAINED // ROOT BLACK HAT CLEARANCE GRANTED</span>
+        <div className="hack-success-banner zero-day-success mt-3">
+          <CheckCircle2 size={16} className="text-emerald-400" />
+          <div className="flex flex-col">
+            <span className="font-bold text-emerald-300">HEAP EXPLOIT SATURATED // {REVEALED_FLAG}</span>
+            <span className="text-[10px] text-emerald-400/80">+500 CTF PTS Awarded to Profile · Vault Unsealed</span>
+          </div>
         </div>
       ) : (
-        <div className="hack-hint-bar">
+        <div className="hack-hint-bar mt-2">
           <span className="live-blip" style={{ background: '#f43f5e' }} />
-          <span>Adjust rods until all 4 channels align within the harmonic resonance window.</span>
+          <span>Tune memory bins within target windows: 75%, 40%, 90%, 60% to overwrite chunk metadata</span>
         </div>
       )}
     </div>

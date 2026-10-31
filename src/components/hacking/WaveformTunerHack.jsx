@@ -1,23 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Activity, CheckCircle2, Radio, Send, Volume2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Activity, CheckCircle2, Radio, Send, Volume2, Zap } from 'lucide-react';
 import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../utils/audio.js';
+import { ctfEngine } from '../../utils/ctf/ctfEngine.js';
+import { getChallengeById } from '../../utils/ctf/ctfChallenges.js';
+
+const CHALLENGE_ID = 'stego-spectrogram-carrier';
+const REVEALED_FLAG = 'FLAG{stego_audio_watermark_demodulated}';
 
 export default function WaveformTunerHack({ onSolved, onBypass }) {
+  const challenge = getChallengeById(CHALLENGE_ID);
   const [playerFreq, setPlayerFreq] = useState(2.0);
   const [playerAmp, setPlayerAmp] = useState(0.4);
-  const [solved, setSolved] = useState(false);
+  const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
   const [lockProgress, setLockProgress] = useState(0);
+  const [manualFlag, setManualFlag] = useState('');
+  const [flagFeedback, setFlagFeedback] = useState(null);
 
-  // Hidden Target Carrier Wave parameters
   const targetFreq = 4.5;
   const targetAmp = 0.8;
 
-  // Compute Coherence Percentage (0 to 100%)
   const freqDiff = Math.abs(playerFreq - targetFreq);
   const ampDiff = Math.abs(playerAmp - targetAmp);
   const coherence = Math.max(0, Math.min(100, Math.round(100 - freqDiff * 22 - ampDiff * 45)));
 
-  // If coherence is above 90%, increment lock progress
   useEffect(() => {
     if (solved) return;
 
@@ -28,10 +33,11 @@ export default function WaveformTunerHack({ onSolved, onBypass }) {
           if (prev >= 100) {
             clearInterval(interval);
             setSolved(true);
+            ctfEngine.submitFlag(CHALLENGE_ID, REVEALED_FLAG);
             playBreachFanfare();
             setTimeout(() => {
-              onSolved();
-            }, 1000);
+              onSolved?.();
+            }, 1500);
             return 100;
           }
           return prev + 25;
@@ -44,7 +50,6 @@ export default function WaveformTunerHack({ onSolved, onBypass }) {
     }
   }, [coherence, solved, onSolved]);
 
-  // Generate SVG wave points (useMemo for 60 FPS slider dragging without string garbage)
   const points = 60;
   const width = 360;
   const height = 110;
@@ -70,16 +75,29 @@ export default function WaveformTunerHack({ onSolved, onBypass }) {
       .join(' ');
   }, [points, width, height, midY, playerFreq, playerAmp]);
 
+  const handleManualSubmit = (e) => {
+    e.preventDefault();
+    if (!manualFlag.trim()) return;
+    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag);
+    if (res.success || res.duplicate) {
+      setSolved(true);
+      setFlagFeedback({ success: true, text: res.message });
+      setTimeout(() => onSolved?.(), 1200);
+    } else {
+      setFlagFeedback({ success: false, text: res.message });
+    }
+  };
+
   return (
     <div className="hack-puzzle-container wave-hack">
       <div className="hack-header-bar">
         <div className="hack-title">
-          <Radio size={14} className="hack-icon-pulse" />
-          <span>SIGNAL_INTERCEPT // OSCILLOSCOPE_TUNE.rf</span>
+          <Radio size={14} className="hack-icon-pulse text-cyan-400" />
+          <span>CTF MISSION // STEGANOGRAPHY: AUDIO SPECTROGRAM DEMODULATION</span>
         </div>
         <div className="hack-actions-right">
-          <span className="hack-status-badge">
-            {solved ? 'SIGNAL_LOCKED' : `${coherence}% COHERENCE`}
+          <span className="hack-status-badge text-emerald-400">
+            {solved ? '✔ FLAG CAPTURED' : `${challenge?.points || 200} PTS`}
           </span>
           <button
             className="hack-bypass-btn"
@@ -87,18 +105,17 @@ export default function WaveformTunerHack({ onSolved, onBypass }) {
               playZapSound();
               onBypass();
             }}
-            title="Instant Reveal"
+            title="Recruiter Fast View"
           >
-            DEV_BYPASS ⚡
+            RECRUITER BYPASS ⚡
           </button>
         </div>
       </div>
 
       <div className="hack-instructions">
-        <p>
-          Adjust <strong className="hl-green">FREQUENCY</strong> and{' '}
-          <strong className="hl-cyan">AMPLITUDE</strong> sliders to match the intercepted carrier
-          waveform until resonance hits 100%.
+        <p className="text-xs text-slate-300">
+          Demodulate the hidden frequency carrier on the emergency relay. Tune <strong className="text-emerald-400">FREQUENCY</strong> and{' '}
+          <strong className="text-cyan-400">AMPLITUDE</strong> to align the oscilloscope phase to extract the concealed watermark flag.
         </p>
       </div>
 
@@ -106,13 +123,10 @@ export default function WaveformTunerHack({ onSolved, onBypass }) {
       <div className="oscilloscope-screen">
         <div className="screen-grid-lines" />
         <svg className="wave-svg" viewBox={`0 0 ${width} ${height}`}>
-          {/* Target Reference Wave (Ghost White / Red Dotted) */}
           <path d={targetPath} className="target-wave" />
-          {/* Player Tuned Wave (Neon Green) */}
           <path d={playerPath} className="player-wave" />
         </svg>
 
-        {/* Lock Progress Indicator Overlay */}
         {lockProgress > 0 && !solved && (
           <div className="lock-hud">
             <span>SYNCHRONIZING CARRIER: {lockProgress}%</span>
@@ -160,15 +174,41 @@ export default function WaveformTunerHack({ onSolved, onBypass }) {
         </div>
       </div>
 
+      {/* MANUAL FLAG SUBMISSION STRIP */}
+      <form onSubmit={handleManualSubmit} className="mt-3 flex gap-2">
+        <input
+          type="text"
+          value={manualFlag}
+          onChange={(e) => setManualFlag(e.target.value)}
+          placeholder="Or submit flag: FLAG{...}"
+          className="flex-1 bg-black/50 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-emerald-500"
+        />
+        <button
+          type="submit"
+          className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-3 py-1 rounded text-xs transition"
+        >
+          SUBMIT
+        </button>
+      </form>
+
+      {flagFeedback && (
+        <div className={`mt-2 text-xs p-1.5 rounded ${flagFeedback.success ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'}`}>
+          {flagFeedback.text}
+        </div>
+      )}
+
       {solved ? (
-        <div className="hack-success-banner">
-          <CheckCircle2 size={16} />
-          <span>RESONANCE LOCKED // DISPATCH CHANNELS UNSEALED</span>
+        <div className="hack-success-banner mt-3">
+          <CheckCircle2 size={16} className="text-emerald-400" />
+          <div className="flex flex-col">
+            <span className="font-bold text-emerald-300">CARRIER WATERMARK DEMODULATED // {REVEALED_FLAG}</span>
+            <span className="text-[10px] text-emerald-400/80">+200 CTF PTS Awarded to Profile</span>
+          </div>
         </div>
       ) : (
-        <div className="hack-hint-bar">
+        <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Target wave: Ghost Trace · Your wave: Neon Pulse</span>
+          <span>Target wave: Ghost Trace · Coherence: {coherence}% · Locks at 90%+</span>
         </div>
       )}
     </div>

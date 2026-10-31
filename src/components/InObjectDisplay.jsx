@@ -48,6 +48,7 @@ import { achievements, profile, projects, skills } from '../data.js';
 import NetworkCircuitHack from './hacking/NetworkCircuitHack.jsx';
 import HexBufferHack from './hacking/HexBufferHack.jsx';
 import TimingScannerHack from './hacking/TimingScannerHack.jsx';
+import BinaryPatchHack from './hacking/BinaryPatchHack.jsx';
 import WaveformTunerHack from './hacking/WaveformTunerHack.jsx';
 import WireSpliceHack from './hacking/WireSpliceHack.jsx';
 import CipherDialHack from './hacking/CipherDialHack.jsx';
@@ -508,7 +509,7 @@ export default function InObjectDisplay({
                 />
               )}
               {activeSection === 'operator' && (
-                <TimingScannerHack
+                <BinaryPatchHack
                   onSolved={() => triggerUnlock('operator')}
                   onBypass={() => triggerUnlock('operator')}
                 />

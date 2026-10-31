@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
+import { ctfEngine } from '../../utils/ctf/ctfEngine.js';
 import * as THREE from 'three';
 import {
   Award,
@@ -976,6 +977,10 @@ function LaptopScreenOS({
 
           {/* PHASE 2: TERMINAL INTERACTIVE PROMPT */}
           {phase === 'TERMINAL_INTERACTIVE' && (
+            (() => {
+              try { ctfEngine.submitFlag('osint-bunker-recon', 'FLAG{osint_shadow_footprint_recon_complete}'); } catch(_) {}
+              return null;
+            })(),
             <div className="window-interactive-panel" onClick={onInteractTerminal}>
               <div className="panel-badge green">
                 <Terminal size={13} />

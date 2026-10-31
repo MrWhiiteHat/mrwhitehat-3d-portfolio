@@ -1,22 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Award, CheckCircle2, ShieldAlert, Sparkles, Zap } from 'lucide-react';
+import { Award, CheckCircle2, ShieldAlert, Sparkles, Zap, Terminal } from 'lucide-react';
 import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../utils/audio.js';
+import { ctfEngine } from '../../utils/ctf/ctfEngine.js';
+import { getChallengeById } from '../../utils/ctf/ctfChallenges.js';
+
+const CHALLENGE_ID = 'web-sidechannel-timing';
+const REVEALED_FLAG = 'FLAG{side_channel_timing_leak_enumerated}';
 
 const TIERS = [
-  { tier: 1, label: 'PORT_8080 // PERIMETER', targetStart: 80, targetEnd: 160, speed: 2.2 },
-  { tier: 2, label: 'TLS_TUNNEL // HANDSHAKE', targetStart: 200, targetEnd: 270, speed: 3.1 },
-  { tier: 3, label: 'ROOT_AIRGAP // OVERRIDE', targetStart: 310, targetEnd: 360, speed: 4.2 },
+  { tier: 1, label: 'BYTE 0 // TIME DELTA: 12.4ms', targetStart: 80, targetEnd: 160, speed: 2.2 },
+  { tier: 2, label: 'BYTE 1 // TIME DELTA: 24.8ms', targetStart: 200, targetEnd: 270, speed: 3.1 },
+  { tier: 3, label: 'BYTE 2 // TIME DELTA: 37.1ms', targetStart: 310, targetEnd: 360, speed: 4.2 },
 ];
 
-/**
- * 60 FPS Hardware-Accelerated Radar Scanner Minigame
- * Uses direct CSS GPU transform for the laser needle, eliminating 60 React
- * re-render cycles per second for flawless 60 FPS performance on both mobile & desktop.
- */
 export default function TimingScannerHack({ onSolved, onBypass }) {
+  const challenge = getChallengeById(CHALLENGE_ID);
   const [currentTierIdx, setCurrentTierIdx] = useState(0);
-  const [solved, setSolved] = useState(false);
+  const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
   const [errorFlash, setErrorFlash] = useState(false);
+  const [manualFlag, setManualFlag] = useState('');
+  const [flagFeedback, setFlagFeedback] = useState(null);
 
   const needleRef = useRef(null);
   const needleAngleRef = useRef(0);
@@ -27,7 +30,6 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
   const currentTier = TIERS[currentTierIdx] || TIERS[0];
   currentTierRef.current = currentTier;
 
-  // Rotate needle smoothly via direct GPU transform (zero React re-renders)
   useEffect(() => {
     if (solved) {
       if (animRef.current) cancelAnimationFrame(animRef.current);
@@ -58,7 +60,6 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
   const handleInject = () => {
     if (solved) return;
 
-    // Check if needle angle is within targetStart and targetEnd
     const angle = needleAngleRef.current;
     const { targetStart, targetEnd } = currentTierRef.current;
     const isHit = angle >= targetStart && angle <= targetEnd;
@@ -66,10 +67,11 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
     if (isHit) {
       if (currentTierIdx >= TIERS.length - 1) {
         setSolved(true);
+        ctfEngine.submitFlag(CHALLENGE_ID, REVEALED_FLAG);
         playBreachFanfare();
         setTimeout(() => {
-          onSolved();
-        }, 1100);
+          onSolved?.();
+        }, 1500);
       } else {
         playHackingBeep(1100 + currentTierIdx * 250);
         setCurrentTierIdx((prev) => prev + 1);
@@ -81,6 +83,19 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
     }
   };
 
+  const handleManualSubmit = (e) => {
+    e.preventDefault();
+    if (!manualFlag.trim()) return;
+    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag);
+    if (res.success || res.duplicate) {
+      setSolved(true);
+      setFlagFeedback({ success: true, text: res.message });
+      setTimeout(() => onSolved?.(), 1200);
+    } else {
+      setFlagFeedback({ success: false, text: res.message });
+    }
+  };
+
   return (
     <div
       className={`hack-puzzle-container timing-hack ${errorFlash ? 'flash-error' : ''}`}
@@ -88,12 +103,12 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
     >
       <div className="hack-header-bar">
         <div className="hack-title">
-          <ShieldAlert size={14} className="hack-icon-pulse" />
-          <span>FIREWALL_BREACH // RADAR_INTRUSION.exe</span>
+          <ShieldAlert size={14} className="hack-icon-pulse text-amber-400" />
+          <span>CTF MISSION // WEB EXPLOITATION: SIDE-CHANNEL TIMING ATTACK</span>
         </div>
         <div className="hack-actions-right">
-          <span className="hack-status-badge">
-            {solved ? 'AIRGAP_BREACHED' : `TIER_${currentTierIdx + 1}/3`}
+          <span className="hack-status-badge text-emerald-400">
+            {solved ? '✔ FLAG CAPTURED' : `${challenge?.points || 350} PTS`}
           </span>
           <button
             className="hack-bypass-btn"
@@ -102,31 +117,27 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
               playZapSound();
               onBypass();
             }}
-            title="Instant Reveal"
+            title="Recruiter Fast View"
           >
-            DEV_BYPASS ⚡
+            RECRUITER BYPASS ⚡
           </button>
         </div>
       </div>
 
       <div className="hack-instructions">
-        <p>
-          Hit <strong className="hl-green">[INJECT PAYLOAD]</strong> or click anywhere when the
-          scanning radar aligns inside the <span className="hl-green">GREEN TARGET SECTOR</span>.
+        <p className="text-xs text-slate-300">
+          Exploit `strcmp` microsecond side-channel latency differences. Click or tap inside the <strong className="text-emerald-400">GREEN RESONANCE GATE</strong> to pinpoint and leak the secret authorization token bytes.
         </p>
       </div>
 
       {/* Circular Radar Port Display */}
       <div className="radar-stage">
         <div className="radar-circle">
-          {/* Target Arc Sector Ring */}
           <svg className="radar-svg" viewBox="0 0 200 200">
-            {/* Background Circle */}
             <circle cx="100" cy="100" r="85" className="radar-bg-circle" />
             <circle cx="100" cy="100" r="55" className="radar-inner-circle" />
             <circle cx="100" cy="100" r="25" className="radar-center-circle" />
 
-            {/* Target Green Sector Arc */}
             <circle
               cx="100"
               cy="100"
@@ -139,7 +150,6 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
             />
           </svg>
 
-          {/* Rotating Scanning Laser Needle (Direct GPU accelerated transform) */}
           <div
             className="radar-needle"
             ref={needleRef}
@@ -149,14 +159,12 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
             <div className="needle-sensor" />
           </div>
 
-          {/* Center Breached Tiers Status */}
           <div className="radar-center-hud">
-            <span className="tier-tag">TIER {currentTierIdx + 1}</span>
+            <span className="tier-tag">GATE {currentTierIdx + 1}/3</span>
             <span className="tier-status">{currentTier.label.split('//')[0]}</span>
           </div>
         </div>
 
-        {/* Tiers Progress Pips */}
         <div className="tier-progress-row">
           {TIERS.map((t, idx) => (
             <div
@@ -166,27 +174,57 @@ export default function TimingScannerHack({ onSolved, onBypass }) {
               }`}
             >
               <span>0{t.tier}</span>
-              <small>{idx < currentTierIdx ? 'BYPASSED' : idx === currentTierIdx ? 'SCANNING' : 'LOCKED'}</small>
+              <small>{idx < currentTierIdx ? 'EXTRACTED' : idx === currentTierIdx ? 'SAMPLING' : 'WAITING'}</small>
             </div>
           ))}
         </div>
       </div>
 
+      {/* MANUAL FLAG SUBMISSION STRIP */}
+      <form
+        onSubmit={handleManualSubmit}
+        className="mt-3 flex gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <input
+          type="text"
+          value={manualFlag}
+          onChange={(e) => setManualFlag(e.target.value)}
+          placeholder="Or submit flag: FLAG{...}"
+          className="flex-1 bg-black/50 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-emerald-500"
+        />
+        <button
+          type="submit"
+          className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-3 py-1 rounded text-xs transition"
+        >
+          SUBMIT
+        </button>
+      </form>
+
+      {flagFeedback && (
+        <div className={`mt-2 text-xs p-1.5 rounded ${flagFeedback.success ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'}`}>
+          {flagFeedback.text}
+        </div>
+      )}
+
       {solved ? (
-        <div className="hack-success-banner">
-          <CheckCircle2 size={16} />
-          <span>AIRGAP OVERRIDDEN // PROJECTOR BEAM READY</span>
+        <div className="hack-success-banner mt-3">
+          <CheckCircle2 size={16} className="text-emerald-400" />
+          <div className="flex flex-col">
+            <span className="font-bold text-emerald-300">SIDE-CHANNEL EXPLOITED // {REVEALED_FLAG}</span>
+            <span className="text-[10px] text-emerald-400/80">+350 CTF PTS Awarded to Profile</span>
+          </div>
         </div>
       ) : (
         <button
-          className="hack-action-btn"
+          className="hack-action-btn mt-3"
           onClick={(e) => {
             e.stopPropagation();
             handleInject();
           }}
         >
           <Zap size={14} />
-          <span>INJECT EXPLOIT AT WINDOW (CLICK / SPACE)</span>
+          <span>SAMPLE LATENCY WINDOW (CLICK / TAP)</span>
         </button>
       )}
     </div>

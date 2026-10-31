@@ -68,6 +68,7 @@ import LeaderboardModal from './components/leaderboard/LeaderboardModal.jsx';
 import GadgetInspectorModal from './components/gadgets/GadgetInspectorModal.jsx';
 import RecruiterDossierModal from './components/recruiter/RecruiterDossierModal.jsx';
 import UserGuideModal from './components/game/UserGuideModal.jsx';
+import CTFControlCenterModal from './components/ctf/CTFControlCenterModal.jsx';
 import { profile } from './data.js';
 import { useFullscreen } from './utils/useFullscreen.js';
 import { useControlSettings } from './utils/useControlSettings.js';
@@ -156,6 +157,8 @@ export default function App() {
   const [isGadgetInspectorOpen, setIsGadgetInspectorOpen] = useState(false);
   const [selectedGadgetId, setSelectedGadgetId] = useState('flipper');
   const [isRecruiterOpen, setIsRecruiterOpen] = useState(false);
+  const [isCTFModalOpen, setIsCTFModalOpen] = useState(false);
+  const [targetCTFChallengeId, setTargetCTFChallengeId] = useState(null);
   const [isUserGuideOpen, setIsUserGuideOpen] = useState(false);
   const stationMenuRef = useRef(null);
 
@@ -528,6 +531,8 @@ export default function App() {
         } else if (hackerSelectedNodeId) {
           handleRotateHackerNode(hackerSelectedNodeId);
         }
+      } else if (e.key === 'c' || e.key === 'C') {
+        setIsCTFModalOpen((prev) => !prev);
       } else if (e.key === 'r' || e.key === 'R') {
         handleResetHackerStage();
       } else if (e.key === 'f' || e.key === 'F') {
@@ -1310,6 +1315,17 @@ export default function App() {
       />
 
       {/* Executive Recruiter 2D Dossier Modal */}
+      {/* Cybersecurity CTF Mission Control Modal */}
+      <CTFControlCenterModal
+        isOpen={isCTFModalOpen}
+        onClose={() => setIsCTFModalOpen(false)}
+        initialChallengeId={targetCTFChallengeId}
+        onNavigateToStation={(stationId) => {
+          setIsCTFModalOpen(false);
+          handleStationInteract(stationId);
+        }}
+      />
+
       <RecruiterDossierModal
         isOpen={isRecruiterOpen}
         onClose={handleCloseRecruiter}

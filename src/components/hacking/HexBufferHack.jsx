@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Database, RefreshCw } from 'lucide-react';
+import { CheckCircle2, Database, RefreshCw, Zap } from 'lucide-react';
 import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../utils/audio.js';
 import SpeedrunTimer from '../leaderboard/SpeedrunTimer.jsx';
 import { recordSolveTime } from '../../utils/speedrunLeaderboardService.js';
+import { ctfEngine } from '../../utils/ctf/ctfEngine.js';
+import { getChallengeById } from '../../utils/ctf/ctfChallenges.js';
+
+const CHALLENGE_ID = 'pwn-stack-matrix-buffer';
+const REVEALED_FLAG = 'FLAG{buffer_overflow_eip_overwritten_0x55}';
 
 const HEX_POOL = ['1C', 'E9', 'BD', '55', '7A'];
 const TARGET_SEQ = ['1C', 'BD', '55'];
 
-/**
- * Generates a 4x4 matrix that is 100% mathematically GUARANTEED to have
- * at least 2 valid paths from row 0 to complete TARGET_SEQ ('1C' -> 'BD' -> '55').
- */
 function generateSolvableMatrix() {
   const m = [];
   for (let r = 0; r < 4; r++) {
@@ -21,48 +22,41 @@ function generateSolvableMatrix() {
     m.push(row);
   }
 
-  // 1. Plant Primary Guaranteed Path:
-  // Step 1: Start in row 0 at random column c0
   const c0 = Math.floor(Math.random() * 4);
   m[0][c0] = TARGET_SEQ[0]; // '1C'
 
-  // Step 2: In column c0, pick a row r1 (between 1 and 3)
   const r1 = 1 + Math.floor(Math.random() * 3);
   m[r1][c0] = TARGET_SEQ[1]; // 'BD'
 
-  // Step 3: In row r1, pick a column c2 (different from c0)
   let c2 = Math.floor(Math.random() * 4);
   if (c2 === c0) c2 = (c0 + 1) % 4;
   m[r1][c2] = TARGET_SEQ[2]; // '55'
 
-  // 2. Plant Alternate Second Path from a different starting column in row 0
   const altC0 = (c0 + 2) % 4;
-  m[0][altC0] = TARGET_SEQ[0]; // '1C'
+  m[0][altC0] = TARGET_SEQ[0];
   const altR1 = ((r1 % 3) + 1);
-  m[altR1][altC0] = TARGET_SEQ[1]; // 'BD'
+  m[altR1][altC0] = TARGET_SEQ[1];
   const altC2 = (altC0 + 1) % 4;
-  m[altR1][altC2] = TARGET_SEQ[2]; // '55'
+  m[altR1][altC2] = TARGET_SEQ[2];
 
   return m;
 }
 
 export default function HexBufferHack({ onSolved, onBypass }) {
+  const challenge = getChallengeById(CHALLENGE_ID);
   const [matrix, setMatrix] = useState(generateSolvableMatrix);
   const targetSeq = TARGET_SEQ;
-  // Current buffer picks (up to 5 slots for forgiving, strategic gameplay)
   const [buffer, setBuffer] = useState([]);
-  // Mode: 'row' or 'col'
   const [activeMode, setActiveMode] = useState('row');
-  // Current active index (starts at row 0)
   const [activeIdx, setActiveIdx] = useState(0);
-  // Selected coordinates history: Array of {r, c}
   const [pickedCoords, setPickedCoords] = useState([]);
   const [hoveredCell, setHoveredCell] = useState(null);
-  const [solved, setSolved] = useState(false);
+  const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
   const [failed, setFailed] = useState(false);
   const [invalidShake, setInvalidShake] = useState(false);
+  const [manualFlag, setManualFlag] = useState('');
+  const [flagFeedback, setFlagFeedback] = useState(null);
 
-  // Compute what byte the player currently needs next in targetSeq
   const getNextNeededByte = () => {
     const bufStr = buffer.join('');
     if (bufStr.endsWith('1CBD')) return '55';
@@ -72,20 +66,19 @@ export default function HexBufferHack({ onSolved, onBypass }) {
 
   const nextNeeded = getNextNeededByte();
 
-  // Check victory / buffer status
   useEffect(() => {
     const bufferStr = buffer.join('');
     const targetStr = targetSeq.join('');
     if (bufferStr.includes(targetStr) && !solved) {
       setSolved(true);
+      ctfEngine.submitFlag(CHALLENGE_ID, REVEALED_FLAG);
       playBreachFanfare();
       setTimeout(() => {
-        onSolved();
-      }, 1000);
+        onSolved?.();
+      }, 1500);
       return;
     }
 
-    // 5 buffer slots give generous leeway for navigation
     if (buffer.length >= 5 && !solved) {
       setFailed(true);
       playClickSound(360, 0.15);
@@ -94,11 +87,8 @@ export default function HexBufferHack({ onSolved, onBypass }) {
 
   const handleCellClick = (r, c) => {
     if (solved || failed) return;
-
-    // Check if cell already picked
     if (pickedCoords.some((p) => p.r === r && p.c === c)) return;
 
-    // Validate that clicked cell is in active row or column
     const isValid =
       (activeMode === 'row' && r === activeIdx) ||
       (activeMode === 'col' && c === activeIdx);
@@ -116,7 +106,6 @@ export default function HexBufferHack({ onSolved, onBypass }) {
     setPickedCoords((prev) => [...prev, { r, c }]);
     setHoveredCell(null);
 
-    // Switch mode
     if (activeMode === 'row') {
       setActiveMode('col');
       setActiveIdx(c);
@@ -137,17 +126,30 @@ export default function HexBufferHack({ onSolved, onBypass }) {
     setFailed(false);
   };
 
+  const handleManualSubmit = (e) => {
+    e.preventDefault();
+    if (!manualFlag.trim()) return;
+    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag);
+    if (res.success || res.duplicate) {
+      setSolved(true);
+      setFlagFeedback({ success: true, text: res.message });
+      setTimeout(() => onSolved?.(), 1200);
+    } else {
+      setFlagFeedback({ success: false, text: res.message });
+    }
+  };
+
   return (
     <div className={`hack-puzzle-container hex-hack ${invalidShake ? 'shake-puzzle' : ''}`}>
       <div className="hack-header-bar">
         <div className="hack-title">
-          <Database size={14} className="hack-icon-pulse" />
-          <span>VAULT_BREACH // MEMORY_BUFFER_OVERFLOW.hex</span>
+          <Database size={14} className="hack-icon-pulse text-cyan-400" />
+          <span>CTF MISSION // BINARY EXPLOITATION: STACK OVERFLOW HIJACK</span>
         </div>
         <div className="hack-actions-right">
           <SpeedrunTimer isRunning={!solved} isSolved={solved} puzzleId="skills" onFinish={(t) => recordSolveTime("skills", t)} />
-          <span className="hack-status-badge">
-            {solved ? 'BUFFER_INJECTED' : 'BUFFER_LOCKED'}
+          <span className="hack-status-badge text-emerald-400">
+            {solved ? '✔ FLAG CAPTURED' : `${challenge?.points || 200} PTS`}
           </span>
           <button
             className="hack-bypass-btn"
@@ -155,24 +157,23 @@ export default function HexBufferHack({ onSolved, onBypass }) {
               playZapSound();
               onBypass();
             }}
-            title="Instant Reveal"
+            title="Recruiter Fast View"
           >
-            DEV_BYPASS ⚡
+            RECRUITER BYPASS ⚡
           </button>
         </div>
       </div>
 
       <div className="hack-instructions">
-        <p>
-          Pick bytes from the highlighted <strong style={{ color: '#38bdf8' }}>{activeMode.toUpperCase()} {activeIdx + 1}</strong> to sequence{' '}
-          <span className="code-seq">{targetSeq.join(' ')}</span> into the memory buffer.
+        <p className="text-xs text-slate-300">
+          Overflow the stack frame buffer without tripping canary values. Jump between row and column execution pointers to route memory to return address <strong className="text-cyan-400">0x55</strong> (win function).
         </p>
       </div>
 
       {/* Target & Buffer Status Bar */}
       <div className="hex-status-row">
         <div className="seq-box">
-          <span className="seq-lbl">TARGET SEQUENCE:</span>
+          <span className="seq-lbl">STACK TARGET VECTOR:</span>
           <div className="seq-pills">
             {targetSeq.map((hex, i) => {
               const isMatched =
@@ -245,7 +246,7 @@ export default function HexBufferHack({ onSolved, onBypass }) {
                   disabled={isPicked}
                   title={
                     isActive
-                      ? `Click to inject ${val} (Switches to ${activeMode === 'row' ? `COLUMN ${c + 1}` : `ROW ${r + 1}`})`
+                      ? `Click to inject ${val}`
                       : `Inactive (Select from active ${activeMode.toUpperCase()})`
                   }
                 >
@@ -257,30 +258,52 @@ export default function HexBufferHack({ onSolved, onBypass }) {
         ))}
       </div>
 
+      {/* MANUAL FLAG SUBMISSION STRIP */}
+      <form onSubmit={handleManualSubmit} className="mt-3 flex gap-2">
+        <input
+          type="text"
+          value={manualFlag}
+          onChange={(e) => setManualFlag(e.target.value)}
+          placeholder="Or submit flag: FLAG{...}"
+          className="flex-1 bg-black/50 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-emerald-500"
+        />
+        <button
+          type="submit"
+          className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-3 py-1 rounded text-xs transition"
+        >
+          SUBMIT
+        </button>
+      </form>
+
+      {flagFeedback && (
+        <div className={`mt-2 text-xs p-1.5 rounded ${flagFeedback.success ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'}`}>
+          {flagFeedback.text}
+        </div>
+      )}
+
       {solved ? (
-        <div className="hack-success-banner">
-          <CheckCircle2 size={16} />
-          <span>BUFFER OVERFLOW COMPLETE // VAULT UNSEALED</span>
+        <div className="hack-success-banner mt-3">
+          <CheckCircle2 size={16} className="text-emerald-400" />
+          <div className="flex flex-col">
+            <span className="font-bold text-emerald-300">INSTRUCTION POINTER OVERWRITTEN // {REVEALED_FLAG}</span>
+            <span className="text-[10px] text-emerald-400/80">+200 CTF PTS Awarded to Profile</span>
+          </div>
         </div>
       ) : failed ? (
-        <div className="hack-failed-banner">
+        <div className="hack-failed-banner mt-2">
           <span>BUFFER CAPACITY EXCEEDED // OVERFLOW MISMATCH</span>
           <button type="button" className="hack-retry-btn" onClick={resetPuzzle}>
             <RefreshCw size={12} /> Retry Solvable Matrix
           </button>
         </div>
       ) : (
-        <div className="hack-hint-bar">
+        <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
           <span>
-            Active line: <strong style={{ color: '#38bdf8' }}>{activeMode.toUpperCase()} {activeIdx + 1}</strong>
-            {hoveredCell ? (
+            Active vector: <strong style={{ color: '#38bdf8' }}>{activeMode.toUpperCase()} {activeIdx + 1}</strong>
+            {hoveredCell && (
               <span style={{ color: '#a5f3fc', marginLeft: '6px' }}>
-                → Next will activate: {activeMode === 'row' ? `COL ${hoveredCell.c + 1}` : `ROW ${hoveredCell.r + 1}`}
-              </span>
-            ) : (
-              <span style={{ color: '#94a3b8', marginLeft: '6px' }}>
-                (Hover over a cell to preview next branch)
+                → Next branch: {activeMode === 'row' ? `COL ${hoveredCell.c + 1}` : `ROW ${hoveredCell.r + 1}`}
               </span>
             )}
           </span>

@@ -32,17 +32,29 @@ An immersive, production-grade **3D Cybersecurity Operations Studio** and develo
 - **Comm & Refreshment Station**: Instant contact channels (Encrypted Email, Discord, LinkedIn, GitHub).
 - **Holographic Sentinel Operative**: Voice-synthesized cyber avatar of MrWhiteHat with bio telemetry and threat radar.
 
-### 🎯 9 Interactive CTF Hacking Minigames
-Test your offensive and defensive cybersecurity skills directly inside the 3D terminal:
-1. **SQL Injection (SQLi)**: Bypass authentication mechanisms using payload injections.
-2. **Hash Cracker**: Crack MD5 and SHA-256 password hashes using rainbow lookup logic.
-3. **Port Scanner & Recon**: Enumerate open services, banner-grab, and detect attack vectors.
-4. **Network Packet Sniffer**: Analyze raw PCAP telemetry to intercept credentials and detect anomalies.
-5. **Cipher Decryptor**: Decode layered Caesar, XOR, and Base64 ciphertexts.
-6. **Memory Hex Inspector**: Analyze memory dumps to locate injected shellcode strings.
-7. **Firewall Rule Bypass**: Reconfigure ACLs and packet filters to pivot into secured subnets.
-8. **Brute-Force Pin Breaker**: Execute timed brute-force routines against encrypted vaults.
-9. **Exploit Payload Generator**: Construct reverse shells and buffer overflow test strings.
+### 🎯 Unified Cybersecurity CTF Challenge Platform (`Key: C`)
+Transformed all interactive office stations and hidden Easter eggs into a professional Capture The Flag (CTF) challenge playground covering 8 cybersecurity disciplines across 4 difficulty levels with SHA-256 hashed verification:
+1. **Operation Caesar: The Red Team Shift Cipher** [Crypto · Easy · 100 PTS]: Caesar tumbler cryptanalysis and letter frequency decoding (`about` station).
+2. **Silicon Evidence: UART Pinout & Flash Dump** [Forensics · Easy · 150 PTS]: Logic analyzer pin bridging (TX/RX/GND/VCC) at 115200 baud (`resume` station).
+3. **Deconstructed Payload: DuckyScript & HID Injection** [Rev · Easy · 150 PTS]: BadUSB keystroke payload reversing and 802.11 handshake interception (`hardware_arsenal` station).
+4. **Physical Recon: Dropped USB Firmware Exfiltration** [Forensics · Easy · 100 PTS]: Executive desk hardware reconnaissance on physical USB Rubber Ducky (`3D desk gadgets`).
+5. **Stack Smash: Matrix Return Address Hijack** [Pwn · Medium · 200 PTS]: Stack frame memory layout analysis to overwrite `EIP`/`RIP` with `0x55` (`skills` station).
+6. **Packet Infiltration: DNS Tunneling & PCAP Analysis** [Forensics · Medium · 250 PTS]: Wireshark packet dissection and neutralization of hostile SQLi/XSS/RCE streams (`wireshark_monitor` station).
+7. **Firewall Breach: SQL Injection & WAF Filter Evasion** [Web · Medium · 250 PTS]: Mainframe firewall evasion using comment-wrapped SQL queries (`server_rack` station).
+8. **Phantom Frequency: Audio Spectrogram Demodulation** [Stego · Medium · 200 PTS]: Radio frequency tuning and spectrogram watermark carrier extraction (`contact` station).
+9. **Acoustic Eavesdropping: Thermal Vent Metadata Carrier** [Stego · Medium · 200 PTS]: HVAC building automation telemetry covert channel analysis (`ceiling vent`).
+10. **Side-Channel Probe: Time-Based String Enumeration** [Web · Hard · 350 PTS]: Microsecond timing attack exploiting non-constant-time comparisons (`achievements` station).
+11. **Subnet Pivoting: Active Directory DC Infiltration** [Network · Hard · 350 PTS]: Routing lateral network pivots across segmented subnets via Chisel/SOCKS5 (`projects` station).
+12. **Binary Patching: Anti-Debugging Bypass** [Rev · Hard · 400 PTS]: Decompiled x86-64 assembly inspection and conditional jump opcode patching (`operator` station).
+13. **Zero-Day Exploit: Heap Overflow & Use-After-Free** [Pwn · Expert · 500 PTS]: Multithreaded heap chunk allocation race condition overload (`secret_vault` station).
+14. **Ghost in the Grid: Deep OSINT & Shadow Recon** [OSINT · Expert · 500 PTS]: Multi-source intelligence gathering across git commits, DNS records, and shadow credentials (`secret bunker laptop`).
+
+#### 🛠️ Central CTF Engine & Diagnostic CLI Terminal
+- **Interactive CTF Control Center (`[C]` or HUD Pill)**: Real-time score tracking, category filters, difficulty tiers, hint unlocking with score penalties, and technical writeups upon challenge solve.
+- **Embedded Diagnostic Terminal**: Interactive Linux/Kali terminal supporting `help`, `ls`, `cat`, `grep`, `file`, `strings`, `base64 -d`, `curl`, `nmap`, and `flag` submission commands.
+- **SHA-256 Hashed Flag Validation**: Flags (`FLAG{...}`) are verified client-side using pure JavaScript SHA-256 hashes without exposing plaintext flags in the DOM.
+- **Persistent Progression & Badges**: LocalStorage state tracking with 9 unlockable achievement badges (First Blood, Cipher Breaker, Packet Ninja, Stack Hijacker, SQL Injector, Frequency Whisperer, Lateral Master, OSINT Investigator, Elite Root Operative).
+- **Recruiter Fast View / DEV BYPASS**: Every station retains an instant Recruiter Bypass option so non-technical or executive visitors can browse the portfolio resume and projects without completing the challenge.
 
 ---
 

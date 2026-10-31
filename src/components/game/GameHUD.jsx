@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   BriefcaseBusiness,
+  Flag,
   Compass,
   Crosshair,
   Footprints,
@@ -26,6 +27,7 @@ import {
   X,
 } from 'lucide-react';
 import { playClickSound, playWhooshSound } from '../../utils/audio.js';
+import { ctfEngine } from '../../utils/ctf/ctfEngine.js';
 
 export default function GameHUD({
   playerData,
@@ -46,6 +48,7 @@ export default function GameHUD({
   onOpenGadgets = null,
   onOpenRecruiter = null,
   onOpenGuide = null,
+  onOpenCTF = null,
   stations = [],
   unlockedStations = new Set(),
   isEasterEggAvailable = false,
@@ -59,7 +62,12 @@ export default function GameHUD({
   const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || window.innerWidth <= 1024);
   const [showOnScreenControls, setShowOnScreenControls] = useState(() => isTouchDevice);
-  const [isRoomFxOpen, setIsRoomFxOpen] = useState(false);
+  const [isRoomFxOpen, setIsRoomFxOpen] = useState(false);
+  const [ctfState, setCtfState] = useState(() => ctfEngine.getState());
+
+  useEffect(() => {
+    return ctfEngine.subscribe((next) => setCtfState(next));
+  }, []);
 
   useEffect(() => {
     window.__TOGGLE_SETTINGS__ = () => setIsRoomFxOpen((prev) => !prev);
@@ -94,6 +102,7 @@ export default function GameHUD({
     '💡 TIP: Tap [🎛️] Sliders or press [O] to tune Look Sensitivity & Move Speed',
     '💡 TIP: Click 3D Gadgets on the desk to inspect Flipper Zero & Rubber Ducky',
     '💡 TIP: Press [R] anytime for the Executive 2D Recruiter Dossier',
+    '💡 TIP: Press [C] anytime for Cybersecurity CTF Missions & Terminal Workstation',
     '💡 TIP: Adjust the real Air Conditioner ❄️ and Fan 🌀 in Studio Settings',
   ];
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
@@ -365,6 +374,23 @@ export default function GameHUD({
 
         {/* Center Section: Core 1-Click Quick Actions */}
         <div className="hud-center-group">
+          {/* CTF Challenge Center Pill */}
+          {onOpenCTF && (
+            <button
+              type="button"
+              className="hud-ctf-pill"
+              onClick={() => {
+                playClickSound(1000);
+                onOpenCTF();
+              }}
+              title="Open Cybersecurity CTF Challenge Platform (C)"
+            >
+              <Flag size={13} style={{ color: '#10b981' }} />
+              <span className="ctf-pill-label">CTF MISSIONS</span>
+              <span className="ctf-pill-score">{ctfState.solvedCount}/{ctfState.totalCount} ({ctfState.score}p)</span>
+            </button>
+          )}
+
           {/* 1-Click Fast Station Matrix Directory */}
           <button
             type="button"
