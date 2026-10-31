@@ -45,18 +45,18 @@ import {
   Zap,
 } from 'lucide-react';
 import { achievements, profile, projects, skills } from '../data.js';
-import NetworkCircuitHack from './hacking/NetworkCircuitHack.jsx';
-import HexBufferHack from './hacking/HexBufferHack.jsx';
-import TimingScannerHack from './hacking/TimingScannerHack.jsx';
-import BinaryPatchHack from './hacking/BinaryPatchHack.jsx';
-import WaveformTunerHack from './hacking/WaveformTunerHack.jsx';
-import WireSpliceHack from './hacking/WireSpliceHack.jsx';
-import CipherDialHack from './hacking/CipherDialHack.jsx';
-import MainframeFirewallHack from './hacking/MainframeFirewallHack.jsx';
-import HardwareArsenalHack from './hacking/HardwareArsenalHack.jsx';
-import PacketSnifferHack from './hacking/PacketSnifferHack.jsx';
+import NetworkPivotChallenge from './ctf/challenges/NetworkPivotChallenge.jsx';
+import BufferOverflowChallenge from './ctf/challenges/BufferOverflowChallenge.jsx';
+import TimingAttackChallenge from './ctf/challenges/TimingAttackChallenge.jsx';
+import BinaryPatchHack from './ctf/challenges/BinaryPatchHack.jsx';
+import StegoAnalyzerChallenge from './ctf/challenges/StegoAnalyzerChallenge.jsx';
+import HardwareForensicsChallenge from './ctf/challenges/HardwareForensicsChallenge.jsx';
+import CryptoWorkstationChallenge from './ctf/challenges/CryptoWorkstationChallenge.jsx';
+import SQLiChallenge from './ctf/challenges/SQLiChallenge.jsx';
+import DuckyReverseEngChallenge from './ctf/challenges/DuckyReverseEngChallenge.jsx';
+import WiresharkPCAPChallenge from './ctf/challenges/WiresharkPCAPChallenge.jsx';
 import VisitorLogDisplay from './studio/VisitorLogDisplay.jsx';
-import ZeroDayOverloadHack from './hacking/ZeroDayOverloadHack.jsx';
+import HeapOverflowChallenge from './ctf/challenges/HeapOverflowChallenge.jsx';
 import BlackHatVaultDisplay from './vault/BlackHatVaultDisplay.jsx';
 
 export const STATION_ORDER = [
@@ -473,37 +473,37 @@ export default function InObjectDisplay({
           ) : !isUnlocked ? (
             <div className="station-hack-wrapper">
               {activeSection === 'projects' && (
-                <NetworkCircuitHack
+                <NetworkPivotChallenge
                   onSolved={() => triggerUnlock('projects')}
                   onBypass={() => triggerUnlock('projects')}
                 />
               )}
               {activeSection === 'skills' && (
-                <HexBufferHack
+                <BufferOverflowChallenge
                   onSolved={() => triggerUnlock('skills')}
                   onBypass={() => triggerUnlock('skills')}
                 />
               )}
               {activeSection === 'achievements' && (
-                <TimingScannerHack
+                <TimingAttackChallenge
                   onSolved={() => triggerUnlock('achievements')}
                   onBypass={() => triggerUnlock('achievements')}
                 />
               )}
               {activeSection === 'about' && (
-                <CipherDialHack
+                <CryptoWorkstationChallenge
                   onSolved={() => triggerUnlock('about')}
                   onBypass={() => triggerUnlock('about')}
                 />
               )}
               {activeSection === 'resume' && (
-                <WireSpliceHack
+                <HardwareForensicsChallenge
                   onSolved={() => triggerUnlock('resume')}
                   onBypass={() => triggerUnlock('resume')}
                 />
               )}
               {activeSection === 'contact' && (
-                <WaveformTunerHack
+                <StegoAnalyzerChallenge
                   onSolved={() => triggerUnlock('contact')}
                   onBypass={() => triggerUnlock('contact')}
                 />
@@ -515,25 +515,25 @@ export default function InObjectDisplay({
                 />
               )}
               {activeSection === 'server_rack' && (
-                <MainframeFirewallHack
+                <SQLiChallenge
                   onSolved={() => triggerUnlock('server_rack')}
                   onBypass={() => triggerUnlock('server_rack')}
                 />
               )}
               {activeSection === 'hardware_arsenal' && (
-                <HardwareArsenalHack
+                <DuckyReverseEngChallenge
                   onSolved={() => triggerUnlock('hardware_arsenal')}
                   onBypass={() => triggerUnlock('hardware_arsenal')}
                 />
               )}
               {activeSection === 'wireshark_monitor' && (
-                <PacketSnifferHack
+                <WiresharkPCAPChallenge
                   onSolved={() => triggerUnlock('wireshark_monitor')}
                   onBypass={() => triggerUnlock('wireshark_monitor')}
                 />
               )}
               {activeSection === 'secret_vault' && (
-                <ZeroDayOverloadHack
+                <HeapOverflowChallenge
                   onSolved={() => triggerUnlock('secret_vault')}
                   onBypass={() => triggerUnlock('secret_vault')}
                   playerData={playerData}

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Binary, CheckCircle2, Code2, Play, RefreshCw, ShieldAlert, Zap } from 'lucide-react';
-import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../utils/audio.js';
-import { ctfEngine } from '../../utils/ctf/ctfEngine.js';
-import { getChallengeById } from '../../utils/ctf/ctfChallenges.js';
+import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../../utils/audio.js';
+import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
+import { getChallengeById } from '../../../utils/ctf/ctfChallenges.js';
 
 const CHALLENGE_ID = 'rev-anti-debug-patch';
 const REVEALED_FLAG = 'FLAG{binary_patch_nop_anti_debug_bypassed}';
