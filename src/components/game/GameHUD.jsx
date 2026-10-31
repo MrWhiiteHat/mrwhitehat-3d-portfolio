@@ -50,11 +50,30 @@ export default function GameHUD({
   unlockedStations = new Set(),
   isEasterEggAvailable = false,
   onLaunchEasterEgg = null,
+  controlSettings = null,
+  onUpdateSensitivity = null,
+  onUpdateMoveSpeed = null,
+  onResetControlSettings = null,
 }) {
+  const activeSettings = controlSettings || (typeof window !== 'undefined' ? window.__CONTROLS_SETTINGS__ : null) || { sensitivity: 1.0, moveSpeed: 1.0 };
   const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || window.innerWidth <= 1024);
   const [showOnScreenControls, setShowOnScreenControls] = useState(() => isTouchDevice);
-  const [isRoomFxOpen, setIsRoomFxOpen] = useState(false);
+  const [isRoomFxOpen, setIsRoomFxOpen] = useState(false);
+
+  useEffect(() => {
+    window.__TOGGLE_SETTINGS__ = () => setIsRoomFxOpen((prev) => !prev);
+    return () => {
+      delete window.__TOGGLE_SETTINGS__;
+    };
+  }, []);
+
+  useEffect(() => {
+    window.__TOGGLE_SETTINGS__ = () => setIsRoomFxOpen((prev) => !prev);
+    return () => {
+      delete window.__TOGGLE_SETTINGS__;
+    };
+  }, []);
   const [showFsTip, setShowFsTip] = useState(true);
 
   // Auto-hide the tip after 12 seconds so it never overstays its welcome
@@ -72,9 +91,10 @@ export default function GameHUD({
     '💡 TIP: Walk up to any terminal and press [E] or Click to inspect & hack',
     '💡 TIP: Press [1 - 9] on your keyboard to instantly teleport to any station',
     '💡 TIP: Press [F] anytime for immersive 60 FPS Fullscreen mode',
-    '💡 TIP: Click 3D Gadgets on the hacker desk to inspect the Flipper Zero in 3D',
+    '💡 TIP: Tap [🎛️] Sliders or press [O] to tune Look Sensitivity & Move Speed',
+    '💡 TIP: Click 3D Gadgets on the desk to inspect Flipper Zero & Rubber Ducky',
     '💡 TIP: Press [R] anytime for the Executive 2D Recruiter Dossier',
-    '💡 TIP: Adjust the real Air Conditioner ❄️ and Fan 🌀 in Studio FX anytime',
+    '💡 TIP: Adjust the real Air Conditioner ❄️ and Fan 🌀 in Studio Settings',
   ];
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
@@ -438,50 +458,156 @@ export default function GameHUD({
 
             {isRoomFxOpen && (
               <div className="hud-room-fx-menu" onClick={(e) => e.stopPropagation()}>
-                <div className="fx-menu-title">STUDIO ENVIRONMENT</div>
-                <button
-                  type="button"
-                  className={`fx-menu-item ${acActive ? 'is-active' : ''}`}
-                  onClick={handleToggleAc}
-                >
-                  <Snowflake size={14} color={acActive ? '#38bdf8' : '#64748b'} />
-                  <span>Air Conditioner [{acActive ? '18°C ❄️' : 'OFF'}]</span>
-                </button>
-                <button
-                  type="button"
-                  className={`fx-menu-item ${fanActive ? 'is-active' : ''}`}
-                  onClick={handleToggleFan}
-                >
-                  <Fan size={14} color={fanActive ? '#34d399' : '#64748b'} />
-                  <span>Ceiling Fan [{fanActive ? 'ON 🌀' : 'OFF'}]</span>
-                </button>
-                <button
-                  type="button"
-                  className={`fx-menu-item ${neonActive ? 'is-active' : ''}`}
-                  onClick={handleToggleNeon}
-                >
-                  <Lightbulb size={14} color={neonActive ? '#ff1744' : '#64748b'} />
-                  <span>Overhead Neon [{neonActive ? 'ON 💡' : 'OFF'}]</span>
-                </button>
-                <button
-                  type="button"
-                  className="fx-menu-item"
-                  onClick={() => {
-                    onResetView?.();
-                    setIsRoomFxOpen(false);
-                  }}
-                >
-                  <RotateCcw size={14} />
-                  <span>Reset Camera View</span>
-                </button>
-                <button
-                  type="button"
-                  className={`fx-menu-item ${showOnScreenControls ? 'is-active' : ''}`}
-                  onClick={() => setShowOnScreenControls((prev) => !prev)}
-                >
-                  <Compass size={14} />
-                  <span>Touch D-Pad [{showOnScreenControls ? 'ON' : 'OFF'}]</span>
-                </button>
+                <div className="fx-menu-header">
+                  <div className="fx-menu-title">
+                    <Sliders size={13} color="#34d399" />
+                    <span>SETTINGS & CONTROLS</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="fx-close-btn"
+                    onClick={() => setIsRoomFxOpen(false)}
+                    title="Close settings"
+                    aria-label="Close settings"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+
+                {/* Section 1: Look Sensitivity */}
+                <div className="fx-control-group">
+                  <div className="fx-control-label-row">
+                    <span className="fx-control-name">🎯 LOOK SENSITIVITY</span>
+                    <strong className="fx-control-val">
+                      {Math.round((activeSettings.sensitivity || 1.0) * 100)}% ({(activeSettings.sensitivity || 1.0).toFixed(2)}x)
+                    </strong>
+                  </div>
+                  <div className="fx-slider-container">
+                    <span className="fx-slider-end">Slow</span>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="2.5"
+                      step="0.05"
+                      value={activeSettings.sensitivity || 1.0}
+                      onChange={(e) => onUpdateSensitivity?.(parseFloat(e.target.value))}
+                      className="fx-range-slider"
+                    />
+                    <span className="fx-slider-end">Fast</span>
+                  </div>
+                  <div className="fx-quick-chips">
+                    {[0.75, 1.0, 1.25, 1.75].map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        className={`fx-chip-btn ${Math.abs((activeSettings.sensitivity || 1.0) - val) < 0.03 ? 'is-active' : ''}`}
+                        onClick={() => onUpdateSensitivity?.(val)}
+                      >
+                        {val === 1.0 ? '1.0x (Default)' : `${val}x`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Section 2: Movement Speed */}
+                <div className="fx-control-group">
+                  <div className="fx-control-label-row">
+                    <span className="fx-control-name">⚡ MOVEMENT SPEED</span>
+                    <strong className="fx-control-val">
+                      {Math.round((activeSettings.moveSpeed || 1.0) * 100)}% ({(activeSettings.moveSpeed || 1.0).toFixed(2)}x)
+                    </strong>
+                  </div>
+                  <div className="fx-slider-container">
+                    <span className="fx-slider-end">Walk</span>
+                    <input
+                      type="range"
+                      min="0.6"
+                      max="2.0"
+                      step="0.05"
+                      value={activeSettings.moveSpeed || 1.0}
+                      onChange={(e) => onUpdateMoveSpeed?.(parseFloat(e.target.value))}
+                      className="fx-range-slider"
+                    />
+                    <span className="fx-slider-end">Sprint</span>
+                  </div>
+                  <div className="fx-quick-chips">
+                    {[0.8, 1.0, 1.3, 1.6].map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        className={`fx-chip-btn ${Math.abs((activeSettings.moveSpeed || 1.0) - val) < 0.03 ? 'is-active' : ''}`}
+                        onClick={() => onUpdateMoveSpeed?.(val)}
+                      >
+                        {val === 1.0 ? '1.0x (Normal)' : val === 1.3 ? '1.3x (Fast)' : val === 1.6 ? '1.6x (Turbo)' : `${val}x`}
+                      </button>
+                    ))}
+                    {onResetControlSettings && (
+                      <button
+                        type="button"
+                        className="fx-chip-btn fx-reset-btn"
+                        onClick={() => onResetControlSettings()}
+                        title="Reset sensitivity and speed to default"
+                      >
+                        <RotateCcw size={9} />
+                        <span>Reset</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="fx-menu-divider" />
+
+                {/* Section 3: Display & Environment */}
+                <div className="fx-aux-group">
+                  <button
+                    type="button"
+                    className={`fx-menu-item ${showOnScreenControls ? 'is-active' : ''}`}
+                    onClick={() => setShowOnScreenControls((prev) => !prev)}
+                  >
+                    <Compass size={14} />
+                    <span>Touch D-Pad [{showOnScreenControls ? 'ON' : 'OFF'}]</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="fx-menu-item"
+                    onClick={() => {
+                      onResetView?.();
+                      setIsRoomFxOpen(false);
+                    }}
+                  >
+                    <RotateCcw size={14} />
+                    <span>Reset Camera View</span>
+                  </button>
+                  <div className="fx-appliances-row">
+                    <button
+                      type="button"
+                      className={`fx-mini-toggle ${acActive ? 'is-active' : ''}`}
+                      onClick={handleToggleAc}
+                      title="Toggle Air Conditioner"
+                    >
+                      <Snowflake size={13} color={acActive ? '#38bdf8' : '#64748b'} />
+                      <span>AC {acActive ? '❄️' : 'OFF'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`fx-mini-toggle ${fanActive ? 'is-active' : ''}`}
+                      onClick={handleToggleFan}
+                      title="Toggle Ceiling Fan"
+                    >
+                      <Fan size={13} color={fanActive ? '#34d399' : '#64748b'} />
+                      <span>Fan {fanActive ? '🌀' : 'OFF'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`fx-mini-toggle ${neonActive ? 'is-active' : ''}`}
+                      onClick={handleToggleNeon}
+                      title="Toggle Overhead Neon"
+                    >
+                      <Lightbulb size={13} color={neonActive ? '#ff1744' : '#64748b'} />
+                      <span>Neon {neonActive ? '💡' : 'OFF'}</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

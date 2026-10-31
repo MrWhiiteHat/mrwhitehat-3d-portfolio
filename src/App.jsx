@@ -70,6 +70,7 @@ import RecruiterDossierModal from './components/recruiter/RecruiterDossierModal.
 import UserGuideModal from './components/game/UserGuideModal.jsx';
 import { profile } from './data.js';
 import { useFullscreen } from './utils/useFullscreen.js';
+import { useControlSettings } from './utils/useControlSettings.js';
 import {
   isMuted,
   playAirlockDoorSound,
@@ -617,6 +618,12 @@ export default function App() {
 
   // Fullscreen management across PC & Phone
   const { isFullscreen, toggleFullscreen, toastMessage } = useFullscreen();
+  const {
+    settings: controlSettings,
+    updateSensitivity,
+    updateMoveSpeed,
+    resetDefaults: resetControlSettings,
+  } = useControlSettings();
 
   // 1. Theme Cycling
   const handleCycleTheme = useCallback(() => {
@@ -911,6 +918,8 @@ export default function App() {
         handleToggleRecruiter();
       } else if (e.key === 'h' || e.key === 'H' || e.key === '?') {
         setIsUserGuideOpen((prev) => !prev);
+      } else if (e.key === 'o' || e.key === 'O') {
+        window.__TOGGLE_SETTINGS__?.();
       }
     };
 
@@ -955,6 +964,7 @@ export default function App() {
         visitorCount={visitorCount}
         playerData={playerData}
         unlockedCount={unlockedStations.size}
+        controlSettings={controlSettings}
         onOpenGadgets={handleOpenGadgets}
         onOpenLeaderboard={handleOpenLeaderboard}
         onOpenRecruiter={handleOpenRecruiter}
@@ -1006,6 +1016,10 @@ export default function App() {
           onOpenLeaderboard={handleOpenLeaderboard}
           onOpenGadgets={handleOpenGadgets}
           onOpenRecruiter={handleOpenRecruiter}
+          controlSettings={controlSettings}
+          onUpdateSensitivity={updateSensitivity}
+          onUpdateMoveSpeed={updateMoveSpeed}
+          onResetControlSettings={resetControlSettings}
           isEasterEggAvailable={isEasterEggDiscovered() || hasCompletedAllStations(unlockedStations)}
           onLaunchEasterEgg={handleLaunchEasterEgg}
         />
@@ -1044,6 +1058,10 @@ export default function App() {
           onOpenGuide={() => setIsUserGuideOpen(true)}
           stations={NAV_STATIONS}
           unlockedStations={unlockedStations}
+          controlSettings={controlSettings}
+          onUpdateSensitivity={updateSensitivity}
+          onUpdateMoveSpeed={updateMoveSpeed}
+          onResetControlSettings={resetControlSettings}
         />
       )}
 

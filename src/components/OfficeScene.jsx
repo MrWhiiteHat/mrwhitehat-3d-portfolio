@@ -354,6 +354,7 @@ function SceneContents({
   onOpenLeaderboard = null,
   hackerModeData = null,
   onStationBreached = null,
+  controlSettings = null,
 }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -463,6 +464,7 @@ function SceneContents({
           onInteract={onStationInteract}
           mobileInput={mobileInput}
           mobileInputRef={mobileInputRef}
+          controlSettings={controlSettings}
         />
 
         {/* 3D Hotspot Pins (only in legacy Overview mode) */}
@@ -574,6 +576,7 @@ export default function OfficeScene({
   onOpenRecruiter = null,
   hackerModeData = null,
   onStationBreached = null,
+  controlSettings = null,
 }) {
   const controlsRef = useRef(null);
   const [failed, setFailed] = useState(false);
@@ -670,6 +673,7 @@ export default function OfficeScene({
             onReady={onReady}
             hackerModeData={hackerModeData}
             onStationBreached={onStationBreached}
+            controlSettings={controlSettings}
           />
         </Suspense>
       </Canvas>

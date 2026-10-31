@@ -416,8 +416,34 @@ export default function FirstPersonController({
   onInteract,
   mobileInput = { x: 0, y: 0 },
   mobileInputRef = null,
+  controlSettings = null,
 }) {
   const { camera, gl } = useThree();
+
+  // Active control settings ref (sensitivity & movement speed)
+  const controlSettingsRef = useRef(
+    controlSettings ||
+      (typeof window !== 'undefined' ? window.__CONTROLS_SETTINGS__ : null) || {
+        sensitivity: 1.0,
+        moveSpeed: 1.0,
+      }
+  );
+
+  useEffect(() => {
+    if (controlSettings) {
+      controlSettingsRef.current = controlSettings;
+    }
+  }, [controlSettings]);
+
+  useEffect(() => {
+    const handleSettingsChange = (e) => {
+      if (e.detail) {
+        controlSettingsRef.current = e.detail;
+      }
+    };
+    window.addEventListener('control-settings-changed', handleSettingsChange);
+    return () => window.removeEventListener('control-settings-changed', handleSettingsChange);
+  }, []);
 
   // Player position & smoothed kinematics
   const playerPos = useRef(new THREE.Vector3(3.4, 1.68, -2.6));
@@ -609,19 +635,18 @@ export default function FirstPersonController({
       isPointerLocked.current = document.pointerLockElement === canvas;
     };
 
-    // 3. Mouse Movement: Pointer Lock + Drag fallback
+    // 3. Mouse Movement: Pointer Lock + Drag fallback with increased default sensitivity
     const onMouseMove = (e) => {
+      const sens = controlSettingsRef.current?.sensitivity ?? 1.0;
       if (isPointerLocked.current) {
-        const sensitivity = 0.0020;
+        // Increased baseline from 0.0020 to 0.0028 for crisp, responsive turning
+        const sensitivity = 0.0028 * sens;
         targetYaw.current -= e.movementX * sensitivity;
         targetPitch.current -= e.movementY * sensitivity;
         targetPitch.current = Math.max(-1.3, Math.min(1.3, targetPitch.current));
       } else if (isDragging.current) {
-        const dx = e.clientX - lastMousePos.current.x;
-        const dy = e.clientY - lastMousePos.current.y;
-        lastMousePos.current = { x: e.clientX, y: e.clientY };
-
-        const sensitivity = 0.0025;
+        // Increased baseline drag sensitivity from 0.0025 to 0.0034
+        const sensitivity = 0.0034 * sens;
         targetYaw.current -= dx * sensitivity;
         targetPitch.current -= dy * sensitivity;
         targetPitch.current = Math.max(-1.3, Math.min(1.3, targetPitch.current));
@@ -680,7 +705,9 @@ export default function FirstPersonController({
       touchLastX = touch.clientX;
       touchLastY = touch.clientY;
 
-      const touchSensitivity = 0.0028;
+      // Increased baseline touch sensitivity from 0.0028 to 0.0038 for smooth thumb turning
+      const sens = controlSettingsRef.current?.sensitivity ?? 1.0;
+      const touchSensitivity = 0.0038 * sens;
       targetYaw.current -= dx * touchSensitivity;
       targetPitch.current -= dy * touchSensitivity;
       targetPitch.current = Math.max(-1.3, Math.min(1.3, targetPitch.current));
@@ -785,7 +812,8 @@ export default function FirstPersonController({
     }
 
     const isMoving = Math.abs(inputForward) > 0.01 || Math.abs(inputRight) > 0.01;
-    const targetSpeed = keys.current.sprint ? 4.5 : 2.9;
+    const speedMult = controlSettingsRef.current?.moveSpeed ?? 1.0;
+    const targetSpeed = (keys.current.sprint ? 4.8 : 3.1) * speedMult;
 
     let targetVelX = 0;
     let targetVelZ = 0;

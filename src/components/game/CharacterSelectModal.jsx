@@ -13,6 +13,8 @@ import {
   Zap,
   Maximize2,
   Minimize2,
+  Sliders,
+  RotateCcw,
 } from 'lucide-react';
 import { playClickSound, playHackingBeep, playWhooshSound } from '../../utils/audio.js';
 import UserGuideModal from './UserGuideModal.jsx';
@@ -160,7 +162,13 @@ export default function CharacterSelectModal({
   onOpenLeaderboard = null,
   onOpenGadgets = null,
   onOpenRecruiter = null,
+  controlSettings = null,
+  onUpdateSensitivity = null,
+  onUpdateMoveSpeed = null,
+  onResetControlSettings = null,
 }) {
+  const [showControlsTuning, setShowControlsTuning] = useState(false);
+  const activeSettings = controlSettings || (typeof window !== 'undefined' ? window.__CONTROLS_SETTINGS__ : null) || { sensitivity: 1.0, moveSpeed: 1.0 };
   // Empty by default: user must enter their name (no presets/suggestions)
   const [name, setName] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState(CHARACTERS[0]);
@@ -353,8 +361,106 @@ export default function CharacterSelectModal({
                     <Play size={10} fill="currentColor" />
                     <span>TUTORIAL</span>
                   </button>
+                  <button
+                    type="button"
+                    className={`ctrl-settings-link-btn ${showControlsTuning ? 'is-active' : ''}`}
+                    onClick={() => {
+                      playClickSound(950);
+                      setShowControlsTuning((prev) => !prev);
+                    }}
+                    title="Configure mouse/touch look sensitivity and movement speed"
+                  >
+                    <Sliders size={10} />
+                    <span>SPEED & SENSITIVITY</span>
+                  </button>
                 </div>
               </div>
+
+              {/* Collapsible Sensitivity & Movement Speed Tuner */}
+              {showControlsTuning && (
+                <div className="char-tuning-panel">
+                  {/* Look Sensitivity */}
+                  <div className="char-tuning-row">
+                    <div className="char-tuning-labels">
+                      <span className="char-tuning-title">🎯 LOOK SENSITIVITY</span>
+                      <strong className="char-tuning-val">
+                        {Math.round((activeSettings.sensitivity || 1.0) * 100)}% ({(activeSettings.sensitivity || 1.0).toFixed(2)}x)
+                      </strong>
+                    </div>
+                    <div className="char-slider-row">
+                      <span className="char-slider-bound">Slow</span>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="2.5"
+                        step="0.05"
+                        value={activeSettings.sensitivity || 1.0}
+                        onChange={(e) => onUpdateSensitivity?.(parseFloat(e.target.value))}
+                        className="fx-range-slider"
+                      />
+                      <span className="char-slider-bound">Fast</span>
+                    </div>
+                    <div className="fx-quick-chips">
+                      {[0.75, 1.0, 1.25, 1.75].map((val) => (
+                        <button
+                          key={val}
+                          type="button"
+                          className={`fx-chip-btn ${Math.abs((activeSettings.sensitivity || 1.0) - val) < 0.03 ? 'is-active' : ''}`}
+                          onClick={() => onUpdateSensitivity?.(val)}
+                        >
+                          {val === 1.0 ? '1.0x (Default)' : `${val}x`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Movement Speed */}
+                  <div className="char-tuning-row">
+                    <div className="char-tuning-labels">
+                      <span className="char-tuning-title">⚡ MOVEMENT SPEED</span>
+                      <strong className="char-tuning-val">
+                        {Math.round((activeSettings.moveSpeed || 1.0) * 100)}% ({(activeSettings.moveSpeed || 1.0).toFixed(2)}x)
+                      </strong>
+                    </div>
+                    <div className="char-slider-row">
+                      <span className="char-slider-bound">Walk</span>
+                      <input
+                        type="range"
+                        min="0.6"
+                        max="2.0"
+                        step="0.05"
+                        value={activeSettings.moveSpeed || 1.0}
+                        onChange={(e) => onUpdateMoveSpeed?.(parseFloat(e.target.value))}
+                        className="fx-range-slider"
+                      />
+                      <span className="char-slider-bound">Sprint</span>
+                    </div>
+                    <div className="fx-quick-chips">
+                      {[0.8, 1.0, 1.3, 1.6].map((val) => (
+                        <button
+                          key={val}
+                          type="button"
+                          className={`fx-chip-btn ${Math.abs((activeSettings.moveSpeed || 1.0) - val) < 0.03 ? 'is-active' : ''}`}
+                          onClick={() => onUpdateMoveSpeed?.(val)}
+                        >
+                          {val === 1.0 ? '1.0x (Normal)' : val === 1.3 ? '1.3x (Fast)' : val === 1.6 ? '1.6x (Turbo)' : `${val}x`}
+                        </button>
+                      ))}
+                      {onResetControlSettings && (
+                        <button
+                          type="button"
+                          className="fx-chip-btn fx-reset-btn"
+                          onClick={() => onResetControlSettings()}
+                          title="Reset sensitivity and speed to default"
+                        >
+                          <RotateCcw size={9} />
+                          <span>Reset</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="quick-controls-grid">
                 {typeof window !== 'undefined' && window.innerWidth < 768 ? (
                   <>

@@ -40,10 +40,11 @@ const CHAPTERS = [
       { key: 'MOUSE', label: 'Look 360° (Click 3D scene to lock pointer)' },
       { key: 'CLICK / E', label: 'Hack / Interact with nearby terminals' },
       { key: 'SHIFT', label: 'Sprint & Tactical Run' },
+      { key: 'O / SLIDERS', label: 'Tune Look Sensitivity & Movement Speed' },
       { key: 'F', label: 'Toggle Full Screen mode' },
       { key: 'ESC', label: 'Release mouse pointer / Return to menu' },
     ],
-    tips: '💡 Pro Tip: Press [F] or click Fullscreen for buttery 60 FPS performance and distraction-free immersion. Click anywhere inside the 3D office to lock pointer aim.',
+    tips: '💡 Pro Tip: Press [F] for Fullscreen, or press [O] / click [🎛️] Sliders in the top bar to fine-tune your look sensitivity and movement speed anytime!',
   },
   {
     id: 'mobile_controls',
@@ -58,8 +59,9 @@ const CHAPTERS = [
       { key: '⚡ HACK [E]', label: 'Tap the green action button near any station' },
       { key: '⛶ FULLSCREEN', label: 'Tap the floating top-right pill to hide address bars' },
       { key: 'MODE SWITCH', label: 'Toggle between analog Stick or WASD keypad anytime' },
+      { key: '⚙️ SLIDERS', label: 'Adjust Swipe Sensitivity & Movement Speed' },
     ],
-    tips: 'Works in both Portrait and Landscape. Tap the top-right [ ⛶ FULLSCREEN ] button for an immersive, edge-to-edge full screen experience.',
+    tips: '💡 Pro Tip: Tap [🎛️] Sliders in the top bar anytime to adjust swipe sensitivity and walking speed to your exact comfort!',
   },
   {
     id: 'stations',
