@@ -355,6 +355,7 @@ function SceneContents({
   hackerModeData = null,
   onStationBreached = null,
   controlSettings = null,
+  onOpenCyberOS = null,
 }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -487,6 +488,7 @@ function SceneContents({
             playerData={playerData}
             onOpenGadgets={onOpenGadgets}
             onOpenLeaderboard={onOpenLeaderboard}
+            onOpenCyberOS={onOpenCyberOS}
           />
         )}
 
@@ -577,6 +579,7 @@ export default function OfficeScene({
   hackerModeData = null,
   onStationBreached = null,
   controlSettings = null,
+  onOpenCyberOS = null,
 }) {
   const controlsRef = useRef(null);
   const [failed, setFailed] = useState(false);
@@ -674,6 +677,7 @@ export default function OfficeScene({
             hackerModeData={hackerModeData}
             onStationBreached={onStationBreached}
             controlSettings={controlSettings}
+            onOpenCyberOS={onOpenCyberOS}
           />
         </Suspense>
       </Canvas>

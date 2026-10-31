@@ -1,0 +1,850 @@
+/* ==========================================================================
+   CYBER OS (KALI / BLACKHAT ENVIRONMENT) STYLESHEET
+   Authentic Linux Desktop, Window Manager, Taskbar, and Hacker Applications
+   ========================================================================== */
+
+/* 1. Desktop Root Environment */
+.cos-desktop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: radial-gradient(circle at 50% 30%, #0d1520 0%, #06090e 65%, #020406 100%);
+  color: #e2e8f0;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  overflow: hidden;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Subtle Cyber Mesh Background Overlay */
+.cos-desktop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(14, 165, 233, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Wallpaper Centerpiece Watermark */
+.cos-wallpaper-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cos-wallpaper-watermark h1 {
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  color: #00f0ff;
+  text-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+  margin: 0;
+}
+
+.cos-wallpaper-watermark span {
+  font-size: 14px;
+  letter-spacing: 0.4em;
+  color: #94a3b8;
+  margin-top: 8px;
+}
+
+/* Optional CRT Scanlines Effect */
+.cos-crt-scanlines {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 900;
+}
+
+/* 2. Top Taskbar / Panel */
+.cos-taskbar {
+  position: relative;
+  z-index: 1000;
+  height: 38px;
+  background: rgba(10, 15, 22, 0.95);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.cos-taskbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cos-start-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(14, 165, 233, 0.05) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cos-start-btn:hover {
+  background: rgba(0, 240, 255, 0.35);
+  border-color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.cos-taskbar-tasks {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 10px;
+  overflow-x: auto;
+  max-width: 48vw;
+}
+
+.cos-task-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cos-task-tab.is-active {
+  background: rgba(14, 165, 233, 0.22);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
+}
+
+.cos-task-tab:hover {
+  background: rgba(51, 65, 85, 0.8);
+  color: #f1f5f9;
+}
+
+.cos-taskbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.cos-hud-metric {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #cbd5e1;
+}
+
+.cos-score-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.cos-recruiter-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.05) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cos-recruiter-btn:hover {
+  background: rgba(245, 158, 11, 0.35);
+  border-color: #fbbf24;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.cos-exit-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cos-exit-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: #ef4444;
+}
+
+/* 3. Start Menu Dropdown */
+.cos-start-menu {
+  position: absolute;
+  top: 42px;
+  left: 10px;
+  width: 320px;
+  background: rgba(13, 19, 29, 0.98);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(56, 189, 248, 0.15);
+  z-index: 2000;
+  backdrop-filter: blur(16px);
+  padding: 8px 0;
+  font-size: 11.5px;
+  animation: cosFadeIn 0.15s ease-out;
+}
+
+.cos-menu-header {
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #00f0ff;
+  font-weight: 700;
+}
+
+.cos-menu-section-title {
+  padding: 6px 14px 2px;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.cos-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.cos-menu-item:hover {
+  background: rgba(14, 165, 233, 0.18);
+  color: #38bdf8;
+  padding-left: 18px;
+}
+
+.cos-menu-item-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.cos-menu-badge {
+  font-size: 9px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* 4. Desktop Area & Icons */
+.cos-desktop-area {
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  padding: 16px;
+}
+
+.cos-desktop-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 90px);
+  grid-auto-flow: dense;
+  gap: 16px 12px;
+  width: max-content;
+  max-height: calc(100vh - 80px);
+  flex-direction: column;
+}
+
+.cos-desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 8px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  width: 86px;
+}
+
+.cos-desktop-icon:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.cos-icon-graphic {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease;
+}
+
+.cos-desktop-icon:hover .cos-icon-graphic {
+  transform: translateY(-2px) scale(1.05);
+  border-color: #38bdf8;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+}
+
+.cos-icon-label {
+  font-size: 11px;
+  color: #f1f5f9;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.8);
+  word-break: break-word;
+  line-height: 1.25;
+}
+
+/* 5. Window Frame Component */
+.cos-window {
+  position: absolute;
+  background: rgba(10, 15, 23, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), 0 0 18px rgba(14, 165, 233, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  min-width: 380px;
+  min-height: 260px;
+  animation: cosWindowPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cos-window.is-maximized {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0;
+  border: none;
+}
+
+.cos-window.is-active-window {
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(56, 189, 248, 0.25);
+}
+
+/* Window Titlebar */
+.cos-titlebar {
+  height: 34px;
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
+  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  cursor: grab;
+  user-select: none;
+}
+
+.cos-window.is-active-window .cos-titlebar {
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-bottom-color: rgba(56, 189, 248, 0.4);
+}
+
+.cos-titlebar:active {
+  cursor: grabbing;
+}
+
+.cos-titlebar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #f1f5f9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cos-titlebar-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cos-win-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  background: rgba(30, 41, 59, 0.6);
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.cos-win-btn:hover {
+  background: rgba(51, 65, 85, 0.9);
+  color: #fff;
+}
+
+.cos-win-btn.btn-close:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+/* Window Body Content */
+.cos-window-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #060a0f;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 6. Universal App Elements (Buttons, Inputs, Hex Views, Code Previews) */
+.cos-toolbar {
+  background: #0d131a;
+  border-bottom: 1px solid #1e293b;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.cos-btn {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f1f5f9;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.cos-btn:hover {
+  background: #334155;
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.cos-btn-primary {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #fff;
+}
+
+.cos-btn-primary:hover {
+  background: #0369a1;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+.cos-btn-success {
+  background: #059669;
+  border-color: #34d399;
+  color: #fff;
+}
+
+.cos-btn-success:hover {
+  background: #047857;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+}
+
+.cos-input {
+  background: #000;
+  border: 1px solid #334155;
+  color: #38bdf8;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.cos-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
+.cos-table-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  background: #05080c;
+}
+
+.cos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: left;
+}
+
+.cos-table th {
+  background: #0f172a;
+  border-bottom: 1px solid #1e293b;
+  padding: 6px 8px;
+  color: #94a3b8;
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.cos-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+  color: #cbd5e1;
+}
+
+.cos-table tr:hover td {
+  background: rgba(14, 165, 233, 0.08);
+  color: #fff;
+}
+
+.cos-table tr.is-selected td {
+  background: rgba(14, 165, 233, 0.22);
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.cos-hex-dump {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #94a3b8;
+  background: #030609;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #1e293b;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.cos-hex-dump span.hex-ascii {
+  color: #38bdf8;
+  margin-left: 12px;
+}
+
+/* Animations */
+@keyframes cosFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cosWindowPop {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive Styles for Mobile / Small Screens */
+@media (max-width: 768px) {
+  .cos-taskbar-tasks {
+    display: none;
+  }
+  .cos-window {
+    min-width: 95vw;
+    width: 95vw !important;
+    left: 2.5vw !important;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* 7. 3D Station Cyber Access Terminal Card                                   */
+/* -------------------------------------------------------------------------- */
+.station-cyber-access-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 15, 24, 0.95);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(14, 165, 233, 0.15);
+  color: #e2e8f0;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.scac-header-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.scac-category-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+
+.scac-points-tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fbbf24;
+}
+
+.scac-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #f1f5f9;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.scac-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.scac-tool-box {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.scac-tool-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.scac-tool-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.scac-tool-label {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+}
+
+.scac-tool-name {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.scac-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.scac-launch-os-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border: 1px solid #38bdf8;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+}
+
+.scac-launch-os-btn:hover {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+  transform: translateY(-1px);
+}
+
+.scac-bypass-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.scac-bypass-btn:hover {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: #fbbf24;
+}
+
+.scac-quick-submit {
+  border-top: 1px solid rgba(51, 65, 85, 0.5);
+  padding-top: 12px;
+}
+
+.scac-qs-label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.scac-qs-form {
+  display: flex;
+  gap: 8px;
+}
+
+.scac-qs-input {
+  flex: 1;
+  background: #000;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  color: #34d399;
+  outline: none;
+}
+
+.scac-qs-input:focus {
+  border-color: #34d399;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
+}
+
+.scac-qs-btn {
+  background: #059669;
+  border: 1px solid #34d399;
+  color: #fff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scac-qs-btn:hover {
+  background: #047857;
+}
+
+.scac-feedback {
+  margin-top: 8px;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.scac-feedback.is-success {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #34d399;
+}
+
+.scac-feedback.is-error {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #f87171;
+}

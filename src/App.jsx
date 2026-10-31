@@ -68,7 +68,7 @@ import LeaderboardModal from './components/leaderboard/LeaderboardModal.jsx';
 import GadgetInspectorModal from './components/gadgets/GadgetInspectorModal.jsx';
 import RecruiterDossierModal from './components/recruiter/RecruiterDossierModal.jsx';
 import UserGuideModal from './components/game/UserGuideModal.jsx';
-import CTFControlCenterModal from './components/ctf/CTFControlCenterModal.jsx';
+import CyberOSDesktop from './components/ctf/os/CyberOSDesktop.jsx';
 import { profile } from './data.js';
 import { useFullscreen } from './utils/useFullscreen.js';
 import { useControlSettings } from './utils/useControlSettings.js';
@@ -157,8 +157,14 @@ export default function App() {
   const [isGadgetInspectorOpen, setIsGadgetInspectorOpen] = useState(false);
   const [selectedGadgetId, setSelectedGadgetId] = useState('flipper');
   const [isRecruiterOpen, setIsRecruiterOpen] = useState(false);
-  const [isCTFModalOpen, setIsCTFModalOpen] = useState(false);
-  const [targetCTFChallengeId, setTargetCTFChallengeId] = useState(null);
+  const [isCyberOSOpen, setIsCyberOSOpen] = useState(false);
+  const [cyberOSTargetApp, setCyberOSTargetApp] = useState('ctf');
+
+  const handleOpenCyberOS = useCallback((app = 'ctf') => {
+    playWhooshSound();
+    setCyberOSTargetApp(app);
+    setIsCyberOSOpen(true);
+  }, []);
   const [isUserGuideOpen, setIsUserGuideOpen] = useState(false);
   const stationMenuRef = useRef(null);
 
@@ -532,7 +538,7 @@ export default function App() {
           handleRotateHackerNode(hackerSelectedNodeId);
         }
       } else if (e.key === 'c' || e.key === 'C') {
-        setIsCTFModalOpen((prev) => !prev);
+        setIsCyberOSOpen((prev) => !prev);
       } else if (e.key === 'r' || e.key === 'R') {
         handleResetHackerStage();
       } else if (e.key === 'f' || e.key === 'F') {
@@ -877,6 +883,10 @@ export default function App() {
           setIsRecruiterOpen(false);
           return;
         }
+        if (isCyberOSOpen) {
+          setIsCyberOSOpen(false);
+          return;
+        }
         if (isLeaderboardOpen) {
           setIsLeaderboardOpen(false);
           return;
@@ -916,6 +926,8 @@ export default function App() {
         toggleFullscreen();
       } else if (e.key === 'l' || e.key === 'L') {
         handleOpenLeaderboard();
+      } else if (e.key === 'c' || e.key === 'C') {
+        handleOpenCyberOS('ctf');
       } else if (e.key === 'g' || e.key === 'G') {
         handleOpenGadgets('flipper');
 
@@ -941,6 +953,8 @@ export default function App() {
     handleStartGame,
     handleResetToCustomize,
     handleStationInteract,
+    isCyberOSOpen,
+    handleOpenCyberOS,
   ]);
 
   const currentTheme = LIGHTING_THEMES[themeKey] || LIGHTING_THEMES.CYBER_MATRIX;
@@ -973,6 +987,7 @@ export default function App() {
         onOpenGadgets={handleOpenGadgets}
         onOpenLeaderboard={handleOpenLeaderboard}
         onOpenRecruiter={handleOpenRecruiter}
+        onOpenCyberOS={handleOpenCyberOS}
         hackerModeData={{
           isActive: gameState === 'HACKING',
           currentStage: currentHackerStage,
@@ -1061,6 +1076,8 @@ export default function App() {
           onOpenGadgets={handleOpenGadgets}
           onOpenRecruiter={handleOpenRecruiter}
           onOpenGuide={() => setIsUserGuideOpen(true)}
+          onOpenCTF={() => handleOpenCyberOS('ctf')}
+          onOpenCyberOS={handleOpenCyberOS}
           stations={NAV_STATIONS}
           unlockedStations={unlockedStations}
           controlSettings={controlSettings}
@@ -1315,15 +1332,12 @@ export default function App() {
       />
 
       {/* Executive Recruiter 2D Dossier Modal */}
-      {/* Cybersecurity CTF Mission Control Modal */}
-      <CTFControlCenterModal
-        isOpen={isCTFModalOpen}
-        onClose={() => setIsCTFModalOpen(false)}
-        initialChallengeId={targetCTFChallengeId}
-        onNavigateToStation={(stationId) => {
-          setIsCTFModalOpen(false);
-          handleStationInteract(stationId);
-        }}
+      {/* Kali Linux / CyberOS Desktop Workstation */}
+      <CyberOSDesktop
+        isOpen={isCyberOSOpen}
+        onClose={() => setIsCyberOSOpen(false)}
+        initialApp={cyberOSTargetApp}
+        onOpenRecruiter={handleOpenRecruiter}
       />
 
       <RecruiterDossierModal

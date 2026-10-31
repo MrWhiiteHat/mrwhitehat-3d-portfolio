@@ -102,7 +102,7 @@ export default function GameHUD({
     '💡 TIP: Tap [🎛️] Sliders or press [O] to tune Look Sensitivity & Move Speed',
     '💡 TIP: Click 3D Gadgets on the desk to inspect Flipper Zero & Rubber Ducky',
     '💡 TIP: Press [R] anytime for the Executive 2D Recruiter Dossier',
-    '💡 TIP: Press [C] anytime for Cybersecurity CTF Missions & Terminal Workstation',
+    '💡 TIP: Press [C] or tap [CYBER OS] to launch Kali Linux desktop with Wireshark, Burp, Ghidra & CTF tools',
     '💡 TIP: Adjust the real Air Conditioner ❄️ and Fan 🌀 in Studio Settings',
   ];
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
@@ -374,7 +374,7 @@ export default function GameHUD({
 
         {/* Center Section: Core 1-Click Quick Actions */}
         <div className="hud-center-group">
-          {/* CTF Challenge Center Pill */}
+          {/* CyberOS CTF Workstation Pill */}
           {onOpenCTF && (
             <button
               type="button"
@@ -383,10 +383,10 @@ export default function GameHUD({
                 playClickSound(1000);
                 onOpenCTF();
               }}
-              title="Open Cybersecurity CTF Challenge Platform (C)"
+              title="Launch Kali CyberOS Desktop Workstation (C)"
             >
-              <Flag size={13} style={{ color: '#10b981' }} />
-              <span className="ctf-pill-label">CTF MISSIONS</span>
+              <Terminal size={13} style={{ color: '#10b981' }} />
+              <span className="ctf-pill-label">CYBER OS</span>
               <span className="ctf-pill-score">{ctfState.solvedCount}/{ctfState.totalCount} ({ctfState.score}p)</span>
             </button>
           )}

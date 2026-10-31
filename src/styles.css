@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import './components/ctf/os/cyberOS.css';
 
 :root {
   --bg: #070b0a;
@@ -13574,6 +13575,43 @@ canvas {
   color: #ffffff;
 }
 
+
+/* Top HUD CyberOS Workstation Pill */
+.hud-ctf-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #10b981;
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  letter-spacing: 0.04em;
+}
+.hud-ctf-pill:hover {
+  background: #10b981;
+  color: #020617;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
+  transform: translateY(-1px);
+}
+.hud-ctf-pill:hover .ctf-pill-score {
+  color: #020617;
+  background: rgba(0, 0, 0, 0.25);
+}
+.hud-ctf-pill .ctf-pill-score {
+  font-size: 10px;
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.2);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
 /* Top HUD Station Navigator & Guide Pills */
 .hud-stations-pill {
   display: flex;
@@ -13909,6 +13947,7 @@ canvas {
     margin-top: 4px;
     gap: 6px;
   }
+  .hud-ctf-pill,
   .hud-stations-pill {
     padding: 5px 9px;
     font-size: 10px;

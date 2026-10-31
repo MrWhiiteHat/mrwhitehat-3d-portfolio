@@ -45,6 +45,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { achievements, profile, projects, skills } from '../data.js';
+import StationCyberAccessCard from './ctf/StationCyberAccessCard.jsx';
 import NetworkPivotChallenge from './ctf/challenges/NetworkPivotChallenge.jsx';
 import BufferOverflowChallenge from './ctf/challenges/BufferOverflowChallenge.jsx';
 import TimingAttackChallenge from './ctf/challenges/TimingAttackChallenge.jsx';
@@ -242,6 +243,7 @@ export default function InObjectDisplay({
   onOpenGadgets = null,
   onOpenLeaderboard = null,
   onStationBreached = null,
+  onOpenCyberOS = null,
 }) {
   const [selectedProject, setSelectedProject] = useState(0);
   const [selectedSlide, setSelectedSlide] = useState(0);
@@ -472,73 +474,15 @@ export default function InObjectDisplay({
             </div>
           ) : !isUnlocked ? (
             <div className="station-hack-wrapper">
-              {activeSection === 'projects' && (
-                <NetworkPivotChallenge
-                  onSolved={() => triggerUnlock('projects')}
-                  onBypass={() => triggerUnlock('projects')}
-                />
-              )}
-              {activeSection === 'skills' && (
-                <BufferOverflowChallenge
-                  onSolved={() => triggerUnlock('skills')}
-                  onBypass={() => triggerUnlock('skills')}
-                />
-              )}
-              {activeSection === 'achievements' && (
-                <TimingAttackChallenge
-                  onSolved={() => triggerUnlock('achievements')}
-                  onBypass={() => triggerUnlock('achievements')}
-                />
-              )}
-              {activeSection === 'about' && (
-                <CryptoWorkstationChallenge
-                  onSolved={() => triggerUnlock('about')}
-                  onBypass={() => triggerUnlock('about')}
-                />
-              )}
-              {activeSection === 'resume' && (
-                <HardwareForensicsChallenge
-                  onSolved={() => triggerUnlock('resume')}
-                  onBypass={() => triggerUnlock('resume')}
-                />
-              )}
-              {activeSection === 'contact' && (
-                <StegoAnalyzerChallenge
-                  onSolved={() => triggerUnlock('contact')}
-                  onBypass={() => triggerUnlock('contact')}
-                />
-              )}
-              {activeSection === 'operator' && (
-                <BinaryPatchHack
-                  onSolved={() => triggerUnlock('operator')}
-                  onBypass={() => triggerUnlock('operator')}
-                />
-              )}
-              {activeSection === 'server_rack' && (
-                <SQLiChallenge
-                  onSolved={() => triggerUnlock('server_rack')}
-                  onBypass={() => triggerUnlock('server_rack')}
-                />
-              )}
-              {activeSection === 'hardware_arsenal' && (
-                <DuckyReverseEngChallenge
-                  onSolved={() => triggerUnlock('hardware_arsenal')}
-                  onBypass={() => triggerUnlock('hardware_arsenal')}
-                />
-              )}
-              {activeSection === 'wireshark_monitor' && (
-                <WiresharkPCAPChallenge
-                  onSolved={() => triggerUnlock('wireshark_monitor')}
-                  onBypass={() => triggerUnlock('wireshark_monitor')}
-                />
-              )}
-              {activeSection === 'secret_vault' && (
-                <HeapOverflowChallenge
-                  onSolved={() => triggerUnlock('secret_vault')}
-                  onBypass={() => triggerUnlock('secret_vault')}
-                  playerData={playerData}
-                />
-              )}
+              <StationCyberAccessCard
+                sectionKey={activeSection}
+                onLaunchOS={(toolName) => {
+                  onClose?.();
+                  onOpenCyberOS?.(toolName);
+                }}
+                onBypass={() => triggerUnlock(activeSection)}
+                onSolved={() => triggerUnlock(activeSection)}
+              />
             </div>
           ) : (
             <>
