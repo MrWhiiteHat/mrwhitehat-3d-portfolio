@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cpu, Terminal, Play, CheckCircle2, ShieldAlert, Zap, AlertTriangle, Code2 } from 'lucide-react';
+import { Cpu, Terminal, Play, CheckCircle2, ShieldAlert, Zap, AlertTriangle, Code2, KeyRound } from 'lucide-react';
 import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 import { getChallengeById } from '../../../utils/ctf/ctfChallenges.js';
@@ -9,8 +9,9 @@ const REVEALED_FLAG = 'FLAG{buffer_overflow_eip_overwritten_0x55}';
 
 export default function BufferOverflowChallenge({ onSolved, onBypass }) {
   const challenge = getChallengeById(CHALLENGE_ID);
-  const [payloadLength, setPayloadLength] = useState(24);
-  const [returnAddr, setReturnAddr] = useState('0x00401155');
+  // Real CTF: starts empty/blank, user must calculate and type
+  const [paddingOffset, setPaddingOffset] = useState('');
+  const [targetRip, setTargetRip] = useState('');
   const [executing, setExecuting] = useState(false);
   const [gdbOutput, setGdbOutput] = useState('');
   const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
@@ -19,45 +20,60 @@ export default function BufferOverflowChallenge({ onSolved, onBypass }) {
 
   const bufferSize = 16;
   const savedRbpSize = 8;
-  const overflowOffset = bufferSize + savedRbpSize; // 24 bytes to reach RIP
+  const requiredOffset = bufferSize + savedRbpSize; // 24 bytes
 
   const handleTestExploit = () => {
-    if (solved || executing) return;
+    if (executing) return;
+    const offsetNum = parseInt(paddingOffset, 10);
+    const ripClean = targetRip.trim().toLowerCase();
+
+    if (isNaN(offsetNum) || offsetNum < 0) {
+      setGdbOutput('[-] Error: Please enter a valid non-negative byte count for payload padding.');
+      playZapSound();
+      return;
+    }
+
+    if (!ripClean) {
+      setGdbOutput('[-] Error: Target return address (Saved RIP) cannot be empty.');
+      playZapSound();
+      return;
+    }
+
     setExecuting(true);
     playHackingBeep(1100);
-    setGdbOutput('Starting program: ./vuln_server\nInjecting crafted input buffer...');
+    setGdbOutput('Starting program: ./vuln_server\nDebugger attached (gdb-peda)\nInjecting constructed payload bytes...');
 
     setTimeout(() => {
-      if (payloadLength >= overflowOffset && (returnAddr === '0x00401155' || returnAddr === '0x55')) {
+      const isRipWin = ripClean === '0x00401155' || ripClean === '0x401155' || ripClean === '0x55';
+
+      if (offsetNum >= requiredOffset && isRipWin) {
         setGdbOutput(
-          `[+] Payload injected (${payloadLength} bytes padding + target RIP)\n` +
-          `[+] [0x7fffffffe018]: Overwriting Saved RIP -> 0x00401155\n` +
-          `[+] Instruction pointer redirected to win()!\n` +
+          `[+] Payload injected: ${offsetNum} bytes padding ('A'*${offsetNum}) + return address (${targetRip})\n` +
+          `[+] [0x7fffffffe018]: Overwritten Saved RIP -> 0x00401155\n` +
+          `[+] Control flow hijacked! Execution successfully redirected to win()!\n` +
+          `[+] Executing win(): Dumping confidential flag from root vault...\n` +
           `[+] FLAG CAPTURED: ${REVEALED_FLAG}`
         );
-        setExecuting(false);
-        setSolved(true);
-        ctfEngine.submitFlag(CHALLENGE_ID, REVEALED_FLAG);
-        playBreachFanfare();
-        setTimeout(() => onSolved?.(), 1600);
-      } else if (payloadLength < overflowOffset) {
+        playClickSound(1000);
+      } else if (offsetNum < requiredOffset) {
         setGdbOutput(
-          `[-] Injected ${payloadLength} bytes.\n` +
-          `[-] Stack frame not fully saturated (Needs ${overflowOffset} bytes to reach Saved RIP).\n` +
-          `[-] Program exited normally without hijacking control flow.`
+          `[-] Injected ${offsetNum} bytes.\n` +
+          `[-] Stack frame analysis: buffer is ${bufferSize} bytes + ${savedRbpSize} bytes Saved RBP.\n` +
+          `[-] Stack not saturated (Needs ${requiredOffset} bytes total to reach Saved RIP).\n` +
+          `[-] Program exited normally without hijacking control flow (exit code: 0).`
         );
-        setExecuting(false);
-        playClickSound(350, 0.1);
+        playZapSound();
       } else {
         setGdbOutput(
           `[!] Program received signal SIGSEGV, Segmentation fault.\n` +
-          `[!] Invalid memory reference at RIP: ${returnAddr}\n` +
-          `[!] Target win() address is 0x00401155.`
+          `[!] 0x00000000${targetRip.replace('0x', '')} in ?? ()\n` +
+          `[!] Invalid memory dereference at instruction pointer.\n` +
+          `[!] Inspect symbol table: 'win()' function is located at address 0x00401155.`
         );
-        setExecuting(false);
         playZapSound();
       }
-    }, 600);
+      setExecuting(false);
+    }, 700);
   };
 
   const handleManualSubmit = (e) => {
@@ -67,9 +83,11 @@ export default function BufferOverflowChallenge({ onSolved, onBypass }) {
     if (res.success || res.duplicate) {
       setSolved(true);
       setFlagFeedback({ success: true, text: res.message });
-      setTimeout(() => onSolved?.(), 1200);
+      playBreachFanfare();
+      setTimeout(() => onSolved?.(), 1600);
     } else {
       setFlagFeedback({ success: false, text: res.message });
+      playZapSound();
     }
   };
 
@@ -99,121 +117,167 @@ export default function BufferOverflowChallenge({ onSolved, onBypass }) {
 
       <div className="hack-instructions">
         <p className="text-xs text-slate-300">
-          Analyze the vulnerable C source code and stack frame. Calculate the exact byte offset to overwrite the instruction pointer (Saved RIP) and divert control to <code className="text-cyan-400">win() (0x00401155)</code>.
+          The binary <code>vuln_server</code> reads standard input into a fixed stack buffer via vulnerable <code>gets()</code>. Calculate the exact padding offset to reach the Saved RIP return address, then hijack control flow to the <code>win()</code> function.
         </p>
       </div>
 
-      {/* C Source Code Preview */}
-      <div className="p-2.5 bg-black border border-slate-800 rounded font-mono text-[11px] text-slate-300">
-        <div className="text-[10px] text-slate-500 mb-1">// Vulnerable Binary Source (vuln_server.c):</div>
-        <div><span className="text-purple-400">void</span> <span className="text-cyan-400">vuln</span>(<span className="text-purple-400">char</span> *input) &#123;</div>
-        <div className="pl-4"><span className="text-purple-400">char</span> buffer[<span className="text-amber-400">16</span>];</div>
-        <div className="pl-4 text-rose-400">strcpy(buffer, input); <span className="text-slate-500">// Vulnerability: Unbounded copy</span></div>
-        <div>&#125;</div>
-        <div><span className="text-purple-400">void</span> <span className="text-emerald-400">win</span>() &#123; print_flag(); &#125; <span className="text-slate-500">// Located at: 0x00401155</span></div>
-      </div>
+      {/* C Source Code & Disassembly View */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+        <div className="p-2.5 bg-black/90 border border-slate-800 rounded font-mono text-[11px]">
+          <div className="text-cyan-400 text-[10px] uppercase mb-1 flex items-center gap-1">
+            <Code2 size={12} />
+            <span>VULNERABLE C SOURCE (vuln.c):</span>
+          </div>
+          <pre className="text-slate-300 overflow-x-auto leading-relaxed">
+{`void win() {
+    // 0x00401155
+    print_flag_vault();
+}
 
-      {/* Visual Stack Layout Diagram */}
-      <div className="mt-3 p-3 bg-slate-950 border border-slate-800 rounded space-y-2">
-        <div className="text-xs font-mono text-cyan-400 font-bold">// Visual Stack Memory Layout:</div>
-        <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
-          <div className="p-2 bg-slate-900 border border-cyan-500/40 rounded">
-            <span className="text-slate-400 block text-[10px]">LOCAL BUFFER</span>
-            <strong className="text-cyan-300">16 Bytes</strong>
-            <span className="text-[10px] text-slate-500 block">0x7fffffffe000</span>
-          </div>
-          <div className="p-2 bg-slate-900 border border-amber-500/40 rounded">
-            <span className="text-slate-400 block text-[10px]">SAVED RBP</span>
-            <strong className="text-amber-300">8 Bytes</strong>
-            <span className="text-[10px] text-slate-500 block">0x7fffffffe010</span>
-          </div>
-          <div className="p-2 bg-slate-900 border border-rose-500/60 rounded">
-            <span className="text-slate-400 block text-[10px]">SAVED RIP (RET)</span>
-            <strong className="text-rose-400">8 Bytes</strong>
-            <span className="text-[10px] text-slate-500 block">0x7fffffffe018</span>
-          </div>
+void vuln() {
+    char buffer[16]; // 16 bytes
+    gets(buffer);    // No bounds check!
+}`}
+          </pre>
         </div>
 
-        {/* Payload Crafting Controls */}
-        <div className="pt-2 space-y-2">
-          <div className="flex justify-between items-center text-xs font-mono">
-            <span className="text-slate-400">PADDING BYTES (OFFSET):</span>
-            <strong className="text-cyan-400">{payloadLength} Bytes {payloadLength === 24 ? '(Exact Offset!)' : ''}</strong>
+        <div className="p-2.5 bg-black/90 border border-slate-800 rounded font-mono text-[11px]">
+          <div className="text-amber-400 text-[10px] uppercase mb-1 flex items-center gap-1">
+            <Terminal size={12} />
+            <span>GDB DISASSEMBLY & SYMBOLS:</span>
           </div>
-          <input
-            type="range"
-            min="8"
-            max="32"
-            step="1"
-            value={payloadLength}
-            onChange={(e) => setPayloadLength(parseInt(e.target.value, 10))}
-            className="w-full hack-range-input cursor-pointer"
-            disabled={solved || executing}
-          />
-          <div className="flex items-center gap-2 pt-1">
-            <label className="text-xs font-mono text-slate-400">OVERWRITE RIP WITH:</label>
+          <pre className="text-slate-300 overflow-x-auto leading-relaxed">
+{`gdb-peda$ info functions
+0x00401130  main
+0x00401140  vuln
+0x00401155  win
+gdb-peda$ checksec
+CANARY    : Disabled
+FORTIFY   : Disabled
+NX        : Enabled
+PIE       : Disabled`}
+          </pre>
+        </div>
+      </div>
+
+      {/* Stack Frame Layout Visualizer */}
+      <div className="p-2.5 bg-slate-950 border border-slate-800 rounded mt-2 font-mono text-[11px]">
+        <span className="text-[10px] text-slate-400 uppercase block mb-1.5">STACK FRAME MEMORY ARCHITECTURE (x86_64):</span>
+        <div className="grid grid-cols-3 gap-1 text-center text-xs">
+          <div className="p-2 bg-blue-950/40 border border-blue-600/50 rounded">
+            <strong className="text-blue-300 block">buffer[16]</strong>
+            <span className="text-[10px] text-slate-400">16 Bytes</span>
+          </div>
+          <div className="p-2 bg-purple-950/40 border border-purple-600/50 rounded">
+            <strong className="text-purple-300 block">Saved RBP</strong>
+            <span className="text-[10px] text-slate-400">8 Bytes</span>
+          </div>
+          <div className="p-2 bg-rose-950/40 border border-rose-600/50 rounded">
+            <strong className="text-rose-300 block">Saved RIP</strong>
+            <span className="text-[10px] text-slate-400">Target Address</span>
+          </div>
+        </div>
+        <div className="text-[10px] text-slate-500 text-center mt-1">
+          Offset to Saved RIP = 16 bytes (buffer) + 8 bytes (RBP) = <strong>24 Bytes</strong>
+        </div>
+      </div>
+
+      {/* Exploit Construction Inputs */}
+      <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg space-y-2 mt-2">
+        <span className="text-[11px] font-mono text-cyan-400 uppercase tracking-wider block">
+          EXPLOIT PAYLOAD CONFIGURATION:
+        </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label className="text-[10px] font-mono text-slate-400 block mb-1">
+              PADDING LENGTH (BYTES TO SAVED RIP):
+            </label>
+            <input
+              type="number"
+              value={paddingOffset}
+              onChange={(e) => setPaddingOffset(e.target.value)}
+              placeholder="e.g. 24"
+              className="w-full bg-black border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-cyan-300 outline-none focus:border-cyan-500"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] font-mono text-slate-400 block mb-1">
+              TARGET OVERWRITE ADDRESS (SAVED RIP):
+            </label>
             <input
               type="text"
-              value={returnAddr}
-              onChange={(e) => setReturnAddr(e.target.value)}
-              className="flex-1 bg-black border border-slate-700 rounded px-2.5 py-1 text-xs font-mono text-emerald-300 outline-none focus:border-cyan-500"
-              disabled={solved || executing}
+              value={targetRip}
+              onChange={(e) => setTargetRip(e.target.value)}
+              placeholder="e.g. 0x00401155"
+              className="w-full bg-black border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-cyan-300 outline-none focus:border-cyan-500"
             />
-            <button
-              type="button"
-              onClick={handleTestExploit}
-              disabled={solved || executing}
-              className="bg-cyan-600 hover:bg-cyan-500 text-black font-bold px-3 py-1 rounded text-xs flex items-center gap-1 transition"
-            >
-              <Play size={13} />
-              <span>TEST IN GDB</span>
-            </button>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={handleTestExploit}
+          disabled={executing}
+          className="w-full bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-black font-bold py-2 rounded text-xs flex items-center justify-center gap-1.5 transition font-mono mt-1"
+        >
+          <Play size={13} />
+          <span>{executing ? 'RUNNING IN GDB...' : 'RUN EXPLOIT AGAINST ./vuln_server'}</span>
+        </button>
       </div>
 
-      {/* GDB Debugger Console Output */}
+      {/* GDB Execution Console */}
       {gdbOutput && (
-        <div className="mt-3 p-2.5 bg-black border border-cyan-500/30 rounded font-mono text-[11px] text-cyan-300 whitespace-pre-wrap">
-          {gdbOutput}
+        <div className="mt-3 p-2.5 bg-black border border-slate-800 rounded font-mono text-xs">
+          <div className="text-slate-500 text-[10px] uppercase mb-1 flex items-center gap-1">
+            <Terminal size={11} />
+            <span>GDB-PEDA SESSION LOG:</span>
+          </div>
+          <pre className="text-emerald-300 whitespace-pre-wrap select-all overflow-x-auto leading-relaxed">
+            {gdbOutput}
+          </pre>
         </div>
       )}
 
-      {/* MANUAL FLAG SUBMISSION STRIP */}
-      <form onSubmit={handleManualSubmit} className="mt-3 flex gap-2">
-        <input
-          type="text"
-          value={manualFlag}
-          onChange={(e) => setManualFlag(e.target.value)}
-          placeholder="Or submit flag: FLAG{...}"
-          className="flex-1 bg-black/50 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-emerald-500"
-        />
-        <button
-          type="submit"
-          className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-3 py-1 rounded text-xs transition"
-        >
-          SUBMIT
-        </button>
-      </form>
+      {/* FLAG SUBMISSION FORM */}
+      <div className="mt-4 pt-3 border-t border-slate-800">
+        <label className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
+          <KeyRound size={12} />
+          <span>SUBMIT CAPTURED PWN FLAG:</span>
+        </label>
+        <form onSubmit={handleManualSubmit} className="flex gap-2">
+          <input
+            type="text"
+            value={manualFlag}
+            onChange={(e) => setManualFlag(e.target.value)}
+            placeholder="FLAG{buffer_overflow_...}"
+            className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
+          />
+          <button
+            type="submit"
+            className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-4 py-1.5 rounded text-xs transition font-mono"
+          >
+            SUBMIT FLAG
+          </button>
+        </form>
 
-      {flagFeedback && (
-        <div className={`mt-2 text-xs p-1.5 rounded ${flagFeedback.success ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'}`}>
-          {flagFeedback.text}
-        </div>
-      )}
+        {flagFeedback && (
+          <div className={`mt-2 text-xs p-2 rounded font-mono ${flagFeedback.success ? 'bg-emerald-950 border border-emerald-500 text-emerald-300' : 'bg-rose-950 border border-rose-500 text-rose-300'}`}>
+            {flagFeedback.text}
+          </div>
+        )}
+      </div>
 
       {solved ? (
         <div className="hack-success-banner mt-3">
           <CheckCircle2 size={16} className="text-emerald-400" />
           <div className="flex flex-col">
-            <span className="font-bold text-emerald-300">RIP CONTROL HIJACKED // {REVEALED_FLAG}</span>
-            <span className="text-[10px] text-emerald-400/80">+200 CTF PTS Awarded to Profile · Skills Archive Unlocked</span>
+            <span className="font-bold text-emerald-300">EXPLOIT SUCCESSFUL // BUFFER PWNED</span>
+            <span className="text-[10px] text-emerald-400/80">+200 CTF PTS Awarded · Stack Hijack Complete</span>
           </div>
         </div>
       ) : (
         <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Buffer (16 bytes) + Saved RBP (8 bytes) = 24 bytes offset to hijack RIP</span>
+          <span>Calculate offset: buffer size (16) + RBP (8) = 24 bytes to target RIP address 0x00401155</span>
         </div>
       )}
     </div>

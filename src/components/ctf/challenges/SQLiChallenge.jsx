@@ -9,10 +9,12 @@ const REVEALED_FLAG = 'FLAG{sqli_union_select_waf_bypassed}';
 
 export default function SQLiChallenge({ onSolved, onBypass }) {
   const challenge = getChallengeById(CHALLENGE_ID);
-  const [queryInput, setQueryInput] = useState("admin' UNION SELECT null, username, password FROM users--");
+  // Real CTF: starts with an authentic lookup, NOT pre-filled exploit
+  const [queryInput, setQueryInput] = useState('alice');
   const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
   const [executedQuery, setExecutedQuery] = useState('');
   const [dbResults, setDbResults] = useState(null);
+  const [dbError, setDbError] = useState('');
   const [wafBlocked, setWafBlocked] = useState(false);
   const [wafBlockReason, setWafBlockReason] = useState('');
   const [manualFlag, setManualFlag] = useState('');
@@ -20,42 +22,93 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
 
   const simulateSQL = (payload) => {
     playHackingBeep(1200);
-    setExecutedQuery(`SELECT id, username, email FROM accounts WHERE user_input = '${payload}';`);
+    const sanitized = payload.trim();
+    setExecutedQuery(`SELECT id, username, role, clearance_token FROM accounts WHERE username = '${sanitized}';`);
+    setDbError('');
+    setWafBlocked(false);
+    setWafBlockReason('');
 
-    const lower = payload.toLowerCase();
+    const lower = sanitized.toLowerCase();
 
-    // WAF Filter Checks
-    if (lower.includes('drop table') || lower.includes('drop database')) {
+    // WAF Filter Checks: blocks destructive statements
+    if (lower.includes('drop table') || lower.includes('drop database') || lower.includes('delete from')) {
       setWafBlocked(true);
-      setWafBlockReason('WAF ALERT: Destructive DDL statement blocked by Rule #901.');
+      setWafBlockReason('WAF ALERT: Destructive DDL/DML statement intercepted by Rule #901.');
       setDbResults(null);
       playZapSound();
       return;
     }
 
-    setWafBlocked(false);
-    setWafBlockReason('');
+    // Realistic SQL Syntax & Logic Parser:
+    // 1. Unclosed quotes test
+    if ((sanitized.match(/'/g) || []).length % 2 !== 0 && !sanitized.includes('--')) {
+      setDbError("SQLite3::OperationalError: unrecognized token: \"'\" near line 1. Syntax error: unclosed quotation mark.");
+      setDbResults(null);
+      playZapSound();
+      return;
+    }
 
-    // Check for successful SQLi exploit
-    const isUnionSelect = lower.includes('union') && lower.includes('select');
-    const isAuthBypass = lower.includes("' or '1'='1") || lower.includes("' or 1=1") || lower.includes("admin'--");
-
-    if (isUnionSelect || isAuthBypass) {
-      setDbResults([
-        { id: 1, username: 'admin', role: 'root', secret: 'HASH_a48f29bc1' },
-        { id: 2, username: 'operator', role: 'sentinel', secret: 'FLAG_SECRET_PART' },
-        { id: 99, username: 'CTF_REWARD', role: 'SYSTEM_ROOT', secret: REVEALED_FLAG },
-      ]);
-
-      if (!solved) {
-        setSolved(true);
-        ctfEngine.submitFlag(CHALLENGE_ID, REVEALED_FLAG);
-        playBreachFanfare();
-        setTimeout(() => onSolved?.(), 1600);
+    // 2. ORDER BY column count enumeration
+    const orderMatch = lower.match(/order\s+by\s+(\d+)/);
+    if (orderMatch) {
+      const colNum = parseInt(orderMatch[1], 10);
+      if (colNum > 4) {
+        setDbError(`SQLite3::OperationalError: 1st ORDER BY term out of range - should be between 1 and 4.`);
+        setDbResults(null);
+        playZapSound();
+        return;
+      } else {
+        setDbResults([
+          { id: 1, username: 'alice', role: 'Security Analyst', clearance: 'L2_RESTRICTED' },
+        ]);
+        return;
       }
+    }
+
+    // 3. UNION SELECT column count check
+    if (lower.includes('union') && lower.includes('select')) {
+      // Count comma separated terms after SELECT
+      const afterSelect = sanitized.slice(sanitized.toLowerCase().indexOf('select') + 6);
+      const terms = afterSelect.split('--')[0].split('from')[0].split(',');
+      if (terms.length !== 4) {
+        setDbError(`SQLite3::OperationalError: SELECTs to the left and right of UNION do not have the same number of result columns (expected 4 columns, got ${terms.length}).`);
+        setDbResults(null);
+        playZapSound();
+        return;
+      }
+
+      // Valid UNION injection! Returns database dump
+      setDbResults([
+        { id: 1, username: 'alice', role: 'Security Analyst', clearance: 'L2_RESTRICTED' },
+        { id: 2, username: 'bob', role: 'DevOps Engineer', clearance: 'L1_STANDARD' },
+        { id: 99, username: 'root_sentinel', role: 'SYSTEM_ADMINISTRATOR', clearance: REVEALED_FLAG },
+      ]);
+      playClickSound(950);
+      return;
+    }
+
+    // 4. Authentication Bypass (OR 1=1 or OR ''='')
+    if (lower.includes("' or '1'='1") || lower.includes("' or 1=1") || lower.includes("' or ''='") || lower.includes("admin'--")) {
+      setDbResults([
+        { id: 1, username: 'alice', role: 'Security Analyst', clearance: 'L2_RESTRICTED' },
+        { id: 2, username: 'bob', role: 'DevOps Engineer', clearance: 'L1_STANDARD' },
+        { id: 99, username: 'root_sentinel', role: 'SYSTEM_ADMINISTRATOR', clearance: REVEALED_FLAG },
+      ]);
+      playClickSound(950);
+      return;
+    }
+
+    // Normal lookup
+    if (lower === 'alice') {
+      setDbResults([
+        { id: 1, username: 'alice', role: 'Security Analyst', clearance: 'L2_RESTRICTED' },
+      ]);
+    } else if (lower === 'bob') {
+      setDbResults([
+        { id: 2, username: 'bob', role: 'DevOps Engineer', clearance: 'L1_STANDARD' },
+      ]);
     } else {
       setDbResults([]);
-      playClickSound(300, 0.1);
     }
   };
 
@@ -66,9 +119,11 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
     if (res.success || res.duplicate) {
       setSolved(true);
       setFlagFeedback({ success: true, text: res.message });
-      setTimeout(() => onSolved?.(), 1200);
+      playBreachFanfare();
+      setTimeout(() => onSolved?.(), 1600);
     } else {
       setFlagFeedback({ success: false, text: res.message });
+      playZapSound();
     }
   };
 
@@ -98,21 +153,21 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
 
       <div className="hack-instructions">
         <p className="text-xs text-slate-300">
-          The internal 42U Mainframe API authenticates operators via a dynamic SQL query. Craft an injection string using comment termination (`--`) or `UNION SELECT` to dump confidential credentials.
+          The internal 42U Mainframe API authenticates operators via a dynamic SQL query. Enumerate column structure using <code>ORDER BY</code> or craft a 4-column <code>UNION SELECT</code> payload to extract the administrator's clearance token.
         </p>
       </div>
 
       {/* Interactive SQL Injection Input */}
       <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg space-y-2 mt-2">
         <label className="text-[11px] font-mono text-cyan-400 uppercase tracking-wider block">
-          TARGET INPUT PARAMETER: <code>$_GET['user_input']</code>
+          TARGET INPUT PARAMETER: <code>GET /api/v1/accounts?username=</code>
         </label>
         <div className="flex gap-2">
           <input
             type="text"
             value={queryInput}
             onChange={(e) => setQueryInput(e.target.value)}
-            placeholder="' OR '1'='1' --"
+            placeholder="e.g. alice' OR '1'='1'-- or ' UNION SELECT 1,2,3,4--"
             className="flex-1 bg-black border border-slate-700 rounded px-3 py-2 text-xs font-mono text-emerald-300 outline-none focus:border-rose-500"
           />
           <button
@@ -124,35 +179,21 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
             <span>EXECUTE QUERY</span>
           </button>
         </div>
-
-        {/* Quick Payload Presets */}
-        <div className="flex items-center gap-1.5 flex-wrap pt-1">
-          <span className="text-[10px] text-slate-500 font-mono">QUICK PAYLOADS:</span>
-          {[
-            "admin'--",
-            "' OR '1'='1'--",
-            "' UNION SELECT null, username, password FROM users--",
-          ].map((preset) => (
-            <button
-              key={preset}
-              type="button"
-              onClick={() => {
-                setQueryInput(preset);
-                simulateSQL(preset);
-              }}
-              className="text-[10px] font-mono bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-300 px-2 py-0.5 rounded"
-            >
-              {preset}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Backend Live Query Execution Output */}
       {executedQuery && (
         <div className="mt-3 p-2.5 bg-black/90 border border-cyan-500/20 rounded font-mono text-[11px]">
-          <div className="text-slate-500 text-[10px] uppercase mb-1">// Backend Server Query Constructed:</div>
-          <code className="text-amber-300">{executedQuery}</code>
+          <div className="text-slate-500 text-[10px] uppercase mb-1">// Backend Server Query Executed:</div>
+          <code className="text-amber-300 break-all">{executedQuery}</code>
+        </div>
+      )}
+
+      {/* SQL Error Banner */}
+      {dbError && (
+        <div className="mt-2 p-2 bg-amber-950/80 border border-amber-500/50 rounded flex items-center gap-2 text-amber-300 text-xs font-mono">
+          <AlertTriangle size={14} className="text-amber-400 flex-shrink-0" />
+          <span>{dbError}</span>
         </div>
       )}
 
@@ -168,7 +209,7 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
       {dbResults && (
         <div className="mt-3 border border-slate-800 rounded bg-slate-950 overflow-hidden">
           <div className="p-2 bg-slate-900 border-b border-slate-800 text-[11px] font-mono text-slate-400 flex justify-between">
-            <span>DATABASE RESPONSE // TABLE [USERS]</span>
+            <span>DATABASE RESPONSE // TABLE [ACCOUNTS]</span>
             <span className="text-emerald-400">{dbResults.length} RECORD(S) RETURNED</span>
           </div>
           {dbResults.length > 0 ? (
@@ -179,7 +220,7 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
                     <th className="pb-1">ID</th>
                     <th className="pb-1">USERNAME</th>
                     <th className="pb-1">ROLE</th>
-                    <th className="pb-1">EXTRACTED CREDENTIAL / FLAG</th>
+                    <th className="pb-1">CLEARANCE TOKEN</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/40">
@@ -188,7 +229,7 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
                       <td className="py-1 text-slate-500">{r.id}</td>
                       <td className="py-1 font-bold">{r.username}</td>
                       <td className="py-1 text-cyan-400">{r.role}</td>
-                      <td className="py-1 font-mono text-emerald-400">{r.secret}</td>
+                      <td className="py-1 font-mono text-emerald-400 select-all">{r.clearance}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -196,47 +237,53 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
             </div>
           ) : (
             <div className="p-4 text-center text-xs text-slate-500 font-mono">
-              0 rows returned. (Authentication failed: invalid query logic).
+              0 rows returned. (No matching accounts found for query).
             </div>
           )}
         </div>
       )}
 
-      {/* MANUAL FLAG SUBMISSION STRIP */}
-      <form onSubmit={handleManualSubmit} className="mt-3 flex gap-2">
-        <input
-          type="text"
-          value={manualFlag}
-          onChange={(e) => setManualFlag(e.target.value)}
-          placeholder="Or submit flag: FLAG{...}"
-          className="flex-1 bg-black/50 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-emerald-500"
-        />
-        <button
-          type="submit"
-          className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-3 py-1 rounded text-xs transition"
-        >
-          SUBMIT
-        </button>
-      </form>
+      {/* FLAG SUBMISSION STRIP */}
+      <div className="mt-4 pt-3 border-t border-slate-800">
+        <label className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
+          <KeyRound size={12} />
+          <span>SUBMIT EXTRACTED CLEARANCE FLAG:</span>
+        </label>
+        <form onSubmit={handleManualSubmit} className="flex gap-2">
+          <input
+            type="text"
+            value={manualFlag}
+            onChange={(e) => setManualFlag(e.target.value)}
+            placeholder="Paste captured flag: FLAG{...}"
+            className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
+          />
+          <button
+            type="submit"
+            className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-4 py-1.5 rounded text-xs transition"
+          >
+            SUBMIT FLAG
+          </button>
+        </form>
 
-      {flagFeedback && (
-        <div className={`mt-2 text-xs p-1.5 rounded ${flagFeedback.success ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'}`}>
-          {flagFeedback.text}
-        </div>
-      )}
+        {flagFeedback && (
+          <div className={`mt-2 text-xs p-2 rounded font-mono ${flagFeedback.success ? 'bg-emerald-950 border border-emerald-500 text-emerald-300' : 'bg-rose-950 border border-rose-500 text-rose-300'}`}>
+            {flagFeedback.text}
+          </div>
+        )}
+      </div>
 
       {solved ? (
         <div className="hack-success-banner mt-3">
           <CheckCircle2 size={16} className="text-emerald-400" />
           <div className="flex flex-col">
-            <span className="font-bold text-emerald-300">SQL INJECTION SUCCESSFUL // {REVEALED_FLAG}</span>
+            <span className="font-bold text-emerald-300">CHALLENGE COMPLETE // FLAG ACCEPTED</span>
             <span className="text-[10px] text-emerald-400/80">+250 CTF PTS Awarded to Profile · Mainframe Unlocked</span>
           </div>
         </div>
       ) : (
         <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Craft injection with UNION SELECT or OR 1=1 to bypass authentication</span>
+          <span>Tip: Test quotes, enumerate column counts with ORDER BY 1,2,3,4, then inject UNION SELECT</span>
         </div>
       )}
     </div>

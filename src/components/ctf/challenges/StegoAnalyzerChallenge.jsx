@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Radio, Activity, CheckCircle2, Zap, Sliders, Eye } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Radio, Activity, CheckCircle2, Zap, Sliders, Eye, KeyRound } from 'lucide-react';
 import { playBreachFanfare, playClickSound, playHackingBeep, playZapSound } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 import { getChallengeById } from '../../../utils/ctf/ctfChallenges.js';
@@ -9,28 +9,103 @@ const REVEALED_FLAG = 'FLAG{stego_audio_watermark_demodulated}';
 
 export default function StegoAnalyzerChallenge({ onSolved, onBypass }) {
   const challenge = getChallengeById(CHALLENGE_ID);
-  const [carrierFreq, setCarrierFreq] = useState(130.0);
+  const [carrierFreq, setCarrierFreq] = useState(112.5); // Starts untuned
   const [bandpassFilter, setBandpassFilter] = useState('ALL_PASS');
   const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
   const [manualFlag, setManualFlag] = useState('');
   const [flagFeedback, setFlagFeedback] = useState(null);
+  const canvasRef = useRef(null);
 
   const targetFreq = 142.8;
-  const isAligned = Math.abs(carrierFreq - targetFreq) <= 0.6 && bandpassFilter === 'BANDPASS_15KHZ';
+  const isAligned = Math.abs(carrierFreq - targetFreq) <= 0.6 && bandpassFilter === 'HIGHPASS_15KHZ';
 
+  // Live Canvas Spectrogram Waterfall Rendering
   useEffect(() => {
-    if (isAligned && !solved) {
-      setSolved(true);
-      ctfEngine.submitFlag(CHALLENGE_ID, REVEALED_FLAG);
-      playBreachFanfare();
-      setTimeout(() => onSolved?.(), 1600);
-    }
-  }, [isAligned, solved, onSolved]);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrame;
+    let offset = 0;
+
+    const render = () => {
+      offset += 1;
+      const width = canvas.width;
+      const height = canvas.height;
+
+      // Dark background
+      ctx.fillStyle = '#050a08';
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw grid
+      ctx.strokeStyle = '#0e2417';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < width; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      if (isAligned) {
+        // Demodulated clear spectral watermark
+        ctx.fillStyle = 'rgba(52, 211, 153, 0.15)';
+        ctx.fillRect(10, 20, width - 20, height - 40);
+
+        ctx.fillStyle = '#34d399';
+        ctx.font = 'bold 12px monospace';
+        ctx.fillText('DEMODULATED CARRIER LOCK // 142.8 kHz [HIGHPASS_15KHZ]', 16, 38);
+
+        ctx.fillStyle = '#00f0ff';
+        ctx.font = 'bold 13px monospace';
+        ctx.fillText('WATERMARK: ' + REVEALED_FLAG, 16, 70);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px monospace';
+        ctx.fillText('Signal-to-Noise Ratio: 34.2 dB · Modulation: Audio FSK/Spectrogram', 16, 95);
+
+        // Audio waveform lines
+        ctx.strokeStyle = '#34d399';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let x = 0; x < width; x += 4) {
+          const y = 80 + Math.sin((x + offset * 2) * 0.08) * 12 + Math.cos((x) * 0.03) * 6;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      } else {
+        // Untuned noisy spectrogram
+        ctx.fillStyle = '#64748b';
+        ctx.font = '11px monospace';
+        ctx.fillText(`CARRIER: ${carrierFreq.toFixed(1)} kHz | FILTER: ${bandpassFilter}`, 16, 25);
+        ctx.fillText('STATUS: CARRIER DESYNCHRONIZED // STATIC NOISE', 16, 45);
+
+        // Rolling noisy scanlines
+        for (let i = 0; i < 60; i++) {
+          const rx = Math.random() * width;
+          const ry = Math.random() * height;
+          const rw = Math.random() * 25 + 5;
+          ctx.fillStyle = Math.random() > 0.5 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(14, 165, 233, 0.15)';
+          ctx.fillRect(rx, ry, rw, 2);
+        }
+      }
+
+      animationFrame = requestAnimationFrame(render);
+    };
+
+    render();
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isAligned, carrierFreq, bandpassFilter]);
 
   const handleFreqChange = (val) => {
-    if (solved) return;
     setCarrierFreq(val);
-    playClickSound(800 + (val - 120) * 10);
+    playClickSound(800 + (val - 100) * 8);
   };
 
   const handleManualSubmit = (e) => {
@@ -40,9 +115,11 @@ export default function StegoAnalyzerChallenge({ onSolved, onBypass }) {
     if (res.success || res.duplicate) {
       setSolved(true);
       setFlagFeedback({ success: true, text: res.message });
-      setTimeout(() => onSolved?.(), 1200);
+      playBreachFanfare();
+      setTimeout(() => onSolved?.(), 1600);
     } else {
       setFlagFeedback({ success: false, text: res.message });
+      playZapSound();
     }
   };
 
@@ -72,114 +149,119 @@ export default function StegoAnalyzerChallenge({ onSolved, onBypass }) {
 
       <div className="hack-instructions">
         <p className="text-xs text-slate-300">
-          Tune the software-defined radio receiver. Set carrier frequency to the harmonic peak (~142.8 MHz) and apply the 15 kHz Bandpass filter to decode the visual spectrogram waterfall image.
+          Audio forensic units detected a covert ultrasonic carrier hidden inside the office radio transmissions. Tune the demodulator receiver frequency to ~142.8 kHz and engage the 15 kHz high-pass DSP filter to reconstruct the hidden spectral watermark.
         </p>
       </div>
 
-      {/* Spectrogram Waterfall Simulation Canvas */}
-      <div className="mt-3 p-4 bg-black border border-slate-800 rounded font-mono relative overflow-hidden flex flex-col items-center justify-center min-h-[140px]">
-        <div className="absolute top-1 left-2 text-[10px] text-slate-500 uppercase">
-          // FFT Spectrogram Waterfall (Time vs Frequency):
-        </div>
-
-        {isAligned ? (
-          <div className="text-center space-y-1">
-            <span className="text-[10px] text-emerald-400 uppercase tracking-widest block font-bold">
-              [+] DEMODULATED VISUAL WATERMARK DETECTED:
-            </span>
-            <div className="text-lg font-bold text-emerald-300 tracking-wider animate-pulse border border-emerald-500/50 bg-emerald-950/60 px-4 py-2 rounded">
-              {REVEALED_FLAG}
-            </div>
-            <span className="text-[10px] text-slate-400">142.850 MHz · 15 kHz FFT Waterfall Resolved</span>
-          </div>
-        ) : (
-          <div className="text-center text-slate-600 space-y-2">
-            <div className="font-mono text-xs tracking-widest text-slate-500">
-              ~~~ ~~~ ~~~ NOISE FLOOR / UNRESOLVED RF CARRIER ~~~ ~~~ ~~~
-            </div>
-            <div className="text-[11px] text-slate-400">
-              Current Carrier: <strong className="text-cyan-400">{carrierFreq.toFixed(1)} MHz</strong> · Filter: <strong className="text-amber-400">{bandpassFilter}</strong>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Radio Tuning Controls */}
-      <div className="mt-3 p-3 bg-slate-950 border border-slate-800 rounded space-y-3">
+      {/* DSP Controls Box */}
+      <div className="p-3 bg-slate-950 border border-slate-800 rounded mt-2 space-y-3">
+        {/* Carrier Frequency Slider */}
         <div className="space-y-1">
           <div className="flex justify-between items-center text-xs font-mono">
-            <span className="text-slate-400">CARRIER FREQUENCY (MHz):</span>
-            <strong className="text-cyan-400">{carrierFreq.toFixed(1)} MHz (Target: ~142.8 MHz)</strong>
+            <span className="text-slate-300">RECEIVER CARRIER FREQUENCY:</span>
+            <strong className="text-cyan-400 font-bold text-sm">{carrierFreq.toFixed(1)} kHz</strong>
           </div>
           <input
             type="range"
-            min="120.0"
-            max="160.0"
+            min="100.0"
+            max="180.0"
             step="0.2"
             value={carrierFreq}
             onChange={(e) => handleFreqChange(parseFloat(e.target.value))}
-            className="w-full hack-range-input cursor-pointer"
-            disabled={solved}
+            className="w-full accent-cyan-400 cursor-pointer"
           />
+          <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+            <span>100.0 kHz</span>
+            <span>120.0 kHz</span>
+            <span>140.0 kHz</span>
+            <span>160.0 kHz</span>
+            <span>180.0 kHz</span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 pt-1">
-          <span className="text-xs font-mono text-slate-400">BANDPASS FILTER:</span>
-          {['ALL_PASS', 'LOW_PASS_5KHZ', 'BANDPASS_15KHZ', 'HIGH_PASS_30KHZ'].map((filter) => (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => {
-                setBandpassFilter(filter);
-                playHackingBeep(1200);
-              }}
-              className={`text-[10px] font-mono px-2.5 py-1 rounded transition border ${
-                bandpassFilter === filter
-                  ? 'bg-cyan-600 text-black font-bold border-cyan-400'
-                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-600'
-              }`}
-            >
-              {filter.replace('_', ' ')}
-            </button>
-          ))}
+        {/* DSP Bandpass Filter Selector */}
+        <div className="space-y-1">
+          <label className="text-[10px] font-mono text-slate-400 block">
+            DIGITAL SIGNAL PROCESSOR (DSP) ACOUSTIC FILTER:
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+            {[
+              { id: 'ALL_PASS', label: 'All-Pass (Raw)' },
+              { id: 'LOWPASS_5KHZ', label: 'Low-Pass 5kHz' },
+              { id: 'NOTCH_10KHZ', label: 'Notch 10kHz' },
+              { id: 'HIGHPASS_15KHZ', label: 'High-Pass 15kHz' },
+            ].map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => {
+                  playClickSound(950);
+                  setBandpassFilter(f.id);
+                }}
+                className={`px-2 py-1.5 rounded text-xs font-mono transition border ${
+                  bandpassFilter === f.id
+                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/60 font-bold'
+                    : 'bg-black border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* MANUAL FLAG SUBMISSION STRIP */}
-      <form onSubmit={handleManualSubmit} className="mt-3 flex gap-2">
-        <input
-          type="text"
-          value={manualFlag}
-          onChange={(e) => setManualFlag(e.target.value)}
-          placeholder="Or submit flag: FLAG{...}"
-          className="flex-1 bg-black/50 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-emerald-500"
+      {/* Real-time Spectrogram Waterfall Canvas */}
+      <div className="mt-3 border border-slate-800 rounded bg-black overflow-hidden p-1">
+        <canvas
+          ref={canvasRef}
+          width={560}
+          height={120}
+          className="w-full h-32 block rounded"
         />
-        <button
-          type="submit"
-          className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-3 py-1 rounded text-xs transition"
-        >
-          SUBMIT
-        </button>
-      </form>
+      </div>
 
-      {flagFeedback && (
-        <div className={`mt-2 text-xs p-1.5 rounded ${flagFeedback.success ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'}`}>
-          {flagFeedback.text}
-        </div>
-      )}
+      {/* FLAG SUBMISSION FORM */}
+      <div className="mt-4 pt-3 border-t border-slate-800">
+        <label className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
+          <KeyRound size={12} />
+          <span>SUBMIT EXTRACTED STEGO FLAG:</span>
+        </label>
+        <form onSubmit={handleManualSubmit} className="flex gap-2">
+          <input
+            type="text"
+            value={manualFlag}
+            onChange={(e) => setManualFlag(e.target.value)}
+            placeholder="FLAG{stego_...}"
+            className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
+          />
+          <button
+            type="submit"
+            className="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-4 py-1.5 rounded text-xs transition font-mono"
+          >
+            SUBMIT FLAG
+          </button>
+        </form>
+
+        {flagFeedback && (
+          <div className={`mt-2 text-xs p-2 rounded font-mono ${flagFeedback.success ? 'bg-emerald-950 border border-emerald-500 text-emerald-300' : 'bg-rose-950 border border-rose-500 text-rose-300'}`}>
+            {flagFeedback.text}
+          </div>
+        )}
+      </div>
 
       {solved ? (
         <div className="hack-success-banner mt-3">
           <CheckCircle2 size={16} className="text-emerald-400" />
           <div className="flex flex-col">
-            <span className="font-bold text-emerald-300">SPECTROGRAM DEMODULATED // {REVEALED_FLAG}</span>
-            <span className="text-[10px] text-emerald-400/80">+200 CTF PTS Awarded to Profile · Secure Comms Unlocked</span>
+            <span className="font-bold text-emerald-300">STEGANOGRAPHY DECODED // CARRIER LOCKED</span>
+            <span className="text-[10px] text-emerald-400/80">+200 CTF PTS Awarded · Audio Watermark Solved</span>
           </div>
         </div>
       ) : (
         <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Tune to 142.8 MHz and enable BANDPASS 15KHZ to render the spectrogram watermark</span>
+          <span>Tune carrier to ~142.8 kHz and select High-Pass 15kHz filter to resolve the watermark</span>
         </div>
       )}
     </div>
