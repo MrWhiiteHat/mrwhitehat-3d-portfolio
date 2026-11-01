@@ -9,12 +9,8 @@ const REVEALED_FLAG = 'FLAG{side_channel_timing_leak_enumerated}';
 
 export default function TimingAttackChallenge({ onSolved, onBypass }) {
   const challenge = getChallengeById(CHALLENGE_ID);
-  const [tokenGuess, setTokenGuess] = useState('FLAG{');
-  const [latencyHistory, setLatencyHistory] = useState([
-    { candidate: 'FLAG{a', latency: 63.4, match: 5 },
-    { candidate: 'FLAG{s', latency: 78.6, match: 6 },
-    { candidate: 'FLAG{x', latency: 63.2, match: 5 },
-  ]);
+  const [tokenGuess, setTokenGuess] = useState('');
+  const [latencyHistory, setLatencyHistory] = useState([]);
   const [probing, setProbing] = useState(false);
   const [apiResponse, setApiResponse] = useState('');
   const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
@@ -52,7 +48,7 @@ export default function TimingAttackChallenge({ onSolved, onBypass }) {
         setApiResponse(`[200 OK] Token Accepted!\nAuthentication verified against root vault.\nExtracted session flag: ${REVEALED_FLAG}`);
         playClickSound(1100);
       } else {
-        setApiResponse(`[401 Unauthorized] Invalid authentication token.\nTime elapsed: ${latency}ms\nEarly exit encountered at index ${matchedCount}.`);
+        setApiResponse(`[401 Unauthorized] Invalid authentication token.\nRound-trip latency: ${latency}ms.\nExecution aborted by character mismatch.`);
         playZapSound();
       }
       setProbing(false);
@@ -115,7 +111,7 @@ export default function TimingAttackChallenge({ onSolved, onBypass }) {
             type="text"
             value={tokenGuess}
             onChange={(e) => setTokenGuess(e.target.value)}
-            placeholder="FLAG{side_channel_..."
+            placeholder="Enter candidate prefix (e.g. FLAG{...)"
             className="flex-1 bg-black border border-slate-700 rounded px-3 py-1.5 text-xs font-mono text-emerald-300 outline-none focus:border-rose-500"
           />
           <button
@@ -158,7 +154,7 @@ export default function TimingAttackChallenge({ onSolved, onBypass }) {
                     style={{ width: `${Math.max(6, barWidth)}%` }}
                   />
                   <span className="absolute inset-y-0 left-2 flex items-center text-[10px] font-bold text-white drop-shadow">
-                    {item.latency} ms ({item.match} chars matched)
+                    {item.latency} ms
                   </span>
                 </div>
               </div>
@@ -185,7 +181,7 @@ export default function TimingAttackChallenge({ onSolved, onBypass }) {
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{side_channel_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button

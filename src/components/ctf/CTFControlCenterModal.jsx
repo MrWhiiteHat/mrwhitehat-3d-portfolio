@@ -183,7 +183,7 @@ export default function CTFControlCenterModal({
               type="text"
               value={quickFlagInput}
               onChange={(e) => setQuickFlagInput(e.target.value)}
-              placeholder="Paste any captured flag (e.g. FLAG{caesar_shift_...}) to claim points..."
+              placeholder="Paste any captured flag (e.g. FLAG{...}) to claim points..."
               className="ctf-quick-input"
             />
             <button type="submit" className="ctf-quick-submit-btn">

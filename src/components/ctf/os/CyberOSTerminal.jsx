@@ -22,24 +22,24 @@ const VFS = {
   '/home/guest/notes.txt': {
     type: 'file',
     content:
-      'OPERATIVE SCRATCHPAD:\n' +
-      '- Web target: 10.0.0.80 (Vulnerable to SQLi and Basic Auth header leak in Packet #7)\n' +
-      '- IoT MCU: UART baud rate 115200 on TP3 (TX) and TP4 (GND)\n' +
-      '- Ciphertext: IODJ{fdhvdu_vkliw_urw3_fohdudqfh} (ROT-3 Caesar shift: -3)\n' +
-      '- Binary daemon: sentinel_daemon contains ptrace anti-debug jump at 0x004011ad (patch: 90 90)\n' +
-      '- Stack buffer: vuln_server 16-byte buffer + 8-byte RBP = 24 bytes padding to reach 0x00401155 (win())',
+      'OPERATIVE RECON FIELD LOG:\n' +
+      '- Target Network: 10.0.0.0/24 subnet. Plaintext HTTP transactions exchanged on internal ports.\n' +
+      '- IoT Firmware: Hardware test pads exposed on PCB silkscreen. Check serial TX/GND traces.\n' +
+      '- Intercepted Telegram: Classical Caesar shift. Cross-reference cipher letter frequencies with English.\n' +
+      '- Sentinel Daemon: ELF binary contains ptrace anti-debug check. Neutralize conditional jump.\n' +
+      '- Stack Server: Unbounded input buffer in vuln.c. Determine buffer capacity + 64-bit RBP offset.',
   },
   '/home/guest/hints.txt': {
     type: 'file',
     content:
-      '=== CTF SOLVING CHEAT SHEET & QUICK HINTS ===\n' +
-      '1. CRYPTO (Caesar): Shift key is -3 (or ROT-23). In CyberChef, set Shift to -3.\n' +
-      '2. FORENSICS (Wireshark): Filter by "http". Inspect Packet #7 / #8 or Follow TCP Stream.\n' +
-      '3. WEB (Burp Suite SQLi): Inject "\' OR 1=1--" or "\' UNION SELECT 1,2,3,4--" into username.\n' +
-      '4. PWN (Buffer Overflow): Padding offset = 24 bytes, Target RIP = 0x00401155 (win).\n' +
-      '5. REVERSING (Ghidra): Patch conditional jump "74 12" to "90 90" (NOP NOP).\n' +
-      '6. HARDWARE (PulseView): Connect CH0 to TP3 (TX), GND to TP4, set 115200 baud.\n' +
-      '7. STEGO (Spectrogram): Tune carrier to 142.8 kHz and activate 15 kHz High-Pass filter.\n' +
+      '=== CTF METHODOLOGY & INVESTIGATION REFERENCE ===\n' +
+      '1. CRYPTO: Run frequency analysis on intercepted telegram. Compare top cipher letters against English E/T/A.\n' +
+      '2. FORENSICS: Filter pcap by "http" to isolate API requests. Use Follow TCP Stream to reconstruct plaintext.\n' +
+      '3. WEB SQLi: Test single quotes, enumerate column counts with ORDER BY, and inject UNION SELECT statements.\n' +
+      '4. PWN STACK: Buffer capacity + 8-byte saved RBP gives padding bytes to overwrite Saved RIP with win().\n' +
+      '5. REVERSING: Locate anti-debug jump at 0x004011ad and patch with x86 NOP opcodes to force fallthrough.\n' +
+      '6. HARDWARE: Trace PCB silkscreen to locate UART TX and system GND. Cycle standard embedded baud rates.\n' +
+      '7. STEGO: Sweep ultrasonic receiver band (>140 kHz) and apply high-pass DSP filter to clean noise floor.\n' +
       'Type "submit FLAG{...}" to submit any flag directly from this terminal!',
   },
   '/home/guest/submit_flag.sh': {
@@ -138,43 +138,41 @@ export default function CyberOSTerminal({ onOpenApp, onOpenStation }) {
       case 'hint':
         newLines.push(
           '====================================================================',
-          '  💡 HOW TO SOLVE CTF CHALLENGES // STEP-BY-STEP QUICK GUIDE',
+          '  💡 HOW TO SOLVE CTF CHALLENGES // INVESTIGATION GUIDELINES',
           '====================================================================',
           '1. [CRYPTOGRAPHY] Operation Caesar:',
           '   - Target: IODJ{fdhvdu_vkliw_urw3_fohdudqfh}',
-          '   - Shift: -3 (or ROT-23). Launch "cyberchef", set Shift to -3.',
-          '   - Decrypted Flag: FLAG{caesar_shift_rot3_clearance}',
+          '   - Tool: Launch "cyberchef" from the terminal or Applications drawer.',
+          '   - Methodology: Run frequency analysis to deduce letter shift distance, then adjust Caesar shift recipe.',
           ' ',
           '2. [DIGITAL FORENSICS] PCAP Data Exfiltration:',
           '   - Target: capture_042.pcapng',
-          '   - Filter by "http". Inspect Packet #7 (POST login) or Packet #8 (200 OK).',
-          '   - Follow TCP Stream to extract: FLAG{pcap_dns_exfil_basic_auth_neutralized}',
+          '   - Tool: Launch "wireshark".',
+          '   - Methodology: Filter by "http" to isolate plaintext traffic. Inspect packet tree or Follow TCP Stream to recover token.',
           ' ',
           '3. [WEB EXPLOITATION] SQL Injection WAF Bypass:',
           '   - Target: /api/v1/accounts?username=alice',
-          '   - Inject payload: \' OR 1=1-- or \' UNION SELECT 1,2,3,4--',
-          '   - Resulting Flag: FLAG{sqli_union_select_waf_bypassed}',
+          '   - Tool: Launch "burp" -> HTTP Repeater.',
+          '   - Methodology: Test SQL delimiters and boolean/UNION queries to extract elevated administrative clearance records.',
           ' ',
           '4. [BINARY EXPLOITATION] Stack Buffer Overflow:',
-          '   - Buffer size = 16 bytes, Saved RBP = 8 bytes -> Padding = 24 bytes.',
-          '   - Target Saved RIP = 0x00401155 (win() address).',
-          '   - Hijacked Flag: FLAG{buffer_overflow_eip_overwritten_0x55}',
+          '   - Tool: Launch "ghidra" -> Stack Overflow tab.',
+          '   - Methodology: Calculate stack offset (buffer size + saved RBP) to reach Saved RIP, and point it to win().',
           ' ',
           '5. [REVERSE ENGINEERING] Anti-Debug Opcode Patching:',
-          '   - At 0x004011ad, conditional jump is "74 12" (je).',
-          '   - Patch with "90 90" (NOP NOP) to neutralize ptrace() detection.',
-          '   - Bypassed Flag: FLAG{binary_patch_nop_anti_debug_bypassed}',
+          '   - Tool: Launch "ghidra" -> Anti-Debug tab.',
+          '   - Methodology: Locate conditional branch detecting ptrace() and patch with NOP opcodes to fall through.',
           ' ',
           '6. [HARDWARE FORENSICS] UART Silkscreen Reverse Engineering:',
-          '   - Connect probe CH0 to TP3 (UART_TX) and GND to TP4 (GND).',
-          '   - Synchronize baud rate to 115200 (8-N-1) to dump bootloader firmware.',
-          '   - Decoded Flag: FLAG{uart_baud_115200_logic_analyzed}',
+          '   - Tool: Launch "logic" (Logic Analyzer).',
+          '   - Methodology: Identify test pad signals on PCB silkscreen, attach CH0 and GND probes, and set embedded baud rate.',
           ' ',
           '7. [STEGANOGRAPHY] Ultrasonic Audio Demodulation:',
-          '   - Tune carrier frequency to 142.8 kHz and activate 15 kHz High-Pass filter.',
-          '   - Reconstructed Flag: FLAG{stego_audio_watermark_demodulated}',
+          '   - Tool: Launch "spectrogram".',
+          '   - Methodology: Sweep carrier frequency to center on ultrasonic peak and apply DSP filtering to reveal watermark.',
           ' ',
-          'To submit any captured flag right now: type "submit FLAG{...}"',
+          'Format: All flags adhere to standard syntax: FLAG{...}',
+          'Submit from terminal: submit FLAG{...}',
           '===================================================================='
         );
         break;

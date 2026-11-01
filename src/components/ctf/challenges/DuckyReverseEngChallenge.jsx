@@ -135,16 +135,7 @@ export default function DuckyReverseEngChallenge({ onSolved, onBypass }) {
           </pre>
           <div className="mt-2 p-2 bg-slate-900 border border-slate-700 rounded flex items-center justify-between text-[11px]">
             <span className="text-slate-400">Target Encoded Token: <code>$enc_c2</code></span>
-            <button
-              type="button"
-              onClick={() => {
-                setB64Input(ENCODED_TOKEN);
-                setActiveTab('decoder');
-              }}
-              className="text-amber-400 hover:underline text-[10px]"
-            >
-              Send to Decoder ➔
-            </button>
+            <span className="text-slate-500 text-[10px]">Copy base64 string to Decoder tab</span>
           </div>
         </div>
       )}
@@ -207,7 +198,7 @@ export default function DuckyReverseEngChallenge({ onSolved, onBypass }) {
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{ducky_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button

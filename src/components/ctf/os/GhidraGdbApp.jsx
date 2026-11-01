@@ -42,8 +42,8 @@ export default function GhidraGdbApp({ onOpenStation }) {
   const [reversingLog, setReversingLog] = useState('Disassembly loaded: ./sentinel_daemon (x86_64 ELF).\nTarget conditional jump located at 0x004011ad: [74 12].');
 
   // Buffer Overflow State
-  const [paddingLength, setPaddingLength] = useState('24');
-  const [targetRip, setTargetRip] = useState('0x00401155');
+  const [paddingLength, setPaddingLength] = useState('');
+  const [targetRip, setTargetRip] = useState('');
   const [gdbOutput, setGdbOutput] = useState('');
 
   // Flag Submissions
@@ -141,15 +141,16 @@ export default function GhidraGdbApp({ onOpenStation }) {
       } else if (offset < 24) {
         setGdbOutput(
           `[-] Injected ${offset} bytes.\n` +
-          `[-] Stack frame: buffer (16 bytes) + Saved RBP (8 bytes) = 24 bytes required.\n` +
-          `[-] Stack not saturated. Program exited normally with code 0.`
+          `[-] Stack frame not saturated: payload did not reach Saved RIP.\n` +
+          `[-] Stack layout: buffer capacity + 64-bit Saved RBP.\n` +
+          `[-] Program exited normally with code 0.`
         );
         playZapSound();
       } else {
         setGdbOutput(
           `[!] Program received signal SIGSEGV, Segmentation fault.\n` +
           `[!] 0x00000000${targetRip.replace('0x', '')} in ?? ()\n` +
-          `[!] Invalid memory reference. Target win() function address is 0x00401155.`
+          `[!] Invalid memory reference. Check GDB symbol table for win() function address.`
         );
         playZapSound();
       }
@@ -263,10 +264,9 @@ export default function GhidraGdbApp({ onOpenStation }) {
                 </div>
                 <div className="cos-hint-card">
                   <h4>🛠️ How to Solve</h4>
-                  <p>1. Click <strong style={{ color: '#38bdf8' }}>[Patch to 90 90 (NOP NOP)]</strong>.</p>
-                  <p>2. Click <strong style={{ color: '#34d399' }}>[RUN PATCHED BINARY]</strong>.</p>
-                  <p>3. Execution falls through cleanly to <code>decrypt_vault_flag</code>, printing:</p>
-                  <code className="cos-hint-code">{BINARY_PATCH_FLAG}</code>
+                  <p>1. Locate the anti-debug branching instruction at <code>0x004011ad</code> in the disassembly.</p>
+                  <p>2. Patch the jump opcode to NOP (<code>90 90</code>) so execution bypasses termination.</p>
+                  <p>3. Execute the patched binary to reach <code>decrypt_vault_flag()</code> and recover the flag!</p>
                 </div>
               </>
             ) : (
@@ -277,16 +277,14 @@ export default function GhidraGdbApp({ onOpenStation }) {
                 </div>
                 <div className="cos-hint-card">
                   <h4>🔍 Stack Calculation Formula</h4>
-                  <p>Buffer size = <strong style={{ color: '#38bdf8' }}>16 bytes</strong><br />
-                  Saved RBP = <strong style={{ color: '#38bdf8' }}>8 bytes</strong><br />
-                  Offset to Saved RIP = 16 + 8 = <strong style={{ color: '#fbbf24' }}>24 bytes</strong>.</p>
+                  <p>Padding to Saved RIP = Buffer Capacity + 64-bit Saved Frame Pointer (RBP).<br />
+                  Inspect GDB function symbols to find the entry address of <code>win()</code>.</p>
                 </div>
                 <div className="cos-hint-card">
                   <h4>🛠️ How to Solve</h4>
-                  <p>1. Set Padding Offset to <strong style={{ color: '#38bdf8' }}>24</strong>.</p>
-                  <p>2. Set Target Address to <strong style={{ color: '#38bdf8' }}>0x00401155</strong> (win() address).</p>
-                  <p>3. Click <strong style={{ color: '#34d399' }}>[RUN EXPLOIT IN GDB]</strong>.</p>
-                  <code className="cos-hint-code">{BUFFER_OVERFLOW_FLAG}</code>
+                  <p>1. Calculate stack frame offset: buffer capacity (16 bytes) + Saved RBP (8 bytes) to reach Saved RIP.</p>
+                  <p>2. Set target overwrite address to <code>win()</code> found in GDB function symbols.</p>
+                  <p>3. Run the exploit against <code>./vuln_server</code> in GDB to capture the hijacked return flag!</p>
                 </div>
               </>
             )}
@@ -348,13 +346,22 @@ export default function GhidraGdbApp({ onOpenStation }) {
 
                 {/* Patch Control Bar */}
                 <div style={{ marginTop: 'auto', paddingTop: '8px', borderTop: '1px solid #1e293b', display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '10.5px', color: '#94a3b8', fontWeight: 700 }}>Quick Patch:</span>
+                  <span style={{ fontSize: '10.5px', color: '#94a3b8', fontWeight: 700 }}>Patch Opcode:</span>
+                  <input
+                    type="text"
+                    className="cos-input"
+                    style={{ width: '130px', fontSize: '11px', fontFamily: 'monospace' }}
+                    value={patchInput}
+                    onChange={(e) => setPatchInput(e.target.value)}
+                    placeholder="e.g. 90 90"
+                    onKeyDown={(e) => e.key === 'Enter' && handleApplyPatch()}
+                  />
                   <button
                     type="button"
                     className="cos-btn cos-btn-success"
-                    onClick={() => handleApplyPatch('90 90')}
+                    onClick={() => handleApplyPatch()}
                   >
-                    Patch to 90 90 (NOP NOP)
+                    Apply Patch
                   </button>
                   <button
                     type="button"
@@ -381,20 +388,6 @@ export default function GhidraGdbApp({ onOpenStation }) {
             <div className="cos-panel">
               <div className="cos-panel-header">
                 <span>SANDBOX EXECUTION CONSOLE</span>
-                {reversingLog.includes(BINARY_PATCH_FLAG) && (
-                  <button
-                    type="button"
-                    className="cos-btn cos-btn-success"
-                    style={{ fontSize: '9.5px', padding: '1px 6px' }}
-                    onClick={() => {
-                      playClickSound(900);
-                      setManualFlag(BINARY_PATCH_FLAG);
-                    }}
-                  >
-                    <Copy size={10} />
-                    <span>Copy Flag</span>
-                  </button>
-                )}
               </div>
               <div className="cos-panel-body" style={{ padding: '6px' }}>
                 <textarea
@@ -440,7 +433,7 @@ export default function GhidraGdbApp({ onOpenStation }) {
                 <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div>
                     <label style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block', marginBottom: '2px' }}>
-                      Padding Length (Bytes before Saved RIP = 16 + 8):
+                      Padding Length (Bytes to Saved RIP):
                     </label>
                     <input
                       type="number"
@@ -448,12 +441,13 @@ export default function GhidraGdbApp({ onOpenStation }) {
                       style={{ width: '100%' }}
                       value={paddingLength}
                       onChange={(e) => setPaddingLength(e.target.value)}
+                      placeholder="Enter calculated padding bytes..."
                     />
                   </div>
 
                   <div>
                     <label style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block', marginBottom: '2px' }}>
-                      Target Address (Saved RIP ➔ win() at 0x00401155):
+                      Target Address (Saved RIP):
                     </label>
                     <input
                       type="text"
@@ -461,6 +455,7 @@ export default function GhidraGdbApp({ onOpenStation }) {
                       style={{ width: '100%' }}
                       value={targetRip}
                       onChange={(e) => setTargetRip(e.target.value)}
+                      placeholder="0x... (e.g. win() address)"
                     />
                   </div>
 
@@ -474,16 +469,6 @@ export default function GhidraGdbApp({ onOpenStation }) {
                       <Play size={11} />
                       <span>RUN EXPLOIT IN GDB</span>
                     </button>
-                    <button
-                      type="button"
-                      className="cos-btn"
-                      onClick={() => {
-                        setPaddingLength('24');
-                        setTargetRip('0x00401155');
-                      }}
-                    >
-                      Fill 24 + win()
-                    </button>
                   </div>
                 </div>
               </div>
@@ -493,20 +478,6 @@ export default function GhidraGdbApp({ onOpenStation }) {
             <div className="cos-panel">
               <div className="cos-panel-header">
                 <span>GDB-PEDA EXECUTION LOG</span>
-                {gdbOutput.includes(BUFFER_OVERFLOW_FLAG) && (
-                  <button
-                    type="button"
-                    className="cos-btn cos-btn-success"
-                    style={{ fontSize: '9.5px', padding: '1px 6px' }}
-                    onClick={() => {
-                      playClickSound(900);
-                      setManualFlag(BUFFER_OVERFLOW_FLAG);
-                    }}
-                  >
-                    <Copy size={10} />
-                    <span>Copy Flag</span>
-                  </button>
-                )}
               </div>
               <div className="cos-panel-body" style={{ padding: '6px' }}>
                 <textarea

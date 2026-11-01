@@ -415,7 +415,7 @@ export default function WiresharkPCAPChallenge({ onSolved, onBypass }) {
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{pcap_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button

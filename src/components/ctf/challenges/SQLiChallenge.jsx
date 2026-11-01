@@ -153,7 +153,7 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
 
       <div className="hack-instructions">
         <p className="text-xs text-slate-300">
-          The internal 42U Mainframe API authenticates operators via a dynamic SQL query. Enumerate column structure using <code>ORDER BY</code> or craft a 4-column <code>UNION SELECT</code> payload to extract the administrator's clearance token.
+          The internal 42U Mainframe API authenticates operators via a dynamic SQL query. Probe column count using <code>ORDER BY</code> or craft a <code>UNION SELECT</code> payload to extract the administrator's clearance token.
         </p>
       </div>
 
@@ -167,7 +167,7 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
             type="text"
             value={queryInput}
             onChange={(e) => setQueryInput(e.target.value)}
-            placeholder="e.g. alice' OR '1'='1'-- or ' UNION SELECT 1,2,3,4--"
+            placeholder="Enter username parameter (e.g. alice, admin...)"
             className="flex-1 bg-black border border-slate-700 rounded px-3 py-2 text-xs font-mono text-emerald-300 outline-none focus:border-rose-500"
           />
           <button
@@ -283,7 +283,7 @@ export default function SQLiChallenge({ onSolved, onBypass }) {
       ) : (
         <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Tip: Test quotes, enumerate column counts with ORDER BY 1,2,3,4, then inject UNION SELECT</span>
+          <span>Tip: Probe for string injection with quotes, test column boundaries using ORDER BY, or bypass authentication logic with boolean tests.</span>
         </div>
       )}
     </div>

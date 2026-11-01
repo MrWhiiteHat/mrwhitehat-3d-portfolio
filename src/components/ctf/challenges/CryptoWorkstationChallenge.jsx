@@ -151,7 +151,7 @@ export default function CryptoWorkstationChallenge({ onSolved, onBypass }) {
             />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
               <span>0 (RAW)</span>
-              <span>ROT-3</span>
+              <span>ROT-5</span>
               <span>ROT-13</span>
               <span>25</span>
             </div>
@@ -189,31 +189,31 @@ export default function CryptoWorkstationChallenge({ onSolved, onBypass }) {
                   <td className="p-1.5 font-bold">H (h)</td>
                   <td className="p-1.5">14</td>
                   <td className="p-1.5">14.1%</td>
-                  <td className="p-1.5 font-bold text-emerald-400">E (+3 shift: E ➔ F ➔ G ➔ H)</td>
+                  <td className="p-1.5 font-bold text-cyan-300">English 'E' (~12.7%)</td>
                 </tr>
                 <tr>
                   <td className="p-1.5 font-bold">W (w)</td>
                   <td className="p-1.5">10</td>
                   <td className="p-1.5">10.1%</td>
-                  <td className="p-1.5 text-emerald-400">T (+3 shift: T ➔ U ➔ V ➔ W)</td>
+                  <td className="p-1.5 text-cyan-300">English 'T' (~9.1%)</td>
                 </tr>
                 <tr>
                   <td className="p-1.5 font-bold">D (d)</td>
                   <td className="p-1.5">9</td>
                   <td className="p-1.5">9.0%</td>
-                  <td className="p-1.5 text-emerald-400">A (+3 shift: A ➔ B ➔ C ➔ D)</td>
+                  <td className="p-1.5 text-cyan-300">English 'A' (~8.2%)</td>
                 </tr>
                 <tr>
                   <td className="p-1.5 font-bold">R (r)</td>
                   <td className="p-1.5">8</td>
                   <td className="p-1.5">8.1%</td>
-                  <td className="p-1.5 text-emerald-400">O (+3 shift: O ➔ P ➔ Q ➔ R)</td>
+                  <td className="p-1.5 text-cyan-300">English 'O' (~7.5%)</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div className="p-2 bg-amber-950/40 border border-amber-500/40 rounded text-[11px] text-amber-300">
-            💡 <strong>Frequency Deductions:</strong> Ciphertext letter <code>H</code> matches plain <code>E</code>. Distance = 3 letters forward. Apply <strong>ROT-3</strong> (Shift 3) to decrypt.
+          <div className="p-2 bg-slate-900 border border-slate-700 rounded text-[11px] text-slate-300">
+            💡 <strong>Frequency Analysis Tip:</strong> Compare the peak ciphertext frequency (H) against the most frequent letter in the English language (E). Calculate the alphabetical displacement to determine the decryption shift key.
           </div>
         </div>
       )}
@@ -258,7 +258,7 @@ export default function CryptoWorkstationChallenge({ onSolved, onBypass }) {
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{caesar_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button

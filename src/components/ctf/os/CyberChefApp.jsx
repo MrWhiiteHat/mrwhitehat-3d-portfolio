@@ -36,8 +36,8 @@ function caesarShift(text, shift) {
 
 export default function CyberChefApp({ onOpenStation }) {
   const [inputText, setInputText] = useState(ENCRYPTED_TELEGRAM);
-  const [caesarShiftKey, setCaesarShiftKey] = useState(-3);
-  const [activeOps, setActiveOps] = useState(['caesar']);
+  const [caesarShiftKey, setCaesarShiftKey] = useState(0);
+  const [activeOps, setActiveOps] = useState([]);
   const [showHints, setShowHints] = useState(true);
   const [manualFlag, setManualFlag] = useState('');
   const [flagFeedback, setFlagFeedback] = useState(null);
@@ -68,11 +68,6 @@ export default function CyberChefApp({ onOpenStation }) {
       setFlagFeedback({ success: false, text: res.message });
       playZapSound();
     }
-  };
-
-  const copyOutputToSubmit = () => {
-    playClickSound(900);
-    setManualFlag(outputText.trim());
   };
 
   return (
@@ -141,12 +136,9 @@ export default function CyberChefApp({ onOpenStation }) {
 
             <div className="cos-hint-card">
               <h4>🛠️ How to Solve</h4>
-              <p>1. In the <strong>Recipe Pipeline</strong> column, adjust the <strong>Shift Key</strong> slider to <strong style={{ color: '#34d399' }}>-3</strong>.</p>
-              <p>2. Notice the Output box auto-bakes the decrypted text:</p>
-              <div style={{ margin: '4px 0' }}>
-                <code className="cos-hint-code">FLAG&#123;caesar_shift_rot3_clearance&#125;</code>
-              </div>
-              <p>3. Click <strong>"Use As Flag"</strong> below and submit to capture points!</p>
+              <p>1. In the <strong>Recipe Pipeline</strong>, add the <strong>Caesar Cipher</strong> operation.</p>
+              <p>2. Use frequency analysis to deduce the shift distance from cipher letter 'H' to English letter 'E'.</p>
+              <p>3. Adjust the <strong>Shift Key</strong> until the decrypted output becomes legible English containing the flag!</p>
             </div>
           </div>
         </div>
@@ -223,9 +215,12 @@ export default function CyberChefApp({ onOpenStation }) {
                   FREQUENCY ANALYSIS:
                 </div>
                 <div style={{ fontSize: '10px', color: '#cbd5e1', lineHeight: '1.6' }}>
-                  <div>Cipher <strong>H</strong> (14.1%) ➔ English <strong>E</strong> (<span style={{ color: '#34d399' }}>-3 shift</span>)</div>
-                  <div>Cipher <strong>W</strong> (10.1%) ➔ English <strong>T</strong> (<span style={{ color: '#34d399' }}>-3 shift</span>)</div>
-                  <div>Cipher <strong>D</strong> (9.0%) ➔ English <strong>A</strong> (<span style={{ color: '#34d399' }}>-3 shift</span>)</div>
+                  <div>Cipher <strong>H</strong>: 14.1% ➔ English <strong>E</strong>: 12.7%</div>
+                  <div>Cipher <strong>W</strong>: 10.1% ➔ English <strong>T</strong>: 9.1%</div>
+                  <div>Cipher <strong>D</strong>: 9.0% ➔ English <strong>A</strong>: 8.2%</div>
+                </div>
+                <div style={{ fontSize: '9.5px', color: '#64748b', marginTop: '4px' }}>
+                  Count alphabetical shift distance from cipher letter 'H' to English 'E'.
                 </div>
               </div>
             </div>
@@ -288,17 +283,9 @@ export default function CyberChefApp({ onOpenStation }) {
                         type="button"
                         className="cos-btn"
                         style={{ flex: 1, fontSize: '10px' }}
-                        onClick={() => setCaesarShiftKey(-3)}
-                      >
-                        Auto-Set -3 (Cracked)
-                      </button>
-                      <button
-                        type="button"
-                        className="cos-btn"
-                        style={{ fontSize: '10px' }}
                         onClick={() => setCaesarShiftKey(0)}
                       >
-                        Reset 0
+                        Reset Shift: 0
                       </button>
                     </div>
                   </div>
@@ -333,16 +320,6 @@ export default function CyberChefApp({ onOpenStation }) {
             <div className="cos-panel" style={{ flex: 1.2 }}>
               <div className="cos-panel-header">
                 <span style={{ color: '#34d399' }}>OUTPUT PLAINTEXT (Auto-bake Active)</span>
-                <button
-                  type="button"
-                  className="cos-btn"
-                  style={{ fontSize: '10px', padding: '2px 8px' }}
-                  onClick={copyOutputToSubmit}
-                  title="Copy output directly into flag submitter"
-                >
-                  <Copy size={11} />
-                  <span>Use As Flag</span>
-                </button>
               </div>
               <div className="cos-panel-body" style={{ padding: '4px' }}>
                 <textarea

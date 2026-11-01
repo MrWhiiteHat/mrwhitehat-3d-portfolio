@@ -79,7 +79,7 @@ export default function BinaryPatchHack({ onSolved, onBypass }) {
               prev +
               '[0x004011ad]: Opcode 74 12 (JE) taken! Jumped to 0x004011c1 <tamper_kill>!\n' +
               '[!] PROCESS TERMINATED BY TAMPER EXIT (SIGKILL).\n' +
-              '[*] Tip: Patch instruction at 0x004011ad with NOPs (90 90) to prevent the jump.'
+              '[*] Tip: Neutralize the conditional branch at 0x004011ad with x86 no-operation instructions so execution falls through.'
           );
         } else {
           clearInterval(interval);
@@ -90,7 +90,7 @@ export default function BinaryPatchHack({ onSolved, onBypass }) {
             (prev) =>
               prev +
               `[0x004011ad]: Invalid or non-fallthrough opcode [${patchedOpcode}].\n` +
-              `[!] SIGILL: Illegal instruction. Use standard x86 NOP NOP opcode (90 90).`
+              `[!] SIGILL: Illegal instruction. Enter valid 2-byte x86 opcodes (e.g. no-operation instructions).`
           );
         }
       }
@@ -213,7 +213,7 @@ export default function BinaryPatchHack({ onSolved, onBypass }) {
             type="text"
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
-            placeholder="Type replacement hex opcode (e.g. 90 90 for NOP NOP)..."
+            placeholder="Type replacement hex opcode (e.g. 2-byte hex)..."
             className="flex-1 bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-amber-300 outline-none focus:border-cyan-400 font-mono"
           />
           <button
@@ -227,16 +227,7 @@ export default function BinaryPatchHack({ onSolved, onBypass }) {
 
         <div className="flex justify-between items-center text-[10px] text-slate-500 pt-1">
           <span>Active Opcode at 0x004011ad: <strong className="text-amber-400">{patchedOpcode}</strong></span>
-          <button
-            type="button"
-            onClick={() => {
-              setCustomInput('90 90');
-              setPatchedOpcode('90 90');
-            }}
-            className="text-cyan-400 hover:underline"
-          >
-            Use NOP NOP (90 90)
-          </button>
+          <span className="text-slate-400 text-[10px]">Replace JE jump with NOPs to fall through</span>
         </div>
 
         <button
@@ -272,7 +263,7 @@ export default function BinaryPatchHack({ onSolved, onBypass }) {
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{binary_patch_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button
@@ -301,7 +292,7 @@ export default function BinaryPatchHack({ onSolved, onBypass }) {
       ) : (
         <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Replace the conditional jump "74 12" at 0x004011ad with NOP instructions "90 90"</span>
+          <span>Inspect the jump instruction at 0x004011ad: patch with x86 no-operation bytes to allow execution to reach the flag routine.</span>
         </div>
       )}
     </div>

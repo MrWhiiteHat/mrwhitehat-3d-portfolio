@@ -36,12 +36,8 @@ export default function BurpSuiteApp({ onOpenStation }) {
   const [sending, setSending] = useState(false);
 
   // Timing Attack State
-  const [timingToken, setTimingToken] = useState('FLAG{');
-  const [timingLogs, setTimingLogs] = useState([
-    { candidate: 'FLAG{a', latency: 63.4, match: 5 },
-    { candidate: 'FLAG{s', latency: 78.6, match: 6 },
-    { candidate: 'FLAG{x', latency: 63.2, match: 5 },
-  ]);
+  const [timingToken, setTimingToken] = useState('');
+  const [timingLogs, setTimingLogs] = useState([]);
 
   // Decoder State
   const [decoderInput, setDecoderInput] = useState('');
@@ -249,19 +245,15 @@ export default function BurpSuiteApp({ onOpenStation }) {
                   <p>The endpoint <code>/api/v1/accounts?username=alice</code> concatenates input into an unsanitized SQLite query without parameterization.</p>
                 </div>
                 <div className="cos-hint-card">
-                  <h4>🔍 SQLi Quick Payloads</h4>
-                  <p>Click any preset in the toolbar above the request box to inject:</p>
-                  <div>
-                    <code className="cos-hint-code">' OR '1'='1</code> &nbsp;
-                    <code className="cos-hint-code">' UNION SELECT 1,2,3,4--</code>
-                  </div>
+                  <h4>🔍 SQLi Attack Guide</h4>
+                  <p>The backend executes an unparameterized lookup: <code>SELECT ... WHERE username = '&#123;input&#125;'</code>.</p>
+                  <p>Inject quote delimiters and SQL comment tokens (<code>--</code>) to break out of the string literal and extract records.</p>
                 </div>
                 <div className="cos-hint-card">
                   <h4>🛠️ How to Solve</h4>
-                  <p>1. Inject <code className="cos-hint-code">' OR 1=1--</code> or <code className="cos-hint-code">' UNION SELECT 1,2,3,4--</code></p>
+                  <p>1. Test SQL syntax by injecting query conditions (e.g. testing boolean bypasses or UNION SELECT operators) into the URL parameter.</p>
                   <p>2. Click <strong style={{ color: '#fb923c' }}>[SEND HTTP REQUEST]</strong>.</p>
-                  <p>3. Inspect the HTTP Response on the right. The admin clearance holds the flag:</p>
-                  <code className="cos-hint-code">{SQLI_FLAG}</code>
+                  <p>3. Inspect the backend JSON response on the right to discover elevated administrative clearance records holding the flag!</p>
                 </div>
               </>
             ) : activeTab === 'timing' ? (
@@ -276,9 +268,9 @@ export default function BurpSuiteApp({ onOpenStation }) {
                 </div>
                 <div className="cos-hint-card">
                   <h4>🛠️ How to Solve</h4>
-                  <p>Probe prefixes to detect latency spikes. The full secret token is:</p>
-                  <code className="cos-hint-code">{TIMING_FLAG}</code>
-                  <p style={{ marginTop: '4px' }}>Click "Use Full Flag" to test and submit!</p>
+                  <p>1. Send probe candidates starting with the prefix <code>FLAG&#123;</code>.</p>
+                  <p>2. Monitor round-trip execution latency in the measurement log: each correct sequential character increases execution time by ~15ms.</p>
+                  <p>3. Identify the character with the highest latency spike at each index until the complete token is reconstructed!</p>
                 </div>
               </>
             ) : (
@@ -312,28 +304,22 @@ export default function BurpSuiteApp({ onOpenStation }) {
                 </button>
               </div>
 
-              {/* Quick Payload Chips */}
-              <div style={{ background: '#0a0f18', padding: '6px 8px', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 700 }}>Inject:</span>
-                {[
-                  { label: "Normal (alice)", val: "/api/v1/accounts?username=alice" },
-                  { label: "Auth Bypass (' OR 1=1--)", val: "/api/v1/accounts?username=' OR 1=1--" },
-                  { label: "Column Probe (ORDER BY 4)", val: "/api/v1/accounts?username=' ORDER BY 4--" },
-                  { label: "UNION SELECT (1,2,3,4)", val: "/api/v1/accounts?username=' UNION SELECT 1,2,3,4--" },
-                ].map((item, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    className="cos-btn"
-                    style={{ fontSize: '10px', padding: '2px 7px' }}
-                    onClick={() => {
-                      playClickSound(850);
-                      setUrlPath(item.val);
-                    }}
-                  >
-                    {item.label}
-                  </button>
-                ))}
+              {/* Request Reset Bar */}
+              <div style={{ background: '#0a0f18', padding: '6px 8px', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700 }}>ENDPOINT:</span>
+                <span style={{ fontSize: '10px', color: '#94a3b8' }}>/api/v1/accounts?username=...</span>
+                <button
+                  type="button"
+                  className="cos-btn"
+                  style={{ fontSize: '10px', padding: '2px 7px', marginLeft: 'auto' }}
+                  onClick={() => {
+                    playClickSound(850);
+                    setUrlPath('/api/v1/accounts?username=alice');
+                  }}
+                  title="Reset query path to default"
+                >
+                  Reset: alice
+                </button>
               </div>
 
               <div className="cos-panel-body" style={{ padding: '8px', gap: '8px' }}>
@@ -393,20 +379,6 @@ export default function BurpSuiteApp({ onOpenStation }) {
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
                     <span style={{ fontSize: '10px', color: '#64748b' }}>BODY (JSON Payload):</span>
-                    {responseBody.includes(SQLI_FLAG) && (
-                      <button
-                        type="button"
-                        className="cos-btn cos-btn-success"
-                        style={{ fontSize: '9.5px', padding: '1px 6px' }}
-                        onClick={() => {
-                          playClickSound(900);
-                          setManualFlag(SQLI_FLAG);
-                        }}
-                      >
-                        <Copy size={10} />
-                        <span>Copy Flag to Submitter</span>
-                      </button>
-                    )}
                   </div>
                   <textarea
                     className={`cos-textarea ${responseBody.includes(SQLI_FLAG) ? 'cos-textarea-output' : ''}`}
@@ -443,6 +415,7 @@ export default function BurpSuiteApp({ onOpenStation }) {
                       style={{ flex: 1 }}
                       value={timingToken}
                       onChange={(e) => setTimingToken(e.target.value)}
+                      placeholder="Enter candidate prefix (e.g. FLAG{...)"
                     />
                     <button type="submit" className="cos-btn cos-btn-primary">
                       <Send size={11} />
@@ -451,30 +424,8 @@ export default function BurpSuiteApp({ onOpenStation }) {
                   </div>
                 </form>
 
-                <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
-                  <button
-                    type="button"
-                    className="cos-btn"
-                    style={{ fontSize: '10px' }}
-                    onClick={() => {
-                      setTimingToken(TIMING_FLAG);
-                      handleSendTimingProbe();
-                    }}
-                  >
-                    Test Full Flag (Cracked)
-                  </button>
-                  <button
-                    type="button"
-                    className="cos-btn"
-                    style={{ fontSize: '10px' }}
-                    onClick={() => {
-                      playClickSound(900);
-                      setManualFlag(TIMING_FLAG);
-                    }}
-                  >
-                    <Copy size={11} />
-                    <span>Copy Flag to Submitter</span>
-                  </button>
+                <div style={{ marginTop: '12px', fontSize: '10.5px', color: '#64748b' }}>
+                  <span>Probing strategy: Append candidate characters to matching prefix. Watch for latency spikes (~+15ms).</span>
                 </div>
               </div>
             </div>
@@ -490,7 +441,7 @@ export default function BurpSuiteApp({ onOpenStation }) {
                     <tr>
                       <th>Candidate Probe</th>
                       <th>Latency (ms)</th>
-                      <th>Matched Characters</th>
+                      <th>Delta from Baseline</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -501,7 +452,7 @@ export default function BurpSuiteApp({ onOpenStation }) {
                           {log.latency} ms
                         </td>
                         <td>
-                          <span className="cos-badge cos-badge-cyan">{log.match} chars</span>
+                          <span className="cos-badge cos-badge-cyan">+{(log.latency - 3.5).toFixed(1)} ms</span>
                         </td>
                       </tr>
                     ))}

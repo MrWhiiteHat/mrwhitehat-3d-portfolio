@@ -240,11 +240,6 @@ export default function App() {
     subMessage: '',
   });
   const preHackerStateRef = useRef({ themeKey: 'CYBER_NEON_NOIR', gameState: 'EXPLORE' });
-  // Default to true if already discovered or if stations were already completed on load,
-  // preventing unwanted intrusive popups on initial website visit or refresh
-  const hasSeenAnnouncementRef = useRef(
-    isEasterEggDiscovered() || hasCompletedAllStations(getCompletedStations())
-  );
   const prevPoweredCountRef = useRef(1);
   const prevUnlockedSetRef = useRef(new Set());
   const prevHostileTriggeredRef = useRef(false);

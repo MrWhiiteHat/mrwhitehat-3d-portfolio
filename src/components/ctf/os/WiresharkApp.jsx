@@ -190,7 +190,7 @@ const PACKETS = [
 
 export default function WiresharkApp({ onOpenStation }) {
   const [filterStr, setFilterStr] = useState('');
-  const [selectedPacketNo, setSelectedPacketNo] = useState(7);
+  const [selectedPacketNo, setSelectedPacketNo] = useState(1);
   const [showStreamModal, setShowStreamModal] = useState(false);
   const [showHints, setShowHints] = useState(true);
   const [flagInput, setFlagInput] = useState('');
@@ -233,11 +233,6 @@ export default function WiresharkApp({ onOpenStation }) {
       setFlagFeedback({ success: false, text: res.message });
       playZapSound();
     }
-  };
-
-  const copyExtractedFlag = () => {
-    playClickSound(900);
-    setFlagInput('FLAG{pcap_dns_exfil_basic_auth_neutralized}');
   };
 
   return (
@@ -340,10 +335,9 @@ export default function WiresharkApp({ onOpenStation }) {
 
             <div className="cos-hint-card">
               <h4>🛠️ How to Solve</h4>
-              <p>1. Click the <strong style={{ color: '#38bdf8' }}>[http]</strong> quick filter button above.</p>
-              <p>2. Select <strong>Packet #7</strong> or <strong>Packet #8</strong>.</p>
-              <p>3. Click <strong>[Follow TCP Stream]</strong> in the top toolbar to reconstruct the full ASCII conversation.</p>
-              <p>4. Extract the token: <code className="cos-hint-code">FLAG&#123;pcap_dns_exfil_basic_auth_neutralized&#125;</code> and submit below!</p>
+              <p>1. Apply a protocol display filter (e.g. <code>http</code>) to isolate unencrypted application traffic.</p>
+              <p>2. Select authentication request or response packets exchanged with the API server.</p>
+              <p>3. Use <strong>Follow TCP Stream</strong> or inspect the packet dissection tree to extract the exfiltrated authentication token!</p>
             </div>
           </div>
         </div>
@@ -527,17 +521,6 @@ export default function WiresharkApp({ onOpenStation }) {
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '10px' }}>
                 <button
                   type="button"
-                  className="cos-btn cos-btn-success"
-                  onClick={() => {
-                    copyExtractedFlag();
-                    setShowStreamModal(false);
-                  }}
-                >
-                  <Copy size={12} />
-                  <span>Copy Flag & Close</span>
-                </button>
-                <button
-                  type="button"
                   className="cos-btn"
                   onClick={() => setShowStreamModal(false)}
                 >
@@ -555,7 +538,7 @@ export default function WiresharkApp({ onOpenStation }) {
         <input
           type="text"
           className="cos-flag-input"
-          placeholder="FLAG{pcap_...}"
+          placeholder="FLAG{...}"
           value={flagInput}
           onChange={(e) => setFlagInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleFlagSubmit(e)}

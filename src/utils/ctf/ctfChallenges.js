@@ -360,7 +360,7 @@ export const CTF_CHALLENGES = [
     flagHash: '26b8ee83ea8a447dc967eff1822ae8eb041d7f0c366c700ab6a466b78e8d053c',
     hints: [
       { text: 'Look closely at the git commit diffs and DNS TXT records; adversaries often leak secrets in repository history.', cost: 50 },
-      { text: 'The assembled flag identifier is: FLAG{osint_shadow_footprint_recon_complete}.', cost: 100 },
+      { text: 'Combine the DNS TXT seed ("shadow_footprint") with standard recon convention: FLAG{osint_<seed>_recon_complete}.', cost: 100 },
     ],
     writeup: {
       summary: 'Open Source Intelligence (OSINT) leverages publicly accessible information to map an organization’s security posture.',

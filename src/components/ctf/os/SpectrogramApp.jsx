@@ -186,10 +186,9 @@ export default function SpectrogramApp({ onOpenStation }) {
 
             <div className="cos-hint-card">
               <h4>🛠️ How to Solve</h4>
-              <p>1. Tune the Carrier Frequency slider to <strong style={{ color: '#34d399' }}>142.8 kHz</strong> (or click Auto-Tune).</p>
-              <p>2. Select Filter: <strong style={{ color: '#34d399' }}>15 kHz High-Pass DSP</strong>.</p>
-              <p>3. Watch the waterfall visualizer reconstruct the flag:</p>
-              <code className="cos-hint-code">{REVEALED_FLAG}</code>
+              <p>1. Sweep the Carrier Frequency slider across the ultrasonic range (~140-150 kHz) to lock onto the signal peak.</p>
+              <p>2. Select the <strong>15 kHz High-Pass DSP</strong> filter to eliminate background audio interference.</p>
+              <p>3. Inspect the waterfall visualizer canvas as the demodulated spectral watermark renders the captured flag!</p>
             </div>
           </div>
         </div>
@@ -261,15 +260,9 @@ export default function SpectrogramApp({ onOpenStation }) {
               </div>
 
               <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid #1e293b' }}>
-                <button
-                  type="button"
-                  className="cos-btn cos-btn-success"
-                  style={{ width: '100%', justifyContent: 'center' }}
-                  onClick={handleTunePreset}
-                >
-                  <Sparkles size={12} />
-                  <span>Auto-Tune to 142.8 kHz + High-Pass</span>
-                </button>
+                <span style={{ fontSize: '10px', color: '#64748b' }}>
+                  Receiver Status: {isAligned ? 'Carrier locked & filtered' : 'Awaiting lock & filter'}
+                </span>
               </div>
             </div>
           </div>
@@ -278,20 +271,6 @@ export default function SpectrogramApp({ onOpenStation }) {
           <div className="cos-panel" style={{ flex: 1.3 }}>
             <div className="cos-panel-header">
               <span>WATERFALL FFT SPECTRAL HEATMAP (2D FFT)</span>
-              {isAligned && (
-                <button
-                  type="button"
-                  className="cos-btn cos-btn-success"
-                  style={{ fontSize: '9.5px', padding: '1px 6px' }}
-                  onClick={() => {
-                    playClickSound(900);
-                    setManualFlag(REVEALED_FLAG);
-                  }}
-                >
-                  <Copy size={10} />
-                  <span>Copy Flag</span>
-                </button>
-              )}
             </div>
             <div className="cos-panel-body" style={{ padding: '0', background: '#000', overflow: 'hidden' }}>
               <canvas

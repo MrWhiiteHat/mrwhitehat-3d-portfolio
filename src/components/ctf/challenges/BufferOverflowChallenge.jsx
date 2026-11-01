@@ -58,8 +58,8 @@ export default function BufferOverflowChallenge({ onSolved, onBypass }) {
       } else if (offsetNum < requiredOffset) {
         setGdbOutput(
           `[-] Injected ${offsetNum} bytes.\n` +
-          `[-] Stack frame analysis: buffer is ${bufferSize} bytes + ${savedRbpSize} bytes Saved RBP.\n` +
-          `[-] Stack not saturated (Needs ${requiredOffset} bytes total to reach Saved RIP).\n` +
+          `[-] Stack not saturated: Injected payload did not reach Saved RIP.\n` +
+          `[-] Re-calculate: buffer capacity + x86_64 saved frame pointer (RBP).\n` +
           `[-] Program exited normally without hijacking control flow (exit code: 0).`
         );
         playZapSound();
@@ -68,7 +68,7 @@ export default function BufferOverflowChallenge({ onSolved, onBypass }) {
           `[!] Program received signal SIGSEGV, Segmentation fault.\n` +
           `[!] 0x00000000${targetRip.replace('0x', '')} in ?? ()\n` +
           `[!] Invalid memory dereference at instruction pointer.\n` +
-          `[!] Inspect symbol table: 'win()' function is located at address 0x00401155.`
+          `[!] Inspect GDB functions list to locate the correct address for win().`
         );
         playZapSound();
       }
@@ -130,13 +130,12 @@ export default function BufferOverflowChallenge({ onSolved, onBypass }) {
           </div>
           <pre className="text-slate-300 overflow-x-auto leading-relaxed">
 {`void win() {
-    // 0x00401155
     print_flag_vault();
 }
 
 void vuln() {
-    char buffer[16]; // 16 bytes
-    gets(buffer);    // No bounds check!
+    char buffer[16]; // 16-byte fixed buffer
+    gets(buffer);    // Unbounded input!
 }`}
           </pre>
         </div>
@@ -178,7 +177,7 @@ PIE       : Disabled`}
           </div>
         </div>
         <div className="text-[10px] text-slate-500 text-center mt-1">
-          Offset to Saved RIP = 16 bytes (buffer) + 8 bytes (RBP) = <strong>24 Bytes</strong>
+          Total Padding Required = Buffer Capacity (bytes) + 64-bit Saved Base Pointer RBP (bytes)
         </div>
       </div>
 
@@ -196,7 +195,7 @@ PIE       : Disabled`}
               type="number"
               value={paddingOffset}
               onChange={(e) => setPaddingOffset(e.target.value)}
-              placeholder="e.g. 24"
+              placeholder="Padding bytes..."
               className="w-full bg-black border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-cyan-300 outline-none focus:border-cyan-500"
             />
           </div>
@@ -208,7 +207,7 @@ PIE       : Disabled`}
               type="text"
               value={targetRip}
               onChange={(e) => setTargetRip(e.target.value)}
-              placeholder="e.g. 0x00401155"
+              placeholder="0x..."
               className="w-full bg-black border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-cyan-300 outline-none focus:border-cyan-500"
             />
           </div>
@@ -248,7 +247,7 @@ PIE       : Disabled`}
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{buffer_overflow_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button
@@ -277,7 +276,7 @@ PIE       : Disabled`}
       ) : (
         <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Calculate offset: buffer size (16) + RBP (8) = 24 bytes to target RIP address 0x00401155</span>
+          <span>Stack layout: buffer size + saved frame pointer (RBP) = padding required to overwrite Saved RIP. Find win() address in GDB symbols above.</span>
         </div>
       )}
     </div>

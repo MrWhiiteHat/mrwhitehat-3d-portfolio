@@ -189,25 +189,11 @@ export default function NetworkPivotChallenge({ onSolved, onBypass }) {
         </div>
       </div>
 
-      {/* Quick Tool Helpers */}
-      <div className="flex items-center gap-1.5 flex-wrap mt-2 font-mono text-[10px]">
-        <span className="text-slate-500">QUICK COMMANDS:</span>
-        {[
-          'nmap 172.16.50.2',
-          'ping 10.10.10.5',
-          'chisel client 172.16.50.2:8000 R:1080:socks',
-          'proxychains nmap 10.10.10.5',
-          'proxychains secretsdump.py 10.10.10.5',
-        ].map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => handleExecuteCommand(c)}
-            className="bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-300 px-2 py-0.5 rounded transition"
-          >
-            {c}
-          </button>
-        ))}
+      {/* Network Architecture Summary */}
+      <div className="flex items-center gap-2 mt-2 font-mono text-[10px] text-slate-400 bg-slate-950 p-2 border border-slate-800 rounded flex-wrap">
+        <span className="text-cyan-400 font-bold">PIVOT PATH:</span>
+        <span>Local (192.168.1.5) ➔ Bastion (172.16.50.2:8000 Chisel) ➔ DC01 (10.10.10.5:445 Active Directory)</span>
+        <span className="text-slate-500 ml-auto">Type "help" in terminal for command syntax</span>
       </div>
 
       {/* Interactive Terminal Window */}
@@ -269,7 +255,7 @@ export default function NetworkPivotChallenge({ onSolved, onBypass }) {
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{lateral_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button

@@ -304,7 +304,7 @@ export default function HeapOverflowChallenge({ onSolved, onBypass }) {
               type="text"
               value={editPayload}
               onChange={(e) => setEditPayload(e.target.value)}
-              placeholder="e.g. 0x004040a0 (target fd)"
+              placeholder="Enter target forward pointer (0x...)"
               className="flex-1 bg-slate-900 border border-slate-700 text-cyan-300 rounded px-2.5 py-1 text-xs outline-none focus:border-cyan-400"
             />
             <button
@@ -317,16 +317,11 @@ export default function HeapOverflowChallenge({ onSolved, onBypass }) {
           </div>
         </div>
 
-        {/* Quick Target Address Pill */}
-        <div className="flex items-center gap-1 text-[10px] text-slate-500 pt-1">
+        {/* Target Address Info */}
+        <div className="flex items-center gap-1 text-[10px] text-slate-500 pt-1 font-mono">
           <span>Target Descriptor Address:</span>
-          <button
-            type="button"
-            onClick={() => setEditPayload(TARGET_VAULT_ADDR)}
-            className="text-cyan-400 hover:underline font-mono"
-          >
-            0x004040a0 (click to copy into payload)
-          </button>
+          <span className="text-cyan-400 font-bold">{TARGET_VAULT_ADDR}</span>
+          <span className="text-slate-600">(Inspect chunks map above)</span>
         </div>
       </div>
 
@@ -352,7 +347,7 @@ export default function HeapOverflowChallenge({ onSolved, onBypass }) {
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{heap_overflow_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button

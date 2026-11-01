@@ -28,9 +28,9 @@ const TEST_PADS = [
 ];
 
 export default function LogicAnalyzerApp({ onOpenStation }) {
-  const [probeCh0, setProbeCh0] = useState('TP3'); // Connect to TP3 (TX)
-  const [probeGnd, setProbeGnd] = useState('TP4'); // Connect to TP4 (GND)
-  const [selectedBaud, setSelectedBaud] = useState('115200');
+  const [probeCh0, setProbeCh0] = useState('NONE');
+  const [probeGnd, setProbeGnd] = useState('NONE');
+  const [selectedBaud, setSelectedBaud] = useState('9600');
   const [sampling, setSampling] = useState(false);
   const [serialConsole, setSerialConsole] = useState('');
   const [showHints, setShowHints] = useState(true);
@@ -110,7 +110,13 @@ export default function LogicAnalyzerApp({ onOpenStation }) {
       const isGndCorrect = probeGnd === 'TP4';
       const isBaudCorrect = selectedBaud === '115200';
 
-      if (isTxCorrect && isGndCorrect && isBaudCorrect) {
+      if (probeCh0 === 'NONE' || probeGnd === 'NONE') {
+        setSerialConsole(
+          `[-] Probe attachment error: leads disconnected.\n` +
+          `[-] Attach Channel 0 to microcontroller TX and Ground to system GND.`
+        );
+        playZapSound();
+      } else if (isTxCorrect && isGndCorrect && isBaudCorrect) {
         setSerialConsole(
           `[+] Logic analyzer probe CH0 -> TP3 (UART_TX) [ATTACHED]\n` +
           `[+] Ground probe GND -> TP4 (SYSTEM_GND) [LOCKED]\n` +
@@ -127,20 +133,21 @@ export default function LogicAnalyzerApp({ onOpenStation }) {
         playBreachFanfare();
       } else if (!isTxCorrect) {
         setSerialConsole(
-          `[-] Probe CH0 is attached to ${probeCh0}. No UART asynchronous serial frame detected.\n` +
-          `[-] Inspect the silkscreen: TP3 is labeled UART_TX.`
+          `[-] Probe CH0 attached to ${probeCh0}. No serial data transitions detected on this line.\n` +
+          `[-] Inspect PCB silkscreen test pads to locate UART transmit (TX).`
         );
         playZapSound();
       } else if (!isGndCorrect) {
         setSerialConsole(
-          `[-] Ground probe attached to ${probeGnd}. Floating ground reference detected. Attach GND to TP4.`
+          `[-] Ground probe attached to ${probeGnd}. Floating ground reference detected.\n` +
+          `[-] Connect reference lead to system ground (GND).`
         );
         playZapSound();
       } else {
         setSerialConsole(
           `[!] Framing Error: Baud rate mismatch (${selectedBaud} baud).\n` +
-          `[!] Received corrupt garbage bytes: 0xff 0x00 0x7e 0x8a 0xc3.\n` +
-          `[!] Synchronize UART baud to standard IoT 115200 baud.`
+          `[!] Received unaligned framing bits / corrupt garbage bytes: 0xff 0x00 0x7e 0x8a 0xc3.\n` +
+          `[!] Adjust baud rate to match microcontroller asynchronous clock.`
         );
         playZapSound();
       }
@@ -229,11 +236,10 @@ export default function LogicAnalyzerApp({ onOpenStation }) {
 
             <div className="cos-hint-card">
               <h4>🛠️ How to Solve</h4>
-              <p>1. Connect <strong>Channel 0</strong> to <strong style={{ color: '#38bdf8' }}>TP3 (UART_TX)</strong>.</p>
-              <p>2. Connect <strong>Ground</strong> to <strong style={{ color: '#38bdf8' }}>TP4 (GND)</strong>.</p>
-              <p>3. Set Baud Rate to <strong style={{ color: '#34d399' }}>115200</strong>.</p>
-              <p>4. Click <strong style={{ color: '#34d399' }}>[START CAPTURE]</strong> to dump bootloader firmware and copy flag:</p>
-              <code className="cos-hint-code">{REVEALED_FLAG}</code>
+              <p>1. Examine the PCB test pad silkscreen labels to find the serial data transmit line (TX) and ground reference (GND).</p>
+              <p>2. Connect Channel 0 probe to UART TX and Ground probe to GND.</p>
+              <p>3. Select the standard embedded baud rate matching microcontroller asynchronous serial (8-N-1).</p>
+              <p>4. Start logic capture to decode the pulse stream and read the bootloader flag from the serial console!</p>
             </div>
           </div>
         </div>
@@ -260,6 +266,7 @@ export default function LogicAnalyzerApp({ onOpenStation }) {
                     value={probeCh0}
                     onChange={(e) => setProbeCh0(e.target.value)}
                   >
+                    <option value="NONE">-- Select Probe --</option>
                     {TEST_PADS.map((pad) => (
                       <option key={pad.id} value={pad.id}>
                         {pad.name}
@@ -278,6 +285,7 @@ export default function LogicAnalyzerApp({ onOpenStation }) {
                     value={probeGnd}
                     onChange={(e) => setProbeGnd(e.target.value)}
                   >
+                    <option value="NONE">-- Select Ground --</option>
                     {TEST_PADS.map((pad) => (
                       <option key={pad.id} value={pad.id}>
                         {pad.name}
@@ -313,7 +321,7 @@ export default function LogicAnalyzerApp({ onOpenStation }) {
               {/* Live Waveform Canvas */}
               <div style={{ marginTop: 'auto', border: '1px solid #1e293b', borderRadius: '4px', overflow: 'hidden' }}>
                 <div style={{ background: '#0a0f18', padding: '4px 8px', fontSize: '10px', color: '#94a3b8', borderBottom: '1px solid #1e293b' }}>
-                  CH0: {probeCh0} (TX) · CH1: CLK (Synchronized)
+                  CH0: {probeCh0 === 'NONE' ? 'Disconnected' : probeCh0} · GND: {probeGnd === 'NONE' ? 'Disconnected' : probeGnd}
                 </div>
                 <canvas
                   ref={canvasRef}
@@ -329,26 +337,12 @@ export default function LogicAnalyzerApp({ onOpenStation }) {
           <div className="cos-panel">
             <div className="cos-panel-header">
               <span>DECODED UART SERIAL STREAM (115200 8-N-1)</span>
-              {serialConsole.includes(REVEALED_FLAG) && (
-                <button
-                  type="button"
-                  className="cos-btn cos-btn-success"
-                  style={{ fontSize: '9.5px', padding: '1px 6px' }}
-                  onClick={() => {
-                    playClickSound(900);
-                    setManualFlag(REVEALED_FLAG);
-                  }}
-                >
-                  <Copy size={10} />
-                  <span>Copy Flag</span>
-                </button>
-              )}
             </div>
             <div className="cos-panel-body" style={{ padding: '6px' }}>
               <textarea
                 className={`cos-textarea ${serialConsole.includes(REVEALED_FLAG) ? 'cos-textarea-output' : ''}`}
                 readOnly
-                value={serialConsole || 'UART decoder idle.\nConnect CH0 to TP3 (TX), GND to TP4, select 115200 baud, and click START CAPTURE.'}
+                value={serialConsole || 'UART decoder idle.\nConnect CH0 and GND probes, select appropriate baud rate, and click START CAPTURE.'}
                 style={{ color: serialConsole.includes(REVEALED_FLAG) ? '#34d399' : '#cbd5e1' }}
               />
             </div>

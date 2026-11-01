@@ -149,7 +149,7 @@ export default function StegoAnalyzerChallenge({ onSolved, onBypass }) {
 
       <div className="hack-instructions">
         <p className="text-xs text-slate-300">
-          Audio forensic units detected a covert ultrasonic carrier hidden inside the office radio transmissions. Tune the demodulator receiver frequency to ~142.8 kHz and engage the 15 kHz high-pass DSP filter to reconstruct the hidden spectral watermark.
+          Audio forensic units detected a covert ultrasonic carrier hidden inside the office radio transmissions. Sweep the demodulator receiver across the ultrasonic spectrum (above 140 kHz) and apply high-pass DSP filtering to isolate the watermark from background noise.
         </p>
       </div>
 
@@ -232,7 +232,7 @@ export default function StegoAnalyzerChallenge({ onSolved, onBypass }) {
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{stego_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button

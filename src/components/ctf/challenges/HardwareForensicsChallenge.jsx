@@ -52,7 +52,7 @@ export default function HardwareForensicsChallenge({ onSolved, onBypass }) {
           `[ERROR] Logic Analyzer failed to acquire signal:\n` +
           `[-] Probe Channel 0 connected to: ${probeCh0}\n` +
           `[-] Ground Reference connected to: ${probeGnd}\n` +
-          `[-] Required: Connect CH0 to UART_TX (TP3) and GND Probe to System GND (TP4).`
+          `[-] No asynchronous serial transitions detected. Verify probe attachments on serial transmit (TX) and ground (GND) test pads.`
         );
         playZapSound();
         setDumping(false);
@@ -62,10 +62,10 @@ export default function HardwareForensicsChallenge({ onSolved, onBypass }) {
       // Check Baud Rate
       if (selectedBaud !== '115200') {
         setConsoleOutput(
-          `[OK] Probes locked on TP3 (TX) and TP4 (GND).\n` +
+          `[OK] Probes locked on ${probeCh0} and ${probeGnd}.\n` +
           `[FRAMING ERROR] Baud rate mismatch at ${selectedBaud} baud.\n` +
           `[!] Sampled raw byte buffer: \\xfe\\x8a\\x00\\xff\\x7e\\x1b\\x00 [GARBAGE BYTES].\n` +
-          `[!] Logic Analyzer detected stop bit violation. Select standard embedded baud (115200 8-N-1).`
+          `[!] Asynchronous framing error / stop bit violation detected. Adjust baud rate setting to synchronize with microcontroller clock.`
         );
         playZapSound();
         setDumping(false);
@@ -263,7 +263,7 @@ export default function HardwareForensicsChallenge({ onSolved, onBypass }) {
             type="text"
             value={manualFlag}
             onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{uart_...}"
+            placeholder="FLAG{...}"
             className="flex-1 bg-black/60 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200 outline-none focus:border-emerald-500 font-mono"
           />
           <button
@@ -292,7 +292,7 @@ export default function HardwareForensicsChallenge({ onSolved, onBypass }) {
       ) : (
         <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Connect CH0 to UART_TX (TP3), GND to TP4, and select standard 115200 baud</span>
+          <span>Inspect silk-screen markings on the PCB: attach the signal probe to serial TX, reference probe to GND, and test common embedded baud rates.</span>
         </div>
       )}
     </div>
