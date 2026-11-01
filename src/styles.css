@@ -1076,10 +1076,33 @@ button, a {
 
 .obj-device-label {
   font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
   color: #79f2aa;
   letter-spacing: 1.2px;
+}
+
+.obj-recruiter-fast-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  background: rgba(56, 189, 248, 0.16);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #38bdf8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.obj-recruiter-fast-btn:hover {
+  background: #38bdf8;
+  color: #040d16;
+  border-color: #38bdf8;
+  transform: scale(1.04);
 }
 
 .obj-status-actions {
@@ -1141,7 +1164,8 @@ button, a {
    1. DUAL MONITORS WORKSTATION (Projects)
    ========================================================================== */
 .physical-projects {
-  width: 760px;
+  width: 780px;
+  max-height: 540px;
   background: #060b08;
   border: 2px solid rgba(56, 189, 248, 0.4);
   box-shadow: 0 0 50px rgba(56, 189, 248, 0.2);
@@ -1199,7 +1223,7 @@ button, a {
 
 .bezel-title {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10.5px;
   color: #8db599;
   letter-spacing: 0.5px;
 }
@@ -1224,7 +1248,7 @@ button, a {
 }
 
 .term-prompt {
-  font-size: 8.5px;
+  font-size: 11px;
   display: flex;
   gap: 6px;
   color: #6ee7b7;
@@ -1266,25 +1290,25 @@ button, a {
 }
 
 .row-prefix {
-  font-size: 8px;
+  font-size: 10px;
   color: #38bdf8;
   font-weight: 700;
 }
 
 .row-name {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: #fff;
 }
 
 .row-tag {
-  font-size: 8px;
+  font-size: 10px;
   color: #7ba287;
 }
 
 .term-footer-stat {
   margin-top: auto;
-  font-size: 8px;
+  font-size: 10.5px;
   color: #63846e;
   display: flex;
   align-items: center;
@@ -1336,22 +1360,23 @@ button, a {
 }
 
 .ide-project-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.3px;
 }
 
 .ide-project-summary {
-  font-size: 11px;
+  font-size: 13px;
+  color: #a7f3d0;
   font-weight: 600;
   color: #79f2aa;
   line-height: 1.4;
 }
 
 .ide-project-desc {
-  font-size: 10px;
-  color: #9ab4a3;
+  font-size: 12px;
+  color: #cbd5e1;
   line-height: 1.5;
 }
 
@@ -1364,7 +1389,8 @@ button, a {
 
 .stack-header {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10px;
+  font-weight: 700;
   color: #648170;
   letter-spacing: 0.8px;
 }
@@ -1377,7 +1403,8 @@ button, a {
 
 .ide-pill {
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 10.5px;
+  color: #d1fae5;
   padding: 3px 7px;
   border-radius: 3px;
   background: rgba(85, 246, 154, 0.08);
@@ -1397,10 +1424,10 @@ button, a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 12px;
+  padding: 8px 14px;
   background: #38bdf8;
   color: #04131d;
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 700;
   border-radius: 5px;
   transition: all 0.15s ease;
@@ -1432,7 +1459,8 @@ button, a {
    2. AUDITORIUM PROJECTOR SCREEN (Achievements)
    ========================================================================== */
 .physical-achievements {
-  width: 640px;
+  width: 680px;
+  max-height: 520px;
   background: #09140e;
   border: 3px solid rgba(85, 246, 154, 0.5);
   box-shadow: 0 0 60px rgba(85, 246, 154, 0.3);
@@ -1459,14 +1487,14 @@ button, a {
   align-items: center;
   gap: 6px;
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--green);
   letter-spacing: 1px;
 }
 
 .slide-counter {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 11px;
   color: #79f2aa;
   padding: 2px 7px;
   background: rgba(85, 246, 154, 0.1);
@@ -1512,7 +1540,7 @@ button, a {
 
 .slide-award-class {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10px;
   color: var(--green);
   letter-spacing: 1.5px;
   font-weight: 700;
@@ -1527,7 +1555,7 @@ button, a {
 
 .slide-year-tag {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 12px;
   color: #38bdf8;
   font-weight: 700;
 }
@@ -1541,8 +1569,8 @@ button, a {
 }
 
 .slide-award-desc {
-  font-size: 11px;
-  color: #9dbbb4;
+  font-size: 13px;
+  color: #cbd5e1;
   line-height: 1.5;
 }
 
@@ -1557,8 +1585,8 @@ button, a {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10px;
-  color: #c0dec8;
+  font-size: 11.5px;
+  color: #d1fae5;
 }
 
 .bullet-dot {
@@ -1617,7 +1645,8 @@ button, a {
    3. ARCHIVE BOOKCASE (Skills Board)
    ========================================================================== */
 .physical-skills {
-  width: 520px;
+  width: 620px;
+  max-height: 540px;
   background: #08110c;
   border: 2px solid rgba(52, 211, 153, 0.4);
   box-shadow: 0 0 40px rgba(52, 211, 153, 0.2);
@@ -1650,14 +1679,14 @@ button, a {
 
 .board-subtitle {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 11px;
   color: #34d399;
   letter-spacing: 0.8px;
   display: block;
 }
 
 .board-title {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 800;
   color: #fff;
 }
@@ -1670,8 +1699,8 @@ button, a {
 
 .filter-chip {
   font-family: var(--mono);
-  font-size: 8px;
-  padding: 3px 7px;
+  font-size: 11px;
+  padding: 4px 10px;
   background: rgba(52, 211, 153, 0.08);
   border: 1px solid rgba(52, 211, 153, 0.25);
   border-radius: 4px;
@@ -1725,7 +1754,7 @@ button, a {
 
 .drawer-category {
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   color: #95dfae;
   letter-spacing: 0.8px;
@@ -1755,14 +1784,14 @@ button, a {
 }
 
 .skill-name {
-  font-size: 10px;
+  font-size: 12.5px;
   color: #d1fae5;
   flex: 1;
 }
 
 .skill-level {
   font-family: var(--mono);
-  font-size: 7px;
+  font-size: 10.5px;
   color: #34d399;
   font-weight: 700;
 }
@@ -1771,7 +1800,8 @@ button, a {
    4. EXECUTIVE LOUNGE WALL PLAQUE (About Me)
    ========================================================================== */
 .physical-about {
-  width: 460px;
+  width: 580px;
+  max-height: 540px;
   background: #0f1511;
   border: 2px solid rgba(251, 191, 36, 0.4);
   box-shadow: 0 0 45px rgba(251, 191, 36, 0.2);
@@ -1810,22 +1840,22 @@ button, a {
 
 .crest-label {
   font-family: var(--mono);
-  font-size: 7.5px;
+  font-size: 10px;
   color: #fbbf24;
   letter-spacing: 1px;
   display: block;
 }
 
 .plaque-name {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.3px;
 }
 
 .plaque-role {
-  font-size: 10px;
-  color: #b3c7ba;
+  font-size: 13px;
+  color: #cbd5e1;
   display: block;
 }
 
@@ -1849,22 +1879,22 @@ button, a {
 
 .stat-label {
   font-family: var(--mono);
-  font-size: 7px;
+  font-size: 10px;
   color: #e5b849;
   display: block;
 }
 
 .stat-value {
-  font-size: 11px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #fff;
 }
 .live-val { color: var(--green); }
 
 .plaque-bio-text {
-  font-size: 11px;
-  line-height: 1.5;
-  color: #9cb5a5;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #cbd5e1;
 }
 
 .plaque-action-row {
@@ -1879,7 +1909,7 @@ button, a {
   padding: 8px 14px;
   background: #fbbf24;
   color: #171203;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   border-radius: 5px;
   transition: all 0.15s ease;
@@ -1893,7 +1923,8 @@ button, a {
    5. LASER PRINTER OUTPUT TRAY (Printed A4 Resume)
    ========================================================================== */
 .physical-resume {
-  width: 420px;
+  width: 500px;
+  max-height: 540px;
   background: #f4f6f0;
   color: #1e2922;
   border: 1px solid #d1d5db;
@@ -1931,7 +1962,7 @@ button, a {
 
 .doc-num {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10.5px;
   color: #64748b;
   letter-spacing: 0.8px;
   display: block;
@@ -1945,7 +1976,7 @@ button, a {
 }
 
 .doc-subtitle {
-  font-size: 10px;
+  font-size: 13px;
   color: #475569;
   font-weight: 600;
   display: block;
@@ -1977,8 +2008,8 @@ button, a {
 
 .paper-heading {
   font-family: var(--mono);
-  font-size: 8.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
   color: #334155;
   letter-spacing: 0.6px;
   margin-bottom: 3px;
@@ -1987,9 +2018,9 @@ button, a {
 }
 
 .paper-text {
-  font-size: 10px;
-  line-height: 1.45;
-  color: #334155;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #1e293b;
 }
 
 .paper-tag-cloud {
@@ -2000,10 +2031,10 @@ button, a {
 
 .paper-tag-cloud span {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 11px;
   background: #f1f5f9;
   border: 1px solid #cbd5e1;
-  padding: 2px 6px;
+  padding: 3px 8px;
   border-radius: 3px;
   color: #1e293b;
 }
@@ -2020,10 +2051,10 @@ button, a {
   justify-content: center;
   gap: 7px;
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   background: #0f172a;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 12.5px;
   font-weight: 700;
   border-radius: 4px;
   transition: all 0.15s ease;
@@ -2037,7 +2068,8 @@ button, a {
    6. DESKTOP INTERCOM CONSOLE (Contact)
    ========================================================================== */
 .physical-contact {
-  width: 460px;
+  width: 560px;
+  max-height: 520px;
   background: #08110b;
   border: 2px solid rgba(34, 197, 94, 0.4);
   box-shadow: 0 0 45px rgba(34, 197, 94, 0.25);
@@ -2075,14 +2107,14 @@ button, a {
 
 .freq-code {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 11px;
   color: #22c55e;
   letter-spacing: 0.8px;
 }
 
 .console-enc {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10.5px;
   color: #689a77;
 }
 
@@ -2135,12 +2167,12 @@ button, a {
 
 .ch-tag {
   font-family: var(--mono);
-  font-size: 7px;
+  font-size: 10px;
   color: #72a382;
 }
 
 .ch-val {
-  font-size: 11px;
+  font-size: 13.5px;
   color: #fff;
   font-weight: 700;
 }
@@ -6223,7 +6255,8 @@ html, body, .portfolio-container {
    7. MRWHITEHAT // OPERATIVE HOLOGRAPHIC DOSSIER STYLES
    ========================================================================== */
 .physical-operator {
-  width: 500px;
+  width: 620px;
+  max-height: 540px;
   background: #040d16;
   border: 2px solid rgba(56, 189, 248, 0.45);
   box-shadow: 0 0 50px rgba(56, 189, 248, 0.3), inset 0 0 30px rgba(14, 165, 233, 0.08);
@@ -6272,7 +6305,7 @@ html, body, .portfolio-container {
 .callsign-level {
   display: block;
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10.5px;
   letter-spacing: 0.9px;
   color: #38bdf8;
   font-weight: 700;
@@ -6280,7 +6313,7 @@ html, body, .portfolio-container {
 
 .callsign-title {
   margin: 2px 0 0 0;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 800;
   color: #f0f9ff;
   letter-spacing: -0.3px;
@@ -6293,7 +6326,7 @@ html, body, .portfolio-container {
 
 .callsign-legal {
   display: block;
-  font-size: 9.5px;
+  font-size: 12px;
   color: #94a3b8;
   margin-top: 2px;
 }
@@ -6303,7 +6336,7 @@ html, body, .portfolio-container {
   align-items: center;
   gap: 5px;
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10.5px;
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.35);
@@ -6336,7 +6369,7 @@ html, body, .portfolio-container {
   align-items: center;
   gap: 6px;
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10.5px;
   letter-spacing: 0.8px;
   font-weight: 700;
   margin-bottom: 8px;

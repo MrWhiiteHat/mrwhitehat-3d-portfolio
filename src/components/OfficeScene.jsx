@@ -357,6 +357,7 @@ function SceneContents({
   onStationRelocked = null,
   controlSettings = null,
   onOpenCyberOS = null,
+  onOpenRecruiter = null,
 }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -491,6 +492,7 @@ function SceneContents({
             onOpenGadgets={onOpenGadgets}
             onOpenLeaderboard={onOpenLeaderboard}
             onOpenCyberOS={onOpenCyberOS}
+            onOpenRecruiter={onOpenRecruiter}
           />
         )}
 
@@ -682,6 +684,7 @@ export default function OfficeScene({
             onStationRelocked={onStationRelocked}
             controlSettings={controlSettings}
             onOpenCyberOS={onOpenCyberOS}
+            onOpenRecruiter={onOpenRecruiter}
           />
         </Suspense>
       </Canvas>

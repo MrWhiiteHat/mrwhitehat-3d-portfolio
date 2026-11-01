@@ -74,7 +74,7 @@ export const stationConfigs = {
     camTarget: [-4.86, 2.15, -2.0],
     title: 'Auditorium Projector',
     icon: Award,
-    distanceFactor: 1.25,
+    distanceFactor: 1.15,
     lightColor: '#4ade80',
     lightIntensity: 22,
     lightPos: [0, 0, 0.55],
@@ -87,7 +87,7 @@ export const stationConfigs = {
     camTarget: [-1.2, 1.15, 0.15],
     title: 'Dual-Monitor Workstation',
     icon: Code2,
-    distanceFactor: 0.72,
+    distanceFactor: 0.70,
     lightColor: '#38bdf8',
     lightIntensity: 18,
     lightPos: [0, 0, 0.45],
@@ -100,7 +100,7 @@ export const stationConfigs = {
     camTarget: [0.6, 1.90, -4.70],
     title: 'Archive Bookcase',
     icon: BookOpen,
-    distanceFactor: 0.65,
+    distanceFactor: 1.00,
     lightColor: '#34d399',
     lightIntensity: 15,
     lightPos: [0, 0, 0.35],
@@ -109,11 +109,11 @@ export const stationConfigs = {
     // Executive Wall Plaque above Lounge Sofa on Right Wall
     position: [4.95, 2.20, 1.6],
     rotation: [0, -Math.PI / 2, 0],
-    camPos: [2.20, 2.20, 1.6],
+    camPos: [2.50, 2.15, 1.6],
     camTarget: [4.95, 2.20, 1.6],
     title: 'Executive Wall Plaque',
     icon: UserRound,
-    distanceFactor: 0.65,
+    distanceFactor: 1.10,
     lightColor: '#fbbf24',
     lightIntensity: 14,
     lightPos: [0, 0, 0.35],
@@ -126,7 +126,7 @@ export const stationConfigs = {
     camTarget: [-3.6, 1.00, 1.05],
     title: 'Laser Printer Output Tray',
     icon: BriefcaseBusiness,
-    distanceFactor: 0.60,
+    distanceFactor: 0.50,
     lightColor: '#10b981',
     lightIntensity: 10,
     lightPos: [0, 0.15, 0.25],
@@ -139,7 +139,7 @@ export const stationConfigs = {
     camTarget: [3.75, 0.84, -1.25],
     title: 'Secure Comms Relay // Contact',
     icon: Mail,
-    distanceFactor: 0.55,
+    distanceFactor: 0.58,
     lightColor: '#22c55e',
     lightIntensity: 14,
     lightPos: [0, 0.1, 0.3],
@@ -152,7 +152,7 @@ export const stationConfigs = {
     camTarget: [-4.20, 1.60, -4.20],
     title: 'Operative Terminal // MrWhiteHat',
     icon: Terminal,
-    distanceFactor: 0.70,
+    distanceFactor: 1.02,
     lightColor: '#38bdf8',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -165,7 +165,7 @@ export const stationConfigs = {
     camTarget: [-2.85, 1.40, -4.20],
     title: '42U Mainframe Server Rack',
     icon: Server,
-    distanceFactor: 0.70,
+    distanceFactor: 0.75,
     lightColor: '#ef4444',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -178,7 +178,7 @@ export const stationConfigs = {
     camTarget: [-4.88, 2.35, 1.25],
     title: 'Tactical Red Team Hardware Arsenal',
     icon: Radio,
-    distanceFactor: 0.70,
+    distanceFactor: 0.92,
     lightColor: '#f97316',
     lightIntensity: 20,
     lightPos: [0, 0, 0.45],
@@ -191,7 +191,7 @@ export const stationConfigs = {
     camTarget: [-4.88, 3.45, 1.25],
     title: 'Wireshark Monitor // Live PCAP Analyzer',
     icon: Activity,
-    distanceFactor: 0.75,
+    distanceFactor: 0.92,
     lightColor: '#06b6d4',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -204,7 +204,7 @@ export const stationConfigs = {
     camTarget: [4.94, 2.25, -0.4],
     title: 'CTOS Security Visitor Access Terminal',
     icon: Users,
-    distanceFactor: 0.75,
+    distanceFactor: 1.10,
     lightColor: '#34d399',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -216,7 +216,7 @@ export const stationConfigs = {
     camTarget: [-1.15, 0.55, -4.92],
     title: 'Secret Black Hat Vault Mainframe',
     icon: Skull,
-    distanceFactor: 0.75,
+    distanceFactor: 0.72,
     lightColor: '#ef4444',
     lightIntensity: 26,
     lightPos: [0, 0, 0.45],
@@ -235,6 +235,7 @@ export default function InObjectDisplay({
   onStationBreached = null,
   onStationRelocked = null,
   onOpenCyberOS = null,
+  onOpenRecruiter = null,
 }) {
   const [selectedProject, setSelectedProject] = useState(0);
   const [selectedSlide, setSelectedSlide] = useState(0);
@@ -470,6 +471,20 @@ export default function InObjectDisplay({
               >
                 <ChevronRight size={13} />
               </button>
+              {onOpenRecruiter && (
+                <button
+                  type="button"
+                  className="obj-recruiter-fast-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenRecruiter();
+                  }}
+                  title="Open crisp, full-screen 2D Executive Dossier"
+                >
+                  <FileText size={11} />
+                  <span>2D DOSSIER</span>
+                </button>
+              )}
               <button
                 className="obj-exit-btn"
                 onClick={(e) => {
@@ -593,7 +608,7 @@ export default function InObjectDisplay({
                   {projects[selectedProject]?.highlights && (
                     <div className="ide-highlights-box" style={{ marginTop: '8px', marginBottom: '8px' }}>
                       <span className="stack-header" style={{ color: '#38bdf8' }}>KEY ARCHITECTURE & PERFORMANCE SIGNALS:</span>
-                      <ul style={{ margin: '4px 0 0 14px', padding: 0, fontSize: '9px', color: '#cbd5e1', lineHeight: '1.45' }}>
+                      <ul style={{ margin: '4px 0 0 14px', padding: 0, fontSize: '11.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
                         {projects[selectedProject].highlights.map((h, hIdx) => (
                           <li key={hIdx} style={{ marginBottom: '2px' }}>{h}</li>
                         ))}
@@ -802,9 +817,9 @@ export default function InObjectDisplay({
               <div className="plaque-edu-box" style={{ background: 'rgba(251, 191, 36, 0.05)', border: '1px solid rgba(251, 191, 36, 0.2)', borderRadius: '6px', padding: '8px 10px' }}>
                 <span className="stat-label" style={{ marginBottom: '4px' }}>ACADEMIC CREDENTIALS & DEGREES</span>
                 {profile.education?.map((edu) => (
-                  <div key={edu.institution} style={{ marginBottom: '4px', fontSize: '9.5px', color: '#cbd5e1' }}>
+                  <div key={edu.institution} style={{ marginBottom: '4px', fontSize: '12px', color: '#cbd5e1' }}>
                     <strong style={{ color: '#fbbf24' }}>{edu.degree} – {edu.field}</strong>
-                    <div style={{ color: '#94a3b8', fontSize: '8.5px' }}>{edu.institution}, {edu.location} ({edu.period}) · {edu.status}</div>
+                    <div style={{ color: '#94a3b8', fontSize: '11px' }}>{edu.institution}, {edu.location} ({edu.period}) · {edu.status}</div>
                   </div>
                 ))}
               </div>
@@ -814,10 +829,10 @@ export default function InObjectDisplay({
                 <div className="plaque-edu-box" style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: '6px', padding: '8px 10px', marginTop: '6px' }}>
                   <span className="stat-label" style={{ marginBottom: '4px', color: '#38bdf8' }}>CAMPUS LEADERSHIP & STUDENT COORDINATION</span>
                   {profile.leadership.map((lead) => (
-                    <div key={lead.organization} style={{ fontSize: '9.5px', color: '#cbd5e1' }}>
+                    <div key={lead.organization} style={{ fontSize: '12px', color: '#cbd5e1' }}>
                       <strong style={{ color: '#38bdf8' }}>{lead.role}</strong>
-                      <div style={{ color: '#94a3b8', fontSize: '8.5px', marginBottom: '3px' }}>{lead.organization} ({lead.period})</div>
-                      <div style={{ fontSize: '8.5px', color: '#cbd5e1', lineHeight: '1.4' }}>
+                      <div style={{ color: '#94a3b8', fontSize: '11px', marginBottom: '3px' }}>{lead.organization} ({lead.period})</div>
+                      <div style={{ fontSize: '11px', color: '#cbd5e1', lineHeight: '1.5' }}>
                         • Organized and led cybersecurity workshops for 200+ students covering Web AppSec (OWASP Top 10) & Linux hardening.
                         <br />• Mentored student CTF teams in traffic packet forensics and vulnerability remediation.
                       </div>
@@ -830,11 +845,11 @@ export default function InObjectDisplay({
               {profile.availability && (
                 <div style={{ background: 'rgba(34, 197, 94, 0.06)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '6px', padding: '7px 10px', marginTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
                   <div>
-                    <span style={{ fontSize: '7.5px', letterSpacing: '0.8px', color: '#4ade80', fontWeight: 700, display: 'block' }}>RECRUITER STATUS // CAREER AVAILABILITY</span>
-                    <strong style={{ fontSize: '10px', color: '#f0fdf4' }}>{profile.availability.timeframes}</strong>
-                    <div style={{ fontSize: '8px', color: '#86efac' }}>{profile.availability.workPreferences}</div>
+                    <span style={{ fontSize: '10px', letterSpacing: '0.8px', color: '#4ade80', fontWeight: 700, display: 'block' }}>RECRUITER STATUS // CAREER AVAILABILITY</span>
+                    <strong style={{ fontSize: '13px', color: '#f0fdf4' }}>{profile.availability.timeframes}</strong>
+                    <div style={{ fontSize: '11px', color: '#86efac' }}>{profile.availability.workPreferences}</div>
                   </div>
-                  <span style={{ fontSize: '8px', background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(34, 197, 94, 0.4)', fontWeight: 600 }}>
+                  <span style={{ fontSize: '10.5px', background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(34, 197, 94, 0.4)', fontWeight: 600 }}>
                     AppSec · PenTest · AI Security
                   </span>
                 </div>
@@ -888,7 +903,7 @@ export default function InObjectDisplay({
                   <span className="doc-num">DOC-CV-2026 // A4 LASER PRINT</span>
                   <h2 className="doc-title">{profile.name} <span style={{ fontSize: '13px', color: '#16a34a', fontWeight: 600 }}>({profile.alias})</span></h2>
                   <span className="doc-subtitle">{profile.role}</span>
-                  <div style={{ fontSize: '9px', color: '#475569', marginTop: '3px' }}>
+                  <div style={{ fontSize: '11.5px', color: '#475569', marginTop: '3px' }}>
                     {profile.location} · {profile.email} · {profile.phone}
                   </div>
                 </div>
@@ -907,7 +922,7 @@ export default function InObjectDisplay({
                   <h4 className="paper-heading">ACADEMIC BACKGROUND & DEGREES</h4>
                   {profile.education?.map((edu) => (
                     <div key={edu.institution} style={{ marginBottom: '4px' }}>
-                      <strong style={{ fontSize: '10px', color: '#0f172a' }}>{edu.degree} – {edu.field}</strong>
+                      <strong style={{ fontSize: '13px', color: '#0f172a' }}>{edu.degree} – {edu.field}</strong>
                       <div style={{ fontSize: '8.5px', color: '#64748b' }}>{edu.institution}, {edu.location} ({edu.period}) · {edu.status}</div>
                     </div>
                   ))}
