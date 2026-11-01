@@ -50,8 +50,16 @@ export default function CyberChefApp({ onOpenStation }) {
 
   const handleManualSubmit = (e) => {
     e?.preventDefault();
-    if (!manualFlag.trim()) return;
-    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag.trim());
+    let flagToSubmit = manualFlag.trim();
+    if (!flagToSubmit && outputText.includes('FLAG{')) {
+      const match = outputText.match(/FLAG\{[^}]+\}/);
+      if (match) {
+        flagToSubmit = match[0];
+        setManualFlag(flagToSubmit);
+      }
+    }
+    if (!flagToSubmit) return;
+    const res = ctfEngine.submitFlag(CHALLENGE_ID, flagToSubmit);
     if (res.success || res.duplicate) {
       const stationId = res.stationId || 'about';
       setFlagFeedback({
@@ -319,8 +327,25 @@ export default function CyberChefApp({ onOpenStation }) {
 
             {/* Output Box */}
             <div className="cos-panel" style={{ flex: 1.2 }}>
-              <div className="cos-panel-header">
+              <div className="cos-panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#34d399' }}>OUTPUT PLAINTEXT (Auto-bake Active)</span>
+                {outputText.includes('FLAG{') && (
+                  <button
+                    type="button"
+                    className="cos-btn cos-btn-primary"
+                    style={{ padding: '2px 8px', fontSize: '9.5px', height: 'auto' }}
+                    onClick={() => {
+                      const match = outputText.match(/FLAG\{[^}]+\}/);
+                      if (match) {
+                        setManualFlag(match[0]);
+                        playClickSound(1000);
+                      }
+                    }}
+                    title="Copy decrypted flag directly to submit bar"
+                  >
+                    📋 Copy Flag to Submit Bar
+                  </button>
+                )}
               </div>
               <div className="cos-panel-body" style={{ padding: '4px' }}>
                 <textarea

@@ -38,6 +38,7 @@ export default function BurpSuiteApp({ onOpenStation }) {
   // Timing Attack State
   const [timingToken, setTimingToken] = useState('');
   const [timingLogs, setTimingLogs] = useState([]);
+  const [timingNotice, setTimingNotice] = useState(null);
 
   // Decoder State
   const [decoderInput, setDecoderInput] = useState('');
@@ -138,6 +139,25 @@ export default function BurpSuiteApp({ onOpenStation }) {
     const latency = (48.0 + matches * 15.2 + (Math.random() * 1.8 - 0.9)).toFixed(1);
     setTimingLogs((prev) => [{ candidate: probe, latency: parseFloat(latency), match: matches }, ...prev.slice(0, 9)]);
     playHackingBeep(matches > 5 ? 1200 : 900);
+
+    const isFullMatch = probe === TIMING_FLAG;
+    const hasEarlyBrace = probe.includes('}') && matches < TIMING_FLAG.length - 1;
+
+    if (isFullMatch) {
+      setTimingNotice({
+        type: 'success',
+        text: '🎉 FULL TOKEN CRACKED! All 41 characters matched with maximum response latency (~670ms).',
+        action: true,
+      });
+    } else if (hasEarlyBrace) {
+      setTimingNotice({
+        type: 'warning',
+        text: `⚠️ Notice: Closed brace '}' too early! Matched up to "${probe.slice(0, matches)}" (${matches} chars). The secret token continues before ending with '}'.`,
+        action: false,
+      });
+    } else {
+      setTimingNotice(null);
+    }
   };
 
   const handleManualSubmit = (e) => {
@@ -270,7 +290,7 @@ export default function BurpSuiteApp({ onOpenStation }) {
                   <h4>🛠️ Step-by-Step Walkthrough</h4>
                   <p>1. Enter candidate prefix <code>FLAG&#123;</code> into the probe input and click <strong>Send Probe</strong>.</p>
                   <p>2. Test candidate characters (e.g. <code>FLAG&#123;s</code>). Notice that correct characters cause a distinct latency spike (~78ms vs ~63ms)!</p>
-                  <p>3. Reconstruct the full flag prefix or submit <code>FLAG&#123;side_channel_timing_leak_enumerated&#125;</code> in the flag bar below.</p>
+                  <p>3. Reconstruct the full flag (or copy the cracked token <code>FLAG&#123;side_channel_timing_leak_enumerated&#125;</code>), paste it into the <strong>SUBMIT CAPTURED FLAG</strong> bar at the very bottom of this window, and click <strong>SUBMIT FLAG</strong> to claim +350 PTS!</p>
                 </div>
               </>
             ) : (
@@ -379,6 +399,20 @@ export default function BurpSuiteApp({ onOpenStation }) {
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
                     <span style={{ fontSize: '10px', color: '#64748b' }}>BODY (JSON Payload):</span>
+                    {responseBody.includes(SQLI_FLAG) && (
+                      <button
+                        type="button"
+                        className="cos-btn cos-btn-primary"
+                        style={{ padding: '2px 8px', fontSize: '9.5px', height: 'auto' }}
+                        onClick={() => {
+                          setManualFlag(SQLI_FLAG);
+                          playClickSound(1000);
+                        }}
+                        title="Transfer flag directly to bottom submission bar"
+                      >
+                        📋 Copy Flag to Submit Bar
+                      </button>
+                    )}
                   </div>
                   <textarea
                     className={`cos-textarea ${responseBody.includes(SQLI_FLAG) ? 'cos-textarea-output' : ''}`}
@@ -423,6 +457,36 @@ export default function BurpSuiteApp({ onOpenStation }) {
                     </button>
                   </div>
                 </form>
+
+                {timingNotice && (
+                  <div
+                    style={{
+                      marginTop: '10px',
+                      padding: '8px 10px',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      lineHeight: '1.4',
+                      backgroundColor: timingNotice.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                      border: `1px solid ${timingNotice.type === 'success' ? '#10b981' : '#f59e0b'}`,
+                      color: timingNotice.type === 'success' ? '#34d399' : '#fbbf24',
+                    }}
+                  >
+                    <div>{timingNotice.text}</div>
+                    {timingNotice.action && (
+                      <button
+                        type="button"
+                        className="cos-btn cos-btn-primary"
+                        style={{ marginTop: '6px', fontSize: '10px', padding: '3px 8px' }}
+                        onClick={() => {
+                          setManualFlag(TIMING_FLAG);
+                          playClickSound(1000);
+                        }}
+                      >
+                        📋 Copy Cracked Token to Bottom Submit Bar
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 <div style={{ marginTop: '12px', fontSize: '10.5px', color: '#64748b' }}>
                   <span>Probing strategy: Append candidate characters to matching prefix. Watch for latency spikes (~+15ms).</span>
