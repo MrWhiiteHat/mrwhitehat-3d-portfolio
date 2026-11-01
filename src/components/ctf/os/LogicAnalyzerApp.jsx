@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Cpu, Play, CheckCircle2, Zap, KeyRound, Terminal, AlertTriangle } from 'lucide-react';
+import {
+  Cpu,
+  Play,
+  CheckCircle2,
+  Zap,
+  KeyRound,
+  Terminal,
+  HelpCircle,
+  Sparkles,
+  Copy,
+  Radio,
+  Sliders,
+} from 'lucide-react';
 import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 
@@ -21,6 +33,7 @@ export default function LogicAnalyzerApp() {
   const [selectedBaud, setSelectedBaud] = useState('115200');
   const [sampling, setSampling] = useState(false);
   const [serialConsole, setSerialConsole] = useState('');
+  const [showHints, setShowHints] = useState(true);
   const [manualFlag, setManualFlag] = useState('');
   const [flagFeedback, setFlagFeedback] = useState(null);
   const canvasRef = useRef(null);
@@ -30,108 +43,115 @@ export default function LogicAnalyzerApp() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    let frameId;
+    let animId;
     let offset = 0;
 
-    const draw = () => {
-      offset += 2;
-      const w = canvas.width;
-      const h = canvas.height;
+    const render = () => {
+      ctx.fillStyle = '#03060a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = '#050a0f';
-      ctx.fillRect(0, 0, w, h);
-
-      // Grid
-      ctx.strokeStyle = '#0e1726';
+      // Grid lines
+      ctx.strokeStyle = '#0f172a';
       ctx.lineWidth = 1;
-      for (let x = 0; x < w; x += 40) {
+      for (let x = 0; x < canvas.width; x += 30) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
+        ctx.lineTo(x, canvas.height);
         ctx.stroke();
       }
 
-      // Draw Channel 0: UART TX Waveform
+      // CH0: Signal trace
       ctx.strokeStyle = probeCh0 === 'TP3' ? '#38bdf8' : '#64748b';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      for (let x = 0; x < w; x += 10) {
-        const bit = Math.sin((x + offset) * 0.05) > 0 ? 30 : 65;
-        if (x === 0) ctx.moveTo(x, bit);
-        else ctx.lineTo(x, bit);
+      let y = 35;
+      for (let x = 0; x < canvas.width; x += 15) {
+        const bit = ((x + offset) * 7) % 40 > 20 ? 1 : 0;
+        const curY = bit === 1 ? 15 : 45;
+        if (x === 0) ctx.moveTo(x, curY);
+        else {
+          ctx.lineTo(x, curY);
+          ctx.lineTo(x + 15, curY);
+        }
       }
       ctx.stroke();
 
-      // Label
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = '10px monospace';
-      ctx.fillText(`CH0: [${probeCh0}] UART_TX (24 MS/s)`, 10, 20);
-
-      // Draw Channel 1: Ground / Noise
-      ctx.strokeStyle = '#34d399';
+      // CH1: Clock trace
+      ctx.strokeStyle = '#10b981';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      for (let x = 0; x < w; x += 10) {
-        const bit = 110;
-        if (x === 0) ctx.moveTo(x, bit);
-        else ctx.lineTo(x, bit);
+      for (let x = 0; x < canvas.width; x += 10) {
+        const bit = ((x + offset) / 10) % 2 === 0 ? 1 : 0;
+        const curY = bit === 1 ? 65 : 85;
+        if (x === 0) ctx.moveTo(x, curY);
+        else {
+          ctx.lineTo(x, curY);
+          ctx.lineTo(x + 10, curY);
+        }
       }
       ctx.stroke();
-      ctx.fillStyle = '#34d399';
-      ctx.fillText(`GND: [${probeGnd}] 0V Reference`, 10, 100);
 
-      frameId = requestAnimationFrame(draw);
+      offset = (offset + 1) % 60;
+      animId = requestAnimationFrame(render);
     };
 
-    draw();
-    return () => cancelAnimationFrame(frameId);
-  }, [probeCh0, probeGnd]);
+    render();
+    return () => cancelAnimationFrame(animId);
+  }, [probeCh0]);
 
   const handleCapture = () => {
+    if (sampling) return;
     setSampling(true);
-    playHackingBeep(1200);
-    setSerialConsole('Probing digital logic bus at 24 MHz...');
+    playHackingBeep(1100);
+    setSerialConsole('Capturing digital logic stream from physical probes...');
 
     setTimeout(() => {
-      if (probeCh0 === 'TP1') {
-        setSerialConsole('[CRITICAL] Probe connected to TP1 (+3.3V Power Rail). DC line cannot transmit serial data.');
-        playZapSound();
-        setSampling(false);
-        return;
-      }
+      const isTxCorrect = probeCh0 === 'TP3';
+      const isGndCorrect = probeGnd === 'TP4';
+      const isBaudCorrect = selectedBaud === '115200';
 
-      if (probeCh0 !== 'TP3' || probeGnd !== 'TP4') {
-        setSerialConsole(`[ERROR] Signal desynchronized. Connect CH0 to UART_TX (TP3) and GND to TP4.`);
+      if (isTxCorrect && isGndCorrect && isBaudCorrect) {
+        setSerialConsole(
+          `[+] Logic analyzer probe CH0 -> TP3 (UART_TX) [ATTACHED]\n` +
+          `[+] Ground probe GND -> TP4 (SYSTEM_GND) [LOCKED]\n` +
+          `[+] Baud rate synchronized: 115200 baud, 8-N-1\n` +
+          `--------------------------------------------------\n` +
+          `[BOOT] MR_WHITEHAT SECURE IOT BOOTLOADER v2.4.1\n` +
+          `[BOOT] Initializing cryptographic coprocessor...\n` +
+          `[BOOT] Silicon revision: STM32F4-SECURE-REV2\n` +
+          `[BOOT] Dumping hardware diagnostic token:\n` +
+          `[+] FLAG CAPTURED: ${REVEALED_FLAG}\n` +
+          `--------------------------------------------------\n` +
+          `[BOOT] Bootloader locked. System halted.`
+        );
+        playBreachFanfare();
+      } else if (!isTxCorrect) {
+        setSerialConsole(
+          `[-] Probe CH0 is attached to ${probeCh0}. No UART asynchronous serial frame detected.\n` +
+          `[-] Inspect the silkscreen: TP3 is labeled UART_TX.`
+        );
         playZapSound();
-        setSampling(false);
-        return;
-      }
-
-      if (selectedBaud !== '115200') {
-        setSerialConsole(`[FRAMING ERROR] Baud rate mismatch at ${selectedBaud} baud. Received garbage bytes: \\xfe\\x8a\\x00\\xff. Select 115200 8-N-1.`);
+      } else if (!isGndCorrect) {
+        setSerialConsole(
+          `[-] Ground probe attached to ${probeGnd}. Floating ground reference detected. Attach GND to TP4.`
+        );
         playZapSound();
-        setSampling(false);
-        return;
+      } else {
+        setSerialConsole(
+          `[!] Framing Error: Baud rate mismatch (${selectedBaud} baud).\n` +
+          `[!] Received corrupt garbage bytes: 0xff 0x00 0x7e 0x8a 0xc3.\n` +
+          `[!] Synchronize UART baud to standard IoT 115200 baud.`
+        );
+        playZapSound();
       }
-
-      // Success!
-      setSerialConsole(
-        `[OK] Clock synchronization locked at 115200 baud (8-N-1).\n` +
-        `U-Boot 2024.04-arm64 (May 14 2026 - 10:22:01 +0000)\n` +
-        `CPU: Allwinner H616 (Quad-Core ARM Cortex-A53)\n` +
-        `SPI NOR Flash: W25Q128 (16MB) partition /dev/mtdblock0 mounted.\n` +
-        `[+] Decrypting bootloader environment variables...\n` +
-        `[+] ROOT CLEARANCE FLAG: ${REVEALED_FLAG}`
-      );
-      playClickSound(1200);
       setSampling(false);
-    }, 500);
+    }, 450);
   };
 
   const handleManualSubmit = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (!manualFlag.trim()) return;
-    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag);
+    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag.trim());
     if (res.success || res.duplicate) {
       setFlagFeedback({ success: true, text: res.message });
       playBreachFanfare();
@@ -142,120 +162,217 @@ export default function LogicAnalyzerApp() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#070b10] font-mono text-xs select-text overflow-hidden">
-      {/* PulseView Toolbar */}
-      <div className="flex items-center justify-between border-b border-[#1e293b] px-3 py-1.5 bg-[#0f172a]">
-        <div className="flex items-center gap-2">
-          <span className="text-[#38bdf8] font-bold">PulseView // Logic Analyzer & Protocol Decoder</span>
-          <span className="text-slate-500">|</span>
-          <span className="text-slate-300 text-[11px]">8 Channels @ 24 MS/s</span>
-        </div>
-        <button
-          type="button"
-          onClick={handleCapture}
-          disabled={sampling}
-          className="cos-btn cos-btn-primary py-0.5 text-xs font-bold"
-        >
-          {sampling ? 'ACQUIRING...' : 'RUN ACQUISITION'}
-        </button>
-      </div>
-
-      {/* Logic Waveforms Canvas */}
-      <div className="border-b border-[#1e293b] bg-black p-1">
-        <canvas ref={canvasRef} width={640} height={130} className="w-full h-32 block rounded" />
-      </div>
-
-      {/* Decoder & Pinout Settings */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2 bg-[#04070a] overflow-y-auto flex-1">
-        {/* Test Points Mapping */}
-        <div className="p-2.5 bg-[#080d14] border border-[#1e293b] rounded space-y-2">
-          <span className="text-[10px] text-cyan-400 uppercase font-bold block">
-            PCB PROBE ATTACHMENTS (J1 HEADER):
-          </span>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">PROBE CH0 (DATA):</label>
-              <select
-                value={probeCh0}
-                onChange={(e) => setProbeCh0(e.target.value)}
-                className="cos-input w-full py-1 text-xs"
-              >
-                {TEST_PADS.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">GROUND LEAD:</label>
-              <select
-                value={probeGnd}
-                onChange={(e) => setProbeGnd(e.target.value)}
-                className="cos-input w-full py-1 text-xs"
-              >
-                {TEST_PADS.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="text-[10px] text-slate-400 block mb-1">UART PROTOCOL BAUD RATE:</label>
-            <div className="grid grid-cols-3 gap-1">
-              {['9600', '38400', '115200'].map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => setSelectedBaud(b)}
-                  className={`cos-btn py-1 text-center justify-center ${selectedBaud === b ? 'cos-btn-primary font-bold' : ''}`}
-                >
-                  {b}
-                </button>
-              ))}
-            </div>
-          </div>
+    <div className="cos-app-container select-text">
+      {/* 1. Header Toolbar */}
+      <div className="cos-app-header">
+        <div className="cos-app-title">
+          <Cpu size={15} style={{ color: '#00f0ff' }} />
+          <span>PULSEVIEW // HARDWARE LOGIC ANALYZER & UART DECODER</span>
+          <span className="cos-badge cos-badge-cyan">24MHz 8-Channel USB</span>
         </div>
 
-        {/* Decoded Serial Console */}
-        <div className="p-2.5 bg-[#080d14] border border-[#1e293b] rounded flex flex-col">
-          <div className="text-[10px] text-slate-400 uppercase pb-1 mb-1 border-b border-[#1e293b]">
-            UART DECODER OUTPUT (ASCII / ttyS0)
-          </div>
-          <pre className="flex-1 bg-black p-2 rounded text-emerald-300 text-[11px] overflow-y-auto leading-relaxed select-all">
-            {serialConsole || 'Awaiting logic trigger acquisition...'}
-          </pre>
-        </div>
-      </div>
-
-      {/* Flag Submission Bar */}
-      <div className="p-2.5 bg-[#0a0f16] border-t border-[#1e293b] flex items-center justify-between gap-2">
-        <span className="text-[10px] text-slate-400 uppercase">SUBMIT HARDWARE FORENSICS FLAG:</span>
-        <form onSubmit={handleManualSubmit} className="flex items-center gap-2">
-          <input
-            type="text"
-            value={manualFlag}
-            onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{uart_...}"
-            className="cos-input py-1 text-xs w-64"
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
-            type="submit"
-            className="cos-btn cos-btn-success py-1 text-xs font-bold"
+            type="button"
+            className={`cos-hint-toggle ${showHints ? 'is-active' : ''}`}
+            onClick={() => setShowHints((prev) => !prev)}
+            title="Toggle Hardware Forensics Guide & Hints"
           >
-            SUBMIT FLAG
+            <HelpCircle size={13} />
+            <span>{showHints ? 'HIDE HINTS' : '💡 HOW TO SOLVE'}</span>
           </button>
-        </form>
+
+          <button
+            type="button"
+            className="cos-btn cos-btn-primary"
+            onClick={handleCapture}
+            disabled={sampling}
+          >
+            <Play size={11} />
+            <span>{sampling ? 'Capturing...' : 'START CAPTURE'}</span>
+          </button>
+        </div>
       </div>
 
-      {flagFeedback && (
-        <div className={`p-2 text-xs font-mono border-t ${flagFeedback.success ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300' : 'bg-rose-950/80 border-rose-500 text-rose-300'}`}>
-          {flagFeedback.text}
+      {/* 2. Interactive Hint & Walkthrough Drawer */}
+      {showHints && (
+        <div className="cos-hint-drawer">
+          <div className="cos-hint-header-bar">
+            <div className="cos-hint-title">
+              <Sparkles size={14} />
+              <span>HARDWARE FORENSICS GUIDE // UART PROTOCOL REVERSE ENGINEERING</span>
+            </div>
+            <span style={{ fontSize: '10px', color: '#94a3b8' }}>Category: Hardware Forensics · Difficulty: Easy · Reward: +150 PTS</span>
+          </div>
+
+          <div className="cos-hint-grid">
+            <div className="cos-hint-card">
+              <h4>🎯 Objective</h4>
+              <p>Reverse engineer the test points on the target IoT device PCB to intercept serial bootloader communication.</p>
+            </div>
+
+            <div className="cos-hint-card">
+              <h4>🔍 Pinout Clues</h4>
+              <p>• <strong>TP3</strong>: Labeled <code>UART_TX</code> on silkscreen (microcontroller transmit line).<br />
+              • <strong>TP4</strong>: System ground (<code>GND</code>, 0V reference).<br />
+              • Standard embedded baud rate: <strong style={{ color: '#38bdf8' }}>115200 (8-N-1)</strong>.</p>
+            </div>
+
+            <div className="cos-hint-card">
+              <h4>🛠️ How to Solve</h4>
+              <p>1. Connect <strong>Channel 0</strong> to <strong style={{ color: '#38bdf8' }}>TP3 (UART_TX)</strong>.</p>
+              <p>2. Connect <strong>Ground</strong> to <strong style={{ color: '#38bdf8' }}>TP4 (GND)</strong>.</p>
+              <p>3. Set Baud Rate to <strong style={{ color: '#34d399' }}>115200</strong>.</p>
+              <p>4. Click <strong style={{ color: '#34d399' }}>[START CAPTURE]</strong> to dump bootloader firmware and copy flag:</p>
+              <code className="cos-hint-code">{REVEALED_FLAG}</code>
+            </div>
+          </div>
         </div>
       )}
+
+      {/* 3. Main Split View: Hardware Test-Pad Board & Waveforms (Left) | Serial Console (Right) */}
+      <div className="cos-app-body">
+        <div className="cos-split-horizontal">
+          {/* Left Pane: PCB Test-Pads & Probe Settings */}
+          <div className="cos-panel">
+            <div className="cos-panel-header">
+              <span>PHYSICAL PCB TEST-PAD SILKSCREEN & PROBES</span>
+            </div>
+            <div className="cos-panel-body" style={{ gap: '10px' }}>
+              {/* Probe Setup Selectors */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div>
+                  <label style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block', marginBottom: '3px' }}>
+                    Probe CH0 (Signal):
+                  </label>
+                  <select
+                    className="cos-input"
+                    style={{ width: '100%' }}
+                    value={probeCh0}
+                    onChange={(e) => setProbeCh0(e.target.value)}
+                  >
+                    {TEST_PADS.map((pad) => (
+                      <option key={pad.id} value={pad.id}>
+                        {pad.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block', marginBottom: '3px' }}>
+                    Probe GND (Reference):
+                  </label>
+                  <select
+                    className="cos-input"
+                    style={{ width: '100%' }}
+                    value={probeGnd}
+                    onChange={(e) => setProbeGnd(e.target.value)}
+                  >
+                    {TEST_PADS.map((pad) => (
+                      <option key={pad.id} value={pad.id}>
+                        {pad.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Baud Rate Synchronizer */}
+              <div>
+                <label style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block', marginBottom: '3px' }}>
+                  UART Baud Rate:
+                </label>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {['9600', '19200', '57600', '115200'].map((baud) => (
+                    <button
+                      key={baud}
+                      type="button"
+                      className={`cos-btn ${selectedBaud === baud ? 'cos-btn-primary' : ''}`}
+                      style={{ flex: 1, fontSize: '10.5px' }}
+                      onClick={() => {
+                        playClickSound(850);
+                        setSelectedBaud(baud);
+                      }}
+                    >
+                      {baud}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Live Waveform Canvas */}
+              <div style={{ marginTop: 'auto', border: '1px solid #1e293b', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ background: '#0a0f18', padding: '4px 8px', fontSize: '10px', color: '#94a3b8', borderBottom: '1px solid #1e293b' }}>
+                  CH0: {probeCh0} (TX) · CH1: CLK (Synchronized)
+                </div>
+                <canvas
+                  ref={canvasRef}
+                  width={340}
+                  height={100}
+                  style={{ width: '100%', height: '100px', display: 'block' }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Pane: Serial Bootloader Console */}
+          <div className="cos-panel">
+            <div className="cos-panel-header">
+              <span>DECODED UART SERIAL STREAM (115200 8-N-1)</span>
+              {serialConsole.includes(REVEALED_FLAG) && (
+                <button
+                  type="button"
+                  className="cos-btn cos-btn-success"
+                  style={{ fontSize: '9.5px', padding: '1px 6px' }}
+                  onClick={() => {
+                    playClickSound(900);
+                    setManualFlag(REVEALED_FLAG);
+                  }}
+                >
+                  <Copy size={10} />
+                  <span>Copy Flag</span>
+                </button>
+              )}
+            </div>
+            <div className="cos-panel-body" style={{ padding: '6px' }}>
+              <textarea
+                className={`cos-textarea ${serialConsole.includes(REVEALED_FLAG) ? 'cos-textarea-output' : ''}`}
+                readOnly
+                value={serialConsole || 'UART decoder idle.\nConnect CH0 to TP3 (TX), GND to TP4, select 115200 baud, and click START CAPTURE.'}
+                style={{ color: serialConsole.includes(REVEALED_FLAG) ? '#34d399' : '#cbd5e1' }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Flag Submitter Bar */}
+      <div className="cos-flag-bar">
+        <span style={{ fontSize: '11px', fontWeight: 700, color: '#38bdf8' }}>SUBMIT CAPTURED FLAG:</span>
+        <input
+          type="text"
+          className="cos-flag-input"
+          placeholder="FLAG{...}"
+          value={manualFlag}
+          onChange={(e) => setManualFlag(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleManualSubmit(e)}
+        />
+        <button
+          type="button"
+          className="cos-flag-btn"
+          onClick={handleManualSubmit}
+        >
+          SUBMIT FLAG
+        </button>
+
+        {flagFeedback && (
+          <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
+            {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
+            <span>{flagFeedback.text}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

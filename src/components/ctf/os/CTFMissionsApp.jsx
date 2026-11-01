@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
-import { Flag, CheckCircle2, ShieldAlert, Award, KeyRound, ExternalLink, Zap, Lock, Unlock } from 'lucide-react';
+import {
+  Flag,
+  CheckCircle2,
+  ShieldAlert,
+  Award,
+  KeyRound,
+  ExternalLink,
+  Zap,
+  Lock,
+  Unlock,
+  HelpCircle,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 
@@ -9,7 +23,7 @@ export default function CTFMissionsApp({ onOpenApp }) {
   const [feedback, setFeedback] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
 
-  const challenges = (typeof ctfEngine?.getAllChallenges === "function" ? ctfEngine.getAllChallenges() : []) || [];
+  const challenges = (typeof ctfEngine?.getAllChallenges === 'function' ? ctfEngine.getAllChallenges() : []) || [];
   const ctfState = ctfEngine.getState();
 
   const categories = ['ALL', 'WEB', 'CRYPTO', 'REV', 'FORENSICS', 'PWN', 'NET', 'STEGO', 'OSINT'];
@@ -20,11 +34,10 @@ export default function CTFMissionsApp({ onOpenApp }) {
   });
 
   const handleGlobalSubmit = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (!flagInput.trim()) return;
     const clean = flagInput.trim();
 
-    // Check all challenges
     let matched = null;
     let result = null;
 
@@ -42,185 +55,230 @@ export default function CTFMissionsApp({ onOpenApp }) {
       setFlagInput('');
       playBreachFanfare();
     } else {
-      setFeedback({ success: false, text: `Flag "${clean}" is invalid or does not match any challenge hash.` });
+      setFeedback({ success: false, text: `Flag "${clean}" is invalid or does not match any challenge checksum.` });
       playZapSound();
     }
   };
 
   const getToolForChallenge = (chId) => {
-    if (chId.includes('pcap')) return 'wireshark';
-    if (chId.includes('sqli') || chId.includes('timing')) return 'burp';
-    if (chId.includes('stack') || chId.includes('patch')) return 'ghidra';
-    if (chId.includes('caesar')) return 'cyberchef';
-    if (chId.includes('uart')) return 'logic';
-    if (chId.includes('stego')) return 'spectrogram';
-    return 'terminal';
+    switch (chId) {
+      case 'crypto-caesar-tumbler':
+      case 'rev-duckyscript-badusb':
+        return { id: 'cyberchef', name: 'CyberChef' };
+      case 'forensics-pcap-exfiltration':
+        return { id: 'wireshark', name: 'Wireshark' };
+      case 'web-sqli-waf-bypass':
+      case 'web-sidechannel-timing':
+        return { id: 'burp', name: 'Burp Suite' };
+      case 'pwn-stack-matrix-buffer':
+      case 'rev-anti-debug-patch':
+        return { id: 'ghidra', name: 'Ghidra & GDB' };
+      case 'forensics-hardware-uart':
+        return { id: 'logic', name: 'Logic Analyzer' };
+      case 'stego-spectrogram-carrier':
+      case 'stego-ceiling-vent':
+        return { id: 'spectrogram', name: 'Spectrogram' };
+      default:
+        return { id: 'terminal', name: 'Kali Terminal' };
+    }
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#070b10] font-mono text-xs select-text overflow-hidden">
-      {/* Header & Stats Strip */}
-      <div className="p-3 bg-[#0d141f] border-b border-[#1e293b] flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Flag size={16} className="text-emerald-400" />
-          <strong className="text-slate-100 text-sm">CTF MISSION CONTROL // OPERATIVE BRIEFING</strong>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="cos-score-pill">
-            <span>SCORE:</span>
-            <strong className="text-emerald-300">{ctfState.score} PTS</strong>
+    <div className="cos-app-container select-text">
+      {/* 1. Top Mission Control Header */}
+      <div className="cos-app-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="cos-app-title">
+            <Flag size={15} style={{ color: '#10b981' }} />
+            <span>CYBERSECURITY CTF MISSION CONTROL</span>
           </div>
-          <span className="text-slate-400">
-            SOLVED: <strong>{ctfState.solvedChallenges.length} / {challenges.length}</strong>
+          <span className="cos-badge cos-badge-emerald">
+            {ctfState.solvedCount} / {challenges.length} MISSIONS COMPLETED
+          </span>
+          <span className="cos-badge cos-badge-amber">
+            SCORE: {ctfState.score} PTS
           </span>
         </div>
-      </div>
 
-      {/* Global Flag Submitter Bar */}
-      <div className="p-2.5 bg-[#080d14] border-b border-[#1e293b] flex items-center justify-between gap-2">
-        <span className="text-[10px] text-cyan-400 uppercase font-bold flex items-center gap-1">
-          <KeyRound size={12} />
-          <span>GLOBAL FLAG VERIFIER:</span>
-        </span>
-        <form onSubmit={handleGlobalSubmit} className="flex items-center gap-2 flex-1 max-w-lg">
-          <input
-            type="text"
-            value={flagInput}
-            onChange={(e) => setFlagInput(e.target.value)}
-            placeholder="Submit any captured flag: FLAG{...}"
-            className="cos-input py-1 text-xs flex-1 text-emerald-300"
-          />
-          <button
-            type="submit"
-            className="cos-btn cos-btn-success py-1 text-xs font-bold"
-          >
-            VERIFY FLAG
-          </button>
-        </form>
-      </div>
-
-      {/* Feedback Banner */}
-      {feedback && (
-        <div className={`p-2 px-3 text-xs font-mono border-b ${feedback.success ? 'bg-emerald-950 border-emerald-500 text-emerald-300' : 'bg-rose-950 border-rose-500 text-rose-300'}`}>
-          {feedback.text}
-        </div>
-      )}
-
-      {/* Category Filter Pills */}
-      <div className="p-2 bg-[#090e15] border-b border-[#1e293b] flex items-center gap-1.5 overflow-x-auto">
-        <span className="text-[10px] text-slate-500 mr-1">CATEGORY:</span>
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => {
-              playClickSound(850);
-              setSelectedCategory(cat);
-            }}
-            className={`px-2 py-0.5 rounded text-[10px] transition ${
-              selectedCategory === cat
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-bold'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Challenges Grid */}
-      <div className="flex-1 overflow-y-auto p-3 grid grid-cols-1 md:grid-cols-2 gap-2.5 bg-[#04070a]">
-        {filtered.map((ch) => {
-          const isSolved = ctfEngine.isChallengeSolved(ch.id);
-          const isExpanded = expandedId === ch.id;
-          const tool = getToolForChallenge(ch.id);
-
-          return (
-            <div
-              key={ch.id}
-              className={`p-3 rounded border transition ${
-                isSolved
-                  ? 'bg-emerald-950/20 border-emerald-500/40 text-slate-200'
-                  : 'bg-[#080d14] border-[#1e293b] text-slate-300'
-              }`}
+        {/* Category Filter Buttons */}
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`cos-btn ${selectedCategory === cat ? 'cos-btn-primary' : ''}`}
+              style={{ fontSize: '10px', padding: '2px 8px' }}
+              onClick={() => {
+                playClickSound(850);
+                setSelectedCategory(cat);
+              }}
             >
-              {/* Card Header */}
-              <div className="flex justify-between items-start mb-1.5">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300">
-                      {ch.category}
-                    </span>
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 2. Challenge Mission Grid */}
+      <div className="cos-app-body" style={{ overflowY: 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '10px' }}>
+          {filtered.map((ch) => {
+            const isSolved = ctfEngine.isChallengeSolved(ch.id);
+            const tool = getToolForChallenge(ch.id);
+            const isExpanded = expandedId === ch.id;
+
+            return (
+              <div
+                key={ch.id}
+                className="cos-panel"
+                style={{
+                  borderColor: isSolved ? 'rgba(16, 185, 129, 0.5)' : isExpanded ? 'rgba(56, 189, 248, 0.6)' : '#1e293b',
+                  boxShadow: isSolved ? '0 0 12px rgba(16, 185, 129, 0.15)' : 'none',
+                }}
+              >
+                {/* Challenge Header */}
+                <div className="cos-panel-header">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="cos-badge cos-badge-cyan">{ch.category}</span>
                     <span
-                      className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded ${
+                      className={`cos-badge ${
                         ch.difficulty === 'EASY'
-                          ? 'bg-emerald-950 text-emerald-400'
+                          ? 'cos-badge-emerald'
                           : ch.difficulty === 'MEDIUM'
-                          ? 'bg-sky-950 text-sky-400'
+                          ? 'cos-badge-cyan'
                           : ch.difficulty === 'HARD'
-                          ? 'bg-amber-950 text-amber-400'
-                          : 'bg-rose-950 text-rose-400'
+                          ? 'cos-badge-amber'
+                          : 'cos-badge-rose'
                       }`}
                     >
                       {ch.difficulty}
                     </span>
                   </div>
-                  <strong className="block text-xs mt-1 text-slate-100">{ch.title}</strong>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <strong style={{ color: '#fbbf24', fontSize: '11px' }}>+{ch.points} PTS</strong>
+                    {isSolved ? (
+                      <span className="cos-badge cos-badge-emerald">
+                        <CheckCircle2 size={11} /> SOLVED
+                      </span>
+                    ) : (
+                      <span className="cos-badge" style={{ color: '#94a3b8' }}>
+                        <Lock size={10} /> ACTIVE
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-xs font-bold text-amber-400">{ch.points} PTS</span>
-                  {isSolved && (
-                    <span className="block text-[9.5px] text-emerald-400 font-bold">✔ SOLVED</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Description */}
-              <p className="text-[11px] text-slate-400 line-clamp-2 mb-2 leading-relaxed">
-                {ch.description}
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-1 border-t border-slate-800/60">
-                <button
-                  type="button"
-                  onClick={() => onOpenApp?.(tool)}
-                  className="cos-btn cos-btn-primary py-0.5 text-[10.5px] font-bold flex items-center gap-1"
-                >
-                  <ExternalLink size={10} />
-                  <span>LAUNCH {tool.toUpperCase()}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setExpandedId(isExpanded ? null : ch.id)}
-                  className="text-slate-400 hover:text-cyan-300 text-[10.5px]"
-                >
-                  {isExpanded ? 'Hide Details' : 'View Mission Clues'}
-                </button>
-              </div>
-
-              {/* Expanded Details / Writeup */}
-              {isExpanded && (
-                <div className="mt-2 pt-2 border-t border-slate-800 text-[11px] space-y-1.5">
-                  <div className="text-slate-300">
-                    <strong className="text-cyan-400">Objective:</strong> {ch.objective}
+                {/* Challenge Body */}
+                <div className="cos-panel-body" style={{ gap: '8px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#f1f5f9' }}>
+                    {ch.title}
                   </div>
-                  <div className="text-slate-400">
-                    <strong className="text-amber-400">Starting Artifact:</strong> <code>{ch.startingArtifact}</code>
+                  <div style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.45' }}>
+                    {ch.description}
                   </div>
-                  {isSolved && ch.solution && (
-                    <div className="p-2 bg-emerald-950/40 border border-emerald-500/40 rounded mt-1">
-                      <strong className="text-emerald-400 block mb-0.5">TECHNICAL WRITEUP:</strong>
-                      <p className="text-slate-300 text-[10.5px] leading-relaxed">{ch.solution}</p>
+
+                  {/* Tool Action & Hint Toggle */}
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: 'auto', paddingTop: '6px', borderTop: '1px solid #1e293b' }}>
+                    <button
+                      type="button"
+                      className="cos-btn cos-btn-primary"
+                      style={{ fontSize: '10px', padding: '3px 8px' }}
+                      onClick={() => onOpenApp?.(tool.id)}
+                    >
+                      <ExternalLink size={10} />
+                      <span>Launch in {tool.name}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`cos-btn ${isExpanded ? 'cos-btn-primary' : ''}`}
+                      style={{ fontSize: '10px', padding: '3px 8px', marginLeft: 'auto' }}
+                      onClick={() => {
+                        playClickSound(850);
+                        setExpandedId(isExpanded ? null : ch.id);
+                      }}
+                    >
+                      <HelpCircle size={10} />
+                      <span>{isExpanded ? 'Hide Guide' : '💡 How to Solve'}</span>
+                      {isExpanded ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+                    </button>
+                  </div>
+
+                  {/* Expandable Step-by-Step Solving Guide */}
+                  {isExpanded && (
+                    <div
+                      style={{
+                        background: 'rgba(3, 6, 12, 0.95)',
+                        border: '1px solid rgba(245, 158, 11, 0.35)',
+                        borderRadius: '4px',
+                        padding: '10px',
+                        fontSize: '11px',
+                        lineHeight: '1.5',
+                        color: '#cbd5e1',
+                        animation: 'cosFadeIn 0.15s ease-out',
+                      }}
+                    >
+                      <div style={{ fontSize: '11px', fontWeight: 800, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+                        <Sparkles size={12} />
+                        <span>STEP-BY-STEP SOLVING GUIDE</span>
+                      </div>
+
+                      <div style={{ marginBottom: '6px' }}>
+                        <strong style={{ color: '#38bdf8' }}>1. Tool:</strong> Launch <strong>{tool.name}</strong> from the button above or the desktop icon.
+                      </div>
+
+                      <div style={{ marginBottom: '6px' }}>
+                        <strong style={{ color: '#38bdf8' }}>2. Instructions:</strong>
+                        <p style={{ color: '#94a3b8', margin: '2px 0' }}>
+                          {ch.hints && ch.hints[0] ? ch.hints[0].text : 'Analyze the provided artifact in the recommended tool.'}
+                        </p>
+                        {ch.hints && ch.hints[1] && (
+                          <p style={{ color: '#34d399', margin: '2px 0' }}>
+                            <strong>Key Clue:</strong> {ch.hints[1].text}
+                          </p>
+                        )}
+                      </div>
+
+                      <div style={{ fontSize: '10.5px', color: '#64748b' }}>
+                        Flag Format: <code className="cos-hint-code">FLAG&#123;...&#125;</code>
+                      </div>
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          );
-        })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Global Flag Submitter Bar */}
+      <div className="cos-flag-bar">
+        <span style={{ fontSize: '11px', fontWeight: 700, color: '#38bdf8' }}>SUBMIT ANY CAPTURED FLAG:</span>
+        <input
+          type="text"
+          className="cos-flag-input"
+          placeholder="FLAG{unique_challenge_token}"
+          value={flagInput}
+          onChange={(e) => setFlagInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleGlobalSubmit(e)}
+        />
+        <button
+          type="button"
+          className="cos-flag-btn"
+          onClick={handleGlobalSubmit}
+        >
+          SUBMIT FLAG
+        </button>
+
+        {feedback && (
+          <div className={`cos-flag-feedback ${feedback.success ? 'is-success' : 'is-error'}`}>
+            {feedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
+            <span>
+              {feedback.success ? `SUCCESS! [${feedback.title}] (+${feedback.points} PTS) - ${feedback.text}` : feedback.text}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

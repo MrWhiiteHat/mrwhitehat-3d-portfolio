@@ -169,12 +169,14 @@ export default function CyberOSDesktop({
   const openApp = (appId) => {
     playClickSound(950);
     const meta = APP_REGISTRY[appId] || APP_REGISTRY.terminal;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 850;
+
     setOpenWindows((prev) => {
       if (prev[appId]) {
         // Un-minimize if minimized
         return {
           ...prev,
-          [appId]: { ...prev[appId], isMinimized: false },
+          [appId]: { ...prev[appId], isMinimized: false, zIndex: Date.now() },
         };
       }
       return {
@@ -182,7 +184,7 @@ export default function CyberOSDesktop({
         [appId]: {
           ...meta,
           isMinimized: false,
-          isMaximized: false,
+          isMaximized: isMobile,
           zIndex: Date.now(),
         },
       };
@@ -488,10 +490,10 @@ export default function CyberOSDesktop({
               onClick={() => bringToFront(win.id)}
               className={`cos-window ${isActive ? 'is-active-window' : ''} ${win.isMaximized ? 'is-maximized' : ''}`}
               style={{
-                width: win.isMaximized ? '100%' : `${win.defaultSize.w}px`,
-                height: win.isMaximized ? '100%' : `${win.defaultSize.h}px`,
-                left: win.isMaximized ? 0 : `${win.defaultPos.x}px`,
-                top: win.isMaximized ? 0 : `${win.defaultPos.y}px`,
+                width: win.isMaximized ? '100%' : `${Math.min(win.defaultSize.w, typeof window !== 'undefined' ? window.innerWidth - 40 : 800)}px`,
+                height: win.isMaximized ? '100%' : `${Math.min(win.defaultSize.h, typeof window !== 'undefined' ? window.innerHeight - 80 : 520)}px`,
+                left: win.isMaximized ? 0 : `${Math.max(12, win.defaultPos.x)}px`,
+                top: win.isMaximized ? 0 : `${Math.max(8, win.defaultPos.y)}px`,
                 zIndex: win.zIndex,
               }}
             >

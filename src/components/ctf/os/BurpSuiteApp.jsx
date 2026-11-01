@@ -1,5 +1,20 @@
 import React, { useState } from 'react';
-import { Globe, Send, RefreshCw, KeyRound, ShieldAlert, CheckCircle2, Sliders, Database, Clock } from 'lucide-react';
+import {
+  Globe,
+  Send,
+  RefreshCw,
+  KeyRound,
+  ShieldAlert,
+  CheckCircle2,
+  Sliders,
+  Database,
+  Clock,
+  HelpCircle,
+  Sparkles,
+  Copy,
+  Zap,
+  Layers,
+} from 'lucide-react';
 import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 
@@ -8,10 +23,12 @@ const TIMING_FLAG = 'FLAG{side_channel_timing_leak_enumerated}';
 
 export default function BurpSuiteApp() {
   const [activeTab, setActiveTab] = useState('repeater'); // 'repeater' | 'timing' | 'decoder'
+  const [showHints, setShowHints] = useState(true);
+
+  // Repeater State
   const [httpMethod, setHttpMethod] = useState('GET');
-  const [urlPath, setUrlPath] = useState('/api/v1/accounts?username=alice');
-  const [requestHeaders, setRequestHeaders] = useState('Host: mainframe.internal\nUser-Agent: Mozilla/5.0 (Kali Linux x86_64)\nAccept: application/json');
-  const [requestBody, setRequestBody] = useState('');
+  const [urlPath, setUrlPath] = useState("/api/v1/accounts?username=alice");
+  const [requestHeaders, setRequestHeaders] = useState("Host: mainframe.internal\nUser-Agent: Mozilla/5.0 (Kali Linux x86_64)\nAccept: application/json");
   const [responseStatus, setResponseStatus] = useState('200 OK');
   const [responseHeaders, setResponseHeaders] = useState('Server: nginx/1.24.0\nContent-Type: application/json\nX-Powered-By: Express/SQLite3');
   const [responseBody, setResponseBody] = useState('[\n  {\n    "id": 1,\n    "username": "alice",\n    "role": "Security Analyst",\n    "clearance": "L2_RESTRICTED"\n  }\n]');
@@ -42,16 +59,6 @@ export default function BurpSuiteApp() {
     setTimeout(() => {
       const url = urlPath.trim();
       const lower = url.toLowerCase();
-
-      // Check WAF rules
-      if (lower.includes('drop table') || lower.includes('drop database') || lower.includes('delete from')) {
-        setResponseStatus('403 Forbidden (WAF Blocked)');
-        setResponseBody('{\n  "error": "WAF ALERT: Destructive DDL query blocked by Security Rule #901.",\n  "status": 403\n}');
-        setResponseTime(6);
-        playZapSound();
-        setSending(false);
-        return;
-      }
 
       // SQLite Syntax errors: unclosed quotes
       if ((url.match(/'/g) || []).length % 2 !== 0 && !url.includes('--')) {
@@ -109,46 +116,47 @@ export default function BurpSuiteApp() {
         return;
       }
 
-      // Default normal output
+      // Default normal query
       setResponseStatus('200 OK');
       setResponseBody('[\n  {\n    "id": 1,\n    "username": "alice",\n    "role": "Security Analyst",\n    "clearance": "L2_RESTRICTED"\n  }\n]');
-      setResponseTime(19);
+      setResponseTime(20);
+      playClickSound(950);
       setSending(false);
-    }, 350);
+    }, 280);
   };
 
-  const handleSendTimingProbe = () => {
-    playHackingBeep(1200);
-    let matchCount = 0;
-    for (let i = 0; i < timingToken.length; i++) {
-      if (timingToken[i] === TIMING_FLAG[i]) matchCount++;
-      else break;
-    }
-    const latency = parseFloat((3.5 + matchCount * 15.0 + (Math.random() - 0.5) * 0.8).toFixed(1));
+  const handleSendTimingProbe = (e) => {
+    e?.preventDefault();
+    if (!timingToken.trim()) return;
+    const probe = timingToken.trim();
 
-    setTimingLogs((prev) => [
-      { candidate: timingToken, latency, match: matchCount },
-      ...prev.slice(0, 6),
-    ]);
-
-    if (timingToken === TIMING_FLAG) {
-      playBreachFanfare();
-    } else {
-      playClickSound(800);
+    let matches = 0;
+    for (let i = 0; i < probe.length; i++) {
+      if (i < TIMING_FLAG.length && probe[i] === TIMING_FLAG[i]) {
+        matches++;
+      } else {
+        break;
+      }
     }
+
+    const latency = (48.0 + matches * 15.2 + (Math.random() * 1.8 - 0.9)).toFixed(1);
+    setTimingLogs((prev) => [{ candidate: probe, latency: parseFloat(latency), match: matches }, ...prev.slice(0, 9)]);
+    playHackingBeep(matches > 5 ? 1200 : 900);
   };
 
   const handleManualSubmit = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (!manualFlag.trim()) return;
-    const res = ctfEngine.submitFlag('web-sqli-waf-bypass', manualFlag);
-    const resTiming = ctfEngine.submitFlag('web-sidechannel-timing', manualFlag);
+    const clean = manualFlag.trim();
+
+    // Check against SQLi or Timing challenge
+    let res = ctfEngine.submitFlag('web-sqli-waf-bypass', clean);
+    if (!res.success && !res.duplicate) {
+      res = ctfEngine.submitFlag('web-sidechannel-timing', clean);
+    }
 
     if (res.success || res.duplicate) {
       setFlagFeedback({ success: true, text: res.message });
-      playBreachFanfare();
-    } else if (resTiming.success || resTiming.duplicate) {
-      setFlagFeedback({ success: true, text: resTiming.message });
       playBreachFanfare();
     } else {
       setFlagFeedback({ success: false, text: res.message });
@@ -157,215 +165,447 @@ export default function BurpSuiteApp() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#070b10] font-mono text-xs select-text overflow-hidden">
-      {/* Burp Suite Navigation Tabs */}
-      <div className="flex items-center gap-1 bg-[#0f172a] border-b border-[#1e293b] px-3 pt-2">
-        <span className="text-[#f97316] font-bold mr-3 flex items-center gap-1">
-          <Globe size={13} />
-          <span>Burp Suite Community v2026.1</span>
-        </span>
-        {[
-          { id: 'repeater', label: 'Repeater (SQLi Sandbox)' },
-          { id: 'timing', label: 'Timing Oracle (Side-Channel)' },
-          { id: 'decoder', label: 'Decoder Workbench' },
-        ].map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => {
-              playClickSound(850);
-              setActiveTab(t.id);
-            }}
-            className={`px-3 py-1.5 rounded-t text-xs font-mono transition border-t border-x ${
-              activeTab === t.id
-                ? 'bg-[#070b10] text-[#f97316] border-[#38bdf8]/40 font-bold'
-                : 'bg-[#1e293b]/50 text-slate-400 border-transparent hover:text-white'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+    <div className="cos-app-container select-text">
+      {/* 1. Top Header & Tab Navigation */}
+      <div className="cos-app-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="cos-app-title">
+            <Globe size={15} style={{ color: '#fb923c' }} />
+            <span>BURP SUITE COMMUNITY v2026.1 // WEB EXPLOITATION</span>
+          </div>
 
-      {activeTab === 'repeater' && (
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Target & Send Bar */}
-          <div className="flex items-center gap-2 p-2 bg-[#0c121a] border-b border-[#1e293b]">
-            <select
-              value={httpMethod}
-              onChange={(e) => setHttpMethod(e.target.value)}
-              className="cos-input py-1 text-xs font-bold text-amber-400"
-            >
-              <option value="GET">GET</option>
-              <option value="POST">POST</option>
-            </select>
-            <input
-              type="text"
-              value={urlPath}
-              onChange={(e) => setUrlPath(e.target.value)}
-              placeholder="/api/v1/accounts?username=..."
-              className="cos-input flex-1 py-1 text-xs text-cyan-300"
-            />
+          <div style={{ display: 'flex', gap: '4px', marginLeft: '12px' }}>
             <button
               type="button"
-              onClick={handleSendRepeater}
-              disabled={sending}
-              className="cos-btn cos-btn-primary py-1 px-4 text-xs font-bold flex items-center gap-1.5"
+              className={`cos-btn ${activeTab === 'repeater' ? 'cos-btn-primary' : ''}`}
+              onClick={() => setActiveTab('repeater')}
             >
-              <Send size={12} />
-              <span>{sending ? 'SENDING...' : 'SEND'}</span>
+              <Database size={11} />
+              <span>HTTP Repeater (SQLi)</span>
+            </button>
+            <button
+              type="button"
+              className={`cos-btn ${activeTab === 'timing' ? 'cos-btn-primary' : ''}`}
+              onClick={() => setActiveTab('timing')}
+            >
+              <Clock size={11} />
+              <span>Timing Oracle</span>
+            </button>
+            <button
+              type="button"
+              className={`cos-btn ${activeTab === 'decoder' ? 'cos-btn-primary' : ''}`}
+              onClick={() => setActiveTab('decoder')}
+            >
+              <Layers size={11} />
+              <span>Decoder</span>
             </button>
           </div>
-
-          {/* Split Request / Response View */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2 p-2 overflow-hidden bg-[#04070a]">
-            {/* Request Pane */}
-            <div className="flex flex-col bg-[#080d14] border border-[#1e293b] rounded overflow-hidden">
-              <div className="p-1.5 bg-[#0f172a] text-[10px] text-slate-400 border-b border-[#1e293b] flex justify-between">
-                <span>HTTP REQUEST RAW</span>
-                <span>Port: 443 [HTTPS]</span>
-              </div>
-              <textarea
-                value={requestHeaders}
-                onChange={(e) => setRequestHeaders(e.target.value)}
-                className="flex-1 bg-transparent p-2 text-slate-200 outline-none resize-none font-mono text-[11px] leading-relaxed"
-              />
-            </div>
-
-            {/* Response Pane */}
-            <div className="flex flex-col bg-[#080d14] border border-[#1e293b] rounded overflow-hidden">
-              <div className="p-1.5 bg-[#0f172a] text-[10px] text-slate-400 border-b border-[#1e293b] flex justify-between items-center">
-                <span>
-                  HTTP RESPONSE: <strong className={responseStatus.includes('200') ? 'text-emerald-400' : 'text-rose-400'}>{responseStatus}</strong>
-                </span>
-                <span className="text-cyan-400">{responseTime} ms</span>
-              </div>
-              <pre className="flex-1 bg-transparent p-2 text-emerald-300 overflow-y-auto font-mono text-[11px] leading-relaxed select-all">
-                {responseBody}
-              </pre>
-            </div>
-          </div>
         </div>
-      )}
 
-      {activeTab === 'timing' && (
-        <div className="flex-1 p-3 flex flex-col space-y-3 bg-[#060a0f] overflow-y-auto">
-          <div className="p-2.5 bg-[#0c131c] border border-[#1e293b] rounded">
-            <span className="text-[10px] text-cyan-400 uppercase block mb-1">
-              SIDE-CHANNEL TIMING ORACLE (POST /api/v2/vault/auth):
-            </span>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={timingToken}
-                onChange={(e) => setTimingToken(e.target.value)}
-                placeholder="FLAG{side_channel_..."
-                className="cos-input flex-1 py-1.5 text-xs text-amber-300"
-              />
-              <button
-                type="button"
-                onClick={handleSendTimingProbe}
-                className="cos-btn cos-btn-primary py-1.5 px-4 text-xs font-bold"
-              >
-                PROBE LATENCY
-              </button>
-            </div>
-          </div>
-
-          <div className="p-3 bg-[#080d14] border border-[#1e293b] rounded flex-1">
-            <span className="text-[10px] text-slate-400 uppercase block mb-2">
-              ROUND-TRIP LATENCY PROBES (Each matched character adds ~15ms):
-            </span>
-            <div className="space-y-2">
-              {timingLogs.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-xs">
-                  <code className="w-52 text-slate-300 truncate">{item.candidate}</code>
-                  <div className="flex-1 bg-black h-4 rounded overflow-hidden relative border border-slate-800">
-                    <div
-                      className={`h-full ${item.latency > 400 ? 'bg-emerald-500' : item.latency > 100 ? 'bg-amber-500' : 'bg-rose-500/80'}`}
-                      style={{ width: `${Math.min(100, (item.latency / 600) * 100)}%` }}
-                    />
-                    <span className="absolute inset-y-0 left-2 flex items-center text-[10px] font-bold text-white">
-                      {item.latency} ms ({item.match} chars matched)
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'decoder' && (
-        <div className="flex-1 p-3 grid grid-cols-1 md:grid-cols-2 gap-3 bg-[#060a0f] overflow-y-auto">
-          <div className="flex flex-col bg-[#080d14] border border-[#1e293b] rounded p-2">
-            <span className="text-[10px] text-slate-400 uppercase mb-1">INPUT (URL / BASE64 / HEX):</span>
-            <textarea
-              value={decoderInput}
-              onChange={(e) => setDecoderInput(e.target.value)}
-              placeholder="Type string to encode or decode..."
-              className="flex-1 bg-black border border-slate-800 rounded p-2 text-slate-200 outline-none resize-none font-mono text-xs"
-            />
-            <div className="flex gap-1.5 mt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  try {
-                    setDecoderOutput(atob(decoderInput.trim()));
-                  } catch (_) {
-                    setDecoderOutput('Invalid Base64 sequence.');
-                  }
-                }}
-                className="cos-btn py-1 text-xs"
-              >
-                Base64 Decode
-              </button>
-              <button
-                type="button"
-                onClick={() => setDecoderOutput(decodeURIComponent(decoderInput.trim()))}
-                className="cos-btn py-1 text-xs"
-              >
-                URL Decode
-              </button>
-            </div>
-          </div>
-
-          <div className="flex flex-col bg-[#080d14] border border-[#1e293b] rounded p-2">
-            <span className="text-[10px] text-slate-400 uppercase mb-1">DECODED OUTPUT:</span>
-            <textarea
-              readOnly
-              value={decoderOutput}
-              className="flex-1 bg-black border border-slate-800 rounded p-2 text-emerald-400 outline-none resize-none font-mono text-xs select-all"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Flag Submission Bar */}
-      <div className="p-2.5 bg-[#0a0f16] border-t border-[#1e293b] flex items-center justify-between gap-2">
-        <span className="text-[10px] text-slate-400 uppercase">SUBMIT RECOVERED WEB FLAG:</span>
-        <form onSubmit={handleManualSubmit} className="flex items-center gap-2">
-          <input
-            type="text"
-            value={manualFlag}
-            onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{sqli_... or FLAG{side_channel_...}"
-            className="cos-input py-1 text-xs w-64"
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
-            type="submit"
-            className="cos-btn cos-btn-success py-1 text-xs font-bold"
+            type="button"
+            className={`cos-hint-toggle ${showHints ? 'is-active' : ''}`}
+            onClick={() => setShowHints((prev) => !prev)}
+            title="Toggle Web Security Exploit Guide & Hints"
           >
-            SUBMIT FLAG
+            <HelpCircle size={13} />
+            <span>{showHints ? 'HIDE HINTS' : '💡 HOW TO SOLVE'}</span>
           </button>
-        </form>
+        </div>
       </div>
 
-      {flagFeedback && (
-        <div className={`p-2 text-xs font-mono border-t ${flagFeedback.success ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300' : 'bg-rose-950/80 border-rose-500 text-rose-300'}`}>
-          {flagFeedback.text}
+      {/* 2. Interactive Hint & Walkthrough Drawer */}
+      {showHints && (
+        <div className="cos-hint-drawer">
+          <div className="cos-hint-header-bar">
+            <div className="cos-hint-title">
+              <Sparkles size={14} />
+              <span>WEB EXPLOITATION GUIDE // {activeTab === 'repeater' ? 'SQL INJECTION & WAF BYPASS' : activeTab === 'timing' ? 'SIDE-CHANNEL TIMING ATTACK' : 'ENCODING & DECODING'}</span>
+            </div>
+            <span style={{ fontSize: '10px', color: '#94a3b8' }}>
+              {activeTab === 'repeater' ? 'web-sqli-waf-bypass · Medium · +250 PTS' : 'web-sidechannel-timing · Hard · +350 PTS'}
+            </span>
+          </div>
+
+          <div className="cos-hint-grid">
+            {activeTab === 'repeater' ? (
+              <>
+                <div className="cos-hint-card">
+                  <h4>🎯 Objective</h4>
+                  <p>The endpoint <code>/api/v1/accounts?username=alice</code> concatenates input into an unsanitized SQLite query without parameterization.</p>
+                </div>
+                <div className="cos-hint-card">
+                  <h4>🔍 SQLi Quick Payloads</h4>
+                  <p>Click any preset in the toolbar above the request box to inject:</p>
+                  <div>
+                    <code className="cos-hint-code">' OR '1'='1</code> &nbsp;
+                    <code className="cos-hint-code">' UNION SELECT 1,2,3,4--</code>
+                  </div>
+                </div>
+                <div className="cos-hint-card">
+                  <h4>🛠️ How to Solve</h4>
+                  <p>1. Inject <code className="cos-hint-code">' OR 1=1--</code> or <code className="cos-hint-code">' UNION SELECT 1,2,3,4--</code></p>
+                  <p>2. Click <strong style={{ color: '#fb923c' }}>[SEND HTTP REQUEST]</strong>.</p>
+                  <p>3. Inspect the HTTP Response on the right. The admin clearance holds the flag:</p>
+                  <code className="cos-hint-code">{SQLI_FLAG}</code>
+                </div>
+              </>
+            ) : activeTab === 'timing' ? (
+              <>
+                <div className="cos-hint-card">
+                  <h4>🎯 Objective</h4>
+                  <p>The token verification routine uses non-constant-time <code>strcmp()</code> with a simulated <code>usleep(15000)</code> (15ms) delay per matching character.</p>
+                </div>
+                <div className="cos-hint-card">
+                  <h4>🔍 Side-Channel Clue</h4>
+                  <p>Base latency is ~48ms (0 matches). 5 matching characters take ~124ms (48ms + 5×15ms). Notice latency spikes when you test the correct next character!</p>
+                </div>
+                <div className="cos-hint-card">
+                  <h4>🛠️ How to Solve</h4>
+                  <p>Probe prefixes to detect latency spikes. The full secret token is:</p>
+                  <code className="cos-hint-code">{TIMING_FLAG}</code>
+                  <p style={{ marginTop: '4px' }}>Click "Use Full Flag" to test and submit!</p>
+                </div>
+              </>
+            ) : (
+              <div className="cos-hint-card" style={{ gridColumn: '1 / -1' }}>
+                <h4>🛠️ Decoder Workbench</h4>
+                <p>Use the Decoder to encode or decode Base64, URL-encoded strings, or Hex bytes. Useful for analyzing CTF tokens and HTTP authorization headers.</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
+
+      {/* 3. Main Tab Contents */}
+      <div className="cos-app-body">
+        {activeTab === 'repeater' ? (
+          /* Repeater Tab */
+          <div className="cos-split-horizontal">
+            {/* Left: Request Pane */}
+            <div className="cos-panel">
+              <div className="cos-panel-header">
+                <span>HTTP REQUEST (Raw Socket)</span>
+                <button
+                  type="button"
+                  className="cos-btn cos-btn-primary"
+                  style={{ background: '#ea580c', borderColor: '#fb923c' }}
+                  onClick={handleSendRepeater}
+                  disabled={sending}
+                >
+                  <Send size={11} />
+                  <span>{sending ? 'Sending...' : 'SEND REQUEST'}</span>
+                </button>
+              </div>
+
+              {/* Quick Payload Chips */}
+              <div style={{ background: '#0a0f18', padding: '6px 8px', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 700 }}>Inject:</span>
+                {[
+                  { label: "Normal (alice)", val: "/api/v1/accounts?username=alice" },
+                  { label: "Auth Bypass (' OR 1=1--)", val: "/api/v1/accounts?username=' OR 1=1--" },
+                  { label: "Column Probe (ORDER BY 4)", val: "/api/v1/accounts?username=' ORDER BY 4--" },
+                  { label: "UNION SELECT (1,2,3,4)", val: "/api/v1/accounts?username=' UNION SELECT 1,2,3,4--" },
+                ].map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className="cos-btn"
+                    style={{ fontSize: '10px', padding: '2px 7px' }}
+                    onClick={() => {
+                      playClickSound(850);
+                      setUrlPath(item.val);
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="cos-panel-body" style={{ padding: '8px', gap: '8px' }}>
+                {/* Method & URL */}
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <select
+                    className="cos-input"
+                    style={{ width: '80px', color: '#fb923c', fontWeight: 700 }}
+                    value={httpMethod}
+                    onChange={(e) => setHttpMethod(e.target.value)}
+                  >
+                    <option>GET</option>
+                    <option>POST</option>
+                    <option>PUT</option>
+                  </select>
+                  <input
+                    type="text"
+                    className="cos-input"
+                    style={{ flex: 1 }}
+                    value={urlPath}
+                    onChange={(e) => setUrlPath(e.target.value)}
+                  />
+                </div>
+
+                {/* Headers */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '10px', color: '#64748b', marginBottom: '2px' }}>HEADERS:</span>
+                  <textarea
+                    className="cos-textarea"
+                    value={requestHeaders}
+                    onChange={(e) => setRequestHeaders(e.target.value)}
+                    style={{ flex: 1 }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Response Pane */}
+            <div className="cos-panel">
+              <div className="cos-panel-header">
+                <span>HTTP RESPONSE ({responseTime} ms)</span>
+                <span className={`cos-badge ${responseStatus.startsWith('200') ? 'cos-badge-emerald' : 'cos-badge-rose'}`}>
+                  {responseStatus}
+                </span>
+              </div>
+              <div className="cos-panel-body" style={{ padding: '8px', gap: '8px' }}>
+                <div style={{ height: '70px', display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '10px', color: '#64748b', marginBottom: '2px' }}>HEADERS:</span>
+                  <textarea
+                    className="cos-textarea"
+                    style={{ height: '50px', flex: 'none', color: '#94a3b8' }}
+                    readOnly
+                    value={responseHeaders}
+                  />
+                </div>
+
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                    <span style={{ fontSize: '10px', color: '#64748b' }}>BODY (JSON Payload):</span>
+                    {responseBody.includes(SQLI_FLAG) && (
+                      <button
+                        type="button"
+                        className="cos-btn cos-btn-success"
+                        style={{ fontSize: '9.5px', padding: '1px 6px' }}
+                        onClick={() => {
+                          playClickSound(900);
+                          setManualFlag(SQLI_FLAG);
+                        }}
+                      >
+                        <Copy size={10} />
+                        <span>Copy Flag to Submitter</span>
+                      </button>
+                    )}
+                  </div>
+                  <textarea
+                    className={`cos-textarea ${responseBody.includes(SQLI_FLAG) ? 'cos-textarea-output' : ''}`}
+                    style={{ flex: 1, color: responseBody.includes(SQLI_FLAG) ? '#34d399' : '#cbd5e1' }}
+                    readOnly
+                    value={responseBody}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : activeTab === 'timing' ? (
+          /* Timing Attack Tab */
+          <div className="cos-split-horizontal">
+            {/* Probe Controls */}
+            <div className="cos-panel">
+              <div className="cos-panel-header">
+                <span>SIDE-CHANNEL TIMING ATTACK PROBE</span>
+              </div>
+              <div className="cos-panel-body">
+                <p style={{ fontSize: '11px', color: '#94a3b8' }}>
+                  Target Endpoint: <code>POST /api/v2/vault/authVulnerable</code><br />
+                  Non-constant-time <code>strcmp()</code> delay: <strong>~15.0 ms per matching character</strong>.
+                </p>
+
+                <form onSubmit={handleSendTimingProbe} style={{ marginTop: '8px' }}>
+                  <label style={{ fontSize: '10.5px', color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                    Candidate Prefix Probe:
+                  </label>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <input
+                      type="text"
+                      className="cos-input"
+                      style={{ flex: 1 }}
+                      value={timingToken}
+                      onChange={(e) => setTimingToken(e.target.value)}
+                    />
+                    <button type="submit" className="cos-btn cos-btn-primary">
+                      <Send size={11} />
+                      <span>Send Probe</span>
+                    </button>
+                  </div>
+                </form>
+
+                <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
+                  <button
+                    type="button"
+                    className="cos-btn"
+                    style={{ fontSize: '10px' }}
+                    onClick={() => {
+                      setTimingToken(TIMING_FLAG);
+                      handleSendTimingProbe();
+                    }}
+                  >
+                    Test Full Flag (Cracked)
+                  </button>
+                  <button
+                    type="button"
+                    className="cos-btn"
+                    style={{ fontSize: '10px' }}
+                    onClick={() => {
+                      playClickSound(900);
+                      setManualFlag(TIMING_FLAG);
+                    }}
+                  >
+                    <Copy size={11} />
+                    <span>Copy Flag to Submitter</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Timing Latency Log */}
+            <div className="cos-panel">
+              <div className="cos-panel-header">
+                <span>TIMING MEASUREMENT LOGS (ms)</span>
+              </div>
+              <div className="cos-table-container" style={{ flex: 1, border: 'none' }}>
+                <table className="cos-table">
+                  <thead>
+                    <tr>
+                      <th>Candidate Probe</th>
+                      <th>Latency (ms)</th>
+                      <th>Matched Characters</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {timingLogs.map((log, idx) => (
+                      <tr key={idx}>
+                        <td style={{ fontFamily: 'inherit', color: '#38bdf8' }}>{log.candidate}</td>
+                        <td style={{ fontWeight: 700, color: log.latency > 100 ? '#34d399' : '#fbbf24' }}>
+                          {log.latency} ms
+                        </td>
+                        <td>
+                          <span className="cos-badge cos-badge-cyan">{log.match} chars</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Decoder Tab */
+          <div className="cos-split-horizontal">
+            <div className="cos-panel">
+              <div className="cos-panel-header">
+                <span>INPUT DATA</span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <button
+                    type="button"
+                    className="cos-btn"
+                    style={{ fontSize: '10px' }}
+                    onClick={() => {
+                      try {
+                        setDecoderOutput(btoa(decoderInput));
+                      } catch (_) {
+                        setDecoderOutput('[Error: Invalid string for Base64]');
+                      }
+                    }}
+                  >
+                    Base64 Encode
+                  </button>
+                  <button
+                    type="button"
+                    className="cos-btn"
+                    style={{ fontSize: '10px' }}
+                    onClick={() => {
+                      try {
+                        setDecoderOutput(atob(decoderInput));
+                      } catch (_) {
+                        setDecoderOutput('[Error: Invalid Base64]');
+                      }
+                    }}
+                  >
+                    Base64 Decode
+                  </button>
+                  <button
+                    type="button"
+                    className="cos-btn"
+                    style={{ fontSize: '10px' }}
+                    onClick={() => setDecoderOutput(decodeURIComponent(decoderInput))}
+                  >
+                    URL Decode
+                  </button>
+                </div>
+              </div>
+              <div className="cos-panel-body" style={{ padding: '4px' }}>
+                <textarea
+                  className="cos-textarea"
+                  value={decoderInput}
+                  onChange={(e) => setDecoderInput(e.target.value)}
+                  placeholder="Enter text to encode or decode..."
+                />
+              </div>
+            </div>
+
+            <div className="cos-panel">
+              <div className="cos-panel-header">
+                <span style={{ color: '#34d399' }}>DECODED OUTPUT</span>
+                <button
+                  type="button"
+                  className="cos-btn"
+                  style={{ fontSize: '10px' }}
+                  onClick={() => {
+                    playClickSound(900);
+                    setManualFlag(decoderOutput.trim());
+                  }}
+                >
+                  <Copy size={11} />
+                  <span>Use As Flag</span>
+                </button>
+              </div>
+              <div className="cos-panel-body" style={{ padding: '4px' }}>
+                <textarea
+                  className="cos-textarea cos-textarea-output"
+                  readOnly
+                  value={decoderOutput}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 4. Flag Submitter Bar */}
+      <div className="cos-flag-bar">
+        <span style={{ fontSize: '11px', fontWeight: 700, color: '#38bdf8' }}>SUBMIT CAPTURED FLAG:</span>
+        <input
+          type="text"
+          className="cos-flag-input"
+          placeholder="FLAG{...}"
+          value={manualFlag}
+          onChange={(e) => setManualFlag(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleManualSubmit(e)}
+        />
+        <button
+          type="button"
+          className="cos-flag-btn"
+          onClick={handleManualSubmit}
+        >
+          SUBMIT FLAG
+        </button>
+
+        {flagFeedback && (
+          <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
+            {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
+            <span>{flagFeedback.text}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

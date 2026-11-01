@@ -390,7 +390,9 @@
 
 /* Window Titlebar */
 .cos-titlebar {
-  height: 34px;
+  flex-shrink: 0;
+  height: 36px;
+  min-height: 36px;
   background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
   border-bottom: 1px solid rgba(51, 65, 85, 0.6);
   display: flex;
@@ -457,6 +459,7 @@
 /* Window Body Content */
 .cos-window-body {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   background: #060a0f;
@@ -847,4 +850,413 @@
   background: rgba(239, 68, 68, 0.2);
   border: 1px solid rgba(239, 68, 68, 0.5);
   color: #f87171;
+}
+
+/* ==========================================================================
+   APP SCAFFOLDING & INTERACTIVE HINT SYSTEM
+   ========================================================================== */
+
+.cos-app-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  background: #05080c;
+  color: #cbd5e1;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  overflow: hidden;
+  position: relative;
+}
+
+.cos-app-header {
+  flex-shrink: 0;
+  background: #0a0f18;
+  border-bottom: 1px solid #1e293b;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cos-app-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+}
+
+.cos-app-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 8px;
+  gap: 8px;
+}
+
+/* Interactive Hint & Walkthrough Drawer */
+.cos-hint-toggle {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.08) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.cos-hint-toggle:hover {
+  background: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  transform: translateY(-1px);
+}
+
+.cos-hint-toggle.is-active {
+  background: #fbbf24;
+  color: #020617;
+}
+
+.cos-hint-drawer {
+  flex-shrink: 0;
+  background: rgba(13, 20, 32, 0.98);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.45);
+  padding: 10px 14px;
+  animation: cosFadeIn 0.2s ease-out;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+  font-size: 11px;
+  line-height: 1.5;
+  color: #cbd5e1;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.cos-hint-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  padding-bottom: 4px;
+}
+
+.cos-hint-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cos-hint-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.cos-hint-card {
+  background: rgba(8, 13, 22, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.cos-hint-card h4 {
+  color: #38bdf8;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cos-hint-card p {
+  color: #94a3b8;
+  font-size: 10.5px;
+  margin-bottom: 4px;
+}
+
+.cos-hint-code {
+  background: #000;
+  border: 1px solid #1e293b;
+  color: #34d399;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 10.5px;
+  display: inline-block;
+  user-select: all;
+  margin: 2px 0;
+}
+
+/* Grids & Multi-pane Layouts */
+.cos-grid-3 {
+  display: grid;
+  grid-template-columns: 220px 220px 1fr;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+
+.cos-grid-4 {
+  display: grid;
+  grid-template-columns: 200px 220px 1fr 1fr;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+
+.cos-split-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+
+.cos-split-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Panels */
+.cos-panel {
+  background: #080d14;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cos-panel-header {
+  background: #0f172a;
+  border-bottom: 1px solid #1e293b;
+  padding: 6px 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.cos-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Operation Item */
+.cos-op-item {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 11px;
+  color: #cbd5e1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.cos-op-item:hover {
+  background: rgba(14, 165, 233, 0.18);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+/* Recipe Card */
+.cos-recipe-card {
+  background: #0b111a;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cos-recipe-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #38bdf8;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+/* Form Controls */
+.cos-textarea {
+  width: 100%;
+  flex: 1;
+  min-height: 70px;
+  background: #03060a;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  color: #38bdf8;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 8px;
+  outline: none;
+  resize: none;
+}
+
+.cos-textarea:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
+.cos-textarea-output {
+  color: #34d399;
+  background: #030706;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* Flag Submission Footer */
+.cos-flag-bar {
+  flex-shrink: 0;
+  background: #090e17;
+  border-top: 1px solid #1e293b;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cos-flag-input {
+  flex: 1;
+  min-width: 220px;
+  background: #000;
+  border: 1px solid #334155;
+  color: #38bdf8;
+  font-family: inherit;
+  font-size: 11.5px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.cos-flag-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+.cos-flag-btn {
+  background: #059669;
+  border: 1px solid #34d399;
+  color: #fff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cos-flag-btn:hover {
+  background: #047857;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.5);
+}
+
+.cos-flag-feedback {
+  width: 100%;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cos-flag-feedback.is-success {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid #10b981;
+  color: #34d399;
+}
+
+.cos-flag-feedback.is-error {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  color: #f87171;
+}
+
+/* Badges */
+.cos-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cos-badge-cyan {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.cos-badge-emerald {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.cos-badge-amber {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+.cos-badge-rose {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+/* Responsive Overrides */
+@media (max-width: 900px) {
+  .cos-grid-3, .cos-grid-4 {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow-y: auto;
+  }
+  .cos-split-horizontal {
+    grid-template-columns: 1fr;
+  }
 }

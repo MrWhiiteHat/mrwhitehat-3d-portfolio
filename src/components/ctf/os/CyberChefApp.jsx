@@ -1,6 +1,18 @@
 import React, { useState } from 'react';
-import { KeyRound, CheckCircle2, Zap, Play, Plus, Trash2, ArrowRight } from 'lucide-react';
-import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
+import {
+  KeyRound,
+  CheckCircle2,
+  Zap,
+  Play,
+  Plus,
+  Trash2,
+  HelpCircle,
+  Sparkles,
+  Copy,
+  RotateCcw,
+  Sliders,
+} from 'lucide-react';
+import { playClickSound, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 
 const CHALLENGE_ID = 'crypto-caesar-tumbler';
@@ -24,32 +36,22 @@ function caesarShift(text, shift) {
 
 export default function CyberChefApp() {
   const [inputText, setInputText] = useState(ENCRYPTED_TELEGRAM);
-  const [recipe, setRecipe] = useState([{ id: 'caesar', name: 'Caesar Cipher', param: -3 }]);
+  const [caesarShiftKey, setCaesarShiftKey] = useState(-3);
+  const [activeOps, setActiveOps] = useState(['caesar']);
+  const [showHints, setShowHints] = useState(true);
   const [manualFlag, setManualFlag] = useState('');
   const [flagFeedback, setFlagFeedback] = useState(null);
 
   // Compute live output through recipe
   let outputText = inputText;
-  for (const op of recipe) {
-    if (op.id === 'caesar') {
-      outputText = caesarShift(outputText, op.param);
-    } else if (op.id === 'from_b64') {
-      try {
-        outputText = atob(outputText.trim());
-      } catch (_) {
-        outputText = '[Error: Invalid Base64 String]';
-      }
-    } else if (op.id === 'to_b64') {
-      outputText = btoa(outputText);
-    } else if (op.id === 'rot13') {
-      outputText = caesarShift(outputText, 13);
-    }
+  if (activeOps.includes('caesar')) {
+    outputText = caesarShift(outputText, caesarShiftKey);
   }
 
   const handleManualSubmit = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (!manualFlag.trim()) return;
-    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag);
+    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag.trim());
     if (res.success || res.duplicate) {
       setFlagFeedback({ success: true, text: res.message });
       playBreachFanfare();
@@ -59,167 +61,318 @@ export default function CyberChefApp() {
     }
   };
 
+  const copyOutputToSubmit = () => {
+    playClickSound(900);
+    setManualFlag(outputText.trim());
+  };
+
   return (
-    <div className="flex-1 flex flex-col bg-[#070b10] font-mono text-xs select-text overflow-hidden">
-      {/* CyberChef Header */}
-      <div className="flex items-center justify-between border-b border-[#1e293b] px-3 py-1.5 bg-[#0f172a]">
-        <div className="flex items-center gap-2">
-          <span className="text-[#38bdf8] font-bold">CyberChef v10.5.0 // The Cyber Swiss Army Knife</span>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            setInputText(ENCRYPTED_TELEGRAM);
-            setRecipe([{ id: 'caesar', name: 'Caesar Cipher', param: -3 }]);
-          }}
-          className="cos-btn py-0.5 text-[10px]"
-        >
-          Reset Challenge Preset
-        </button>
-      </div>
-
-      {/* Main 3-Column Layout: Operations | Recipe | I/O */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2 p-2 bg-[#04070a] overflow-hidden">
-        {/* Col 1: Operations List */}
-        <div className="flex flex-col bg-[#080d14] border border-[#1e293b] rounded overflow-hidden">
-          <div className="p-1.5 bg-[#0f172a] text-[10px] text-slate-400 border-b border-[#1e293b]">
-            OPERATIONS PALETTE
-          </div>
-          <div className="flex-1 overflow-y-auto p-1.5 space-y-1">
-            {[
-              { id: 'caesar', name: 'Caesar Cipher (Shift)', param: -3 },
-              { id: 'rot13', name: 'ROT13', param: 13 },
-              { id: 'from_b64', name: 'From Base64', param: null },
-              { id: 'to_b64', name: 'To Base64', param: null },
-            ].map((op) => (
-              <button
-                key={op.id}
-                type="button"
-                onClick={() => {
-                  playClickSound(850);
-                  setRecipe((prev) => [...prev, op]);
-                }}
-                className="w-full text-left p-1.5 bg-[#0d141f] hover:bg-[#1e293b] text-slate-300 hover:text-cyan-300 rounded text-xs transition flex justify-between items-center"
-              >
-                <span>{op.name}</span>
-                <Plus size={11} className="text-cyan-400" />
-              </button>
-            ))}
-
-            {/* Frequency Analysis Cheat Card */}
-            <div className="p-2 bg-[#0e1726] border border-[#1e293b] rounded mt-2">
-              <span className="text-[10px] text-amber-400 uppercase font-bold block mb-1">
-                FREQUENCY ANALYSIS:
-              </span>
-              <div className="text-[10.5px] text-slate-300 space-y-0.5">
-                <div>Cipher <strong>H</strong> (14.1%) ➔ English <strong>E</strong> (+3 shift)</div>
-                <div>Cipher <strong>W</strong> (10.1%) ➔ English <strong>T</strong> (+3 shift)</div>
-                <div>Cipher <strong>D</strong> (9.0%) ➔ English <strong>A</strong> (+3 shift)</div>
-              </div>
-            </div>
-          </div>
+    <div className="cos-app-container select-text">
+      {/* 1. Header Toolbar */}
+      <div className="cos-app-header">
+        <div className="cos-app-title">
+          <KeyRound size={15} style={{ color: '#38bdf8' }} />
+          <span>CYBERCHEF v10.5 // CRYPTANALYSIS WORKBENCH</span>
+          <span className="cos-badge cos-badge-amber">ROT-3 CAESAR CIPHER</span>
         </div>
 
-        {/* Col 2: Recipe Pipeline */}
-        <div className="flex flex-col bg-[#080d14] border border-[#1e293b] rounded overflow-hidden">
-          <div className="p-1.5 bg-[#0f172a] text-[10px] text-slate-400 border-b border-[#1e293b] flex justify-between items-center">
-            <span>RECIPE PIPELINE ({recipe.length})</span>
-            <button
-              type="button"
-              onClick={() => setRecipe([])}
-              className="text-slate-500 hover:text-rose-400 text-[10px]"
-            >
-              Clear
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-1.5 space-y-1.5">
-            {recipe.map((op, idx) => (
-              <div key={idx} className="p-2 bg-[#0d141f] border border-[#1e293b] rounded space-y-1">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-cyan-300">{op.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => setRecipe((prev) => prev.filter((_, i) => i !== idx))}
-                    className="text-slate-500 hover:text-rose-400"
-                  >
-                    <Trash2 size={11} />
-                  </button>
-                </div>
-                {op.id === 'caesar' && (
-                  <div className="flex items-center gap-2 pt-1">
-                    <span className="text-[10px] text-slate-400">Shift Key:</span>
-                    <input
-                      type="number"
-                      value={op.param}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value, 10) || 0;
-                        setRecipe((prev) =>
-                          prev.map((item, i) => (i === idx ? { ...item, param: val } : item))
-                        );
-                      }}
-                      className="cos-input py-0.5 px-1.5 text-xs w-16"
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Col 3 & 4: Input / Output */}
-        <div className="md:col-span-2 flex flex-col gap-2 overflow-hidden">
-          {/* Input Box */}
-          <div className="flex-1 flex flex-col bg-[#080d14] border border-[#1e293b] rounded overflow-hidden">
-            <div className="p-1.5 bg-[#0f172a] text-[10px] text-slate-400 border-b border-[#1e293b]">
-              INPUT CIPHERTEXT
-            </div>
-            <textarea
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 bg-transparent p-2 text-rose-300 outline-none resize-none font-mono text-xs leading-relaxed select-all"
-            />
-          </div>
-
-          {/* Output Box */}
-          <div className="flex-1 flex flex-col bg-[#080d14] border border-[#1e293b] rounded overflow-hidden">
-            <div className="p-1.5 bg-[#0f172a] text-[10px] text-slate-400 border-b border-[#1e293b] flex justify-between">
-              <span>OUTPUT DECRYPTED PLAINTEXT</span>
-              <span className="text-emerald-400 font-bold">Auto-bake Active</span>
-            </div>
-            <textarea
-              readOnly
-              value={outputText}
-              className="flex-1 bg-transparent p-2 text-emerald-400 outline-none resize-none font-mono text-xs font-bold leading-relaxed select-all"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Flag Submission Bar */}
-      <div className="p-2.5 bg-[#0a0f16] border-t border-[#1e293b] flex items-center justify-between gap-2">
-        <span className="text-[10px] text-slate-400 uppercase">SUBMIT DECRYPTED FLAG:</span>
-        <form onSubmit={handleManualSubmit} className="flex items-center gap-2">
-          <input
-            type="text"
-            value={manualFlag}
-            onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{caesar_...}"
-            className="cos-input py-1 text-xs w-64"
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
-            type="submit"
-            className="cos-btn cos-btn-success py-1 text-xs font-bold"
+            type="button"
+            className={`cos-hint-toggle ${showHints ? 'is-active' : ''}`}
+            onClick={() => setShowHints((prev) => !prev)}
+            title="Toggle Step-by-Step Solving Guide & Hints"
           >
-            SUBMIT FLAG
+            <HelpCircle size={13} />
+            <span>{showHints ? 'HIDE HINTS' : '💡 HOW TO SOLVE'}</span>
           </button>
-        </form>
+
+          <button
+            type="button"
+            className="cos-btn"
+            onClick={() => {
+              playClickSound(800);
+              setInputText(ENCRYPTED_TELEGRAM);
+              setCaesarShiftKey(-3);
+              setActiveOps(['caesar']);
+            }}
+          >
+            <RotateCcw size={12} />
+            <span>Reset Preset</span>
+          </button>
+        </div>
       </div>
 
-      {flagFeedback && (
-        <div className={`p-2 text-xs font-mono border-t ${flagFeedback.success ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300' : 'bg-rose-950/80 border-rose-500 text-rose-300'}`}>
-          {flagFeedback.text}
+      {/* 2. Interactive Hint & Walkthrough Drawer */}
+      {showHints && (
+        <div className="cos-hint-drawer">
+          <div className="cos-hint-header-bar">
+            <div className="cos-hint-title">
+              <Sparkles size={14} />
+              <span>CRYPTANALYSIS SOLVING GUIDE // OPERATION CAESAR</span>
+            </div>
+            <span style={{ fontSize: '10px', color: '#94a3b8' }}>Category: Cryptography · Difficulty: Easy · Reward: +100 PTS</span>
+          </div>
+
+          <div className="cos-hint-grid">
+            <div className="cos-hint-card">
+              <h4>🎯 Objective</h4>
+              <p>The intercepted telegram uses a classical monoalphabetic substitution cipher (Caesar shift). Decrypt the ciphertext to recover the flag.</p>
+              <div style={{ marginTop: '4px' }}>
+                <span style={{ fontSize: '10.5px', color: '#64748b' }}>Input Ciphertext:</span><br />
+                <code className="cos-hint-code">{ENCRYPTED_TELEGRAM}</code>
+              </div>
+            </div>
+
+            <div className="cos-hint-card">
+              <h4>🔍 Frequency Analysis Clue</h4>
+              <p>In standard English, the most frequent letter is <strong>'E'</strong> (~12.7%). In this ciphertext, the letter <strong>'H'</strong> occurs with the highest frequency (14.1%).</p>
+              <p>Distance from <code>H</code> (ASCII 72) backward to <code>E</code> (ASCII 69) is <strong style={{ color: '#fbbf24' }}>-3 shifts</strong> (A ➔ X, B ➔ Y, C ➔ Z).</p>
+            </div>
+
+            <div className="cos-hint-card">
+              <h4>🛠️ How to Solve</h4>
+              <p>1. In the <strong>Recipe Pipeline</strong> column, adjust the <strong>Shift Key</strong> slider to <strong style={{ color: '#34d399' }}>-3</strong>.</p>
+              <p>2. Notice the Output box auto-bakes the decrypted text:</p>
+              <div style={{ margin: '4px 0' }}>
+                <code className="cos-hint-code">FLAG&#123;caesar_shift_rot3_clearance&#125;</code>
+              </div>
+              <p>3. Click <strong>"Use As Flag"</strong> below and submit to capture points!</p>
+            </div>
+          </div>
         </div>
       )}
+
+      {/* 3. Main 3-Column Workspace (Palette | Recipe | I/O) */}
+      <div className="cos-app-body">
+        <div className="cos-grid-3">
+          {/* Column 1: Operations Palette */}
+          <div className="cos-panel">
+            <div className="cos-panel-header">
+              <span>OPERATIONS PALETTE</span>
+            </div>
+            <div className="cos-panel-body">
+              <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                Available Ciphers
+              </div>
+
+              <div
+                className="cos-op-item"
+                onClick={() => {
+                  playClickSound(850);
+                  if (!activeOps.includes('caesar')) setActiveOps([...activeOps, 'caesar']);
+                }}
+              >
+                <span>Caesar Cipher (Shift)</span>
+                <span className="cos-badge cos-badge-cyan">Active</span>
+              </div>
+
+              <div
+                className="cos-op-item"
+                onClick={() => {
+                  playClickSound(850);
+                  setCaesarShiftKey(13);
+                }}
+              >
+                <span>ROT13 (Preset Shift 13)</span>
+                <span className="cos-badge cos-badge-amber">Shift 13</span>
+              </div>
+
+              <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', margin: '8px 0 4px' }}>
+                Encodings
+              </div>
+
+              <div
+                className="cos-op-item"
+                onClick={() => {
+                  playClickSound(850);
+                  try {
+                    setInputText(btoa(inputText));
+                  } catch (_) {}
+                }}
+              >
+                <span>To Base64</span>
+                <span className="cos-badge">Encode</span>
+              </div>
+
+              <div
+                className="cos-op-item"
+                onClick={() => {
+                  playClickSound(850);
+                  try {
+                    setInputText(atob(inputText));
+                  } catch (_) {}
+                }}
+              >
+                <span>From Base64</span>
+                <span className="cos-badge">Decode</span>
+              </div>
+
+              {/* Frequency Analysis Mini-Table */}
+              <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid #1e293b' }}>
+                <div style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 700, marginBottom: '4px' }}>
+                  FREQUENCY ANALYSIS:
+                </div>
+                <div style={{ fontSize: '10px', color: '#cbd5e1', lineHeight: '1.6' }}>
+                  <div>Cipher <strong>H</strong> (14.1%) ➔ English <strong>E</strong> (<span style={{ color: '#34d399' }}>-3 shift</span>)</div>
+                  <div>Cipher <strong>W</strong> (10.1%) ➔ English <strong>T</strong> (<span style={{ color: '#34d399' }}>-3 shift</span>)</div>
+                  <div>Cipher <strong>D</strong> (9.0%) ➔ English <strong>A</strong> (<span style={{ color: '#34d399' }}>-3 shift</span>)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 2: Recipe Pipeline */}
+          <div className="cos-panel">
+            <div className="cos-panel-header">
+              <span>RECIPE PIPELINE ({activeOps.length})</span>
+              <button
+                type="button"
+                className="cos-btn"
+                style={{ fontSize: '9.5px', padding: '1px 6px' }}
+                onClick={() => {
+                  setActiveOps([]);
+                  setCaesarShiftKey(0);
+                }}
+              >
+                Clear
+              </button>
+            </div>
+            <div className="cos-panel-body">
+              {activeOps.includes('caesar') ? (
+                <div className="cos-recipe-card">
+                  <div className="cos-recipe-header">
+                    <span>1. Caesar Cipher</span>
+                    <button
+                      type="button"
+                      className="cos-win-btn btn-close"
+                      style={{ width: '18px', height: '18px' }}
+                      onClick={() => setActiveOps(activeOps.filter((o) => o !== 'caesar'))}
+                      title="Remove Step"
+                    >
+                      <Trash2 size={10} />
+                    </button>
+                  </div>
+
+                  <div style={{ marginTop: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', marginBottom: '4px' }}>
+                      <span style={{ color: '#94a3b8' }}>Shift Key (Offset):</span>
+                      <strong style={{ color: caesarShiftKey === -3 ? '#34d399' : '#38bdf8' }}>
+                        {caesarShiftKey} {caesarShiftKey === -3 ? '(CRACKED KEY!)' : ''}
+                      </strong>
+                    </div>
+
+                    <input
+                      type="range"
+                      min="-25"
+                      max="25"
+                      value={caesarShiftKey}
+                      onChange={(e) => {
+                        playClickSound(1100);
+                        setCaesarShiftKey(parseInt(e.target.value, 10));
+                      }}
+                      style={{ width: '100%', accentColor: '#38bdf8' }}
+                    />
+
+                    <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                      <button
+                        type="button"
+                        className="cos-btn"
+                        style={{ flex: 1, fontSize: '10px' }}
+                        onClick={() => setCaesarShiftKey(-3)}
+                      >
+                        Auto-Set -3 (Cracked)
+                      </button>
+                      <button
+                        type="button"
+                        className="cos-btn"
+                        style={{ fontSize: '10px' }}
+                        onClick={() => setCaesarShiftKey(0)}
+                      >
+                        Reset 0
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', color: '#64748b', padding: '30px 10px', fontSize: '11px' }}>
+                  No operations in recipe pipeline.<br />Click Caesar Cipher on the left to add.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Column 3: Input & Output Panels */}
+          <div className="cos-split-vertical">
+            {/* Input Box */}
+            <div className="cos-panel" style={{ flex: 1 }}>
+              <div className="cos-panel-header">
+                <span>INPUT CIPHERTEXT</span>
+                <span style={{ fontSize: '10px', color: '#64748b' }}>{inputText.length} bytes</span>
+              </div>
+              <div className="cos-panel-body" style={{ padding: '4px' }}>
+                <textarea
+                  className="cos-textarea"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  placeholder="Paste encrypted string here..."
+                />
+              </div>
+            </div>
+
+            {/* Output Box */}
+            <div className="cos-panel" style={{ flex: 1.2 }}>
+              <div className="cos-panel-header">
+                <span style={{ color: '#34d399' }}>OUTPUT PLAINTEXT (Auto-bake Active)</span>
+                <button
+                  type="button"
+                  className="cos-btn"
+                  style={{ fontSize: '10px', padding: '2px 8px' }}
+                  onClick={copyOutputToSubmit}
+                  title="Copy output directly into flag submitter"
+                >
+                  <Copy size={11} />
+                  <span>Use As Flag</span>
+                </button>
+              </div>
+              <div className="cos-panel-body" style={{ padding: '4px' }}>
+                <textarea
+                  className="cos-textarea cos-textarea-output"
+                  readOnly
+                  value={outputText}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Flag Submitter Bar */}
+      <div className="cos-flag-bar">
+        <span style={{ fontSize: '11px', fontWeight: 700, color: '#38bdf8' }}>SUBMIT CAPTURED FLAG:</span>
+        <input
+          type="text"
+          className="cos-flag-input"
+          placeholder="FLAG{...}"
+          value={manualFlag}
+          onChange={(e) => setManualFlag(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleManualSubmit(e)}
+        />
+        <button
+          type="button"
+          className="cos-flag-btn"
+          onClick={handleManualSubmit}
+        >
+          SUBMIT FLAG
+        </button>
+
+        {flagFeedback && (
+          <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
+            {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
+            <span>{flagFeedback.text}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

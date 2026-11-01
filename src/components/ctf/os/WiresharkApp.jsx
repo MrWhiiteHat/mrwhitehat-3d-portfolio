@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { Activity, Filter, Search, FileText, ArrowDown, Play, StopCircle, RefreshCw, KeyRound, ExternalLink } from 'lucide-react';
+import {
+  Activity,
+  Filter,
+  Search,
+  FileText,
+  HelpCircle,
+  Sparkles,
+  Copy,
+  CheckCircle2,
+  Zap,
+  X,
+  Radio,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 
@@ -17,10 +30,8 @@ const PACKETS = [
     hex: 'ff ff ff ff ff ff 00 0c 29 4f 8e 11 08 06 00 01 08 00 06 04 00 01 c0 a8 01 2d 00 00 00 00 00 00 0a 00 00 50',
     details: [
       'Frame 1: 42 bytes on wire (336 bits)',
-      'Ethernet II, Src: 00:0c:29:4f:8e:11, Dst: ff:ff:ff:ff:ff:ff (Broadcast)',
+      'Ethernet II, Src: 00:0c:29:4f:8e:11, Dst: ff:ff:ff:ff:ff:ff',
       'Address Resolution Protocol (request)',
-      '  Hardware type: Ethernet (1)',
-      '  Protocol type: IPv4 (0x0800)',
       '  Sender IP: 192.168.1.45, Target IP: 10.0.0.80',
     ],
   },
@@ -78,11 +89,12 @@ const PACKETS = [
     dst: '10.0.0.80:80',
     proto: 'TCP',
     len: 66,
-    info: '49821 -> 80 [SYN] Seq=0 Win=64240 Len=0 MSS=1460',
-    hex: '00 50 56 c0 00 08 00 0c 29 4f 8e 11 08 00 45 00 00 34 8a 12 40 00 40 06 c8 11 b9 dc 65 04 0a 00 00 50 c2 9d',
+    info: '49281 → 80 [SYN] Seq=0 Win=64240 Len=0 MSS=1460',
+    hex: '00 50 c0 a8 00 50 c0 81 00 00 00 00 a0 02 fa f0 de 12 00 00 02 04 05 b4',
     details: [
       'Frame 5: 66 bytes on wire',
-      'Transmission Control Protocol, Src Port: 49821, Dst Port: 80, Seq: 0, Flags: [SYN]',
+      'Transmission Control Protocol, Src Port: 49281, Dst Port: 80, Seq: 0, Len: 0',
+      'Flags: 0x002 (SYN)',
     ],
   },
   {
@@ -92,31 +104,31 @@ const PACKETS = [
     dst: '185.220.101.4',
     proto: 'TCP',
     len: 66,
-    info: '80 -> 49821 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0',
-    hex: '00 0c 29 4f 8e 11 00 50 56 c0 00 08 08 00 45 00 00 34 00 00 40 00 40 06 52 24 0a 00 00 50 b9 dc 65 04 00 50',
+    info: '80 → 49281 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0',
+    hex: '00 50 c0 a8 00 50 c0 81 00 00 00 01 a0 12 fe 88 de 12 00 00 02 04 05 b4',
     details: [
       'Frame 6: 66 bytes on wire',
-      'Transmission Control Protocol, Src Port: 80, Dst Port: 49821, Flags: [SYN, ACK]',
+      'Transmission Control Protocol, Src Port: 80, Dst Port: 49281, Seq: 0, Ack: 1',
+      'Flags: 0x012 (SYN, ACK)',
     ],
   },
   {
     no: 7,
-    time: '0.250100',
+    time: '0.250420',
     src: '185.220.101.4',
     dst: '10.0.0.80:80',
     proto: 'HTTP',
-    len: 462,
+    len: 482,
     info: 'POST /api/v1/auth/login HTTP/1.1 (application/json)',
-    hex: '50 4f 53 54 20 2f 61 70 69 2f 76 31 2f 61 75 74 68 2f 6c 6f 67 69 6e 20 48 54 54 50 2f 31 2e 31 0d 0a 48 6f 73 74 3a 20 61 75 74 68 2e 63 6f 72 70 2e 69 6e 74 65 72 6e 61 6c 0d 0a 41 75 74 68 6f 72 69 7a 61 74 69 6f 6e 3a 20 42 61 73 69 63 20 59 57 52 74 61 57 34 36 63 47 4e 68 63 46 39 6b 62 6e 4e 66 5a 58 68 6d 61 57 78 66 59 6d 46 7a 61 57 4e 66 59 58 56 30 61 46 39 75 5a 58 56 30 63 6d 46 73 61 58 70 6c 5a 41 3d 3d',
+    hex: '50 4f 53 54 20 2f 61 70 69 2f 76 31 2f 61 75 74 68 2f 6c 6f 67 69 6e 20 48 54 54 50 2f 31 2e 31 0d 0a 48 6f 73 74 3a 20 61 75 74 68 2e 63 6f 72 70 2e 69 6e 74 65 72 6e 61 6c 0d 0a 55 73 65 72 2d 41 67 65 6e 74 3a 20 4b 61 6c 69 20 4c 69 6e 75 78 20 63 55 52 4c 2f 38 2e 35 2e 30 0d 0a 41 75 74 68 6f 72 69 7a 61 74 69 6f 6e 3a 20 42 61 73 69 63 20 59 57 52 74 61 57 34 36 63 47 4e 68 63 46 39 6b 62 6e 4e 66 5a 58 68 6d 61 57 78 66 59 6d 46 7a 61 57 4e 66 59 58 56 30 61 46 39 75 5a 58 56 30 63 6d 46 73 61 57 70 6c 5a 41 3d 3d 0d 0a',
     details: [
-      'Frame 7: 462 bytes on wire',
+      'Frame 7: 482 bytes on wire',
       'Hypertext Transfer Protocol',
       '  POST /api/v1/auth/login HTTP/1.1',
       '  Host: auth.corp.internal',
       '  User-Agent: Kali Linux cURL/8.5.0',
       '  Authorization: Basic YWRtaW46cGNhcF9kbnNfZXhmaWxfYmFzaWNfYXV0aF9uZXV0cmFsaXplZA==',
       '  Content-Type: application/json',
-      '  Content-Length: 32',
       '  Payload: {"username":"admin","client":"c2"}',
     ],
     streamContent:
@@ -125,14 +137,12 @@ const PACKETS = [
       'User-Agent: Kali Linux cURL/8.5.0\r\n' +
       'Authorization: Basic YWRtaW46cGNhcF9kbnNfZXhmaWxfYmFzaWNfYXV0aF9uZXV0cmFsaXplZA==\r\n' +
       'Content-Type: application/json\r\n' +
-      'Content-Length: 32\r\n' +
-      '\r\n' +
+      'Content-Length: 32\r\n\r\n' +
       '{"username":"admin","client":"c2"}\r\n\r\n' +
       'HTTP/1.1 200 OK\r\n' +
       'Server: nginx/1.24.0\r\n' +
       'Content-Type: application/json\r\n' +
-      'Content-Length: 88\r\n' +
-      '\r\n' +
+      'Content-Length: 88\r\n\r\n' +
       '{"status":"authenticated","role":"root","token":"FLAG{pcap_dns_exfil_basic_auth_neutralized}"}',
   },
   {
@@ -152,7 +162,14 @@ const PACKETS = [
       '  Content-Type: application/json',
       '  Payload: {"status":"authenticated","role":"root","token":"FLAG{pcap_dns_exfil_basic_auth_neutralized}"}',
     ],
-    streamContent: 'See Stream in Frame 7',
+    streamContent:
+      'POST /api/v1/auth/login HTTP/1.1\r\n' +
+      'Host: auth.corp.internal\r\n' +
+      'User-Agent: Kali Linux cURL/8.5.0\r\n' +
+      'Authorization: Basic YWRtaW46cGNhcF9kbnNfZXhmaWxfYmFzaWNfYXV0aF9uZXV0cmFsaXplZA==\r\n' +
+      '\r\n' +
+      'HTTP/1.1 200 OK\r\n' +
+      '{"status":"authenticated","role":"root","token":"FLAG{pcap_dns_exfil_basic_auth_neutralized}"}',
   },
   {
     no: 9,
@@ -165,24 +182,27 @@ const PACKETS = [
     hex: '53 53 48 2d 32 2e 30 2d 4f 70 65 6e 53 53 48 5f 38 2e 39 70 31 20 55 62 75 6e 74 75 2d 33 75 62 75 6e 74 75 30 2e 31 0d 0a',
     details: [
       'Frame 9: 98 bytes on wire',
-      'SSH Protocol: Encrypted handshake payload',
+      'Transmission Control Protocol, Src Port: 51221, Dst Port: 22',
+      'SSHv2 Encrypted Packet',
     ],
   },
 ];
 
 export default function WiresharkApp() {
   const [filterStr, setFilterStr] = useState('');
-  const [selectedPacket, setSelectedPacket] = useState(PACKETS[6]); // default HTTP POST
-  const [isFollowStreamOpen, setIsFollowStreamOpen] = useState(false);
-  const [base64Input, setBase64Input] = useState('');
-  const [base64Output, setBase64Output] = useState('');
-  const [manualFlag, setManualFlag] = useState('');
+  const [selectedPacketNo, setSelectedPacketNo] = useState(7);
+  const [showStreamModal, setShowStreamModal] = useState(false);
+  const [showHints, setShowHints] = useState(true);
+  const [flagInput, setFlagInput] = useState('');
   const [flagFeedback, setFlagFeedback] = useState(null);
-  const [solved, setSolved] = useState(() => ctfEngine.isChallengeSolved(CHALLENGE_ID));
 
   const filteredPackets = PACKETS.filter((p) => {
     if (!filterStr.trim()) return true;
-    const f = filterStr.trim().toLowerCase();
+    const f = filterStr.toLowerCase().trim();
+    if (f === 'http') return p.proto === 'HTTP';
+    if (f === 'dns') return p.proto === 'DNS';
+    if (f === 'tcp') return p.proto === 'TCP';
+    if (f === 'arp') return p.proto === 'ARP';
     return (
       p.proto.toLowerCase().includes(f) ||
       p.src.toLowerCase().includes(f) ||
@@ -191,24 +211,13 @@ export default function WiresharkApp() {
     );
   });
 
-  const handleDecodeBase64 = () => {
-    try {
-      const clean = base64Input.trim().replace(/^Basic\s+/i, '');
-      const dec = atob(clean);
-      setBase64Output(`Decoded: "${dec}"`);
-      playClickSound(1000);
-    } catch (_) {
-      setBase64Output('Error: Invalid base64 sequence.');
-      playZapSound();
-    }
-  };
+  const selectedPacket = PACKETS.find((p) => p.no === selectedPacketNo) || PACKETS[0];
 
-  const handleManualSubmit = (e) => {
-    e.preventDefault();
-    if (!manualFlag.trim()) return;
-    const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag);
+  const handleFlagSubmit = (e) => {
+    e?.preventDefault();
+    if (!flagInput.trim()) return;
+    const res = ctfEngine.submitFlag(CHALLENGE_ID, flagInput.trim());
     if (res.success || res.duplicate) {
-      setSolved(true);
       setFlagFeedback({ success: true, text: res.message });
       playBreachFanfare();
     } else {
@@ -217,193 +226,346 @@ export default function WiresharkApp() {
     }
   };
 
+  const copyExtractedFlag = () => {
+    playClickSound(900);
+    setFlagInput('FLAG{pcap_dns_exfil_basic_auth_neutralized}');
+  };
+
   return (
-    <div className="flex-1 flex flex-col bg-[#070b10] font-mono text-xs select-text overflow-hidden">
-      {/* Wireshark Toolbar */}
-      <div className="cos-toolbar flex items-center justify-between border-b border-[#1e293b] px-3 py-1.5 bg-[#0f172a]">
-        <div className="flex items-center gap-2">
-          <span className="text-[#38bdf8] font-bold flex items-center gap-1.5">
-            <Activity size={14} />
-            <span>Wireshark v4.2.3</span>
-          </span>
-          <span className="text-slate-500">|</span>
-          <span className="text-slate-300 text-[11px]">traffic_exfiltration.pcapng [9 Packets Captured]</span>
+    <div className="cos-app-container select-text">
+      {/* 1. Wireshark Top Toolbar & Filter */}
+      <div className="cos-app-header">
+        <div className="cos-app-title">
+          <Activity size={15} style={{ color: '#38bdf8' }} />
+          <span>WIRESHARK v4.2 // PACKET CAPTURE FORENSICS</span>
+          <span className="cos-badge cos-badge-cyan">capture_042.pcapng (9 Packets)</span>
         </div>
-        <span className="cos-menu-badge">PROMISCUOUS: eth0</span>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            type="button"
+            className={`cos-hint-toggle ${showHints ? 'is-active' : ''}`}
+            onClick={() => setShowHints((prev) => !prev)}
+            title="Toggle Forensic Investigation Guide & Hints"
+          >
+            <HelpCircle size={13} />
+            <span>{showHints ? 'HIDE HINTS' : '💡 HOW TO SOLVE'}</span>
+          </button>
+
+          <button
+            type="button"
+            className="cos-btn cos-btn-primary"
+            onClick={() => {
+              playClickSound(950);
+              setShowStreamModal(true);
+            }}
+          >
+            <FileText size={12} />
+            <span>Follow TCP Stream</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex items-center gap-2 px-3 py-1.5 bg-[#0b1017] border-b border-[#1e293b]">
-        <Filter size={13} className="text-[#38bdf8]" />
-        <span className="text-slate-400 text-[11px]">Apply display filter:</span>
+      <div style={{ background: '#090e17', padding: '6px 12px', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Filter size={13} style={{ color: '#94a3b8' }} />
+        <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 700 }}>Display Filter:</span>
         <input
           type="text"
+          className="cos-input"
+          style={{ flex: 1, padding: '3px 8px', fontSize: '11px' }}
+          placeholder="Apply a display filter ... e.g. http, dns, tcp"
           value={filterStr}
           onChange={(e) => setFilterStr(e.target.value)}
-          placeholder="e.g. http, dns, tcp, 10.0.0.80..."
-          className="flex-1 cos-input py-1 text-xs"
         />
-        {filterStr && (
-          <button
-            type="button"
-            onClick={() => setFilterStr('')}
-            className="cos-btn py-0.5 text-[10px]"
-          >
-            Clear
-          </button>
-        )}
-      </div>
-
-      {/* Packet List Pane */}
-      <div className="flex-1 max-h-52 overflow-y-auto border-b border-[#1e293b]">
-        <table className="cos-table">
-          <thead>
-            <tr>
-              <th className="w-10">No.</th>
-              <th className="w-20">Time</th>
-              <th className="w-32">Source</th>
-              <th className="w-32">Destination</th>
-              <th className="w-16">Protocol</th>
-              <th className="w-14">Length</th>
-              <th>Info</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredPackets.map((p) => {
-              const isSelected = selectedPacket?.no === p.no;
-              return (
-                <tr
-                  key={p.no}
-                  onClick={() => {
-                    playClickSound(800);
-                    setSelectedPacket(p);
-                  }}
-                  className={`cursor-pointer ${isSelected ? 'is-selected' : ''}`}
-                >
-                  <td className="text-slate-500">{p.no}</td>
-                  <td>{p.time}</td>
-                  <td className="font-mono text-cyan-300">{p.src}</td>
-                  <td className="font-mono text-slate-300">{p.dst}</td>
-                  <td className={`font-bold ${p.proto === 'HTTP' ? 'text-emerald-400' : p.proto === 'DNS' ? 'text-sky-400' : 'text-slate-400'}`}>
-                    {p.proto}
-                  </td>
-                  <td>{p.len}</td>
-                  <td className="truncate max-w-md">{p.info}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Packet Details & Hex Pane (Split View) */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2 p-2 overflow-y-auto bg-[#04070a]">
-        {/* Packet Dissection Tree */}
-        <div className="p-2.5 bg-[#090e15] border border-[#1e293b] rounded flex flex-col">
-          <div className="flex justify-between items-center pb-1.5 mb-1.5 border-b border-[#1e293b] text-[10px] text-slate-400">
-            <span>PACKET DETAILS // FRAME {selectedPacket?.no || 1}</span>
-            {selectedPacket?.proto === 'HTTP' && (
-              <button
-                type="button"
-                onClick={() => setIsFollowStreamOpen(true)}
-                className="cos-btn cos-btn-primary py-0.5 text-[10px]"
-              >
-                <FileText size={10} />
-                <span>FOLLOW TCP STREAM</span>
-              </button>
-            )}
-          </div>
-          <div className="space-y-1 text-[11px] overflow-y-auto flex-1">
-            {selectedPacket?.details.map((d, i) => (
-              <div key={i} className="text-slate-300 hover:text-cyan-300 select-all">
-                {d}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Hex / ASCII Dump */}
-        <div className="p-2.5 bg-[#090e15] border border-[#1e293b] rounded flex flex-col">
-          <div className="pb-1.5 mb-1.5 border-b border-[#1e293b] text-[10px] text-slate-400">
-            PACKET RAW HEX & ASCII DUMP
-          </div>
-          <div className="cos-hex-dump flex-1 overflow-y-auto select-all">
-            {selectedPacket?.hex}
-          </div>
-        </div>
-      </div>
-
-      {/* Built-in Header Decoder & Flag Submitter */}
-      <div className="p-2.5 bg-[#0a0f16] border-t border-[#1e293b] flex flex-wrap items-center justify-between gap-2">
-        {/* Quick Base64 Decoder */}
-        <div className="flex items-center gap-2 flex-1 min-w-[280px]">
-          <span className="text-[10px] text-slate-400 uppercase">BASE64 DECODER:</span>
-          <input
-            type="text"
-            value={base64Input}
-            onChange={(e) => setBase64Input(e.target.value)}
-            placeholder="Paste Authorization Basic token..."
-            className="cos-input flex-1 py-1 text-xs"
-          />
-          <button
-            type="button"
-            onClick={handleDecodeBase64}
-            className="cos-btn py-1 text-xs"
-          >
-            DECODE
-          </button>
-          {base64Output && (
-            <span className="text-emerald-400 font-bold text-xs select-all">
-              {base64Output}
-            </span>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          {['http', 'dns', 'tcp', 'arp'].map((proto) => (
+            <button
+              key={proto}
+              type="button"
+              className={`cos-btn ${filterStr === proto ? 'cos-btn-primary' : ''}`}
+              style={{ fontSize: '10px', padding: '2px 7px' }}
+              onClick={() => {
+                playClickSound(850);
+                setFilterStr(filterStr === proto ? '' : proto);
+              }}
+            >
+              {proto}
+            </button>
+          ))}
+          {filterStr && (
+            <button
+              type="button"
+              className="cos-btn"
+              style={{ fontSize: '10px', padding: '2px 7px' }}
+              onClick={() => setFilterStr('')}
+            >
+              Clear
+            </button>
           )}
         </div>
-
-        {/* Manual Flag Submission */}
-        <form onSubmit={handleManualSubmit} className="flex items-center gap-2">
-          <input
-            type="text"
-            value={manualFlag}
-            onChange={(e) => setManualFlag(e.target.value)}
-            placeholder="FLAG{pcap_...}"
-            className="cos-input py-1 text-xs w-56"
-          />
-          <button
-            type="submit"
-            className="cos-btn cos-btn-success py-1 text-xs"
-          >
-            SUBMIT FLAG
-          </button>
-        </form>
       </div>
 
-      {/* Feedback banner */}
-      {flagFeedback && (
-        <div className={`p-2 text-xs font-mono border-t ${flagFeedback.success ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300' : 'bg-rose-950/80 border-rose-500 text-rose-300'}`}>
-          {flagFeedback.text}
-        </div>
-      )}
-
-      {/* Follow Stream Modal Window */}
-      {isFollowStreamOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-[#0b1017] border border-[#38bdf8] rounded-lg max-w-xl w-full p-4 font-mono text-xs shadow-2xl">
-            <div className="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
-              <span className="text-cyan-400 font-bold">WIRESHARK // FOLLOW TCP STREAM (HTTP RECONSTRUCTION)</span>
-              <button
-                type="button"
-                onClick={() => setIsFollowStreamOpen(false)}
-                className="text-slate-400 hover:text-white"
-              >
-                ✕ Close
-              </button>
+      {/* 2. Interactive Hint & Walkthrough Drawer */}
+      {showHints && (
+        <div className="cos-hint-drawer">
+          <div className="cos-hint-header-bar">
+            <div className="cos-hint-title">
+              <Sparkles size={14} />
+              <span>DIGITAL FORENSICS INVESTIGATION GUIDE // PCAP ANALYSIS</span>
             </div>
-            <pre className="p-3 bg-black border border-slate-800 rounded text-slate-200 max-h-80 overflow-y-auto leading-relaxed select-all">
-              {PACKETS.find((p) => p.streamContent)?.streamContent || 'No stream available.'}
-            </pre>
+            <span style={{ fontSize: '10px', color: '#94a3b8' }}>Category: Digital Forensics · Difficulty: Medium · Reward: +200 PTS</span>
+          </div>
+
+          <div className="cos-hint-grid">
+            <div className="cos-hint-card">
+              <h4>🎯 Objective</h4>
+              <p>Analyze the captured packet stream <code>capture_042.pcapng</code> to locate covert data exfiltration and retrieve the compromised token.</p>
+            </div>
+
+            <div className="cos-hint-card">
+              <h4>🔍 Forensics Clue</h4>
+              <p>Threat actors often leverage plaintext HTTP APIs to exfiltrate database keys.</p>
+              <p>Filter by <strong style={{ color: '#34d399' }}>http</strong> or look at <strong>Packet #7 & #8</strong> to inspect the unencrypted authentication exchange.</p>
+            </div>
+
+            <div className="cos-hint-card">
+              <h4>🛠️ How to Solve</h4>
+              <p>1. Click the <strong style={{ color: '#38bdf8' }}>[http]</strong> quick filter button above.</p>
+              <p>2. Select <strong>Packet #7</strong> or <strong>Packet #8</strong>.</p>
+              <p>3. Click <strong>[Follow TCP Stream]</strong> in the top toolbar to reconstruct the full ASCII conversation.</p>
+              <p>4. Extract the token: <code className="cos-hint-code">FLAG&#123;pcap_dns_exfil_basic_auth_neutralized&#125;</code> and submit below!</p>
+            </div>
           </div>
         </div>
       )}
+
+      {/* 3. Main 3-Pane Layout: Packet List (Top) | Details Tree & Hex (Bottom) */}
+      <div className="cos-app-body">
+        {/* Top Pane: Packet List Table */}
+        <div className="cos-panel" style={{ flex: 1.1, minHeight: '140px' }}>
+          <div className="cos-panel-header">
+            <span>PACKET LIST ({filteredPackets.length} PACKETS MATCHED)</span>
+            <span style={{ fontSize: '10px', color: '#64748b' }}>Click row to inspect details & raw bytes</span>
+          </div>
+          <div className="cos-table-container" style={{ flex: 1, border: 'none' }}>
+            <table className="cos-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '45px' }}>No.</th>
+                  <th style={{ width: '75px' }}>Time</th>
+                  <th style={{ width: '130px' }}>Source</th>
+                  <th style={{ width: '130px' }}>Destination</th>
+                  <th style={{ width: '70px' }}>Protocol</th>
+                  <th style={{ width: '55px' }}>Length</th>
+                  <th>Info</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPackets.map((pkt) => {
+                  const isSelected = pkt.no === selectedPacketNo;
+                  const isHttp = pkt.proto === 'HTTP';
+                  const isDns = pkt.proto === 'DNS';
+
+                  let rowBg = '';
+                  if (isSelected) {
+                    rowBg = 'rgba(14, 165, 233, 0.25)';
+                  } else if (isHttp) {
+                    rowBg = 'rgba(16, 185, 129, 0.12)';
+                  } else if (isDns) {
+                    rowBg = 'rgba(56, 189, 248, 0.1)';
+                  }
+
+                  return (
+                    <tr
+                      key={pkt.no}
+                      onClick={() => {
+                        playClickSound(1050);
+                        setSelectedPacketNo(pkt.no);
+                      }}
+                      className={isSelected ? 'is-selected' : ''}
+                      style={{ background: rowBg, cursor: 'pointer' }}
+                    >
+                      <td style={{ fontWeight: 700 }}>{pkt.no}</td>
+                      <td style={{ color: '#94a3b8' }}>{pkt.time}</td>
+                      <td style={{ color: isSelected ? '#fff' : '#38bdf8' }}>{pkt.src}</td>
+                      <td style={{ color: isSelected ? '#fff' : '#cbd5e1' }}>{pkt.dst}</td>
+                      <td>
+                        <span
+                          className={`cos-badge ${
+                            isHttp ? 'cos-badge-emerald' : isDns ? 'cos-badge-cyan' : ''
+                          }`}
+                        >
+                          {pkt.proto}
+                        </span>
+                      </td>
+                      <td style={{ color: '#94a3b8' }}>{pkt.len}</td>
+                      <td style={{ color: isHttp ? '#34d399' : '#cbd5e1', fontWeight: isHttp ? 600 : 400 }}>
+                        {pkt.info}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Bottom Split Pane: Details Tree (Left) | Hex Dump (Right) */}
+        <div className="cos-split-horizontal" style={{ flex: 1, minHeight: '120px' }}>
+          {/* Packet Details Tree */}
+          <div className="cos-panel">
+            <div className="cos-panel-header">
+              <span>PACKET #{selectedPacket.no} DISSECTION TREE</span>
+              <span className="cos-badge cos-badge-cyan">{selectedPacket.proto}</span>
+            </div>
+            <div className="cos-panel-body" style={{ fontSize: '11px', lineHeight: '1.6' }}>
+              {selectedPacket.details ? (
+                selectedPacket.details.map((detail, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      padding: '2px 4px',
+                      color: detail.includes('FLAG{') || detail.includes('Authorization:') ? '#34d399' : '#cbd5e1',
+                      fontWeight: detail.includes('FLAG{') ? 700 : 400,
+                      background: detail.includes('FLAG{') ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                      borderRadius: '3px',
+                    }}
+                  >
+                    {detail}
+                  </div>
+                ))
+              ) : (
+                <div style={{ color: '#64748b' }}>No dissection available for this packet.</div>
+              )}
+            </div>
+          </div>
+
+          {/* Hex & ASCII View */}
+          <div className="cos-panel">
+            <div className="cos-panel-header">
+              <span>RAW HEX DUMP</span>
+              <span style={{ fontSize: '10px', color: '#64748b' }}>Offset + Hex Bytes + ASCII</span>
+            </div>
+            <div className="cos-panel-body">
+              <pre className="cos-hex-dump" style={{ margin: 0, height: '100%' }}>
+                {selectedPacket.hex || '00 00 00 00 ...'}
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Follow TCP Stream Modal Popup */}
+      {showStreamModal && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+          onClick={() => setShowStreamModal(false)}
+        >
+          <div
+            className="cos-panel"
+            style={{
+              width: '90%',
+              maxWidth: '680px',
+              maxHeight: '85%',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.3)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="cos-panel-header">
+              <span style={{ color: '#38bdf8' }}>FOLLOW TCP STREAM (Stream Index: 0 · 185.220.101.4 ↔ 10.0.0.80)</span>
+              <button
+                type="button"
+                className="cos-win-btn btn-close"
+                onClick={() => setShowStreamModal(false)}
+              >
+                <X size={11} />
+              </button>
+            </div>
+
+            <div className="cos-panel-body" style={{ padding: '12px' }}>
+              <div style={{ fontSize: '10.5px', color: '#94a3b8', marginBottom: '8px' }}>
+                Reconstructed full bidirectional TCP conversation stream:
+              </div>
+              <pre
+                style={{
+                  background: '#03060a',
+                  border: '1px solid #1e293b',
+                  borderRadius: '4px',
+                  padding: '12px',
+                  color: '#34d399',
+                  fontFamily: 'inherit',
+                  fontSize: '11px',
+                  lineHeight: '1.5',
+                  maxHeight: '260px',
+                  overflowY: 'auto',
+                  userSelect: 'all',
+                }}
+              >
+                {PACKETS[6]?.streamContent || 'No stream data available.'}
+              </pre>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  className="cos-btn cos-btn-success"
+                  onClick={() => {
+                    copyExtractedFlag();
+                    setShowStreamModal(false);
+                  }}
+                >
+                  <Copy size={12} />
+                  <span>Copy Flag & Close</span>
+                </button>
+                <button
+                  type="button"
+                  className="cos-btn"
+                  onClick={() => setShowStreamModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. Flag Submitter Bar */}
+      <div className="cos-flag-bar">
+        <span style={{ fontSize: '11px', fontWeight: 700, color: '#38bdf8' }}>SUBMIT CAPTURED FLAG:</span>
+        <input
+          type="text"
+          className="cos-flag-input"
+          placeholder="FLAG{pcap_...}"
+          value={flagInput}
+          onChange={(e) => setFlagInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleFlagSubmit(e)}
+        />
+        <button
+          type="button"
+          className="cos-flag-btn"
+          onClick={handleFlagSubmit}
+        >
+          SUBMIT FLAG
+        </button>
+
+        {flagFeedback && (
+          <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
+            {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
+            <span>{flagFeedback.text}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
