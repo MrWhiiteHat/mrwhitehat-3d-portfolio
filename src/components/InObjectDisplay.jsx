@@ -74,7 +74,7 @@ export const stationConfigs = {
     camTarget: [-4.86, 2.15, -2.0],
     title: 'Auditorium Projector',
     icon: Award,
-    distanceFactor: 1.15,
+    distanceFactor: 0.98,
     lightColor: '#4ade80',
     lightIntensity: 22,
     lightPos: [0, 0, 0.55],
@@ -87,7 +87,7 @@ export const stationConfigs = {
     camTarget: [-1.2, 1.15, 0.15],
     title: 'Dual-Monitor Workstation',
     icon: Code2,
-    distanceFactor: 0.70,
+    distanceFactor: 0.60,
     lightColor: '#38bdf8',
     lightIntensity: 18,
     lightPos: [0, 0, 0.45],
@@ -100,7 +100,7 @@ export const stationConfigs = {
     camTarget: [0.6, 1.90, -4.70],
     title: 'Archive Bookcase',
     icon: BookOpen,
-    distanceFactor: 1.00,
+    distanceFactor: 0.82,
     lightColor: '#34d399',
     lightIntensity: 15,
     lightPos: [0, 0, 0.35],
@@ -113,7 +113,7 @@ export const stationConfigs = {
     camTarget: [4.95, 2.20, 1.6],
     title: 'Executive Wall Plaque',
     icon: UserRound,
-    distanceFactor: 1.10,
+    distanceFactor: 0.90,
     lightColor: '#fbbf24',
     lightIntensity: 14,
     lightPos: [0, 0, 0.35],
@@ -126,7 +126,7 @@ export const stationConfigs = {
     camTarget: [-3.6, 1.00, 1.05],
     title: 'Laser Printer Output Tray',
     icon: BriefcaseBusiness,
-    distanceFactor: 0.50,
+    distanceFactor: 0.42,
     lightColor: '#10b981',
     lightIntensity: 10,
     lightPos: [0, 0.15, 0.25],
@@ -139,7 +139,7 @@ export const stationConfigs = {
     camTarget: [3.75, 0.84, -1.25],
     title: 'Secure Comms Relay // Contact',
     icon: Mail,
-    distanceFactor: 0.58,
+    distanceFactor: 0.48,
     lightColor: '#22c55e',
     lightIntensity: 14,
     lightPos: [0, 0.1, 0.3],
@@ -152,7 +152,7 @@ export const stationConfigs = {
     camTarget: [-4.20, 1.60, -4.20],
     title: 'Operative Terminal // MrWhiteHat',
     icon: Terminal,
-    distanceFactor: 1.02,
+    distanceFactor: 0.85,
     lightColor: '#38bdf8',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -165,7 +165,7 @@ export const stationConfigs = {
     camTarget: [-2.85, 1.40, -4.20],
     title: '42U Mainframe Server Rack',
     icon: Server,
-    distanceFactor: 0.75,
+    distanceFactor: 0.62,
     lightColor: '#ef4444',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -178,7 +178,7 @@ export const stationConfigs = {
     camTarget: [-4.88, 2.35, 1.25],
     title: 'Tactical Red Team Hardware Arsenal',
     icon: Radio,
-    distanceFactor: 0.92,
+    distanceFactor: 0.78,
     lightColor: '#f97316',
     lightIntensity: 20,
     lightPos: [0, 0, 0.45],
@@ -191,7 +191,7 @@ export const stationConfigs = {
     camTarget: [-4.88, 3.45, 1.25],
     title: 'Wireshark Monitor // Live PCAP Analyzer',
     icon: Activity,
-    distanceFactor: 0.92,
+    distanceFactor: 0.78,
     lightColor: '#06b6d4',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -204,7 +204,7 @@ export const stationConfigs = {
     camTarget: [4.94, 2.25, -0.4],
     title: 'CTOS Security Visitor Access Terminal',
     icon: Users,
-    distanceFactor: 1.10,
+    distanceFactor: 0.92,
     lightColor: '#34d399',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -216,7 +216,7 @@ export const stationConfigs = {
     camTarget: [-1.15, 0.55, -4.92],
     title: 'Secret Black Hat Vault Mainframe',
     icon: Skull,
-    distanceFactor: 0.72,
+    distanceFactor: 0.62,
     lightColor: '#ef4444',
     lightIntensity: 26,
     lightPos: [0, 0, 0.45],
@@ -368,7 +368,11 @@ export default function InObjectDisplay({
     }
   }, [activeSection, onStationRelocked]);
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const config = activeSection ? stationConfigs[activeSection] : null;
+  const activeDistanceFactor = isMobile
+    ? (config?.distanceFactor || 0.75) * 0.78
+    : (config?.distanceFactor || 0.75);
   // Keep a station light mounted even when no station is open: adding or removing a light
   // changes the scene's light count, which recompiles every lit material (a visible freeze).
   if (!config) return <pointLight intensity={0} distance={2.8} />;
@@ -400,8 +404,8 @@ export default function InObjectDisplay({
       <Html
         center
         transform
-        distanceFactor={config.distanceFactor || 0.75}
-        position={[0, 0, 0]}
+        distanceFactor={activeDistanceFactor}
+        position={[0, -0.10, 0]}
         zIndexRange={[200, 0]}
       >
         <div
@@ -422,12 +426,12 @@ export default function InObjectDisplay({
               {isUnlocked ? (
                 <span className="obj-sec-tag unlocked">
                   <ShieldCheck size={11} />
-                  <span>UNLOCKED // CTOS BREACHED</span>
+                  <span>UNLOCKED</span>
                 </span>
               ) : (
                 <span className="obj-sec-tag locked">
                   <ShieldAlert size={11} />
-                  <span>ENCRYPTED // HACK TO ACCESS</span>
+                  <span>ENCRYPTED</span>
                 </span>
               )}
             </div>
@@ -446,31 +450,6 @@ export default function InObjectDisplay({
                   <span>Re-lock 🔒</span>
                 </button>
               )}
-              <button
-                className="obj-step-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onNavigate?.(prevSection);
-                }}
-                title="Previous object in office (←)"
-                aria-label="Previous object"
-              >
-                <ChevronLeft size={13} />
-              </button>
-              <span className="obj-step-index">
-                {currentIndex + 1}/{STATION_ORDER.length}
-              </span>
-              <button
-                className="obj-step-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onNavigate?.(nextSection);
-                }}
-                title="Next object in office (→)"
-                aria-label="Next object"
-              >
-                <ChevronRight size={13} />
-              </button>
               {onOpenRecruiter && (
                 <button
                   type="button"
@@ -485,17 +464,6 @@ export default function InObjectDisplay({
                   <span>2D DOSSIER</span>
                 </button>
               )}
-              <button
-                className="obj-exit-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose();
-                }}
-                title="Step back to full office view (Esc)"
-              >
-                <span>Back</span>
-                <RotateCcw size={11} />
-              </button>
             </div>
           </div>
 

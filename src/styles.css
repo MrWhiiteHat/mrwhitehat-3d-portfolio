@@ -1039,12 +1039,78 @@ button, a {
 .physical-object-medium {
   display: flex;
   flex-direction: column;
+  max-height: 520px;
+  max-width: 95vw;
   overflow: hidden;
   user-select: auto;
   pointer-events: auto;
   position: relative;
-  border-radius: 6px;
+  border-radius: 8px;
   font-family: var(--font);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85);
+}
+
+/* Universal Station Body Scrollable Container */
+.monitor-screen-body,
+.projector-cloth-slide,
+.archive-bookcase-board,
+.executive-wall-plaque,
+.printer-paper-sheet,
+.desktop-comms-console,
+.operative-dossier-terminal,
+.mainframe-dossier-terminal,
+.arsenal-dossier-terminal,
+.pcap-dossier-terminal {
+  flex: 1;
+  min-height: 0 !important;
+  max-height: 460px;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  padding-bottom: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(85, 246, 154, 0.4) rgba(0, 0, 0, 0.25);
+  -webkit-overflow-scrolling: touch;
+}
+
+.monitor-screen-body::-webkit-scrollbar,
+.projector-cloth-slide::-webkit-scrollbar,
+.archive-bookcase-board::-webkit-scrollbar,
+.executive-wall-plaque::-webkit-scrollbar,
+.printer-paper-sheet::-webkit-scrollbar,
+.desktop-comms-console::-webkit-scrollbar,
+.operative-dossier-terminal::-webkit-scrollbar,
+.mainframe-dossier-terminal::-webkit-scrollbar,
+.arsenal-dossier-terminal::-webkit-scrollbar,
+.pcap-dossier-terminal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.monitor-screen-body::-webkit-scrollbar-track,
+.projector-cloth-slide::-webkit-scrollbar-track,
+.archive-bookcase-board::-webkit-scrollbar-track,
+.executive-wall-plaque::-webkit-scrollbar-track,
+.printer-paper-sheet::-webkit-scrollbar-track,
+.desktop-comms-console::-webkit-scrollbar-track,
+.operative-dossier-terminal::-webkit-scrollbar-track,
+.mainframe-dossier-terminal::-webkit-scrollbar-track,
+.arsenal-dossier-terminal::-webkit-scrollbar-track,
+.pcap-dossier-terminal::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+}
+
+.monitor-screen-body::-webkit-scrollbar-thumb,
+.projector-cloth-slide::-webkit-scrollbar-thumb,
+.archive-bookcase-board::-webkit-scrollbar-thumb,
+.executive-wall-plaque::-webkit-scrollbar-thumb,
+.printer-paper-sheet::-webkit-scrollbar-thumb,
+.desktop-comms-console::-webkit-scrollbar-thumb,
+.operative-dossier-terminal::-webkit-scrollbar-thumb,
+.mainframe-dossier-terminal::-webkit-scrollbar-thumb,
+.arsenal-dossier-terminal::-webkit-scrollbar-thumb,
+.pcap-dossier-terminal::-webkit-scrollbar-thumb {
+  background: rgba(85, 246, 154, 0.45);
+  border-radius: 3px;
 }
 
 /* Universal Physical Device Top Status Bar */
@@ -1164,8 +1230,8 @@ button, a {
    1. DUAL MONITORS WORKSTATION (Projects)
    ========================================================================== */
 .physical-projects {
-  width: 780px;
-  max-height: 540px;
+  width: 720px;
+  max-height: 520px;
   background: #060b08;
   border: 2px solid rgba(56, 189, 248, 0.4);
   box-shadow: 0 0 50px rgba(56, 189, 248, 0.2);
@@ -1459,7 +1525,7 @@ button, a {
    2. AUDITORIUM PROJECTOR SCREEN (Achievements)
    ========================================================================== */
 .physical-achievements {
-  width: 680px;
+  width: 620px;
   max-height: 520px;
   background: #09140e;
   border: 3px solid rgba(85, 246, 154, 0.5);
@@ -1645,8 +1711,8 @@ button, a {
    3. ARCHIVE BOOKCASE (Skills Board)
    ========================================================================== */
 .physical-skills {
-  width: 620px;
-  max-height: 540px;
+  width: 560px;
+  max-height: 520px;
   background: #08110c;
   border: 2px solid rgba(52, 211, 153, 0.4);
   box-shadow: 0 0 40px rgba(52, 211, 153, 0.2);
@@ -1800,8 +1866,8 @@ button, a {
    4. EXECUTIVE LOUNGE WALL PLAQUE (About Me)
    ========================================================================== */
 .physical-about {
-  width: 580px;
-  max-height: 540px;
+  width: 540px;
+  max-height: 520px;
   background: #0f1511;
   border: 2px solid rgba(251, 191, 36, 0.4);
   box-shadow: 0 0 45px rgba(251, 191, 36, 0.2);
@@ -1923,8 +1989,8 @@ button, a {
    5. LASER PRINTER OUTPUT TRAY (Printed A4 Resume)
    ========================================================================== */
 .physical-resume {
-  width: 500px;
-  max-height: 540px;
+  width: 480px;
+  max-height: 520px;
   background: #f4f6f0;
   color: #1e2922;
   border: 1px solid #d1d5db;
@@ -2068,7 +2134,7 @@ button, a {
    6. DESKTOP INTERCOM CONSOLE (Contact)
    ========================================================================== */
 .physical-contact {
-  width: 560px;
+  width: 520px;
   max-height: 520px;
   background: #08110b;
   border: 2px solid rgba(34, 197, 94, 0.4);
@@ -6255,8 +6321,8 @@ html, body, .portfolio-container {
    7. MRWHITEHAT // OPERATIVE HOLOGRAPHIC DOSSIER STYLES
    ========================================================================== */
 .physical-operator {
-  width: 620px;
-  max-height: 540px;
+  width: 560px;
+  max-height: 520px;
   background: #040d16;
   border: 2px solid rgba(56, 189, 248, 0.45);
   box-shadow: 0 0 50px rgba(56, 189, 248, 0.3), inset 0 0 30px rgba(14, 165, 233, 0.08);
@@ -14571,4 +14637,114 @@ canvas {
   background: rgba(52, 211, 153, 0.15);
   border-color: rgba(52, 211, 153, 0.4);
   color: #34d399;
+}
+
+
+/* =============================================================================
+   UNIVERSAL PC & MOBILE RESPONSIVE STYLING FOR 3D STATIONS & HUD
+   ============================================================================= */
+
+/* Short Screen Viewports (e.g. 1366x768 laptops, landscape tablets) */
+@media (max-height: 800px) {
+  .physical-object-medium {
+    max-height: 450px !important;
+  }
+  .monitor-screen-body,
+  .projector-cloth-slide,
+  .archive-bookcase-board,
+  .executive-wall-plaque,
+  .printer-paper-sheet,
+  .desktop-comms-console,
+  .operative-dossier-terminal,
+  .mainframe-dossier-terminal,
+  .arsenal-dossier-terminal,
+  .pcap-dossier-terminal {
+    max-height: 395px !important;
+  }
+  .station-inspect-header {
+    top: 8px !important;
+  }
+}
+
+/* Mobile Devices & Small Screens (max-width: 768px) */
+@media (max-width: 768px) {
+  .physical-object-medium {
+    width: 94vw !important;
+    max-width: 94vw !important;
+    max-height: 64vh !important;
+  }
+
+  .physical-projects,
+  .physical-achievements,
+  .physical-skills,
+  .physical-about,
+  .physical-resume,
+  .physical-contact,
+  .physical-operator {
+    width: 94vw !important;
+    max-width: 94vw !important;
+  }
+
+  .monitor-screen-body,
+  .projector-cloth-slide,
+  .archive-bookcase-board,
+  .executive-wall-plaque,
+  .printer-paper-sheet,
+  .desktop-comms-console,
+  .operative-dossier-terminal,
+  .mainframe-dossier-terminal,
+  .arsenal-dossier-terminal,
+  .pcap-dossier-terminal {
+    max-height: calc(64vh - 46px) !important;
+  }
+
+  .dual-monitors-rig {
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+
+  .console-main-grid {
+    flex-direction: column !important;
+  }
+
+  .plaque-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .drawer-items-list {
+    grid-template-columns: 1fr !important;
+  }
+
+  .obj-sec-tag {
+    display: none !important; /* Hide secondary security tag on mobile so status bar stays compact */
+  }
+
+  .obj-device-label {
+    font-size: 9.5px !important;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .station-inspect-header {
+    top: 6px !important;
+    left: 6px !important;
+    right: 6px !important;
+    gap: 4px !important;
+  }
+
+  .station-back-walk-btn {
+    padding: 5px 9px !important;
+    font-size: 9.5px !important;
+  }
+
+  .station-selector-trigger {
+    padding: 5px 9px !important;
+    font-size: 10px !important;
+  }
+
+  .station-trigger-count {
+    display: none !important;
+  }
 }
