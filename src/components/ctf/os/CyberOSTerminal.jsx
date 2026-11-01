@@ -32,14 +32,14 @@ const VFS = {
   '/home/guest/hints.txt': {
     type: 'file',
     content:
-      '=== CTF METHODOLOGY & INVESTIGATION REFERENCE ===\n' +
-      '1. CRYPTO: Run frequency analysis on intercepted telegram. Compare top cipher letters against English E/T/A.\n' +
-      '2. FORENSICS: Filter pcap by "http" to isolate API requests. Use Follow TCP Stream to reconstruct plaintext.\n' +
-      '3. WEB SQLi: Test single quotes, enumerate column counts with ORDER BY, and inject UNION SELECT statements.\n' +
-      '4. PWN STACK: Buffer capacity + 8-byte saved RBP gives padding bytes to overwrite Saved RIP with win().\n' +
-      '5. REVERSING: Locate anti-debug jump at 0x004011ad and patch with x86 NOP opcodes to force fallthrough.\n' +
-      '6. HARDWARE: Trace PCB silkscreen to locate UART TX and system GND. Cycle standard embedded baud rates.\n' +
-      '7. STEGO: Sweep ultrasonic receiver band (>140 kHz) and apply high-pass DSP filter to clean noise floor.\n' +
+      '=== CTF SOLVING WALKTHROUGH & INVESTIGATION REFERENCE ===\n' +
+      '1. CRYPTO (Caesar): In CyberChef, add "Caesar Cipher". Peak cipher letter is H; English is E (distance = -3). Set Shift Key to -3 to decrypt.\n' +
+      '2. FORENSICS (Wireshark): Type "http" in filter bar. Open Packet #7 or #8, click [Follow TCP Stream] to view plaintext token in JSON.\n' +
+      '3. WEB SQLi (Burp Suite): In URL bar, replace "alice" with "\' OR 1=1--" to bypass query and extract root_sentinel admin clearance.\n' +
+      '4. PWN STACK (Ghidra): Buffer is 16 bytes, saved RBP is 8 bytes. Enter Padding = 24, Target Address = 0x00401155 (or "win"). Click Run.\n' +
+      '5. REVERSING (Ghidra): Target jump at 0x004011ad terminates process. In Patch Opcode, enter "90 90", click Apply, then Run Patched Binary.\n' +
+      '6. HARDWARE (PulseView): Connect Probe CH0 to TP3 (UART_TX) and GND to TP4 (GND). Set Baud Rate to 115200 and click Start Capture.\n' +
+      '7. STEGO (Spectrogram): Set Carrier Frequency to 142.8 kHz and DSP Filter to High-Pass (15 kHz) to reveal green watermark text.\n' +
       'Type "submit FLAG{...}" to submit any flag directly from this terminal!',
   },
   '/home/guest/submit_flag.sh': {
@@ -138,38 +138,42 @@ export default function CyberOSTerminal({ onOpenApp, onOpenStation }) {
       case 'hint':
         newLines.push(
           '====================================================================',
-          '  💡 HOW TO SOLVE CTF CHALLENGES // INVESTIGATION GUIDELINES',
+          '  💡 HOW TO SOLVE CTF CHALLENGES // STEP-BY-STEP OPERATIVE GUIDE',
           '====================================================================',
           '1. [CRYPTOGRAPHY] Operation Caesar:',
-          '   - Target: IODJ{fdhvdu_vkliw_urw3_fohdudqfh}',
-          '   - Tool: Launch "cyberchef" from the terminal or Applications drawer.',
-          '   - Methodology: Run frequency analysis to deduce letter shift distance, then adjust Caesar shift recipe.',
+          '   - Tool: Launch "cyberchef" from the terminal or Applications menu.',
+          '   - Action: Add "Caesar Cipher" to recipe. Set Shift Key to -3 (letter H shifted back to E).',
+          '   - Result: Output box deciphers the plaintext containing the flag!',
           ' ',
           '2. [DIGITAL FORENSICS] PCAP Data Exfiltration:',
-          '   - Target: capture_042.pcapng',
           '   - Tool: Launch "wireshark".',
-          '   - Methodology: Filter by "http" to isolate plaintext traffic. Inspect packet tree or Follow TCP Stream to recover token.',
+          '   - Action: Click [http] filter button. Select Packet #7 or #8. Click [Follow TCP Stream].',
+          '   - Result: Inspect JSON response body for the "token" value.',
           ' ',
           '3. [WEB EXPLOITATION] SQL Injection WAF Bypass:',
-          '   - Target: /api/v1/accounts?username=alice',
           '   - Tool: Launch "burp" -> HTTP Repeater.',
-          '   - Methodology: Test SQL delimiters and boolean/UNION queries to extract elevated administrative clearance records.',
+          '   - Action: Replace "alice" with "\' OR 1=1--" in the URL and click [SEND REQUEST].',
+          '   - Result: Admin account (root_sentinel) clearance record contains the flag!',
           ' ',
           '4. [BINARY EXPLOITATION] Stack Buffer Overflow:',
-          '   - Tool: Launch "ghidra" -> Stack Overflow tab.',
-          '   - Methodology: Calculate stack offset (buffer size + saved RBP) to reach Saved RIP, and point it to win().',
+          '   - Tool: Launch "ghidra" -> GDB Stack Buffer Overflow tab.',
+          '   - Action: Enter Padding = 24 (16 bytes buffer + 8 bytes RBP) and Target Address = 0x00401155 (or "win").',
+          '   - Result: Click [RUN EXPLOIT IN GDB] to hijack execution to win() and dump the flag!',
           ' ',
           '5. [REVERSE ENGINEERING] Anti-Debug Opcode Patching:',
-          '   - Tool: Launch "ghidra" -> Anti-Debug tab.',
-          '   - Methodology: Locate conditional branch detecting ptrace() and patch with NOP opcodes to fall through.',
+          '   - Tool: Launch "ghidra" -> Ghidra Opcode Patcher tab.',
+          '   - Action: Type "90 90" into Patch Opcode, click [Apply Patch], then click [RUN PATCHED BINARY].',
+          '   - Result: Bypass anti-debug ptrace check to call decrypt_vault_flag()!',
           ' ',
           '6. [HARDWARE FORENSICS] UART Silkscreen Reverse Engineering:',
-          '   - Tool: Launch "logic" (Logic Analyzer).',
-          '   - Methodology: Identify test pad signals on PCB silkscreen, attach CH0 and GND probes, and set embedded baud rate.',
+          '   - Tool: Launch "logic" (PulseView).',
+          '   - Action: Connect Probe CH0 to TP3 (UART_TX), Probe GND to TP4 (GND), set Baud to 115200.',
+          '   - Result: Click [START CAPTURE] to dump the bootloader firmware flag in the serial console!',
           ' ',
           '7. [STEGANOGRAPHY] Ultrasonic Audio Demodulation:',
-          '   - Tool: Launch "spectrogram".',
-          '   - Methodology: Sweep carrier frequency to center on ultrasonic peak and apply DSP filtering to reveal watermark.',
+          '   - Tool: Launch "spectrogram" (SonicVisualizer).',
+          '   - Action: Tune Carrier Frequency to 142.8 kHz and select High-Pass (15 kHz) DSP filter.',
+          '   - Result: Waterfall canvas demodulates the hidden green spectral watermark!',
           ' ',
           'Format: All flags adhere to standard syntax: FLAG{...}',
           'Submit from terminal: submit FLAG{...}',

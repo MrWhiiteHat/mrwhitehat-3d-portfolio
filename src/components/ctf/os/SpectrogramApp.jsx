@@ -181,14 +181,15 @@ export default function SpectrogramApp({ onOpenStation }) {
             <div className="cos-hint-card">
               <h4>🔍 Steganography Clues</h4>
               <p>• The covert carrier frequency sits at <strong style={{ color: '#38bdf8' }}>~142.8 kHz</strong>.<br />
-              • Audible background noise drowns the watermark unless the <strong style={{ color: '#ec4899' }}>15 kHz High-Pass DSP filter</strong> is engaged.</p>
+              • Low-frequency room audio drowns the watermark unless the <strong style={{ color: '#ec4899' }}>High-Pass (15 kHz) DSP filter</strong> is engaged.</p>
             </div>
 
             <div className="cos-hint-card">
-              <h4>🛠️ How to Solve</h4>
-              <p>1. Sweep the Carrier Frequency slider across the ultrasonic range (~140-150 kHz) to lock onto the signal peak.</p>
-              <p>2. Select the <strong>15 kHz High-Pass DSP</strong> filter to eliminate background audio interference.</p>
-              <p>3. Inspect the waterfall visualizer canvas as the demodulated spectral watermark renders the captured flag!</p>
+              <h4>🛠️ Step-by-Step Walkthrough</h4>
+              <p>1. In <strong>RF / DSP Receiver Controls</strong>, drag the <strong>Carrier Frequency</strong> slider up to approximately <strong style={{ color: '#38bdf8' }}>142.8 kHz</strong>.</p>
+              <p>2. Set the <strong>Digital Signal Filter (DSP)</strong> dropdown to <strong style={{ color: '#ec4899' }}>High-Pass (15 kHz)</strong> to filter out low-frequency noise.</p>
+              <p>3. Watch the waterfall canvas on the right lock onto the green ultrasonic carrier and render the legible flag!</p>
+              <p>4. Read the revealed flag, copy it, and paste it into the submit box below.</p>
             </div>
           </div>
         </div>

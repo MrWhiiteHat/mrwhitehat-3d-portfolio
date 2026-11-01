@@ -246,31 +246,31 @@ export default function BurpSuiteApp({ onOpenStation }) {
                 </div>
                 <div className="cos-hint-card">
                   <h4>🔍 SQLi Attack Guide</h4>
-                  <p>The backend executes an unparameterized lookup: <code>SELECT ... WHERE username = '&#123;input&#125;'</code>.</p>
-                  <p>Inject quote delimiters and SQL comment tokens (<code>--</code>) to break out of the string literal and extract records.</p>
+                  <p>The backend executes: <code>SELECT ... WHERE username = '&#123;input&#125;'</code>.</p>
+                  <p>Inject a quote (<code>'</code>) to escape the string, an <code>OR 1=1</code> clause to make the condition always true, and comment dashes (<code>--</code>) to ignore trailing SQL.</p>
                 </div>
                 <div className="cos-hint-card">
-                  <h4>🛠️ How to Solve</h4>
-                  <p>1. Test SQL syntax by injecting query conditions (e.g. testing boolean bypasses or UNION SELECT operators) into the URL parameter.</p>
+                  <h4>🛠️ Step-by-Step Walkthrough</h4>
+                  <p>1. In the URL path, replace <code>alice</code> with: <code>' OR 1=1--</code> (or <code>' UNION SELECT 1,2,3,4--</code>).</p>
                   <p>2. Click <strong style={{ color: '#fb923c' }}>[SEND HTTP REQUEST]</strong>.</p>
-                  <p>3. Inspect the backend JSON response on the right to discover elevated administrative clearance records holding the flag!</p>
+                  <p>3. Inspect the JSON response on the right: look for user <code>root_sentinel</code> to find the admin clearance flag, then copy and submit it below!</p>
                 </div>
               </>
             ) : activeTab === 'timing' ? (
               <>
                 <div className="cos-hint-card">
                   <h4>🎯 Objective</h4>
-                  <p>The token verification routine uses non-constant-time <code>strcmp()</code> with a simulated <code>usleep(15000)</code> (15ms) delay per matching character.</p>
+                  <p>The token verification routine uses non-constant-time <code>strcmp()</code>, adding a measurable ~15ms delay per sequentially matching character.</p>
                 </div>
                 <div className="cos-hint-card">
-                  <h4>🔍 Side-Channel Clue</h4>
-                  <p>Base latency is ~48ms (0 matches). 5 matching characters take ~124ms (48ms + 5×15ms). Notice latency spikes when you test the correct next character!</p>
+                  <h4>🔍 Timing Attack Concept</h4>
+                  <p>Base latency is ~48ms. When probing candidate characters, every correct letter adds an extra ~15ms delay. The flag starts with: <code>FLAG&#123;side_channel_timing_...</code></p>
                 </div>
                 <div className="cos-hint-card">
-                  <h4>🛠️ How to Solve</h4>
-                  <p>1. Send probe candidates starting with the prefix <code>FLAG&#123;</code>.</p>
-                  <p>2. Monitor round-trip execution latency in the measurement log: each correct sequential character increases execution time by ~15ms.</p>
-                  <p>3. Identify the character with the highest latency spike at each index until the complete token is reconstructed!</p>
+                  <h4>🛠️ Step-by-Step Walkthrough</h4>
+                  <p>1. Enter candidate prefix <code>FLAG&#123;</code> into the probe input and click <strong>Send Probe</strong>.</p>
+                  <p>2. Test candidate characters (e.g. <code>FLAG&#123;s</code>). Notice that correct characters cause a distinct latency spike (~78ms vs ~63ms)!</p>
+                  <p>3. Reconstruct the full flag prefix or submit <code>FLAG&#123;side_channel_timing_leak_enumerated&#125;</code> in the flag bar below.</p>
                 </div>
               </>
             ) : (

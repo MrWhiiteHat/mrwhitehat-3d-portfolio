@@ -44,11 +44,21 @@ export default function BufferOverflowChallenge({ onSolved, onBypass }) {
     setGdbOutput('Starting program: ./vuln_server\nDebugger attached (gdb-peda)\nInjecting constructed payload bytes...');
 
     setTimeout(() => {
-      const isRipWin = ripClean === '0x00401155' || ripClean === '0x401155' || ripClean === '0x55';
+      const isRipWin =
+        ripClean === '0x00401155' ||
+        ripClean === '0x401155' ||
+        ripClean === '401155' ||
+        ripClean === '0x55' ||
+        ripClean.startsWith('win') ||
+        ripClean.includes('win') ||
+        ripClean.includes('401155');
+
+      const resolvedAddr = (ripClean.includes('win') || ripClean === '0x55') ? '0x00401155' : targetRip;
 
       if (offsetNum >= requiredOffset && isRipWin) {
         setGdbOutput(
-          `[+] Payload injected: ${offsetNum} bytes padding ('A'*${offsetNum}) + return address (${targetRip})\n` +
+          `[+] Payload injected: ${offsetNum} bytes padding ('A'*${offsetNum}) + return address (${resolvedAddr})\n` +
+          (ripClean.includes('win') ? `[+] GDB Symbol Resolver: Resolved function 'win()' to memory address 0x00401155\n` : '') +
           `[+] [0x7fffffffe018]: Overwritten Saved RIP -> 0x00401155\n` +
           `[+] Control flow hijacked! Execution successfully redirected to win()!\n` +
           `[+] Executing win(): Dumping confidential flag from root vault...\n` +
@@ -59,7 +69,7 @@ export default function BufferOverflowChallenge({ onSolved, onBypass }) {
         setGdbOutput(
           `[-] Injected ${offsetNum} bytes.\n` +
           `[-] Stack not saturated: Injected payload did not reach Saved RIP.\n` +
-          `[-] Re-calculate: buffer capacity + x86_64 saved frame pointer (RBP).\n` +
+          `[-] Stack calculation: buffer (16 bytes) + Saved RBP (8 bytes) = 24 bytes required.\n` +
           `[-] Program exited normally without hijacking control flow (exit code: 0).`
         );
         playZapSound();
@@ -68,7 +78,7 @@ export default function BufferOverflowChallenge({ onSolved, onBypass }) {
           `[!] Program received signal SIGSEGV, Segmentation fault.\n` +
           `[!] 0x00000000${targetRip.replace('0x', '')} in ?? ()\n` +
           `[!] Invalid memory dereference at instruction pointer.\n` +
-          `[!] Inspect GDB functions list to locate the correct address for win().`
+          `[!] Inspect GDB functions list to locate the correct address for win() (0x00401155, or type "win").`
         );
         playZapSound();
       }
@@ -276,7 +286,7 @@ PIE       : Disabled`}
       ) : (
         <div className="hack-hint-bar mt-2">
           <span className="live-blip" />
-          <span>Stack layout: buffer size + saved frame pointer (RBP) = padding required to overwrite Saved RIP. Find win() address in GDB symbols above.</span>
+          <span>Walkthrough: Buffer size (16 bytes) + Saved RBP (8 bytes) = 24 bytes padding. Target win() address = 0x00401155 (or enter "win").</span>
         </div>
       )}
     </div>

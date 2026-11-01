@@ -131,14 +131,15 @@ export default function CyberChefApp({ onOpenStation }) {
             <div className="cos-hint-card">
               <h4>🔍 Frequency Analysis Clue</h4>
               <p>In standard English, the most frequent letter is <strong>'E'</strong> (~12.7%). In this ciphertext, the letter <strong>'H'</strong> occurs with the highest frequency (14.1%).</p>
-              <p>Distance from <code>H</code> (ASCII 72) backward to <code>E</code> (ASCII 69) is <strong style={{ color: '#fbbf24' }}>-3 shifts</strong> (A ➔ X, B ➔ Y, C ➔ Z).</p>
+              <p>Distance from <code>H</code> backward to <code>E</code> is <strong style={{ color: '#fbbf24' }}>-3 letters</strong> (H ➔ G ➔ F ➔ E).</p>
             </div>
 
             <div className="cos-hint-card">
-              <h4>🛠️ How to Solve</h4>
-              <p>1. In the <strong>Recipe Pipeline</strong>, add the <strong>Caesar Cipher</strong> operation.</p>
-              <p>2. Use frequency analysis to deduce the shift distance from cipher letter 'H' to English letter 'E'.</p>
-              <p>3. Adjust the <strong>Shift Key</strong> until the decrypted output becomes legible English containing the flag!</p>
+              <h4>🛠️ Step-by-Step Walkthrough</h4>
+              <p>1. In the <strong>Operations Palette</strong> on the left, click <strong>Caesar Cipher</strong> to add it to the Recipe Pipeline.</p>
+              <p>2. In the <strong>Recipe Pipeline</strong>, drag the <strong>Shift Key</strong> slider to <strong style={{ color: '#38bdf8' }}>-3</strong> (or type <code>-3</code>).</p>
+              <p>3. Notice the <strong>Output Plaintext</strong> box immediately deciphers the secret message into readable English!</p>
+              <p>4. Locate the decrypted flag inside the text, copy it, and paste it into the submit box below.</p>
             </div>
           </div>
         </div>

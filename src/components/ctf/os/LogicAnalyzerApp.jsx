@@ -228,18 +228,18 @@ export default function LogicAnalyzerApp({ onOpenStation }) {
             </div>
 
             <div className="cos-hint-card">
-              <h4>🔍 Pinout Clues</h4>
-              <p>• <strong>TP3</strong>: Labeled <code>UART_TX</code> on silkscreen (microcontroller transmit line).<br />
-              • <strong>TP4</strong>: System ground (<code>GND</code>, 0V reference).<br />
-              • Standard embedded baud rate: <strong style={{ color: '#38bdf8' }}>115200 (8-N-1)</strong>.</p>
+              <h4>🔍 Pinout & Hardware Clues</h4>
+              <p>• <strong>TP3</strong>: Labeled <code>UART_TX</code> on silkscreen (serial data transmit line).<br />
+              • <strong>TP4</strong>: System ground (<code>GND</code>, 0V reference lead).<br />
+              • Microcontroller clock: <strong style={{ color: '#38bdf8' }}>115200 baud (8-N-1)</strong>.</p>
             </div>
 
             <div className="cos-hint-card">
-              <h4>🛠️ How to Solve</h4>
-              <p>1. Examine the PCB test pad silkscreen labels to find the serial data transmit line (TX) and ground reference (GND).</p>
-              <p>2. Connect Channel 0 probe to UART TX and Ground probe to GND.</p>
-              <p>3. Select the standard embedded baud rate matching microcontroller asynchronous serial (8-N-1).</p>
-              <p>4. Start logic capture to decode the pulse stream and read the bootloader flag from the serial console!</p>
+              <h4>🛠️ Step-by-Step Walkthrough</h4>
+              <p>1. In <strong>Probe Setup</strong>, select <code>TP3 (UART_TX)</code> for Probe CH0 and <code>TP4 (GND)</code> for Probe GND.</p>
+              <p>2. In <strong>UART Baud Rate</strong>, select <code>115200</code> (standard embedded baud rate).</p>
+              <p>3. Click <strong style={{ color: '#34d399' }}>[START CAPTURE]</strong> to sample the digital square-wave transitions.</p>
+              <p>4. Read the decoded U-Boot bootloader diagnostic output in the serial console on the right to extract and submit the flag!</p>
             </div>
           </div>
         </div>

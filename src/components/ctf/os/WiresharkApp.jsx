@@ -329,15 +329,16 @@ export default function WiresharkApp({ onOpenStation }) {
 
             <div className="cos-hint-card">
               <h4>🔍 Forensics Clue</h4>
-              <p>Threat actors often leverage plaintext HTTP APIs to exfiltrate database keys.</p>
+              <p>Threat actors often leverage unencrypted HTTP APIs to exfiltrate database keys.</p>
               <p>Filter by <strong style={{ color: '#34d399' }}>http</strong> or look at <strong>Packet #7 & #8</strong> to inspect the unencrypted authentication exchange.</p>
             </div>
 
             <div className="cos-hint-card">
-              <h4>🛠️ How to Solve</h4>
-              <p>1. Apply a protocol display filter (e.g. <code>http</code>) to isolate unencrypted application traffic.</p>
-              <p>2. Select authentication request or response packets exchanged with the API server.</p>
-              <p>3. Use <strong>Follow TCP Stream</strong> or inspect the packet dissection tree to extract the exfiltrated authentication token!</p>
+              <h4>🛠️ Step-by-Step Walkthrough</h4>
+              <p>1. In the display filter bar above, click the <strong style={{ color: '#38bdf8' }}>[http]</strong> quick filter button (or type <code>http</code>) to isolate web traffic.</p>
+              <p>2. In the filtered packet list, click <strong>Packet #7</strong> (POST /api/v1/auth/login) or <strong>Packet #8</strong> (HTTP/1.1 200 OK).</p>
+              <p>3. Click <strong>[Follow TCP Stream]</strong> in the top toolbar to reconstruct the full plaintext conversation.</p>
+              <p>4. Inside the JSON response body, find the <code>token</code> value holding the flag, copy it, and paste it into the submit box below!</p>
             </div>
           </div>
         </div>

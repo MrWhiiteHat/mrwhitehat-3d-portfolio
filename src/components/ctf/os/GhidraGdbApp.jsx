@@ -30,6 +30,22 @@ const ASM_INSTRUCTIONS = [
   { addr: '0x004011c1', hex: 'e8 a0 fe ff', asm: 'call <tamper_kill>', note: 'Tamper detected exit routine' },
 ];
 
+const DEFAULT_GDB_OUTPUT =
+  'gdb-peda$ file ./vuln_server\n' +
+  'Reading symbols from ./vuln_server... done (ELF 64-bit LSB executable).\n' +
+  'gdb-peda$ info functions\n' +
+  'All defined functions in ./vuln_server:\n' +
+  '  0x00401130  main(int, char**)\n' +
+  '  0x00401140  vuln()        // Reads stdin into 16-byte stack buffer via gets()\n' +
+  '  0x00401155  win()         // Target secret routine: dumps root flag vault\n' +
+  'gdb-peda$ checksec\n' +
+  '  CANARY: Disabled  |  FORTIFY: Disabled  |  NX: Enabled  |  PIE: Disabled\n' +
+  '--------------------------------------------------------------------------------\n' +
+  'EXPLOIT INSTRUCTIONS:\n' +
+  '1. Padding Length: Enter 24 (16 bytes buffer + 8 bytes Saved RBP)\n' +
+  '2. Target Address: Enter 0x00401155 (or type "win")\n' +
+  '3. Click [RUN EXPLOIT IN GDB] to hijack control flow to win()!';
+
 export default function GhidraGdbApp({ onOpenStation }) {
   const [activeTab, setActiveTab] = useState('reversing'); // 'reversing' | 'buffer'
   const [showHints, setShowHints] = useState(true);
@@ -44,7 +60,7 @@ export default function GhidraGdbApp({ onOpenStation }) {
   // Buffer Overflow State
   const [paddingLength, setPaddingLength] = useState('');
   const [targetRip, setTargetRip] = useState('');
-  const [gdbOutput, setGdbOutput] = useState('');
+  const [gdbOutput, setGdbOutput] = useState(DEFAULT_GDB_OUTPUT);
 
   // Flag Submissions
   const [manualFlag, setManualFlag] = useState('');
@@ -109,16 +125,17 @@ export default function GhidraGdbApp({ onOpenStation }) {
 
   const handleTestBufferExploit = () => {
     const offset = parseInt(paddingLength, 10);
-    const rip = targetRip.trim().toLowerCase();
+    const ripRaw = targetRip.trim();
+    const ripClean = ripRaw.toLowerCase();
 
     if (isNaN(offset) || offset < 0) {
-      setGdbOutput('[-] Error: Please enter a valid byte count for padding offset.');
+      setGdbOutput('[-] GDB Error: Please enter a valid number of padding bytes (e.g. 24).');
       playZapSound();
       return;
     }
 
-    if (!rip) {
-      setGdbOutput('[-] Error: Target return address (Saved RIP) cannot be empty.');
+    if (!ripClean) {
+      setGdbOutput('[-] GDB Error: Target return address (Saved RIP) cannot be empty. Enter 0x00401155 or "win".');
       playZapSound();
       return;
     }
@@ -127,30 +144,43 @@ export default function GhidraGdbApp({ onOpenStation }) {
     setGdbOutput('Starting program: ./vuln_server in GDB-PEDA...\nInjecting crafted buffer...');
 
     setTimeout(() => {
-      const isRipWin = rip === '0x00401155' || rip === '0x401155' || rip === '0x55';
+      const isRipWin =
+        ripClean === '0x00401155' ||
+        ripClean === '0x401155' ||
+        ripClean === '401155' ||
+        ripClean === '0x55' ||
+        ripClean.startsWith('win') ||
+        ripClean.includes('win') ||
+        ripClean.includes('401155');
+
+      const resolvedAddr = (ripClean.includes('win') || ripClean === '0x55') ? '0x00401155' : ripRaw;
 
       if (offset >= 24 && isRipWin) {
         setGdbOutput(
-          `[+] Injected ${offset} bytes padding ('A'*${offset}) + return address (${targetRip})\n` +
+          `[+] Exploit payload generated: ${offset} bytes padding ('A'*${offset}) + return address (${resolvedAddr})\n` +
+          (ripClean.includes('win') ? `[+] GDB Symbol Resolver: Resolved function 'win()' to memory address 0x00401155\n` : '') +
           `[+] [0x7fffffffe018]: Overwritten Saved RIP -> 0x00401155\n` +
           `[+] Control flow hijacked! Execution successfully redirected to win()!\n` +
           `[+] Executing win(): Dumping confidential flag from root vault...\n` +
-          `[+] FLAG CAPTURED: ${BUFFER_OVERFLOW_FLAG}`
+          `--------------------------------------------------------------------------------\n` +
+          `[+] FLAG CAPTURED: ${BUFFER_OVERFLOW_FLAG}\n` +
+          `--------------------------------------------------------------------------------\n` +
+          `[+] Exploit verified! Copy the flag above and paste it into the submit box below.`
         );
         playBreachFanfare();
       } else if (offset < 24) {
         setGdbOutput(
           `[-] Injected ${offset} bytes.\n` +
           `[-] Stack frame not saturated: payload did not reach Saved RIP.\n` +
-          `[-] Stack layout: buffer capacity + 64-bit Saved RBP.\n` +
-          `[-] Program exited normally with code 0.`
+          `[-] Stack layout: 16 bytes (buffer) + 8 bytes (Saved RBP) = 24 bytes minimum padding required.\n` +
+          `[-] Program exited normally with code 0. Re-enter Padding Length = 24.`
         );
         playZapSound();
       } else {
         setGdbOutput(
           `[!] Program received signal SIGSEGV, Segmentation fault.\n` +
-          `[!] 0x00000000${targetRip.replace('0x', '')} in ?? ()\n` +
-          `[!] Invalid memory reference. Check GDB symbol table for win() function address.`
+          `[!] 0x00000000${ripRaw.replace('0x', '')} in ?? ()\n` +
+          `[!] Invalid memory reference. Target 'win()' function is located at address 0x00401155 (or type "win").`
         );
         playZapSound();
       }
@@ -259,32 +289,36 @@ export default function GhidraGdbApp({ onOpenStation }) {
                   <p>Binary <code>./sentinel_daemon</code> detects if a debugger is attached via <code>ptrace()</code> and jumps to <code>tamper_kill</code>.</p>
                 </div>
                 <div className="cos-hint-card">
-                  <h4>🔍 Reversing Clue</h4>
-                  <p>At address <code>0x004011ad</code>, opcode <code>74 12</code> is a conditional jump (<code>je</code>). Replacing it with <strong style={{ color: '#34d399' }}>90 90 (NOP NOP)</strong> neutralizes the check!</p>
+                  <h4>🔍 Reversing & Patching Guide</h4>
+                  <p>At address <code>0x004011ad</code>, opcode <code>74 12</code> is a conditional jump (<code>je &lt;tamper_kill&gt;</code>). In x86, replacing it with <strong style={{ color: '#34d399' }}>90 90 (NOP NOP)</strong> turns the jump into a no-operation, allowing execution to safely fall through!</p>
                 </div>
                 <div className="cos-hint-card">
-                  <h4>🛠️ How to Solve</h4>
-                  <p>1. Locate the anti-debug branching instruction at <code>0x004011ad</code> in the disassembly.</p>
-                  <p>2. Patch the jump opcode to NOP (<code>90 90</code>) so execution bypasses termination.</p>
-                  <p>3. Execute the patched binary to reach <code>decrypt_vault_flag()</code> and recover the flag!</p>
+                  <h4>🛠️ Step-by-Step Walkthrough</h4>
+                  <p>1. In the disassembly table, look at instruction <code>0x004011ad: 74 12</code> (conditional branch to exit).</p>
+                  <p>2. In the <strong>Patch Opcode</strong> input below, enter <code>90 90</code> and click <strong>Apply Patch</strong>.</p>
+                  <p>3. Click <strong>[RUN PATCHED BINARY]</strong>. The program will bypass termination, call <code>decrypt_vault_flag()</code>, and dump the flag in the console!</p>
+                  <p>4. Copy the flag from the console and paste it into the submit box below.</p>
                 </div>
               </>
             ) : (
               <>
                 <div className="cos-hint-card">
                   <h4>🎯 Objective</h4>
-                  <p>Vulnerable program <code>vuln_server</code> uses unsafe <code>gets(buffer)</code> without bounds checking. Overwrite Saved RIP to hijack control flow to <code>win()</code>.</p>
+                  <p>Program <code>vuln_server</code> reads input into a 16-byte buffer via unsafe <code>gets()</code>. Overflow the buffer and overwrite Saved RIP with the address of <code>win()</code>.</p>
                 </div>
                 <div className="cos-hint-card">
-                  <h4>🔍 Stack Calculation Formula</h4>
-                  <p>Padding to Saved RIP = Buffer Capacity + 64-bit Saved Frame Pointer (RBP).<br />
-                  Inspect GDB function symbols to find the entry address of <code>win()</code>.</p>
+                  <h4>🔍 Stack Calculation Guide</h4>
+                  <p>• <strong>Buffer Size:</strong> 16 bytes.<br />
+                  • <strong>Saved Frame Pointer (RBP):</strong> 8 bytes.<br />
+                  • <strong>Total Padding Required:</strong> 16 + 8 = <strong style={{ color: '#fbbf24' }}>24 bytes</strong>.<br />
+                  • <strong>Target Function:</strong> Look at the GDB console on the right: <code>win()</code> is at <strong style={{ color: '#38bdf8' }}>0x00401155</strong>.</p>
                 </div>
                 <div className="cos-hint-card">
-                  <h4>🛠️ How to Solve</h4>
-                  <p>1. Calculate stack frame offset: buffer capacity (16 bytes) + Saved RBP (8 bytes) to reach Saved RIP.</p>
-                  <p>2. Set target overwrite address to <code>win()</code> found in GDB function symbols.</p>
-                  <p>3. Run the exploit against <code>./vuln_server</code> in GDB to capture the hijacked return flag!</p>
+                  <h4>🛠️ Step-by-Step Walkthrough</h4>
+                  <p>1. In <strong>Padding Length</strong>, enter <code>24</code> (fills the 16-byte buffer + 8-byte RBP).</p>
+                  <p>2. In <strong>Target Address</strong>, enter <code>0x00401155</code> (or simply type <code>win</code>).</p>
+                  <p>3. Click <strong>[RUN EXPLOIT IN GDB]</strong>. Execution will jump directly to <code>win()</code> and dump the flag in the log!</p>
+                  <p>4. Copy the flag from the execution log and paste it into the submit box below.</p>
                 </div>
               </>
             )}
