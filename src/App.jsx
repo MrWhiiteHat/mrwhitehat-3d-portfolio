@@ -510,40 +510,20 @@ export default function App() {
     }, 1100);
   }, [initHackerStage]);
 
-  // Auto-trigger announcement ONLY when all stations are genuinely breached during active 3D exploration
-  useEffect(() => {
-    if (
-      gameState === 'EXPLORE' &&
-      hasCompletedAllStations(unlockedStations) &&
-      !hasSeenAnnouncementRef.current &&
-      !isEasterEggDiscovered()
-    ) {
-      hasSeenAnnouncementRef.current = true;
-      const timer = setTimeout(() => {
-        setGameState('ANNOUNCEMENT');
-      }, 900);
-      return () => clearTimeout(timer);
-    }
-  }, [unlockedStations, gameState]);
-
   const handleStationBreached = useCallback((stationId) => {
     markStationCompleted(stationId);
     setUnlockedStations((prev) => {
       const next = new Set([...prev, stationId]);
-      if (
-        gameState === 'EXPLORE' &&
-        hasCompletedAllStations(next) &&
-        !hasSeenAnnouncementRef.current &&
-        !isEasterEggDiscovered()
-      ) {
-        hasSeenAnnouncementRef.current = true;
+      if (hasCompletedAllStations(next) && !isEasterEggDiscovered()) {
+        markEasterEggDiscovered();
+        setToastMessage('🏆 ALL SECTORS BREACHED // SECRET NETRUN EASTER EGG UNLOCKED IN TOP HUD [⚡]');
         setTimeout(() => {
-          setGameState('ANNOUNCEMENT');
-        }, 1200);
+          setToastMessage(null);
+        }, 5000);
       }
       return next;
     });
-  }, [gameState]);
+  }, []);
 
   // Timer & countdown for stage 3
   useEffect(() => {
@@ -1418,8 +1398,8 @@ export default function App() {
         onClose={() => setIsUserGuideOpen(false)}
       />
 
-      {/* Cinematic Glitch Announcement Modal */}
-      {gameState === 'ANNOUNCEMENT' && (
+      {/* Cinematic Glitch Announcement Modal (only when manually triggered outside CyberOS) */}
+      {gameState === 'ANNOUNCEMENT' && !isCyberOSOpen && (
         <HackingCircuitAnnouncement
           onInvestigate={handleInvestigateEasterEgg}
           onSkip={handleSkipEasterEgg}
