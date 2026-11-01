@@ -289,6 +289,8 @@ export default function App() {
 
   const handleLaunchEasterEgg = useCallback(() => {
     setIsLoadingFinished(true);
+    setIsCyberOSOpen(false);
+    setSection(null);
     playGlitchTransition();
     preHackerStateRef.current = { themeKey, gameState: 'EXPLORE' };
     setThemeKey('HACKER_NETRUN');
@@ -994,6 +996,8 @@ export default function App() {
 
       } else if (e.key === 'r' || e.key === 'R') {
         handleToggleRecruiter();
+      } else if (e.key === 'n' || e.key === 'N') {
+        handleLaunchEasterEgg();
       } else if (e.key === 'h' || e.key === 'H' || e.key === '?') {
         setIsUserGuideOpen((prev) => !prev);
       } else if (e.key === 'o' || e.key === 'O') {
@@ -1146,6 +1150,8 @@ export default function App() {
           onUpdateSensitivity={updateSensitivity}
           onUpdateMoveSpeed={updateMoveSpeed}
           onResetControlSettings={resetControlSettings}
+          isEasterEggAvailable={true}
+          onLaunchEasterEgg={handleLaunchEasterEgg}
         />
       )}
 
@@ -1257,6 +1263,14 @@ export default function App() {
           </div>
 
           <div className="station-quick-controls">
+            <button
+              type="button"
+              className="hud-action-btn"
+              onClick={handleLaunchEasterEgg}
+              title="Launch Watch Dogs 2 3D Circuit Network Bypass [N]"
+            >
+              <Zap size={15} style={{ color: '#00f3ff' }} />
+            </button>
             <button
               type="button"
               className="hud-action-btn"
@@ -1401,6 +1415,7 @@ export default function App() {
         initialApp={cyberOSTargetApp}
         onOpenRecruiter={handleOpenRecruiter}
         onOpenStation={handleOpenStationFromCyberOS}
+        onLaunchEasterEgg={handleLaunchEasterEgg}
       />
 
       <RecruiterDossierModal

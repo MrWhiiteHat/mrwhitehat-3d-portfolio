@@ -68,7 +68,7 @@ const VFS = {
   },
 };
 
-export default function CyberOSTerminal({ onOpenApp, onOpenStation }) {
+export default function CyberOSTerminal({ onOpenApp, onOpenStation, onLaunchEasterEgg }) {
   const [cwd, setCwd] = useState('/home/guest');
   const [history, setHistory] = useState([
     'Linux kali-box 6.6.9-amd64 #1 SMP PREEMPT Kali 6.6.9-1kali1 (2026-01-15) x86_64',
@@ -130,8 +130,23 @@ export default function CyberOSTerminal({ onOpenApp, onOpenStation }) {
           '  cyberchef            Launch CyberChef Cryptanalysis Suite GUI',
           '  logic                Launch PulseView Hardware Logic Analyzer GUI',
           '  spectrogram          Launch SonicVisualizer Audio Stego GUI',
-          '  ctf                  Launch CTF Mission Control Center GUI'
+          '  ctf                  Launch CTF Mission Control Center GUI',
+          '  netrun               Launch Watch Dogs 2 3D Hacking Circuit Easter Egg'
         );
+        break;
+
+      case 'netrun':
+      case 'easteregg':
+      case 'easter':
+      case 'bypass':
+        newLines.push(
+          '[*] DISENGAGING KALI LINUX CTF SANDBOX...',
+          '[*] CONNECTING TO CTOS 3D CIRCUIT MESH FREQUENCY...',
+          '[*] Launching Watch Dogs 2 3D Hacking Circuit Easter Egg...'
+        );
+        setTimeout(() => {
+          onLaunchEasterEgg?.();
+        }, 500);
         break;
 
       case 'hints':

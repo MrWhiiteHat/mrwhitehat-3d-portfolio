@@ -100,6 +100,14 @@ const APP_REGISTRY = {
     defaultSize: { w: 840, h: 550 },
     defaultPos: { x: 100, y: 50 },
   },
+  netrun: {
+    id: 'netrun',
+    title: 'Watch Dogs 2 Netrun 3D Bypass [⚡]',
+    icon: Zap,
+    category: 'Easter Egg',
+    defaultSize: { w: 700, h: 450 },
+    defaultPos: { x: 100, y: 60 },
+  },
 };
 
 export default function CyberOSDesktop({
@@ -108,6 +116,7 @@ export default function CyberOSDesktop({
   initialApp = 'ctf',
   onOpenRecruiter = null,
   onOpenStation = null,
+  onLaunchEasterEgg = null,
 }) {
   const [openWindows, setOpenWindows] = useState({});
   const [activeWindowId, setActiveWindowId] = useState(null);
@@ -169,6 +178,11 @@ export default function CyberOSDesktop({
 
   const openApp = (appId) => {
     playClickSound(950);
+    if (appId === 'netrun') {
+      onClose?.();
+      onLaunchEasterEgg?.();
+      return;
+    }
     const meta = APP_REGISTRY[appId] || APP_REGISTRY.terminal;
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 850;
 
@@ -247,7 +261,16 @@ export default function CyberOSDesktop({
   const renderAppContent = (appId) => {
     switch (appId) {
       case 'terminal':
-        return <CyberOSTerminal onOpenApp={openApp} onOpenStation={onOpenStation} />;
+        return (
+          <CyberOSTerminal
+            onOpenApp={openApp}
+            onOpenStation={onOpenStation}
+            onLaunchEasterEgg={() => {
+              onClose?.();
+              onLaunchEasterEgg?.();
+            }}
+          />
+        );
       case 'wireshark':
         return <WiresharkApp onOpenStation={onOpenStation} />;
       case 'burp':
@@ -263,7 +286,16 @@ export default function CyberOSDesktop({
       case 'ctf':
         return <CTFMissionsApp onOpenApp={openApp} onOpenStation={onOpenStation} />;
       default:
-        return <CyberOSTerminal onOpenApp={openApp} onOpenStation={onOpenStation} />;
+        return (
+          <CyberOSTerminal
+            onOpenApp={openApp}
+            onOpenStation={onOpenStation}
+            onLaunchEasterEgg={() => {
+              onClose?.();
+              onLaunchEasterEgg?.();
+            }}
+          />
+        );
     }
   };
 

@@ -104,6 +104,7 @@ export default function GameHUD({
     '💡 TIP: Press [R] anytime for the Executive 2D Recruiter Dossier',
     '💡 TIP: Press [C] or tap [CYBER OS] to launch Kali Linux desktop with Wireshark, Burp, Ghidra & CTF tools',
     '💡 TIP: Adjust the real Air Conditioner ❄️ and Fan 🌀 in Studio Settings',
+    '💡 TIP: Press [N] or tap [⚡ NETRUN] to launch Watch Dogs 2 3D Hacking Circuit Easter Egg',
   ];
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
@@ -447,7 +448,7 @@ export default function GameHUD({
                 playClickSound(1200);
                 onLaunchEasterEgg?.();
               }}
-              title="Launch Watch Dogs 2 3D Circuit Network Bypass"
+              title="Launch Watch Dogs 2 3D Circuit Network Bypass [N]"
             >
               <Zap size={13} style={{ color: '#00f0ff' }} />
               <span className="netrun-pill-label">NETRUN</span>

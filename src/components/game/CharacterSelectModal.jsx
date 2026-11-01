@@ -166,6 +166,8 @@ export default function CharacterSelectModal({
   onUpdateSensitivity = null,
   onUpdateMoveSpeed = null,
   onResetControlSettings = null,
+  isEasterEggAvailable = false,
+  onLaunchEasterEgg = null,
 }) {
   const [showControlsTuning, setShowControlsTuning] = useState(false);
   const activeSettings = controlSettings || (typeof window !== 'undefined' ? window.__CONTROLS_SETTINGS__ : null) || { sensitivity: 1.0, moveSpeed: 1.0 };
@@ -216,6 +218,18 @@ export default function CharacterSelectModal({
             <span>TERMINAL // 3D WORKSPACE VISITOR CLEARANCE</span>
           </div>
           <div className="char-header-right">
+            {onLaunchEasterEgg && (
+              <button
+                type="button"
+                className="char-fullscreen-toggle-btn netrun-trigger-btn"
+                onClick={onLaunchEasterEgg}
+                title="Launch Watch Dogs 2 3D Circuit Network Bypass [N]"
+                style={{ borderColor: 'rgba(0, 243, 255, 0.4)', color: '#00f3ff' }}
+              >
+                <Zap size={13} />
+                <span>NETRUN 3D</span>
+              </button>
+            )}
             <button
               type="button"
               className={`char-fullscreen-toggle-btn ${isFullscreen ? 'is-active' : ''}`}

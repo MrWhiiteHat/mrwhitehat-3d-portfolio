@@ -119,7 +119,7 @@ function CameraDirector({
         target: new THREE.Vector3(...config.camTarget),
       };
       isAnimating.current = true;
-    } else if (gameState === 'EXPLORE') {
+    } else if (gameState === 'EXPLORE' || gameState === 'HACKING') {
       isAnimating.current = false;
       desired.current = null;
     } else {
