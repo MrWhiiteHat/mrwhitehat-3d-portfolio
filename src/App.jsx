@@ -208,6 +208,15 @@ export default function App() {
     setCyberOSTargetApp(app);
     setIsCyberOSOpen(true);
   }, []);
+
+  const handleOpenStationFromCyberOS = useCallback((stationId) => {
+    if (!stationId) return;
+    setIsCyberOSOpen(false);
+    playWhooshSound();
+    setSection(stationId);
+    setGameState('INSPECT_STATION');
+    setUnlockedStations((prev) => new Set([...prev, stationId]));
+  }, []);
   const [isUserGuideOpen, setIsUserGuideOpen] = useState(false);
   const stationMenuRef = useRef(null);
 
@@ -1395,6 +1404,7 @@ export default function App() {
         onClose={() => setIsCyberOSOpen(false)}
         initialApp={cyberOSTargetApp}
         onOpenRecruiter={handleOpenRecruiter}
+        onOpenStation={handleOpenStationFromCyberOS}
       />
 
       <RecruiterDossierModal

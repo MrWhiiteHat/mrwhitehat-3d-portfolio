@@ -1260,3 +1260,31 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Open Station Information Button */
+.cos-open-station-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 12px;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  border: 1px solid #34d399;
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-family: monospace;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45);
+  transition: all 0.2s ease;
+  vertical-align: middle;
+}
+
+.cos-open-station-btn:hover {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: #022c22;
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.8);
+  transform: translateY(-1px);
+}

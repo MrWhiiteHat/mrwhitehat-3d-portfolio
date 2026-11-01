@@ -21,7 +21,7 @@ import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 const SQLI_FLAG = 'FLAG{sqli_union_select_waf_bypassed}';
 const TIMING_FLAG = 'FLAG{side_channel_timing_leak_enumerated}';
 
-export default function BurpSuiteApp() {
+export default function BurpSuiteApp({ onOpenStation }) {
   const [activeTab, setActiveTab] = useState('repeater'); // 'repeater' | 'timing' | 'decoder'
   const [showHints, setShowHints] = useState(true);
 
@@ -149,15 +149,28 @@ export default function BurpSuiteApp() {
     if (!manualFlag.trim()) return;
     const clean = manualFlag.trim();
 
-    // Check against SQLi or Timing challenge
     let res = ctfEngine.submitFlag('web-sqli-waf-bypass', clean);
+    let targetStationId = 'server_rack';
+    let targetStationName = 'SERVER RACK MAINFRAME';
+
     if (!res.success && !res.duplicate) {
       res = ctfEngine.submitFlag('web-sidechannel-timing', clean);
+      targetStationId = 'achievements';
+      targetStationName = 'AWARDS / PROJECTOR';
     }
 
     if (res.success || res.duplicate) {
-      setFlagFeedback({ success: true, text: res.message });
+      const stationId = res.stationId || targetStationId;
+      setFlagFeedback({
+        success: true,
+        text: res.message,
+        stationId,
+        stationName: targetStationName
+      });
       playBreachFanfare();
+      setTimeout(() => {
+        onOpenStation?.(stationId);
+      }, 1800);
     } else {
       setFlagFeedback({ success: false, text: res.message });
       playZapSound();
@@ -603,6 +616,16 @@ export default function BurpSuiteApp() {
           <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
             {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
             <span>{flagFeedback.text}</span>
+            {flagFeedback.success && flagFeedback.stationId && (
+              <button
+                type="button"
+                className="cos-open-station-btn"
+                onClick={() => onOpenStation?.(flagFeedback.stationId)}
+                title="Open Unlocked 3D Station Information Dossier Now"
+              >
+                <span>🔓 VIEW {flagFeedback.stationName || 'STATION'} INFORMATION ➔</span>
+              </button>
+            )}
           </div>
         )}
       </div>

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Terminal, CheckCircle2, Play, Zap, ArrowRight, CornerDownLeft, HelpCircle } from 'lucide-react';
 import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
-import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
+import { ctfEngine, CHALLENGE_TO_STATION } from '../../../utils/ctf/ctfEngine.js';
 
 // Virtual Filesystem (VFS)
 const VFS = {
@@ -68,7 +68,7 @@ const VFS = {
   },
 };
 
-export default function CyberOSTerminal({ onOpenApp }) {
+export default function CyberOSTerminal({ onOpenApp, onOpenStation }) {
   const [cwd, setCwd] = useState('/home/guest');
   const [history, setHistory] = useState([
     'Linux kali-box 6.6.9-amd64 #1 SMP PREEMPT Kali 6.6.9-1kali1 (2026-01-15) x86_64',
@@ -264,17 +264,51 @@ export default function CyberOSTerminal({ onOpenApp }) {
           }
 
           if (solvedChallenge) {
+            const stationId = CHALLENGE_TO_STATION[solvedChallenge.id] || solvedChallenge.stationId;
             const curScore = typeof ctfEngine?.getScore === 'function' ? ctfEngine.getScore() : (ctfEngine?.getState?.()?.score ?? 0);
             newLines.push(
               `[+] SUCCESS! ${feedbackMsg}`,
               `[+] Challenge '${solvedChallenge.title}' (+${solvedChallenge.points} PTS) SOLVED!`,
+              stationId ? `[+] 🔓 STATION UNLOCKED: ${stationId.toUpperCase().replace('_', ' ')}` : '',
+              stationId ? `[+] Opening 3D station information window in 2s...` : '',
               `[+] Current CTF Score: ${curScore} PTS`
             );
             playBreachFanfare();
+            if (stationId) {
+              setTimeout(() => onOpenStation?.(stationId), 2000);
+            }
           } else {
             newLines.push(`[-] Verification Failed: "${flagStr}" does not match any challenge SHA-256 hash.`);
             playZapSound();
           }
+        }
+        break;
+      }
+
+      case 'open':
+      case 'dossier': {
+        const target = args[0]?.toLowerCase().trim();
+        if (!target) {
+          newLines.push('Usage: open <station_id> (e.g. projects, skills, about, resume, wireshark, server_rack, operator, contact)');
+        } else {
+          const mapping = {
+            wireshark: 'wireshark_monitor',
+            network: 'wireshark_monitor',
+            projects: 'projects',
+            skills: 'skills',
+            about: 'about',
+            resume: 'resume',
+            contact: 'contact',
+            operator: 'operator',
+            server: 'server_rack',
+            server_rack: 'server_rack',
+            hardware: 'hardware_arsenal',
+            vault: 'secret_vault',
+            visitor: 'visitor_log',
+          };
+          const resolved = mapping[target] || target;
+          newLines.push(`[*] Opening 3D station information dossier for: ${resolved.toUpperCase()}...`);
+          onOpenStation?.(resolved);
         }
         break;
       }

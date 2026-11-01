@@ -27,7 +27,7 @@ const TEST_PADS = [
   { id: 'TP6', name: 'TP6 (RESET_N)', type: 'reset', desc: 'Active-Low Hardware Reset' },
 ];
 
-export default function LogicAnalyzerApp() {
+export default function LogicAnalyzerApp({ onOpenStation }) {
   const [probeCh0, setProbeCh0] = useState('TP3'); // Connect to TP3 (TX)
   const [probeGnd, setProbeGnd] = useState('TP4'); // Connect to TP4 (GND)
   const [selectedBaud, setSelectedBaud] = useState('115200');
@@ -153,8 +153,17 @@ export default function LogicAnalyzerApp() {
     if (!manualFlag.trim()) return;
     const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag.trim());
     if (res.success || res.duplicate) {
-      setFlagFeedback({ success: true, text: res.message });
+      const stationId = res.stationId || 'resume';
+      setFlagFeedback({
+        success: true,
+        text: res.message,
+        stationId,
+        stationName: 'RESUME DOSSIER'
+      });
       playBreachFanfare();
+      setTimeout(() => {
+        onOpenStation?.(stationId);
+      }, 1800);
     } else {
       setFlagFeedback({ success: false, text: res.message });
       playZapSound();
@@ -370,6 +379,16 @@ export default function LogicAnalyzerApp() {
           <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
             {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
             <span>{flagFeedback.text}</span>
+            {flagFeedback.success && flagFeedback.stationId && (
+              <button
+                type="button"
+                className="cos-open-station-btn"
+                onClick={() => onOpenStation?.(flagFeedback.stationId)}
+                title="Open Unlocked 3D Station Information Dossier Now"
+              >
+                <span>🔓 VIEW {flagFeedback.stationName || 'STATION'} INFORMATION ➔</span>
+              </button>
+            )}
           </div>
         )}
       </div>

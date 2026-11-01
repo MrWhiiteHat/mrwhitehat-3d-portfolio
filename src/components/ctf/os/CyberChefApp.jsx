@@ -34,7 +34,7 @@ function caesarShift(text, shift) {
     .join('');
 }
 
-export default function CyberChefApp() {
+export default function CyberChefApp({ onOpenStation }) {
   const [inputText, setInputText] = useState(ENCRYPTED_TELEGRAM);
   const [caesarShiftKey, setCaesarShiftKey] = useState(-3);
   const [activeOps, setActiveOps] = useState(['caesar']);
@@ -53,8 +53,17 @@ export default function CyberChefApp() {
     if (!manualFlag.trim()) return;
     const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag.trim());
     if (res.success || res.duplicate) {
-      setFlagFeedback({ success: true, text: res.message });
+      const stationId = res.stationId || 'about';
+      setFlagFeedback({
+        success: true,
+        text: res.message,
+        stationId,
+        stationName: 'ABOUT DOSSIER'
+      });
       playBreachFanfare();
+      setTimeout(() => {
+        onOpenStation?.(stationId);
+      }, 1800);
     } else {
       setFlagFeedback({ success: false, text: res.message });
       playZapSound();
@@ -370,6 +379,16 @@ export default function CyberChefApp() {
           <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
             {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
             <span>{flagFeedback.text}</span>
+            {flagFeedback.success && flagFeedback.stationId && (
+              <button
+                type="button"
+                className="cos-open-station-btn"
+                onClick={() => onOpenStation?.(flagFeedback.stationId)}
+                title="Open Unlocked 3D Station Information Dossier Now"
+              >
+                <span>🔓 VIEW {flagFeedback.stationName || 'STATION'} INFORMATION ➔</span>
+              </button>
+            )}
           </div>
         )}
       </div>

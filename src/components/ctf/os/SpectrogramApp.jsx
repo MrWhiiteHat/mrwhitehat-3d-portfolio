@@ -17,7 +17,7 @@ import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 const CHALLENGE_ID = 'stego-spectrogram-carrier';
 const REVEALED_FLAG = 'FLAG{stego_audio_watermark_demodulated}';
 
-export default function SpectrogramApp() {
+export default function SpectrogramApp({ onOpenStation }) {
   const [carrierFreq, setCarrierFreq] = useState(115.0);
   const [bandpassFilter, setBandpassFilter] = useState('ALL_PASS');
   const [showHints, setShowHints] = useState(true);
@@ -106,8 +106,17 @@ export default function SpectrogramApp() {
     if (!manualFlag.trim()) return;
     const res = ctfEngine.submitFlag(CHALLENGE_ID, manualFlag.trim());
     if (res.success || res.duplicate) {
-      setFlagFeedback({ success: true, text: res.message });
+      const stationId = res.stationId || 'contact';
+      setFlagFeedback({
+        success: true,
+        text: res.message,
+        stationId,
+        stationName: 'CONTACT TERMINAL'
+      });
       playBreachFanfare();
+      setTimeout(() => {
+        onOpenStation?.(stationId);
+      }, 1800);
     } else {
       setFlagFeedback({ success: false, text: res.message });
       playZapSound();
@@ -319,6 +328,16 @@ export default function SpectrogramApp() {
           <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
             {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
             <span>{flagFeedback.text}</span>
+            {flagFeedback.success && flagFeedback.stationId && (
+              <button
+                type="button"
+                className="cos-open-station-btn"
+                onClick={() => onOpenStation?.(flagFeedback.stationId)}
+                title="Open Unlocked 3D Station Information Dossier Now"
+              >
+                <span>🔓 VIEW {flagFeedback.stationName || 'STATION'} INFORMATION ➔</span>
+              </button>
+            )}
           </div>
         )}
       </div>

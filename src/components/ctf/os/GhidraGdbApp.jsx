@@ -30,7 +30,7 @@ const ASM_INSTRUCTIONS = [
   { addr: '0x004011c1', hex: 'e8 a0 fe ff', asm: 'call <tamper_kill>', note: 'Tamper detected exit routine' },
 ];
 
-export default function GhidraGdbApp() {
+export default function GhidraGdbApp({ onOpenStation }) {
   const [activeTab, setActiveTab] = useState('reversing'); // 'reversing' | 'buffer'
   const [showHints, setShowHints] = useState(true);
 
@@ -162,13 +162,32 @@ export default function GhidraGdbApp() {
     const clean = manualFlag.trim();
 
     let res = ctfEngine.submitFlag('rev-anti-debug-patch', clean);
+    let targetStationId = 'operator';
+    let targetStationName = 'MRWHITEHAT OPERATOR';
+
     if (!res.success && !res.duplicate) {
       res = ctfEngine.submitFlag('pwn-stack-matrix-buffer', clean);
+      targetStationId = 'skills';
+      targetStationName = 'SKILLS ARCHIVE';
+    }
+    if (!res.success && !res.duplicate) {
+      res = ctfEngine.submitFlag('pwn-heap-race-condition', clean);
+      targetStationId = 'secret_vault';
+      targetStationName = 'BLACK HAT VAULT';
     }
 
     if (res.success || res.duplicate) {
-      setFlagFeedback({ success: true, text: res.message });
+      const stationId = res.stationId || targetStationId;
+      setFlagFeedback({
+        success: true,
+        text: res.message,
+        stationId,
+        stationName: targetStationName
+      });
       playBreachFanfare();
+      setTimeout(() => {
+        onOpenStation?.(stationId);
+      }, 1800);
     } else {
       setFlagFeedback({ success: false, text: res.message });
       playZapSound();
@@ -525,6 +544,16 @@ export default function GhidraGdbApp() {
           <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
             {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
             <span>{flagFeedback.text}</span>
+            {flagFeedback.success && flagFeedback.stationId && (
+              <button
+                type="button"
+                className="cos-open-station-btn"
+                onClick={() => onOpenStation?.(flagFeedback.stationId)}
+                title="Open Unlocked 3D Station Information Dossier Now"
+              >
+                <span>🔓 VIEW {flagFeedback.stationName || 'STATION'} INFORMATION ➔</span>
+              </button>
+            )}
           </div>
         )}
       </div>

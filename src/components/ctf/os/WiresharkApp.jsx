@@ -188,7 +188,7 @@ const PACKETS = [
   },
 ];
 
-export default function WiresharkApp() {
+export default function WiresharkApp({ onOpenStation }) {
   const [filterStr, setFilterStr] = useState('');
   const [selectedPacketNo, setSelectedPacketNo] = useState(7);
   const [showStreamModal, setShowStreamModal] = useState(false);
@@ -218,8 +218,17 @@ export default function WiresharkApp() {
     if (!flagInput.trim()) return;
     const res = ctfEngine.submitFlag(CHALLENGE_ID, flagInput.trim());
     if (res.success || res.duplicate) {
-      setFlagFeedback({ success: true, text: res.message });
+      const stationId = res.stationId || 'wireshark_monitor';
+      setFlagFeedback({
+        success: true,
+        text: res.message,
+        stationId,
+        stationName: 'WIRESHARK MONITOR'
+      });
       playBreachFanfare();
+      setTimeout(() => {
+        onOpenStation?.(stationId);
+      }, 1800);
     } else {
       setFlagFeedback({ success: false, text: res.message });
       playZapSound();
@@ -563,6 +572,16 @@ export default function WiresharkApp() {
           <div className={`cos-flag-feedback ${flagFeedback.success ? 'is-success' : 'is-error'}`}>
             {flagFeedback.success ? <CheckCircle2 size={13} /> : <Zap size={13} />}
             <span>{flagFeedback.text}</span>
+            {flagFeedback.success && flagFeedback.stationId && (
+              <button
+                type="button"
+                className="cos-open-station-btn"
+                onClick={() => onOpenStation?.(flagFeedback.stationId)}
+                title="Open Unlocked 3D Station Information Dossier Now"
+              >
+                <span>🔓 VIEW {flagFeedback.stationName || 'STATION'} INFORMATION ➔</span>
+              </button>
+            )}
           </div>
         )}
       </div>

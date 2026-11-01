@@ -15,9 +15,9 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
-import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
+import { ctfEngine, CHALLENGE_TO_STATION } from '../../../utils/ctf/ctfEngine.js';
 
-export default function CTFMissionsApp({ onOpenApp }) {
+export default function CTFMissionsApp({ onOpenApp, onOpenStation }) {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [flagInput, setFlagInput] = useState('');
   const [feedback, setFeedback] = useState(null);
@@ -51,9 +51,21 @@ export default function CTFMissionsApp({ onOpenApp }) {
     }
 
     if (matched) {
-      setFeedback({ success: true, text: result.message, title: matched.title, points: matched.points });
+      const stationId = result.stationId || CHALLENGE_TO_STATION[matched.id] || matched.stationId;
+      setFeedback({
+        success: true,
+        text: result.message,
+        title: matched.title,
+        points: matched.points,
+        stationId
+      });
       setFlagInput('');
       playBreachFanfare();
+      if (stationId) {
+        setTimeout(() => {
+          onOpenStation?.(stationId);
+        }, 1800);
+      }
     } else {
       setFeedback({ success: false, text: `Flag "${clean}" is invalid or does not match any challenge checksum.` });
       playZapSound();
@@ -190,6 +202,18 @@ export default function CTFMissionsApp({ onOpenApp }) {
                       <span>Launch in {tool.name}</span>
                     </button>
 
+                    {isSolved && (CHALLENGE_TO_STATION[ch.id] || ch.stationId) && (
+                      <button
+                        type="button"
+                        className="cos-btn"
+                        style={{ fontSize: '10px', padding: '3px 8px', background: 'rgba(16, 185, 129, 0.2)', borderColor: '#34d399', color: '#6ee7b7' }}
+                        onClick={() => onOpenStation?.(CHALLENGE_TO_STATION[ch.id] || ch.stationId)}
+                        title="Open Unlocked 3D Station Information Dossier"
+                      >
+                        <span>🔓 View 3D Station</span>
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       className={`cos-btn ${isExpanded ? 'cos-btn-primary' : ''}`}
@@ -277,6 +301,16 @@ export default function CTFMissionsApp({ onOpenApp }) {
             <span>
               {feedback.success ? `SUCCESS! [${feedback.title}] (+${feedback.points} PTS) - ${feedback.text}` : feedback.text}
             </span>
+            {feedback.success && feedback.stationId && (
+              <button
+                type="button"
+                className="cos-open-station-btn"
+                onClick={() => onOpenStation?.(feedback.stationId)}
+                title="Open Unlocked 3D Station Information Dossier Now"
+              >
+                <span>🔓 VIEW STATION INFORMATION ➔</span>
+              </button>
+            )}
           </div>
         )}
       </div>

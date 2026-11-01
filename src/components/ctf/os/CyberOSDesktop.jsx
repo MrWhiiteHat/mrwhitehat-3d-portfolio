@@ -107,6 +107,7 @@ export default function CyberOSDesktop({
   onClose,
   initialApp = 'ctf',
   onOpenRecruiter = null,
+  onOpenStation = null,
 }) {
   const [openWindows, setOpenWindows] = useState({});
   const [activeWindowId, setActiveWindowId] = useState(null);
@@ -246,23 +247,23 @@ export default function CyberOSDesktop({
   const renderAppContent = (appId) => {
     switch (appId) {
       case 'terminal':
-        return <CyberOSTerminal onOpenApp={openApp} />;
+        return <CyberOSTerminal onOpenApp={openApp} onOpenStation={onOpenStation} />;
       case 'wireshark':
-        return <WiresharkApp />;
+        return <WiresharkApp onOpenStation={onOpenStation} />;
       case 'burp':
-        return <BurpSuiteApp />;
+        return <BurpSuiteApp onOpenStation={onOpenStation} />;
       case 'ghidra':
-        return <GhidraGdbApp />;
+        return <GhidraGdbApp onOpenStation={onOpenStation} />;
       case 'cyberchef':
-        return <CyberChefApp />;
+        return <CyberChefApp onOpenStation={onOpenStation} />;
       case 'logic':
-        return <LogicAnalyzerApp />;
+        return <LogicAnalyzerApp onOpenStation={onOpenStation} />;
       case 'spectrogram':
-        return <SpectrogramApp />;
+        return <SpectrogramApp onOpenStation={onOpenStation} />;
       case 'ctf':
-        return <CTFMissionsApp onOpenApp={openApp} />;
+        return <CTFMissionsApp onOpenApp={openApp} onOpenStation={onOpenStation} />;
       default:
-        return <CyberOSTerminal onOpenApp={openApp} />;
+        return <CyberOSTerminal onOpenApp={openApp} onOpenStation={onOpenStation} />;
     }
   };
 
