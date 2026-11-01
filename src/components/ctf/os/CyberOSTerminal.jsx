@@ -7,7 +7,14 @@ import { ctfEngine, CHALLENGE_TO_STATION } from '../../../utils/ctf/ctfEngine.js
 const VFS = {
   '/home/guest': {
     type: 'dir',
-    files: ['README.txt', 'notes.txt', 'hints.txt', 'submit_flag.sh'],
+    files: ['README.txt', 'notes.txt', 'hints.txt', 'submit_flag.sh', '.override'],
+  },
+  '/home/guest/.override': {
+    type: 'file',
+    content:
+      '[CTOS SEC-CLEARANCE PROTOCOL]\n' +
+      'Emergency Air-Gap Bypass Keyword: "white"\n' +
+      'Enter keyword directly into terminal console to engage 3D physical network bypass.',
   },
   '/home/guest/README.txt': {
     type: 'file',
@@ -130,19 +137,23 @@ export default function CyberOSTerminal({ onOpenApp, onOpenStation, onLaunchEast
           '  cyberchef            Launch CyberChef Cryptanalysis Suite GUI',
           '  logic                Launch PulseView Hardware Logic Analyzer GUI',
           '  spectrogram          Launch SonicVisualizer Audio Stego GUI',
-          '  ctf                  Launch CTF Mission Control Center GUI',
-          '  netrun               Launch Watch Dogs 2 3D Hacking Circuit Easter Egg'
+          '  ctf                  Launch CTF Mission Control Center GUI'
         );
         break;
 
+      case 'white':
+      case 'mrwhite':
+      case 'mrwhitehat':
+      case 'hack':
       case 'netrun':
       case 'easteregg':
       case 'easter':
       case 'bypass':
         newLines.push(
-          '[*] DISENGAGING KALI LINUX CTF SANDBOX...',
-          '[*] CONNECTING TO CTOS 3D CIRCUIT MESH FREQUENCY...',
-          '[*] Launching Watch Dogs 2 3D Hacking Circuit Easter Egg...'
+          '[*] [!] SYSTEM OVERRIDE SEQUENCE DETECTED...',
+          '[*] AUTHENTICATING OPERATIVE KEY: "WHITE"...',
+          '[*] CLEARANCE GRANTED // BREACHING CTOS 3D AIR-GAP MESH...',
+          '[*] INITIATING 3D CIRCUIT NETWORK BYPASS...'
         );
         setTimeout(() => {
           onLaunchEasterEgg?.();

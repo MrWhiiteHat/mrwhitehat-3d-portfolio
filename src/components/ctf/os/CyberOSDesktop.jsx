@@ -101,14 +101,6 @@ const APP_REGISTRY = {
     defaultSize: { w: 840, h: 550 },
     defaultPos: { x: 100, y: 50 },
   },
-  netrun: {
-    id: 'netrun',
-    title: 'Watch Dogs 2 Netrun 3D Bypass [⚡]',
-    icon: Zap,
-    category: 'Easter Egg',
-    defaultSize: { w: 700, h: 450 },
-    defaultPos: { x: 100, y: 60 },
-  },
 };
 
 export default function CyberOSDesktop({

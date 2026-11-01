@@ -113,6 +113,7 @@ export default function App() {
 
   // Game State Machine: 'CUSTOMIZE' | 'AIRLOCK_ENTRY' | 'EXPLORE' | 'INSPECT_STATION'
   const [gameState, setGameState] = useState('CUSTOMIZE');
+  const keyBufferRef = useRef('');
 
   // Player customized avatar & telemetry
   const [playerData, setPlayerData] = useState({
@@ -755,6 +756,7 @@ export default function App() {
       // Disallow triggering station inspection or appliances during hacker Easter egg mode
       if (gameState === 'HACKING' || gameState === 'ANNOUNCEMENT') return;
 
+
       // Interactive Studio Appliances (AC, Fan, Lights)
       if (stationId === 'air_conditioner') {
         window.__TOGGLE_AC__?.();
@@ -937,6 +939,20 @@ export default function App() {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (gameState === 'HACKING' || gameState === 'ANNOUNCEMENT') return;
 
+      // Secret Hacker Keystroke Detector: Type 'mrwhite' or 'hack'
+      if (e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        keyBufferRef.current = (keyBufferRef.current + e.key.toLowerCase()).slice(-20);
+        if (
+          keyBufferRef.current.endsWith('mrwhite') ||
+          keyBufferRef.current.endsWith('hack') ||
+          keyBufferRef.current.endsWith('mrwhitehat')
+        ) {
+          keyBufferRef.current = '';
+          handleLaunchEasterEgg();
+          return;
+        }
+      }
+
       if (e.key === 'Escape') {
         if (isUserGuideOpen) {
           setIsUserGuideOpen(false);
@@ -996,8 +1012,6 @@ export default function App() {
 
       } else if (e.key === 'r' || e.key === 'R') {
         handleToggleRecruiter();
-      } else if (e.key === 'n' || e.key === 'N') {
-        handleLaunchEasterEgg();
       } else if (e.key === 'h' || e.key === 'H' || e.key === '?') {
         setIsUserGuideOpen((prev) => !prev);
       } else if (e.key === 'o' || e.key === 'O') {
@@ -1263,14 +1277,6 @@ export default function App() {
           </div>
 
           <div className="station-quick-controls">
-            <button
-              type="button"
-              className="hud-action-btn"
-              onClick={handleLaunchEasterEgg}
-              title="Launch Watch Dogs 2 3D Circuit Network Bypass [N]"
-            >
-              <Zap size={15} style={{ color: '#00f3ff' }} />
-            </button>
             <button
               type="button"
               className="hud-action-btn"

@@ -104,9 +104,30 @@ export default function GameHUD({
     '💡 TIP: Press [R] anytime for the Executive 2D Recruiter Dossier',
     '💡 TIP: Press [C] or tap [CYBER OS] to launch Kali Linux desktop with Wireshark, Burp, Ghidra & CTF tools',
     '💡 TIP: Adjust the real Air Conditioner ❄️ and Fan 🌀 in Studio Settings',
-    '💡 TIP: Press [N] or tap [⚡ NETRUN] to launch Watch Dogs 2 3D Hacking Circuit Easter Egg',
   ];
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
+
+  // Secret 5-tap avatar Easter Egg trigger for mobile & touch/mouse
+  const secretTapCountRef = useRef(0);
+  const secretLastTapTimeRef = useRef(0);
+
+  const handleSecretBadgeClick = () => {
+    if (!onLaunchEasterEgg) return;
+    const now = Date.now();
+    if (now - secretLastTapTimeRef.current > 2500) {
+      secretTapCountRef.current = 1;
+    } else {
+      secretTapCountRef.current += 1;
+    }
+    secretLastTapTimeRef.current = now;
+
+    if (secretTapCountRef.current < 5) {
+      playHackingBeep(700 + secretTapCountRef.current * 160);
+    } else {
+      secretTapCountRef.current = 0;
+      onLaunchEasterEgg();
+    }
+  };
 
   useEffect(() => {
     const tipInterval = setInterval(() => {
@@ -342,7 +363,7 @@ export default function GameHUD({
       <header className="hud-top-bar">
         {/* Left Section: Compact Operative Identity & Breach Progress */}
         <div className="hud-left-group">
-          <div className="hud-agent-card">
+          <div className="hud-agent-card" onClick={handleSecretBadgeClick} style={{ cursor: "pointer" }} title="Operative Identity">
             <div
               className="hud-agent-avatar"
               style={{ borderColor: playerData.accentColor || '#34d399' }}
@@ -439,21 +460,7 @@ export default function GameHUD({
             </button>
           )}
 
-          {/* Discreet Watch Dogs 2 Netrun Easter Egg Pill */}
-          {isEasterEggAvailable && (
-            <button
-              type="button"
-              className="hud-netrun-pill"
-              onClick={() => {
-                playClickSound(1200);
-                onLaunchEasterEgg?.();
-              }}
-              title="Launch Watch Dogs 2 3D Circuit Network Bypass [N]"
-            >
-              <Zap size={13} style={{ color: '#00f0ff' }} />
-              <span className="netrun-pill-label">NETRUN</span>
-            </button>
-          )}
+          
         </div>
 
         {/* Right Section: Utilities & Studio Controls */}

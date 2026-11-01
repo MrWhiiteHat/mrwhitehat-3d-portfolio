@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   BriefcaseBusiness,
@@ -188,6 +188,28 @@ export default function CharacterSelectModal({
 
   const [autoFullscreen, setAutoFullscreen] = useState(true);
 
+  // Secret 5-tap avatar Easter Egg trigger for mobile & touch/mouse
+  const avatarTapCountRef = useRef(0);
+  const avatarLastTapTimeRef = useRef(0);
+
+  const handleSecretAvatarTap = () => {
+    if (!onLaunchEasterEgg) return;
+    const now = Date.now();
+    if (now - avatarLastTapTimeRef.current > 2500) {
+      avatarTapCountRef.current = 1;
+    } else {
+      avatarTapCountRef.current += 1;
+    }
+    avatarLastTapTimeRef.current = now;
+
+    if (avatarTapCountRef.current < 5) {
+      playHackingBeep(700 + avatarTapCountRef.current * 160);
+    } else {
+      avatarTapCountRef.current = 0;
+      onLaunchEasterEgg();
+    }
+  };
+
   const handleLaunch = (customName) => {
     const finalName = (customName || name).trim() || 'Guest Operative';
     playWhooshSound();
@@ -218,18 +240,6 @@ export default function CharacterSelectModal({
             <span>TERMINAL // 3D WORKSPACE VISITOR CLEARANCE</span>
           </div>
           <div className="char-header-right">
-            {onLaunchEasterEgg && (
-              <button
-                type="button"
-                className="char-fullscreen-toggle-btn netrun-trigger-btn"
-                onClick={onLaunchEasterEgg}
-                title="Launch Watch Dogs 2 3D Circuit Network Bypass [N]"
-                style={{ borderColor: 'rgba(0, 243, 255, 0.4)', color: '#00f3ff' }}
-              >
-                <Zap size={13} />
-                <span>NETRUN 3D</span>
-              </button>
-            )}
             <button
               type="button"
               className={`char-fullscreen-toggle-btn ${isFullscreen ? 'is-active' : ''}`}
@@ -255,7 +265,7 @@ export default function CharacterSelectModal({
               <div className="preview-holo-scanline" />
             </div>
 
-            <div className="preview-badge-footer">
+            <div className="preview-badge-footer" onClick={handleSecretAvatarTap} style={{ cursor: "pointer" }} title="3D Avatar Holo Matrix">
               <span className="badge-agent-title">3D AVATAR PREVIEW</span>
               <strong
                 className="badge-agent-name"
