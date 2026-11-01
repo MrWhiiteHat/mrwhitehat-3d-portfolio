@@ -19,6 +19,7 @@ import {
   Clock,
   Shield,
   FileText,
+  Zap,
 } from 'lucide-react';
 import { playClickSound, playWhooshSound, playZapSound } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
