@@ -354,6 +354,7 @@ function SceneContents({
   onOpenLeaderboard = null,
   hackerModeData = null,
   onStationBreached = null,
+  onStationRelocked = null,
   controlSettings = null,
   onOpenCyberOS = null,
 }) {
@@ -477,6 +478,7 @@ function SceneContents({
         {!hackerModeData?.isActive && (
           <InObjectDisplay
             onStationBreached={onStationBreached}
+            onStationRelocked={onStationRelocked}
             activeSection={activeSection}
             onClose={onDeselect}
             onNavigate={(sec) => {
@@ -578,6 +580,7 @@ export default function OfficeScene({
   onOpenRecruiter = null,
   hackerModeData = null,
   onStationBreached = null,
+  onStationRelocked = null,
   controlSettings = null,
   onOpenCyberOS = null,
 }) {
@@ -676,6 +679,7 @@ export default function OfficeScene({
             onReady={onReady}
             hackerModeData={hackerModeData}
             onStationBreached={onStationBreached}
+            onStationRelocked={onStationRelocked}
             controlSettings={controlSettings}
             onOpenCyberOS={onOpenCyberOS}
           />

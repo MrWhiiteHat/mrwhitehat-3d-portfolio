@@ -153,13 +153,13 @@ export default function BurpSuiteApp({ onOpenStation }) {
     let targetStationId = 'server_rack';
     let targetStationName = 'SERVER RACK MAINFRAME';
 
-    if (!res.success && !res.duplicate) {
+    if (!res.success) {
       res = ctfEngine.submitFlag('web-sidechannel-timing', clean);
       targetStationId = 'achievements';
       targetStationName = 'AWARDS / PROJECTOR';
     }
 
-    if (res.success || res.duplicate) {
+    if (res.success) {
       const stationId = res.stationId || targetStationId;
       setFlagFeedback({
         success: true,

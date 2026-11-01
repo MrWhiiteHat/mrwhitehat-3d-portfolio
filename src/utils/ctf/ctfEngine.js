@@ -7,7 +7,7 @@
 import { verifyFlagHash, normalizeFlag } from './cryptoUtils.js';
 import { CTF_CHALLENGES, getChallengeById } from './ctfChallenges.js';
 import { playBreachFanfare, playHackingBeep, playZapSound } from '../audio.js';
-import { markStationCompleted } from '../../components/easteregg/easterEggState.js';
+import { markStationCompleted, removeCompletedStation, saveCompletedStations } from '../../components/easteregg/easterEggState.js';
 
 const STORAGE_KEY = 'mrwhitehat_ctf_state_v1';
 
@@ -201,6 +201,34 @@ class CTFEngine {
     return Boolean(this.state.solvedChallenges[challengeId]);
   }
 
+  relockChallenge(challengeId) {
+    let changed = false;
+    if (this.state.solvedChallenges && this.state.solvedChallenges[challengeId]) {
+      delete this.state.solvedChallenges[challengeId];
+      changed = true;
+    }
+    const stationId = CHALLENGE_TO_STATION[challengeId];
+    if (stationId) {
+      try {
+        removeCompletedStation(stationId);
+      } catch (_) {}
+    }
+    if (changed) {
+      this.saveState();
+    }
+    return changed;
+  }
+
+  relockAllChallenges() {
+    this.state.solvedChallenges = {};
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        saveCompletedStations([]);
+      } catch (_) {}
+    }
+    this.saveState();
+  }
+
   getUnlockedHints(challengeId) {
     return this.state.unlockedHints[challengeId] || [];
   }
@@ -240,22 +268,6 @@ class CTFEngine {
 
     const stationId = CHALLENGE_TO_STATION[challengeId] || challenge.stationId;
 
-    if (this.isChallengeSolved(challengeId)) {
-      if (stationId) {
-        try {
-          markStationCompleted(stationId);
-        } catch (_) {}
-      }
-      return {
-        success: false,
-        duplicate: true,
-        alreadySolved: true,
-        challenge,
-        stationId,
-        message: `Challenge "${challenge.title}" is already solved! Station unlocked.`,
-      };
-    }
-
     const isValid = verifyFlagHash(normalized, challenge.flagHash);
 
     const logEntry = {
@@ -273,7 +285,30 @@ class CTFEngine {
       this.saveState();
       return {
         success: false,
+        duplicate: false,
+        alreadySolved: false,
         message: 'INVALID FLAG: Checksum hash does not match challenge target.',
+      };
+    }
+
+    // Flag is valid! Check if previously solved
+    if (this.isChallengeSolved(challengeId)) {
+      if (stationId) {
+        try {
+          markStationCompleted(stationId);
+        } catch (_) {}
+      }
+      try {
+        playBreachFanfare();
+      } catch (_) {}
+      return {
+        success: true,
+        duplicate: true,
+        alreadySolved: true,
+        pointsAwarded: 0,
+        challenge,
+        stationId,
+        message: `✔ FLAG VERIFIED! [CORRECT] Challenge "${challenge.title}" re-verified. Access confirmed!`,
       };
     }
 

@@ -53,6 +53,12 @@ export function markStationCompleted(stationId) {
   return current;
 }
 
+export function removeCompletedStation(stationId) {
+  const current = getCompletedStations().filter((id) => id !== stationId);
+  saveCompletedStations(current);
+  return current;
+}
+
 export function hasCompletedAllStations(stations) {
   if (!stations) return false;
   const list = stations instanceof Set ? Array.from(stations) : Array.isArray(stations) ? stations : [];

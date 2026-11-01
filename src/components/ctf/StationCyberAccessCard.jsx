@@ -136,24 +136,17 @@ export default function StationCyberAccessCard({ sectionKey, onLaunchOS, onBypas
   const [feedback, setFeedback] = useState(null);
   const isAlreadySolved = ctfEngine.isChallengeSolved(challenge.id);
 
-  // If already solved, automatically trigger onSolved to unlock the station information
-  useEffect(() => {
-    if (ctfEngine.isChallengeSolved(challenge.id)) {
-      onSolved?.();
-    }
-  }, [challenge.id, onSolved]);
-
   const handleQuickSubmit = (e) => {
     e.preventDefault();
     if (!flagInput.trim()) return;
     const res = ctfEngine.submitFlag(challenge.id, flagInput.trim());
 
-    if (res.success || res.duplicate) {
+    if (res.success) {
       setFeedback({ success: true, text: res.message });
       playBreachFanfare();
       setTimeout(() => {
         onSolved?.();
-      }, 350);
+      }, 450);
     } else {
       setFeedback({ success: false, text: res.message });
       playZapSound();
@@ -165,7 +158,20 @@ export default function StationCyberAccessCard({ sectionKey, onLaunchOS, onBypas
       {/* Header Strip */}
       <div className="scac-header-strip">
         <span className="scac-category-tag">{challenge.category}</span>
-        <span className="scac-points-tag">+{challenge.points} CTF PTS</span>
+        {isAlreadySolved ? (
+          <span
+            className="scac-points-tag"
+            style={{
+              background: 'rgba(34, 197, 94, 0.15)',
+              color: '#4ade80',
+              borderColor: 'rgba(74, 222, 128, 0.4)',
+            }}
+          >
+            ✓ SOLVED (REPLAY ACTIVE)
+          </span>
+        ) : (
+          <span className="scac-points-tag">+{challenge.points} CTF PTS</span>
+        )}
       </div>
 
       {/* Challenge Title & Objective */}

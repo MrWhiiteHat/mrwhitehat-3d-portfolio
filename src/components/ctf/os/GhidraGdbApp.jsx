@@ -165,18 +165,18 @@ export default function GhidraGdbApp({ onOpenStation }) {
     let targetStationId = 'operator';
     let targetStationName = 'MRWHITEHAT OPERATOR';
 
-    if (!res.success && !res.duplicate) {
+    if (!res.success) {
       res = ctfEngine.submitFlag('pwn-stack-matrix-buffer', clean);
       targetStationId = 'skills';
       targetStationName = 'SKILLS ARCHIVE';
     }
-    if (!res.success && !res.duplicate) {
+    if (!res.success) {
       res = ctfEngine.submitFlag('pwn-heap-race-condition', clean);
       targetStationId = 'secret_vault';
       targetStationName = 'BLACK HAT VAULT';
     }
 
-    if (res.success || res.duplicate) {
+    if (res.success) {
       const stationId = res.stationId || targetStationId;
       setFlagFeedback({
         success: true,

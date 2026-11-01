@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Flag,
   CheckCircle2,
@@ -13,6 +13,7 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  RotateCcw,
 } from 'lucide-react';
 import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
 import { ctfEngine, CHALLENGE_TO_STATION } from '../../../utils/ctf/ctfEngine.js';
@@ -22,9 +23,17 @@ export default function CTFMissionsApp({ onOpenApp, onOpenStation }) {
   const [flagInput, setFlagInput] = useState('');
   const [feedback, setFeedback] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
+  const [engineState, setEngineState] = useState(() => ctfEngine.getState());
+
+  useEffect(() => {
+    const unsub = ctfEngine.subscribe((state) => {
+      setEngineState({ ...state });
+    });
+    return () => unsub();
+  }, []);
 
   const challenges = (typeof ctfEngine?.getAllChallenges === 'function' ? ctfEngine.getAllChallenges() : []) || [];
-  const ctfState = ctfEngine.getState();
+  const ctfState = engineState;
 
   const categories = ['ALL', 'WEB', 'CRYPTO', 'REV', 'FORENSICS', 'PWN', 'NET', 'STEGO', 'OSINT'];
 
@@ -43,7 +52,7 @@ export default function CTFMissionsApp({ onOpenApp, onOpenStation }) {
 
     for (const ch of challenges) {
       const res = ctfEngine.submitFlag(ch.id, clean);
-      if (res.success || res.duplicate) {
+      if (res.success) {
         matched = ch;
         result = res;
         break;
@@ -112,8 +121,8 @@ export default function CTFMissionsApp({ onOpenApp, onOpenStation }) {
           </span>
         </div>
 
-        {/* Category Filter Buttons */}
-        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+        {/* Category Filter Buttons & Re-lock All */}
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
           {categories.map((cat) => (
             <button
               key={cat}
@@ -128,6 +137,26 @@ export default function CTFMissionsApp({ onOpenApp, onOpenStation }) {
               {cat}
             </button>
           ))}
+          <button
+            type="button"
+            className="cos-btn"
+            style={{
+              fontSize: '10px',
+              padding: '2px 8px',
+              background: 'rgba(239, 68, 68, 0.15)',
+              borderColor: '#ef4444',
+              color: '#fca5a5',
+              marginLeft: '4px',
+            }}
+            onClick={() => {
+              playClickSound(800);
+              ctfEngine.relockAllChallenges();
+            }}
+            title="Re-lock all challenges and reset CTF progress for complete replay"
+          >
+            <RotateCcw size={10} />
+            <span>Re-lock All 🔒</span>
+          </button>
         </div>
       </div>
 
@@ -135,7 +164,7 @@ export default function CTFMissionsApp({ onOpenApp, onOpenStation }) {
       <div className="cos-app-body" style={{ overflowY: 'auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '10px' }}>
           {filtered.map((ch) => {
-            const isSolved = ctfEngine.isChallengeSolved(ch.id);
+            const isSolved = Boolean(engineState.solvedChallenges?.[ch.id]);
             const tool = getToolForChallenge(ch.id);
             const isExpanded = expandedId === ch.id;
 
@@ -211,6 +240,28 @@ export default function CTFMissionsApp({ onOpenApp, onOpenStation }) {
                         title="Open Unlocked 3D Station Information Dossier"
                       >
                         <span>🔓 View 3D Station</span>
+                      </button>
+                    )}
+
+                    {isSolved && (
+                      <button
+                        type="button"
+                        className="cos-btn"
+                        style={{
+                          fontSize: '10px',
+                          padding: '3px 8px',
+                          background: 'rgba(239, 68, 68, 0.12)',
+                          borderColor: '#ef4444',
+                          color: '#fca5a5',
+                        }}
+                        onClick={() => {
+                          playClickSound(800);
+                          ctfEngine.relockChallenge(ch.id);
+                        }}
+                        title="Re-lock this challenge to replay and solve again"
+                      >
+                        <Lock size={10} />
+                        <span>Re-lock 🔒</span>
                       </button>
                     )}
 

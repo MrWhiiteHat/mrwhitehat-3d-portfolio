@@ -70,13 +70,23 @@ if (!validRes.success || validRes.pointsAwarded !== testChal.points - hintCost) 
   console.log(`  ✔ Valid flag accepted with hint deduction: +${validRes.pointsAwarded} pts (Base: ${testChal.points}, Penalty: -${hintCost})`);
 }
 
-// Duplicate submission test
+// Re-verification test on already-solved challenge:
+// Valid flag must return success: true, duplicate: true, alreadySolved: true, pointsAwarded: 0
 const dupRes = ctfEngine.submitFlag(testChal.id, KNOWN_FLAGS[testChal.id]);
-if (dupRes.success !== false || !dupRes.duplicate) {
-  console.error('❌ Duplicate flag was not flagged as duplicate!');
+if (!dupRes.success || !dupRes.duplicate || !dupRes.alreadySolved || dupRes.pointsAwarded !== 0) {
+  console.error('❌ Re-verification of solved flag failed or gave duplicate points!', dupRes);
   errors++;
 } else {
-  console.log('  ✔ Duplicate submission blocked correctly without extra points.');
+  console.log('  ✔ Valid flag re-verification confirmed access without duplicate point inflation.');
+}
+
+// Submitting WRONG flag on an already-solved challenge must still fail (not claim already solved)
+const wrongOnSolved = ctfEngine.submitFlag(testChal.id, 'FLAG{completely_wrong}');
+if (wrongOnSolved.success !== false || wrongOnSolved.alreadySolved) {
+  console.error('❌ Invalid flag on solved challenge was masked as already solved or succeeded!');
+  errors++;
+} else {
+  console.log('  ✔ Invalid flag on solved challenge was correctly rejected with hash mismatch.');
 }
 
 // 3. Test Badges and State Progression
@@ -123,6 +133,43 @@ for (const [st, chId] of Object.entries(STATION_TO_CHALLENGE)) {
 }
 if (mappingErrors === 0) {
   console.log('  ✔ All bidirectional Station <-> Challenge mappings verified.');
+}
+
+// 5. Test Relocking and Re-solving
+console.log('\n[TEST 5] Testing Relocking & Re-solving Capability...');
+const relocked = ctfEngine.relockChallenge(testChal.id);
+if (!relocked || ctfEngine.isChallengeSolved(testChal.id)) {
+  console.error(`❌ Failed to relock challenge ${testChal.id}`);
+  errors++;
+} else {
+  console.log(`  ✔ Challenge "${testChal.id}" successfully relocked.`);
+}
+
+const stationsAfterRelock = getCompletedStations();
+if (stationsAfterRelock.includes(stationForTestChal)) {
+  console.error(`❌ Station ${stationForTestChal} was NOT removed from completed stations on relock!`);
+  errors++;
+} else {
+  console.log(`  ✔ Station "${stationForTestChal}" successfully removed from completed stations.`);
+}
+
+// Now re-solve the relocked challenge
+const resolveRes = ctfEngine.submitFlag(testChal.id, KNOWN_FLAGS[testChal.id]);
+if (!resolveRes.success || resolveRes.duplicate || !ctfEngine.isChallengeSolved(testChal.id)) {
+  console.error(`❌ Failed to re-solve relocked challenge!`, resolveRes);
+  errors++;
+} else {
+  console.log(`  ✔ Re-solving relocked challenge succeeded! +${resolveRes.pointsAwarded} pts awarded.`);
+}
+
+// Test relockAllChallenges
+ctfEngine.relockAllChallenges();
+const stateAfterRelockAll = ctfEngine.getState();
+if (Object.keys(stateAfterRelockAll.solvedChallenges).length !== 0) {
+  console.error('❌ relockAllChallenges did not clear all solved challenges!');
+  errors++;
+} else {
+  console.log('  ✔ relockAllChallenges cleared all challenge solves.');
 }
 
 console.log('\n========================================');

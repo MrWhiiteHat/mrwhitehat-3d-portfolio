@@ -256,7 +256,7 @@ export default function CyberOSTerminal({ onOpenApp, onOpenStation }) {
 
           for (const ch of activeChallenges) {
             const res = ctfEngine.submitFlag(ch.id, flagStr);
-            if (res.success || res.duplicate) {
+            if (res.success) {
               solvedChallenge = ch;
               feedbackMsg = res.message;
               break;

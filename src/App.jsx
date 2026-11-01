@@ -5,6 +5,7 @@ import { STAGES, evaluateCircuit, NODE_TYPES } from './components/easteregg/circ
 import {
   getCompletedStations,
   markStationCompleted,
+  removeCompletedStation,
   hasCompletedAllStations,
   isEasterEggDiscovered,
   markEasterEggDiscovered,
@@ -69,7 +70,7 @@ import GadgetInspectorModal from './components/gadgets/GadgetInspectorModal.jsx'
 import RecruiterDossierModal from './components/recruiter/RecruiterDossierModal.jsx';
 import UserGuideModal from './components/game/UserGuideModal.jsx';
 import CyberOSDesktop from './components/ctf/os/CyberOSDesktop.jsx';
-import { ctfEngine, CHALLENGE_TO_STATION } from './utils/ctf/ctfEngine.js';
+import { ctfEngine, CHALLENGE_TO_STATION, STATION_TO_CHALLENGE } from './utils/ctf/ctfEngine.js';
 import { profile } from './data.js';
 import { useFullscreen } from './utils/useFullscreen.js';
 import { useControlSettings } from './utils/useControlSettings.js';
@@ -510,6 +511,19 @@ export default function App() {
     }, 1100);
   }, [initHackerStage]);
 
+  const handleStationRelocked = useCallback((stationId) => {
+    removeCompletedStation(stationId);
+    const challengeId = STATION_TO_CHALLENGE[stationId];
+    if (challengeId) {
+      ctfEngine.relockChallenge(challengeId);
+    }
+    setUnlockedStations((prev) => {
+      const next = new Set(prev);
+      next.delete(stationId);
+      return next;
+    });
+  }, []);
+
   const handleStationBreached = useCallback((stationId) => {
     markStationCompleted(stationId);
     setUnlockedStations((prev) => {
@@ -911,8 +925,14 @@ export default function App() {
       };
       window.__RESET_HACKER_EASTER_EGG__ = () => {
         resetEasterEggProgress();
+        ctfEngine.relockAllChallenges();
         setUnlockedStations(new Set());
         setGameState('EXPLORE');
+      };
+      window.__RELOCK_ALL_HACKS__ = () => {
+        REQUIRED_STATIONS.forEach((st) => removeCompletedStation(st));
+        ctfEngine.relockAllChallenges();
+        setUnlockedStations(new Set());
       };
     }
 
@@ -1053,6 +1073,7 @@ export default function App() {
           onRestartEasterEgg: handleRestartEasterEgg,
         }}
         onStationBreached={handleStationBreached}
+        onStationRelocked={handleStationRelocked}
       />
 
       {/* 0. HIGH-TECH CYBER PRELOADER LOADING SCREEN (Pre-loads 3D models & pre-warms shaders) */}

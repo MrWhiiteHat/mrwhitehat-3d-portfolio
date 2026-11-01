@@ -1,4 +1,4 @@
-import { getCompletedStations, markStationCompleted } from './easteregg/easterEggState.js';
+import { getCompletedStations, markStationCompleted, removeCompletedStation } from './easteregg/easterEggState.js';
 import { useEffect, useState } from 'react';
 import { Html } from '@react-three/drei';
 import {
@@ -233,6 +233,7 @@ export default function InObjectDisplay({
   onOpenGadgets = null,
   onOpenLeaderboard = null,
   onStationBreached = null,
+  onStationRelocked = null,
   onOpenCyberOS = null,
 }) {
   const [selectedProject, setSelectedProject] = useState(0);
@@ -286,16 +287,14 @@ export default function InObjectDisplay({
   useEffect(() => {
     const syncFromCtf = () => {
       const saved = getCompletedStations();
-      setUnlockedStations((prev) => {
-        const next = { ...prev };
-        saved.forEach((st) => { next[st] = true; });
-        Object.entries(STATION_TO_CHALLENGE).forEach(([st, chId]) => {
-          if (chId && ctfEngine.isChallengeSolved(chId)) {
-            next[st] = true;
-          }
-        });
-        return next;
+      const next = {};
+      saved.forEach((st) => { next[st] = true; });
+      Object.entries(STATION_TO_CHALLENGE).forEach(([st, chId]) => {
+        if (chId && ctfEngine.isChallengeSolved(chId)) {
+          next[st] = true;
+        }
       });
+      setUnlockedStations(next);
     };
     syncFromCtf();
     const unsub = ctfEngine.subscribe(syncFromCtf);
@@ -319,8 +318,18 @@ export default function InObjectDisplay({
   };
 
   const relockStation = (sectionKey) => {
+    removeCompletedStation(sectionKey);
+    const chId = STATION_TO_CHALLENGE[sectionKey];
+    if (chId) {
+      ctfEngine.relockChallenge(chId);
+    }
     setRelockedStations((prev) => ({ ...prev, [sectionKey]: true }));
-    setUnlockedStations((prev) => ({ ...prev, [sectionKey]: false }));
+    setUnlockedStations((prev) => {
+      const next = { ...prev };
+      delete next[sectionKey];
+      return next;
+    });
+    onStationRelocked?.(sectionKey);
   };
 
   useEffect(() => {
@@ -344,24 +353,19 @@ export default function InObjectDisplay({
         });
       };
       window.__RELOCK_ALL_HACKS__ = () => {
-        setUnlockedStations({
-          projects: false,
-          skills: false,
-          achievements: false,
-          about: false,
-          resume: false,
-          contact: false,
-          operator: false,
-          server_rack: false,
-          hardware_arsenal: false,
-          wireshark_monitor: false,
+        ctfEngine.relockAllChallenges();
+        setRelockedStations({});
+        setUnlockedStations({});
+        REQUIRED_STATIONS.forEach((st) => {
+          removeCompletedStation(st);
+          onStationRelocked?.(st);
         });
       };
       window.__UNLOCK_CURRENT__ = () => {
         if (activeSection) triggerUnlock(activeSection);
       };
     }
-  }, [activeSection]);
+  }, [activeSection, onStationRelocked]);
 
   const config = activeSection ? stationConfigs[activeSection] : null;
   // Keep a station light mounted even when no station is open: adding or removing a light
