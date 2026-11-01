@@ -370,7 +370,7 @@ export default function CyberOSDesktop({
           </button>
 
           {/* Clock */}
-          <div className="cos-hud-metric" title="System Local Time">
+          <div className="cos-hud-metric hidden md:flex" title="System Local Time">
             <Clock size={12} className="text-slate-400" />
             <span>{currentTime || '00:00:00'}</span>
           </div>
@@ -387,7 +387,8 @@ export default function CyberOSDesktop({
               title="Recruiter Fast View (Instant 2D Dossier, Projects & Resume)"
             >
               <BriefcaseBusiness size={12} />
-              <span>RECRUITER DOSSIER</span>
+              <span className="hidden sm:inline">RECRUITER DOSSIER</span>
+              <span className="sm:hidden">DOSSIER</span>
             </button>
           )}
 

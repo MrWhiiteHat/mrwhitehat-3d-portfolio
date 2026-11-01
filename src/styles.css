@@ -14074,18 +14074,28 @@ canvas {
   .hud-center-group {
     order: 3;
     width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
     margin-top: 4px;
     gap: 6px;
+    padding: 2px 0;
+    flex-wrap: nowrap;
+  }
+  .hud-center-group::-webkit-scrollbar {
+    display: none;
   }
   .hud-ctf-pill,
   .hud-stations-pill {
     padding: 5px 9px;
     font-size: 10px;
+    flex-shrink: 0;
   }
   .hud-recruiter-pill {
     padding: 5px 9px;
     font-size: 10px;
+    flex-shrink: 0;
   }
 }
 
@@ -14673,13 +14683,13 @@ canvas {
 
 
 /* =============================================================================
-   UNIVERSAL PC & MOBILE RESPONSIVE STYLING FOR 3D STATIONS & HUD
+   UNIVERSAL PC & MOBILE RESPONSIVE STYLING FOR 3D STATIONS, MODALS & HUD
    ============================================================================= */
 
 /* Short Screen Viewports (e.g. 1366x768 laptops, landscape tablets) */
 @media (max-height: 800px) {
   .physical-object-medium {
-    max-height: 450px !important;
+    max-height: min(440px, 68vh) !important;
   }
   .monitor-screen-body,
   .projector-cloth-slide,
@@ -14690,8 +14700,9 @@ canvas {
   .operative-dossier-terminal,
   .mainframe-dossier-terminal,
   .arsenal-dossier-terminal,
-  .pcap-dossier-terminal {
-    max-height: 395px !important;
+  .pcap-dossier-terminal,
+  .physical-visitor_log .visitor-log-container {
+    max-height: min(380px, 58vh) !important;
   }
   .station-inspect-header {
     top: 8px !important;
@@ -14701,9 +14712,9 @@ canvas {
 /* Mobile Devices & Small Screens (max-width: 768px) */
 @media (max-width: 768px) {
   .physical-object-medium {
-    width: 94vw !important;
+    width: min(94vw, 440px) !important;
     max-width: 94vw !important;
-    max-height: 64vh !important;
+    max-height: min(78vh, 620px) !important;
   }
 
   .physical-projects,
@@ -14717,7 +14728,7 @@ canvas {
   .physical-wireshark_monitor,
   .physical-visitor_log,
   .physical-server_rack {
-    width: 94vw !important;
+    width: min(94vw, 440px) !important;
     max-width: 94vw !important;
   }
 
@@ -14734,8 +14745,9 @@ canvas {
   .operative-dossier-terminal,
   .mainframe-dossier-terminal,
   .arsenal-dossier-terminal,
-  .pcap-dossier-terminal {
-    max-height: calc(64vh - 46px) !important;
+  .pcap-dossier-terminal,
+  .physical-visitor_log .visitor-log-container {
+    max-height: calc(78vh - 48px) !important;
   }
 
   .dual-monitors-rig {
@@ -14760,11 +14772,21 @@ canvas {
   }
 
   .obj-device-label {
-    font-size: 9.5px !important;
-    max-width: 140px;
+    font-size: 9px !important;
+    max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .obj-status-actions {
+    gap: 4px !important;
+  }
+
+  .obj-relock-btn,
+  .obj-recruiter-fast-btn {
+    padding: 3px 6px !important;
+    font-size: 8.5px !important;
   }
 
   .station-inspect-header {
@@ -14775,16 +14797,107 @@ canvas {
   }
 
   .station-back-walk-btn {
-    padding: 5px 9px !important;
-    font-size: 9.5px !important;
+    padding: 5px 8px !important;
+    font-size: 9px !important;
   }
 
   .station-selector-trigger {
-    padding: 5px 9px !important;
-    font-size: 10px !important;
+    padding: 5px 8px !important;
+    font-size: 9.5px !important;
   }
 
   .station-trigger-count {
+    display: none !important;
+  }
+
+  /* Modals on Mobile */
+  .leaderboard-backdrop {
+    padding: 8px !important;
+  }
+  .leaderboard-modal {
+    width: 100% !important;
+    max-height: 94vh !important;
+    border-radius: 14px !important;
+  }
+  .lb-header {
+    padding: 12px 14px !important;
+  }
+  .lb-podium {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 10px 14px !important;
+  }
+  .lb-podium-card {
+    padding: 8px !important;
+  }
+  .lb-subbar {
+    padding: 8px 14px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+  }
+  .lb-search-input {
+    width: 100% !important;
+  }
+  .lb-table-wrapper {
+    padding: 0 10px 10px 10px !important;
+    overflow-x: auto !important;
+  }
+
+  .recruiter-candidate-card {
+    padding: 12px 14px !important;
+    gap: 12px !important;
+  }
+  .recruiter-photo-wrap {
+    width: 52px !important;
+    height: 52px !important;
+  }
+  .recruiter-candidate-meta {
+    min-width: 0 !important;
+  }
+  .recruiter-candidate-name {
+    font-size: 17px !important;
+  }
+  .recruiter-actions-toolbar {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .recruiter-action-btn {
+    padding: 6px 10px !important;
+    font-size: 10.5px !important;
+  }
+
+  .gadget-modal-backdrop {
+    padding: 8px !important;
+  }
+  .gadget-inspector-modal {
+    width: 100% !important;
+    height: 92vh !important;
+    border-radius: 14px !important;
+  }
+  .gadget-header {
+    padding: 10px 12px !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .gadget-overlay-hud .gadget-hints {
+    display: none !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .station-quick-controls {
+    gap: 3px !important;
+  }
+  .station-quick-controls .hud-action-btn {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+  }
+  /* On compact phones, streamline to core buttons */
+  .station-quick-controls .hud-action-btn:nth-child(2), /* Leaderboard */
+  .station-quick-controls .hud-action-btn:nth-child(3), /* Gadgets */
+  .station-quick-controls .hud-action-btn:nth-child(5)  /* Theme */ {
     display: none !important;
   }
 }
