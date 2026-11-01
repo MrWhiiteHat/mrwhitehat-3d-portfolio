@@ -230,7 +230,11 @@ export default function App() {
     subMessage: '',
   });
   const preHackerStateRef = useRef({ themeKey: 'CYBER_NEON_NOIR', gameState: 'EXPLORE' });
-  const hasSeenAnnouncementRef = useRef(false);
+  // Default to true if already discovered or if stations were already completed on load,
+  // preventing unwanted intrusive popups on initial website visit or refresh
+  const hasSeenAnnouncementRef = useRef(
+    isEasterEggDiscovered() || hasCompletedAllStations(getCompletedStations())
+  );
   const prevPoweredCountRef = useRef(1);
   const prevUnlockedSetRef = useRef(new Set());
   const prevHostileTriggeredRef = useRef(false);
@@ -497,22 +501,32 @@ export default function App() {
     }, 1100);
   }, [initHackerStage]);
 
-  // Auto-trigger announcement when all stations are genuinely breached
+  // Auto-trigger announcement ONLY when all stations are genuinely breached during active 3D exploration
   useEffect(() => {
-    if (hasCompletedAllStations(unlockedStations) && !hasSeenAnnouncementRef.current) {
+    if (
+      gameState === 'EXPLORE' &&
+      hasCompletedAllStations(unlockedStations) &&
+      !hasSeenAnnouncementRef.current &&
+      !isEasterEggDiscovered()
+    ) {
       hasSeenAnnouncementRef.current = true;
       const timer = setTimeout(() => {
         setGameState('ANNOUNCEMENT');
       }, 900);
       return () => clearTimeout(timer);
     }
-  }, [unlockedStations]);
+  }, [unlockedStations, gameState]);
 
   const handleStationBreached = useCallback((stationId) => {
     markStationCompleted(stationId);
     setUnlockedStations((prev) => {
       const next = new Set([...prev, stationId]);
-      if (hasCompletedAllStations(next) && !hasSeenAnnouncementRef.current) {
+      if (
+        gameState === 'EXPLORE' &&
+        hasCompletedAllStations(next) &&
+        !hasSeenAnnouncementRef.current &&
+        !isEasterEggDiscovered()
+      ) {
         hasSeenAnnouncementRef.current = true;
         setTimeout(() => {
           setGameState('ANNOUNCEMENT');
@@ -520,7 +534,7 @@ export default function App() {
       }
       return next;
     });
-  }, []);
+  }, [gameState]);
 
   // Timer & countdown for stage 3
   useEffect(() => {
