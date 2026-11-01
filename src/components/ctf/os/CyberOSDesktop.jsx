@@ -122,11 +122,22 @@ export default function CyberOSDesktop({
       setCurrentTime(
         now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
       );
-      setCtfScore(ctfEngine.getScore());
+      const score = typeof ctfEngine?.getScore === 'function'
+        ? ctfEngine.getScore()
+        : (ctfEngine?.getState?.()?.score ?? 0);
+      setCtfScore(score);
     };
     update();
     const timer = setInterval(update, 1000);
-    return () => clearInterval(timer);
+    const unsubscribe = ctfEngine?.subscribe?.((state) => {
+      if (state && typeof state.score === 'number') {
+        setCtfScore(state.score);
+      }
+    });
+    return () => {
+      clearInterval(timer);
+      unsubscribe?.();
+    };
   }, []);
 
   // Launch initial app when desktop opens

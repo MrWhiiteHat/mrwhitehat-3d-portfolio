@@ -142,6 +142,18 @@ class CTFEngine {
     };
   }
 
+  getScore() {
+    return this.getState().score;
+  }
+
+  getAllChallenges() {
+    return CTF_CHALLENGES;
+  }
+
+  getChallengeById(id) {
+    return getChallengeById(id);
+  }
+
   isChallengeSolved(challengeId) {
     return Boolean(this.state.solvedChallenges[challengeId]);
   }

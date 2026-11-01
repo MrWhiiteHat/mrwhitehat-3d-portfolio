@@ -228,7 +228,7 @@ export default function CyberOSTerminal({ onOpenApp }) {
         } else {
           const flagStr = args[0].trim();
           // Find matching challenge
-          const activeChallenges = ctfEngine.getAllChallenges();
+          const activeChallenges = (typeof ctfEngine?.getAllChallenges === "function" ? ctfEngine.getAllChallenges() : ctfEngine?.getState?.()?.challenges) || [];
           let solvedChallenge = null;
           let feedbackMsg = '';
 
@@ -245,7 +245,7 @@ export default function CyberOSTerminal({ onOpenApp }) {
             newLines.push(
               `[+] SUCCESS! ${feedbackMsg}`,
               `[+] Challenge '${solvedChallenge.title}' (+${solvedChallenge.points} PTS) SOLVED!`,
-              `[+] Current CTF Score: ${ctfEngine.getScore()} PTS`
+              `[+] Current CTF Score: ${typeof ctfEngine?.getScore === "function" ? ctfEngine.getScore() : (ctfEngine?.getState?.()?.score ?? 0)} PTS`
             );
             playBreachFanfare();
           } else {

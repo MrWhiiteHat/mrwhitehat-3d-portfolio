@@ -9,7 +9,7 @@ export default function CTFMissionsApp({ onOpenApp }) {
   const [feedback, setFeedback] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
 
-  const challenges = ctfEngine.getAllChallenges();
+  const challenges = (typeof ctfEngine?.getAllChallenges === "function" ? ctfEngine.getAllChallenges() : []) || [];
   const ctfState = ctfEngine.getState();
 
   const categories = ['ALL', 'WEB', 'CRYPTO', 'REV', 'FORENSICS', 'PWN', 'NET', 'STEGO', 'OSINT'];
