@@ -7,8 +7,38 @@
 import { verifyFlagHash, normalizeFlag } from './cryptoUtils.js';
 import { CTF_CHALLENGES, getChallengeById } from './ctfChallenges.js';
 import { playBreachFanfare, playHackingBeep, playZapSound } from '../audio.js';
+import { markStationCompleted } from '../../components/easteregg/easterEggState.js';
 
 const STORAGE_KEY = 'mrwhitehat_ctf_state_v1';
+
+export const STATION_TO_CHALLENGE = {
+  projects: 'net-lateral-pivot-ad',
+  skills: 'pwn-stack-matrix-buffer',
+  achievements: 'web-sidechannel-timing',
+  about: 'crypto-caesar-tumbler',
+  resume: 'forensics-hardware-uart',
+  contact: 'stego-spectrogram-carrier',
+  operator: 'rev-anti-debug-patch',
+  server_rack: 'web-sqli-waf-bypass',
+  hardware_arsenal: 'rev-duckyscript-badusb',
+  wireshark_monitor: 'forensics-pcap-exfiltration',
+  secret_vault: 'pwn-heap-race-condition',
+  visitor_log: null,
+};
+
+export const CHALLENGE_TO_STATION = {
+  'net-lateral-pivot-ad': 'projects',
+  'pwn-stack-matrix-buffer': 'skills',
+  'web-sidechannel-timing': 'achievements',
+  'crypto-caesar-tumbler': 'about',
+  'forensics-hardware-uart': 'resume',
+  'stego-spectrogram-carrier': 'contact',
+  'rev-anti-debug-patch': 'operator',
+  'web-sqli-waf-bypass': 'server_rack',
+  'rev-duckyscript-badusb': 'hardware_arsenal',
+  'forensics-pcap-exfiltration': 'wireshark_monitor',
+  'pwn-heap-race-condition': 'secret_vault',
+};
 
 export const CTF_BADGES = [
   {
@@ -71,6 +101,19 @@ class CTFEngine {
   constructor() {
     this.listeners = new Set();
     this.state = this.loadState();
+    this.syncSolvedStations();
+  }
+
+  syncSolvedStations() {
+    try {
+      const solvedIds = Object.keys(this.state.solvedChallenges || {});
+      for (const chId of solvedIds) {
+        const stationId = CHALLENGE_TO_STATION[chId];
+        if (stationId) {
+          markStationCompleted(stationId);
+        }
+      }
+    } catch (_) {}
   }
 
   loadState() {
@@ -195,11 +238,21 @@ class CTFEngine {
       };
     }
 
+    const stationId = CHALLENGE_TO_STATION[challengeId] || challenge.stationId;
+
     if (this.isChallengeSolved(challengeId)) {
+      if (stationId) {
+        try {
+          markStationCompleted(stationId);
+        } catch (_) {}
+      }
       return {
         success: false,
         duplicate: true,
-        message: `Challenge "${challenge.title}" is already solved!`,
+        alreadySolved: true,
+        challenge,
+        stationId,
+        message: `Challenge "${challenge.title}" is already solved! Station unlocked.`,
       };
     }
 
@@ -240,6 +293,13 @@ class CTFEngine {
       flag: normalized,
     };
 
+    // Mark station unlocked in 3D portfolio & easter egg persistence
+    if (stationId) {
+      try {
+        markStationCompleted(stationId);
+      } catch (_) {}
+    }
+
     // Check Badges
     this.evaluateBadges(challenge);
 
@@ -249,11 +309,14 @@ class CTFEngine {
 
     this.saveState();
 
+    const stationLabel = stationId ? ` [${stationId.toUpperCase().replace('_', ' ')} STATION UNLOCKED]` : '';
+
     return {
       success: true,
       challenge,
       pointsAwarded,
-      message: `FLAG ACCEPTED! +${pointsAwarded} PTS awarded for "${challenge.title}".`,
+      stationId,
+      message: `FLAG ACCEPTED! +${pointsAwarded} PTS awarded for "${challenge.title}".${stationLabel}`,
     };
   }
 

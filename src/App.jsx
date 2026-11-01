@@ -69,6 +69,7 @@ import GadgetInspectorModal from './components/gadgets/GadgetInspectorModal.jsx'
 import RecruiterDossierModal from './components/recruiter/RecruiterDossierModal.jsx';
 import UserGuideModal from './components/game/UserGuideModal.jsx';
 import CyberOSDesktop from './components/ctf/os/CyberOSDesktop.jsx';
+import { ctfEngine, CHALLENGE_TO_STATION } from './utils/ctf/ctfEngine.js';
 import { profile } from './data.js';
 import { useFullscreen } from './utils/useFullscreen.js';
 import { useControlSettings } from './utils/useControlSettings.js';
@@ -124,7 +125,49 @@ export default function App() {
 
   const [isGateOpen, setIsGateOpen] = useState(false);
   const [activeProximity, setActiveProximity] = useState(null);
-  const [unlockedStations, setUnlockedStations] = useState(() => new Set(getCompletedStations()));
+  const [unlockedStations, setUnlockedStations] = useState(() => {
+    const set = new Set(getCompletedStations());
+    try {
+      const state = ctfEngine.getState();
+      Object.keys(state.solvedChallenges || {}).forEach((chId) => {
+        const stationId = CHALLENGE_TO_STATION[chId];
+        if (stationId) {
+          set.add(stationId);
+          markStationCompleted(stationId);
+        }
+      });
+    } catch (_) {}
+    return set;
+  });
+
+  // Keep unlockedStations synchronized with any solved CTF challenges across CyberOS tools
+  useEffect(() => {
+    const syncCtfUnlocks = () => {
+      const completed = getCompletedStations();
+      const nextSet = new Set(completed);
+      try {
+        const state = ctfEngine.getState();
+        Object.keys(state.solvedChallenges || {}).forEach((chId) => {
+          const stationId = CHALLENGE_TO_STATION[chId];
+          if (stationId) {
+            nextSet.add(stationId);
+            markStationCompleted(stationId);
+          }
+        });
+      } catch (_) {}
+
+      setUnlockedStations((prev) => {
+        if (prev.size === nextSet.size && Array.from(prev).every((id) => nextSet.has(id))) {
+          return prev;
+        }
+        return nextSet;
+      });
+    };
+
+    syncCtfUnlocks();
+    const unsub = ctfEngine.subscribe(syncCtfUnlocks);
+    return () => unsub();
+  }, []);
   const mobileInputRef = useRef({ x: 0, y: 0 });
   const handleMobileMove = useCallback((pos) => {
     mobileInputRef.current = pos;

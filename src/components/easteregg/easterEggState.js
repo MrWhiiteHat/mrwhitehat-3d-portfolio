@@ -19,24 +19,27 @@ const STORAGE_KEY_DISCOVERED = 'mrwhitehat_easter_egg_discovered_v1';
 const STORAGE_KEY_COMPLETED_EGG = 'mrwhitehat_easter_egg_completed_v1';
 const STORAGE_KEY_BEST_TIME = 'mrwhitehat_easter_egg_best_time_v1';
 
+let memoryCompletedStations = [];
+
 export function getCompletedStations() {
   if (typeof window === 'undefined' || !window.localStorage) {
-    return [];
+    return [...memoryCompletedStations];
   }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY_COMPLETED);
-    if (!raw) return [];
+    if (!raw) return [...memoryCompletedStations];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
   } catch (e) {
-    return [];
+    return [...memoryCompletedStations];
   }
 }
 
 export function saveCompletedStations(stationsList) {
+  const arr = Array.from(new Set(stationsList));
+  memoryCompletedStations = [...arr];
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
-    const arr = Array.from(new Set(stationsList));
     window.localStorage.setItem(STORAGE_KEY_COMPLETED, JSON.stringify(arr));
   } catch (e) {}
 }

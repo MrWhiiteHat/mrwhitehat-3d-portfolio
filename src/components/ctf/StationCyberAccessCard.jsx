@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShieldAlert,
   Terminal,
@@ -134,6 +134,14 @@ export default function StationCyberAccessCard({ sectionKey, onLaunchOS, onBypas
   const ToolIcon = challenge.icon;
   const [flagInput, setFlagInput] = useState('');
   const [feedback, setFeedback] = useState(null);
+  const isAlreadySolved = ctfEngine.isChallengeSolved(challenge.id);
+
+  // If already solved, automatically trigger onSolved to unlock the station information
+  useEffect(() => {
+    if (ctfEngine.isChallengeSolved(challenge.id)) {
+      onSolved?.();
+    }
+  }, [challenge.id, onSolved]);
 
   const handleQuickSubmit = (e) => {
     e.preventDefault();
@@ -143,7 +151,9 @@ export default function StationCyberAccessCard({ sectionKey, onLaunchOS, onBypas
     if (res.success || res.duplicate) {
       setFeedback({ success: true, text: res.message });
       playBreachFanfare();
-      setTimeout(() => onSolved?.(), 1100);
+      setTimeout(() => {
+        onSolved?.();
+      }, 350);
     } else {
       setFeedback({ success: false, text: res.message });
       playZapSound();
@@ -221,6 +231,33 @@ export default function StationCyberAccessCard({ sectionKey, onLaunchOS, onBypas
         {feedback && (
           <div className={`scac-feedback font-mono ${feedback.success ? 'is-success' : 'is-error'}`}>
             {feedback.text}
+          </div>
+        )}
+
+        {isAlreadySolved && (
+          <div style={{ marginTop: '12px' }}>
+            <button
+              type="button"
+              className="scac-launch-os-btn"
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #059669, #10b981)',
+                borderColor: '#34d399',
+                color: '#ffffff',
+                fontWeight: 700,
+                padding: '10px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                borderRadius: '6px'
+              }}
+              onClick={() => onSolved?.()}
+            >
+              <CheckCircle2 size={16} />
+              <span>ACCESS GRANTED // VIEW STATION INFORMATION</span>
+            </button>
           </div>
         )}
       </div>

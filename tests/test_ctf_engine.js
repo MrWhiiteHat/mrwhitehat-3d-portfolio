@@ -1,6 +1,7 @@
 import { CTF_CHALLENGES, getChallengeById } from '../src/utils/ctf/ctfChallenges.js';
-import { ctfEngine } from '../src/utils/ctf/ctfEngine.js';
+import { ctfEngine, CHALLENGE_TO_STATION, STATION_TO_CHALLENGE } from '../src/utils/ctf/ctfEngine.js';
 import { verifyFlagHash } from '../src/utils/ctf/cryptoUtils.js';
+import { getCompletedStations } from '../src/components/easteregg/easterEggState.js';
 
 console.log('========================================');
 console.log('RUNNING AUTOMATED CTF ENGINE TEST SUITE');
@@ -93,6 +94,35 @@ if (!state.badges.includes('first_blood') || !state.badges.includes('crypto_brea
   errors++;
 } else {
   console.log(`  ✔ Badges correctly unlocked: ${state.badges.join(', ')}`);
+}
+
+// 4. Test Station Unlocking & Mapping Synchronization
+console.log('\n[TEST 4] Testing Station Unlocking & Mapping Synchronization...');
+const stationForTestChal = CHALLENGE_TO_STATION[testChal.id];
+if (!stationForTestChal) {
+  console.error(`❌ Missing station mapping for challenge: ${testChal.id}`);
+  errors++;
+} else {
+  const completedStations = getCompletedStations();
+  if (!completedStations.includes(stationForTestChal)) {
+    console.error(`❌ Station ${stationForTestChal} was NOT unlocked when challenge ${testChal.id} was solved!`);
+    errors++;
+  } else {
+    console.log(`  ✔ Station "${stationForTestChal}" automatically unlocked upon solving "${testChal.id}".`);
+  }
+}
+
+// Check bidirectional mapping consistency
+let mappingErrors = 0;
+for (const [st, chId] of Object.entries(STATION_TO_CHALLENGE)) {
+  if (chId && CHALLENGE_TO_STATION[chId] !== st) {
+    console.error(`❌ Bidirectional mapping mismatch for station: ${st} -> ${chId} -> ${CHALLENGE_TO_STATION[chId]}`);
+    mappingErrors++;
+    errors++;
+  }
+}
+if (mappingErrors === 0) {
+  console.log('  ✔ All bidirectional Station <-> Challenge mappings verified.');
 }
 
 console.log('\n========================================');

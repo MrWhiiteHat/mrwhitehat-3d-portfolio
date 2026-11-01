@@ -46,19 +46,9 @@ import {
 } from 'lucide-react';
 import { achievements, profile, projects, skills } from '../data.js';
 import StationCyberAccessCard from './ctf/StationCyberAccessCard.jsx';
-import NetworkPivotChallenge from './ctf/challenges/NetworkPivotChallenge.jsx';
-import BufferOverflowChallenge from './ctf/challenges/BufferOverflowChallenge.jsx';
-import TimingAttackChallenge from './ctf/challenges/TimingAttackChallenge.jsx';
-import BinaryPatchHack from './ctf/challenges/BinaryPatchHack.jsx';
-import StegoAnalyzerChallenge from './ctf/challenges/StegoAnalyzerChallenge.jsx';
-import HardwareForensicsChallenge from './ctf/challenges/HardwareForensicsChallenge.jsx';
-import CryptoWorkstationChallenge from './ctf/challenges/CryptoWorkstationChallenge.jsx';
-import SQLiChallenge from './ctf/challenges/SQLiChallenge.jsx';
-import DuckyReverseEngChallenge from './ctf/challenges/DuckyReverseEngChallenge.jsx';
-import WiresharkPCAPChallenge from './ctf/challenges/WiresharkPCAPChallenge.jsx';
 import VisitorLogDisplay from './studio/VisitorLogDisplay.jsx';
-import HeapOverflowChallenge from './ctf/challenges/HeapOverflowChallenge.jsx';
 import BlackHatVaultDisplay from './vault/BlackHatVaultDisplay.jsx';
+import { ctfEngine, STATION_TO_CHALLENGE, CHALLENGE_TO_STATION } from '../utils/ctf/ctfEngine.js';
 
 export const STATION_ORDER = [
   'projects',
@@ -259,7 +249,7 @@ export default function InObjectDisplay({
     }
   };
 
-  // Track unlocked state per station with persistent storage
+  // Track unlocked state per station with persistent storage & CTF engine
   const [unlockedStations, setUnlockedStations] = useState(() => {
     const saved = getCompletedStations();
     const initial = {
@@ -279,23 +269,57 @@ export default function InObjectDisplay({
     saved.forEach((st) => {
       initial[st] = true;
     });
+    // Integrate any stations solved in CTF Engine
+    Object.entries(STATION_TO_CHALLENGE).forEach(([st, chId]) => {
+      if (chId && ctfEngine.isChallengeSolved(chId)) {
+        initial[st] = true;
+      }
+    });
     return initial;
   });
 
+  const [relockedStations, setRelockedStations] = useState({});
   // Track active breach transition animation
   const [breachingSection, setBreachingSection] = useState(null);
 
+  // Sync whenever CTF engine updates or solves any challenge
+  useEffect(() => {
+    const syncFromCtf = () => {
+      const saved = getCompletedStations();
+      setUnlockedStations((prev) => {
+        const next = { ...prev };
+        saved.forEach((st) => { next[st] = true; });
+        Object.entries(STATION_TO_CHALLENGE).forEach(([st, chId]) => {
+          if (chId && ctfEngine.isChallengeSolved(chId)) {
+            next[st] = true;
+          }
+        });
+        return next;
+      });
+    };
+    syncFromCtf();
+    const unsub = ctfEngine.subscribe(syncFromCtf);
+    return () => unsub();
+  }, []);
+
   const triggerUnlock = (sectionKey) => {
+    // Clear manual relock
+    setRelockedStations((prev) => ({ ...prev, [sectionKey]: false }));
+    // Immediately persist and inform parent
+    markStationCompleted(sectionKey);
+    onStationBreached?.(sectionKey);
+    // Instant unlock state
+    setUnlockedStations((prev) => ({ ...prev, [sectionKey]: true }));
+
+    // Show crisp breach animation
     setBreachingSection(sectionKey);
     setTimeout(() => {
-      setUnlockedStations((prev) => ({ ...prev, [sectionKey]: true }));
       setBreachingSection(null);
-      markStationCompleted(sectionKey);
-      onStationBreached?.(sectionKey);
-    }, 1100);
+    }, 600);
   };
 
   const relockStation = (sectionKey) => {
+    setRelockedStations((prev) => ({ ...prev, [sectionKey]: true }));
     setUnlockedStations((prev) => ({ ...prev, [sectionKey]: false }));
   };
 
@@ -344,7 +368,12 @@ export default function InObjectDisplay({
   // changes the scene's light count, which recompiles every lit material (a visible freeze).
   if (!config) return <pointLight intensity={0} distance={2.8} />;
 
-  const isUnlocked = !!unlockedStations[activeSection];
+  const challengeId = STATION_TO_CHALLENGE[activeSection];
+  const isCtfSolved = challengeId ? ctfEngine.isChallengeSolved(challengeId) : false;
+  const isUnlocked = activeSection === 'visitor_log' || (
+    !relockedStations[activeSection] &&
+    Boolean(unlockedStations[activeSection] || isCtfSolved)
+  );
   const isBreaching = breachingSection === activeSection;
 
   const currentIndex = STATION_ORDER.indexOf(activeSection);
