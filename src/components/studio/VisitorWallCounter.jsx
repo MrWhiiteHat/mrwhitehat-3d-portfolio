@@ -8,6 +8,7 @@ export default function VisitorWallCounter({
   visitorCount = 1,
   latestVisitor = null,
   currentThemeKey = 'CYBER_NEON_NOIR',
+  activeSection = null,
   onSelect,
   onHover,
 }) {
@@ -287,6 +288,7 @@ export default function VisitorWallCounter({
       position={[4.94, 2.25, -0.4]}
       rotation={[0, -Math.PI / 2, 0]}
       name="VisitorWallCounter"
+      visible={activeSection !== 'visitor_log'}
       onClick={handleClick}
       onPointerOver={() => {
         document.body.style.cursor = 'pointer';

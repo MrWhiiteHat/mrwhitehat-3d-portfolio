@@ -439,7 +439,7 @@ function SceneContents({
         <Suspense fallback={null}>
           <DecorElements />
         </Suspense>
-        <StudioWallGraphicsAndCurtains currentThemeKey={themeKey} />
+        <StudioWallGraphicsAndCurtains currentThemeKey={themeKey} activeSection={activeSection} />
         <Suspense fallback={null}>
           <FrontWallPanoramicFeature currentThemeKey={themeKey} />
         </Suspense>
@@ -453,6 +453,7 @@ function SceneContents({
           visitorCount={visitorCount}
           latestVisitor={visitorLogs[0] || null}
           currentThemeKey={themeKey}
+          activeSection={activeSection}
           onSelect={hackerModeData?.isActive ? undefined : onSelect}
           onHover={hackerModeData?.isActive ? undefined : onHover}
         />

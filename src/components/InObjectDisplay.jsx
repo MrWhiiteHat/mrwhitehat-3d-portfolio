@@ -172,13 +172,14 @@ export const stationConfigs = {
   },
   hardware_arsenal: {
     // Tactical Red Team Hardware Arsenal Pegboard on Left Wall
-    position: [-4.88, 2.35, 1.25],
+    position: [-4.88, 2.30, 1.25],
     rotation: [0, Math.PI / 2, 0],
-    camPos: [-2.85, 2.35, 1.25],
-    camTarget: [-4.88, 2.35, 1.25],
+    camPos: [-2.50, 2.30, 1.25],
+    camTarget: [-4.88, 2.30, 1.25],
     title: 'Tactical Red Team Hardware Arsenal',
     icon: Radio,
-    distanceFactor: 0.78,
+    distanceFactor: 1.05,
+    htmlPosition: [0, 0, 0.05],
     lightColor: '#f97316',
     lightIntensity: 20,
     lightPos: [0, 0, 0.45],
@@ -187,11 +188,12 @@ export const stationConfigs = {
     // Wireshark Live PCAP Analyzer on Left Wall
     position: [-4.88, 3.45, 1.25],
     rotation: [0, Math.PI / 2, 0],
-    camPos: [-2.85, 3.45, 1.25],
+    camPos: [-2.50, 3.45, 1.25],
     camTarget: [-4.88, 3.45, 1.25],
     title: 'Wireshark Monitor // Live PCAP Analyzer',
     icon: Activity,
-    distanceFactor: 0.78,
+    distanceFactor: 1.05,
+    htmlPosition: [0, 0, 0.05],
     lightColor: '#06b6d4',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -204,7 +206,8 @@ export const stationConfigs = {
     camTarget: [4.94, 2.25, -0.4],
     title: 'CTOS Security Visitor Access Terminal',
     icon: Users,
-    distanceFactor: 0.92,
+    distanceFactor: 0.98,
+    htmlPosition: [0, 0, 0.05],
     lightColor: '#34d399',
     lightIntensity: 22,
     lightPos: [0, 0, 0.45],
@@ -405,7 +408,7 @@ export default function InObjectDisplay({
         center
         transform
         distanceFactor={activeDistanceFactor}
-        position={[0, -0.10, 0]}
+        position={config.htmlPosition || [0, -0.10, 0]}
         zIndexRange={[200, 0]}
       >
         <div

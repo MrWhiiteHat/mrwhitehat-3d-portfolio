@@ -9,7 +9,10 @@ import {
 } from '../../utils/cyberScreens.js';
 import { playClickSound, playHackingBeep } from '../../utils/audio.js';
 
-export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER_NEON_NOIR' }) {
+export default function StudioWallGraphicsAndCurtains({
+  currentThemeKey = 'CYBER_NEON_NOIR',
+  activeSection = null,
+}) {
   const theme = LIGHTING_THEMES[currentThemeKey] || LIGHTING_THEMES.CYBER_NEON_NOIR;
 
   // Refs for animated elements
@@ -282,6 +285,7 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       {/* ======================================================== */}
       <group
         position={[-4.94, 2.35, 1.25]}
+        visible={activeSection !== 'hardware_arsenal'}
         rotation={[0, Math.PI / 2, 0]}
         onClick={(e) => {
           e.stopPropagation();
@@ -732,6 +736,7 @@ export default function StudioWallGraphicsAndCurtains({ currentThemeKey = 'CYBER
       {/* ======================================================== */}
       <group
         position={[-4.94, 3.45, 1.25]}
+        visible={activeSection !== 'wireshark_monitor'}
         rotation={[0, Math.PI / 2, 0]}
         onClick={(e) => {
           e.stopPropagation();
