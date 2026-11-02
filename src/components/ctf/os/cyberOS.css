@@ -646,15 +646,38 @@
 .station-cyber-access-card {
   display: flex;
   flex-direction: column;
-  background: rgba(10, 15, 24, 0.95);
+  flex: 1;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.4) rgba(0, 0, 0, 0.25);
+  background: rgba(10, 15, 24, 0.96);
   border: 1px solid rgba(56, 189, 248, 0.4);
   border-radius: 8px;
-  padding: 16px;
+  padding: 14px 16px 20px;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(14, 165, 233, 0.15);
   color: #e2e8f0;
   max-width: 520px;
+  width: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
+}
+
+.station-cyber-access-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.station-cyber-access-card::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+}
+
+.station-cyber-access-card::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.45);
+  border-radius: 3px;
 }
 
 .scac-header-strip {
@@ -848,6 +871,82 @@
 
 .scac-qs-btn:hover {
   background: #047857;
+}
+
+
+/* Mobile & Short-Height Landscape Overrides for Cyber Access Card */
+@media (max-width: 768px), (max-height: 550px) {
+  .station-cyber-access-card {
+    padding: 8px 10px 14px !important;
+    gap: 6px;
+  }
+  .scac-header-strip {
+    padding-bottom: 4px !important;
+    margin-bottom: 4px !important;
+  }
+  .scac-category-tag {
+    font-size: 9px !important;
+    padding: 1px 5px !important;
+  }
+  .scac-points-tag {
+    font-size: 10.5px !important;
+  }
+  .scac-title {
+    font-size: 12.5px !important;
+    margin-bottom: 3px !important;
+    line-height: 1.2 !important;
+  }
+  .scac-desc {
+    font-size: 10.5px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 6px !important;
+  }
+  .scac-tool-box {
+    padding: 5px 8px !important;
+    margin-bottom: 6px !important;
+    gap: 8px !important;
+  }
+  .scac-tool-icon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .scac-tool-label {
+    font-size: 8.5px !important;
+  }
+  .scac-tool-name {
+    font-size: 10.5px !important;
+  }
+  .scac-actions-row {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    margin-bottom: 6px !important;
+  }
+  .scac-launch-os-btn {
+    font-size: 10px !important;
+    padding: 6px 8px !important;
+    gap: 5px !important;
+  }
+  .scac-bypass-btn {
+    font-size: 9.5px !important;
+    padding: 6px 8px !important;
+    gap: 4px !important;
+  }
+  .scac-quick-submit {
+    padding-top: 6px !important;
+  }
+  .scac-qs-label {
+    font-size: 8.5px !important;
+    margin-bottom: 3px !important;
+  }
+  .scac-qs-input {
+    padding: 4px 6px !important;
+    font-size: 10px !important;
+  }
+  .scac-qs-btn {
+    padding: 4px 8px !important;
+    font-size: 9.5px !important;
+  }
 }
 
 .scac-feedback {

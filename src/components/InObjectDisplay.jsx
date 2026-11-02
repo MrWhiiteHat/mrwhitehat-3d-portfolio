@@ -376,20 +376,33 @@ export default function InObjectDisplay({
     }
   }, [activeSection, onStationRelocked]);
 
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== 'undefined' && window.innerWidth < 768
-  );
+  const checkIsMobile = () => {
+    if (typeof window === 'undefined') return false;
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isNarrow = window.innerWidth < 768;
+    const isLandscapePhone = window.innerHeight < 550 && window.innerWidth < 1050;
+    const isTouchTablet = isTouch && (window.innerWidth < 1024 && window.innerHeight < 768);
+    return isNarrow || isLandscapePhone || isTouchTablet;
+  };
+
+  const [isMobile, setIsMobile] = useState(checkIsMobile);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(checkIsMobile());
     };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
   }, []);
 
   const config = activeSection ? stationConfigs[activeSection] : null;
-  const activeDistanceFactor = config?.distanceFactor || 0.75;
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 900;
+  const desktopScale = vh < 750 ? Math.max(1.15, 800 / Math.max(vh, 450)) : 1;
+  const activeDistanceFactor = (config?.distanceFactor || 0.75) * desktopScale;
   // Keep a station light mounted even when no station is open: adding or removing a light
   // changes the scene's light count, which recompiles every lit material (a visible freeze).
   if (!config) return <pointLight intensity={0} distance={2.8} />;
