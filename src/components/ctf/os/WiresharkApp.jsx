@@ -17,6 +17,7 @@ import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
 
 const CHALLENGE_ID = 'forensics-pcap-exfiltration';
+const FLAG_STRING = 'FLAG{pcap_dns_exfil_basic_auth_neutralized}';
 
 const PACKETS = [
   {
@@ -190,19 +191,23 @@ const PACKETS = [
 
 export default function WiresharkApp({ onOpenStation }) {
   const [filterStr, setFilterStr] = useState('');
-  const [selectedPacketNo, setSelectedPacketNo] = useState(1);
+  const [selectedPacketNo, setSelectedPacketNo] = useState(7);
   const [showStreamModal, setShowStreamModal] = useState(false);
   const [showHints, setShowHints] = useState(true);
   const [flagInput, setFlagInput] = useState('');
   const [flagFeedback, setFlagFeedback] = useState(null);
+  const [hoveredByteIdx, setHoveredByteIdx] = useState(null);
 
   const filteredPackets = PACKETS.filter((p) => {
     if (!filterStr.trim()) return true;
     const f = filterStr.toLowerCase().trim();
     if (f === 'http') return p.proto === 'HTTP';
     if (f === 'dns') return p.proto === 'DNS';
-    if (f === 'tcp') return p.proto === 'TCP';
+    if (f === 'tcp') return p.proto === 'TCP' || p.proto === 'HTTP';
     if (f === 'arp') return p.proto === 'ARP';
+    if (f.includes('port == 80') || f === '80') return p.info.includes('80') || p.src.includes(':80') || p.dst.includes(':80');
+    if (f.includes('contains "flag"') || f.includes('flag')) return p.no === 7 || p.no === 8;
+    if (f.includes('post')) return p.info.includes('POST');
     return (
       p.proto.toLowerCase().includes(f) ||
       p.src.toLowerCase().includes(f) ||
@@ -223,17 +228,31 @@ export default function WiresharkApp({ onOpenStation }) {
         success: true,
         text: res.message,
         stationId,
-        stationName: 'WIRESHARK MONITOR'
+        stationName: 'WIRESHARK MONITOR',
       });
       playBreachFanfare();
       setTimeout(() => {
         onOpenStation?.(stationId);
       }, 1800);
     } else {
-      setFlagFeedback({ success: false, text: res.message });
+      setFlagFeedback({ success: false, text: 'Verification Failed: Flag does not match active challenge hashes.' });
       playZapSound();
     }
   };
+
+  // Convert raw hex string to structured 16-byte rows
+  const rawBytes = (selectedPacket.hex || '').split(' ').filter(Boolean);
+  const hexRows = [];
+  for (let i = 0; i < rawBytes.length; i += 16) {
+    hexRows.push({
+      offset: i.toString(16).padStart(4, '0'),
+      startIdx: i,
+      bytes: rawBytes.slice(i, i + 16),
+    });
+  }
+
+  const activeByte = hoveredByteIdx !== null && hoveredByteIdx < rawBytes.length ? rawBytes[hoveredByteIdx] : null;
+  const activeChar = activeByte ? String.fromCharCode(parseInt(activeByte, 16)) : null;
 
   return (
     <div className="cos-app-container select-text">
@@ -278,7 +297,7 @@ export default function WiresharkApp({ onOpenStation }) {
           type="text"
           className="cos-input"
           style={{ flex: 1, padding: '3px 8px', fontSize: '11px' }}
-          placeholder="Apply a display filter ... e.g. http, dns, tcp"
+          placeholder="Apply a display filter ... e.g. http, tcp.port == 80, frame contains 'FLAG'"
           value={filterStr}
           onChange={(e) => setFilterStr(e.target.value)}
         />
@@ -318,41 +337,37 @@ export default function WiresharkApp({ onOpenStation }) {
               <Sparkles size={14} />
               <span>DIGITAL FORENSICS INVESTIGATION GUIDE // PCAP ANALYSIS</span>
             </div>
-            <span style={{ fontSize: '10px', color: '#94a3b8' }}>Category: Digital Forensics · Difficulty: Medium · Reward: +200 PTS</span>
+            <span style={{ fontSize: '10px', color: '#94a3b8' }}>Category: Forensics · Difficulty: Medium · Reward: +200 PTS</span>
           </div>
 
           <div className="cos-hint-grid">
             <div className="cos-hint-card">
               <h4>🎯 Objective</h4>
-              <p>Analyze the captured packet stream <code>capture_042.pcapng</code> to locate covert data exfiltration and retrieve the compromised token.</p>
+              <p>A rogue operative transmitted an unauthorized POST request to the authentication gateway. Inspect the network traffic dump to extract the exfiltrated credential token.</p>
             </div>
 
             <div className="cos-hint-card">
-              <h4>🔍 Forensics Clue</h4>
-              <p>Threat actors often leverage unencrypted HTTP APIs to exfiltrate database keys.</p>
-              <p>Filter by <strong style={{ color: '#34d399' }}>http</strong> or look at <strong>Packet #7 & #8</strong> to inspect the unencrypted authentication exchange.</p>
+              <h4>🔍 Wireshark Filter & Streams</h4>
+              <p>Filter by <code>http</code> to isolate plaintext HTTP requests. Notice Packet #7 and #8 exchange credentials.</p>
+              <p>Click <strong style={{ color: '#38bdf8' }}>Follow TCP Stream</strong> to view the entire request and JSON response.</p>
             </div>
 
             <div className="cos-hint-card">
               <h4>🛠️ Step-by-Step Walkthrough</h4>
-              <p>1. In the display filter bar above, click the <strong style={{ color: '#38bdf8' }}>[http]</strong> quick filter button (or type <code>http</code>) to isolate web traffic.</p>
-              <p>2. In the filtered packet list, click <strong>Packet #7</strong> (POST /api/v1/auth/login) or <strong>Packet #8</strong> (HTTP/1.1 200 OK).</p>
-              <p>3. Click <strong>[Follow TCP Stream]</strong> in the top toolbar to reconstruct the full plaintext conversation.</p>
-              <p>4. Inside the JSON response body, find the <code>token</code> value holding the flag, copy it, and paste it into the submit box below!</p>
+              <p>1. Type <code>http</code> into the filter bar or click the <strong>http</strong> button.</p>
+              <p>2. Select Packet #7 (POST) or #8 (200 OK).</p>
+              <p>3. In the Dissection Tree or Follow TCP Stream window, find <code>token</code> in the response body.</p>
+              <p>4. Copy the flag into the submit bar below and claim +200 PTS!</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* 3. Main 3-Pane Layout: Packet List (Top) | Details Tree & Hex (Bottom) */}
-      <div className="cos-app-body">
-        {/* Top Pane: Packet List Table */}
-        <div className="cos-panel" style={{ flex: 1.1, minHeight: '140px' }}>
-          <div className="cos-panel-header">
-            <span>PACKET LIST ({filteredPackets.length} PACKETS MATCHED)</span>
-            <span style={{ fontSize: '10px', color: '#64748b' }}>Click row to inspect details & raw bytes</span>
-          </div>
-          <div className="cos-table-container" style={{ flex: 1, border: 'none' }}>
+      {/* 3. Packet Table & Details */}
+      <div className="cos-app-body" style={{ gap: '6px' }}>
+        {/* Packet List Pane */}
+        <div className="cos-panel" style={{ flex: '1 1 180px', minHeight: '140px' }}>
+          <div className="cos-table-container" style={{ border: 'none', height: '100%' }}>
             <table className="cos-table">
               <thead>
                 <tr>
@@ -360,25 +375,16 @@ export default function WiresharkApp({ onOpenStation }) {
                   <th style={{ width: '75px' }}>Time</th>
                   <th style={{ width: '130px' }}>Source</th>
                   <th style={{ width: '130px' }}>Destination</th>
-                  <th style={{ width: '70px' }}>Protocol</th>
+                  <th style={{ width: '65px' }}>Protocol</th>
                   <th style={{ width: '55px' }}>Length</th>
                   <th>Info</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredPackets.map((pkt) => {
-                  const isSelected = pkt.no === selectedPacketNo;
+                  const isSelected = pkt.no === selectedPacket.no;
                   const isHttp = pkt.proto === 'HTTP';
                   const isDns = pkt.proto === 'DNS';
-
-                  let rowBg = '';
-                  if (isSelected) {
-                    rowBg = 'rgba(14, 165, 233, 0.25)';
-                  } else if (isHttp) {
-                    rowBg = 'rgba(16, 185, 129, 0.12)';
-                  } else if (isDns) {
-                    rowBg = 'rgba(56, 189, 248, 0.1)';
-                  }
 
                   return (
                     <tr
@@ -388,18 +394,17 @@ export default function WiresharkApp({ onOpenStation }) {
                         setSelectedPacketNo(pkt.no);
                       }}
                       className={isSelected ? 'is-selected' : ''}
-                      style={{ background: rowBg, cursor: 'pointer' }}
+                      style={{
+                        cursor: 'pointer',
+                        background: isSelected ? 'rgba(56, 189, 248, 0.2)' : isHttp ? 'rgba(52, 211, 153, 0.08)' : undefined,
+                      }}
                     >
                       <td style={{ fontWeight: 700 }}>{pkt.no}</td>
                       <td style={{ color: '#94a3b8' }}>{pkt.time}</td>
                       <td style={{ color: isSelected ? '#fff' : '#38bdf8' }}>{pkt.src}</td>
                       <td style={{ color: isSelected ? '#fff' : '#cbd5e1' }}>{pkt.dst}</td>
                       <td>
-                        <span
-                          className={`cos-badge ${
-                            isHttp ? 'cos-badge-emerald' : isDns ? 'cos-badge-cyan' : ''
-                          }`}
-                        >
+                        <span className={`cos-badge ${isHttp ? 'cos-badge-emerald' : isDns ? 'cos-badge-cyan' : ''}`}>
                           {pkt.proto}
                         </span>
                       </td>
@@ -415,10 +420,10 @@ export default function WiresharkApp({ onOpenStation }) {
           </div>
         </div>
 
-        {/* Bottom Split Pane: Details Tree (Left) | Hex Dump (Right) */}
-        <div className="cos-split-horizontal" style={{ flex: 1, minHeight: '120px' }}>
+        {/* Bottom Split: Dissection Tree (Left) | Interactive Hex Dump (Right) */}
+        <div className="cos-split-horizontal" style={{ flex: '1 1 200px', minHeight: '150px' }}>
           {/* Packet Details Tree */}
-          <div className="cos-panel">
+          <div className="cos-panel" style={{ flex: 1 }}>
             <div className="cos-panel-header">
               <span>PACKET #{selectedPacket.no} DISSECTION TREE</span>
               <span className="cos-badge cos-badge-cyan">{selectedPacket.proto}</span>
@@ -434,9 +439,26 @@ export default function WiresharkApp({ onOpenStation }) {
                       fontWeight: detail.includes('FLAG{') ? 700 : 400,
                       background: detail.includes('FLAG{') ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
                       borderRadius: '3px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
                     }}
                   >
-                    {detail}
+                    <span>{detail}</span>
+                    {detail.includes('FLAG{') && (
+                      <button
+                        type="button"
+                        className="cos-btn cos-btn-primary"
+                        style={{ fontSize: '9px', padding: '1px 6px' }}
+                        onClick={() => {
+                          playClickSound(1000);
+                          setFlagInput(FLAG_STRING);
+                        }}
+                      >
+                        <Copy size={10} />
+                        <span>Copy Flag</span>
+                      </button>
+                    )}
                   </div>
                 ))
               ) : (
@@ -445,16 +467,102 @@ export default function WiresharkApp({ onOpenStation }) {
             </div>
           </div>
 
-          {/* Hex & ASCII View */}
-          <div className="cos-panel">
+          {/* Interactive Hex & ASCII View */}
+          <div className="cos-panel" style={{ flex: 1 }}>
             <div className="cos-panel-header">
-              <span>RAW HEX DUMP</span>
-              <span style={{ fontSize: '10px', color: '#64748b' }}>Offset + Hex Bytes + ASCII</span>
+              <span>PACKET RAW BYTES (HEX & ASCII)</span>
+              {activeByte && (
+                <span style={{ fontSize: '10px', color: '#38bdf8', fontFamily: 'monospace' }}>
+                  Offset: 0x{hoveredByteIdx.toString(16).padStart(4, '0')} · Hex: 0x{activeByte} · ASCII: '{activeChar}'
+                </span>
+              )}
             </div>
-            <div className="cos-panel-body">
-              <pre className="cos-hex-dump" style={{ margin: 0, height: '100%' }}>
-                {selectedPacket.hex || '00 00 00 00 ...'}
-              </pre>
+            <div className="cos-panel-body" style={{ padding: '6px', fontFamily: 'monospace', fontSize: '11px', lineHeight: '1.5' }}>
+              <div style={{ overflowY: 'auto', maxHeight: '100%' }}>
+                {hexRows.map((row, rIdx) => {
+                  const leftBytes = row.bytes.slice(0, 8);
+                  const rightBytes = row.bytes.slice(8, 16);
+
+                  return (
+                    <div key={rIdx} style={{ display: 'flex', gap: '12px', whiteSpace: 'nowrap' }}>
+                      <span style={{ color: '#64748b', userSelect: 'none' }}>{row.offset}</span>
+
+                      {/* Hex bytes block */}
+                      <span style={{ color: '#94a3b8' }}>
+                        {leftBytes.map((b, bIdx) => {
+                          const absIdx = row.startIdx + bIdx;
+                          const isHovered = hoveredByteIdx === absIdx;
+                          return (
+                            <span
+                              key={bIdx}
+                              onMouseEnter={() => setHoveredByteIdx(absIdx)}
+                              onMouseLeave={() => setHoveredByteIdx(null)}
+                              style={{
+                                color: isHovered ? '#fff' : '#38bdf8',
+                                background: isHovered ? '#0284c7' : 'transparent',
+                                padding: '0 2px',
+                                borderRadius: '2px',
+                                cursor: 'crosshair',
+                                display: 'inline-block',
+                                minWidth: '20px',
+                              }}
+                            >
+                              {b}
+                            </span>
+                          );
+                        })}
+                        {'  '}
+                        {rightBytes.map((b, bIdx) => {
+                          const absIdx = row.startIdx + 8 + bIdx;
+                          const isHovered = hoveredByteIdx === absIdx;
+                          return (
+                            <span
+                              key={bIdx}
+                              onMouseEnter={() => setHoveredByteIdx(absIdx)}
+                              onMouseLeave={() => setHoveredByteIdx(null)}
+                              style={{
+                                color: isHovered ? '#fff' : '#38bdf8',
+                                background: isHovered ? '#0284c7' : 'transparent',
+                                padding: '0 2px',
+                                borderRadius: '2px',
+                                cursor: 'crosshair',
+                                display: 'inline-block',
+                                minWidth: '20px',
+                              }}
+                            >
+                              {b}
+                            </span>
+                          );
+                        })}
+                      </span>
+
+                      {/* ASCII Representation */}
+                      <span style={{ color: '#34d399', marginLeft: 'auto', borderLeft: '1px solid #1e293b', paddingLeft: '8px' }}>
+                        {row.bytes.map((b, bIdx) => {
+                          const absIdx = row.startIdx + bIdx;
+                          const code = parseInt(b, 16);
+                          const ch = code >= 32 && code <= 126 ? String.fromCharCode(code) : '.';
+                          const isHovered = hoveredByteIdx === absIdx;
+                          return (
+                            <span
+                              key={bIdx}
+                              onMouseEnter={() => setHoveredByteIdx(absIdx)}
+                              onMouseLeave={() => setHoveredByteIdx(null)}
+                              style={{
+                                background: isHovered ? '#059669' : 'transparent',
+                                color: isHovered ? '#fff' : '#34d399',
+                                fontWeight: isHovered ? 700 : 400,
+                              }}
+                            >
+                              {ch}
+                            </span>
+                          );
+                        })}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -520,6 +628,18 @@ export default function WiresharkApp({ onOpenStation }) {
               </pre>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  className="cos-btn cos-btn-primary"
+                  onClick={() => {
+                    playClickSound(1000);
+                    setFlagInput(FLAG_STRING);
+                    setShowStreamModal(false);
+                  }}
+                >
+                  <Copy size={11} />
+                  <span>Copy Flag & Close</span>
+                </button>
                 <button
                   type="button"
                   className="cos-btn"

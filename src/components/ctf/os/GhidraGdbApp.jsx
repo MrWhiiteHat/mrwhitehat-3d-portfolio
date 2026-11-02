@@ -13,6 +13,8 @@ import {
   Sparkles,
   Copy,
   Zap,
+  StepForward,
+  Layers,
 } from 'lucide-react';
 import { playClickSound, playHackingBeep, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
@@ -57,9 +59,22 @@ export default function GhidraGdbApp({ onOpenStation }) {
   const [activeStep, setActiveStep] = useState(-1);
   const [reversingLog, setReversingLog] = useState('Disassembly loaded: ./sentinel_daemon (x86_64 ELF).\nTarget conditional jump located at 0x004011ad: [74 12].');
 
+  // Live Register State
+  const [registers, setRegisters] = useState({
+    rax: '0x0000000000000000',
+    rbx: '0x00007fffffffe400',
+    rcx: '0x0000000000000000',
+    rdx: '0x00007fffffffe3f0',
+    rsi: '0x0000000000000001',
+    rdi: '0x00007fffffffe3c0',
+    rbp: '0x00007fffffffe3d0',
+    rsp: '0x00007fffffffe3a8',
+    rip: '0x00000000004011a0',
+  });
+
   // Buffer Overflow State
-  const [paddingLength, setPaddingLength] = useState('');
-  const [targetRip, setTargetRip] = useState('');
+  const [paddingLength, setPaddingLength] = useState('24');
+  const [targetRip, setTargetRip] = useState('0x00401155');
   const [gdbOutput, setGdbOutput] = useState(DEFAULT_GDB_OUTPUT);
 
   // Flag Submissions
@@ -75,8 +90,35 @@ export default function GhidraGdbApp({ onOpenStation }) {
     setReversingLog(
       `[PATCH] Modified address 0x004011ad: 74 12 -> [${code}].\n` +
       `Byte modification committed to memory image.\n` +
-      `Click 'Run Patched Binary' to simulate execution.`
+      `Click 'Run Patched Binary' or 'Step' to simulate execution.`
     );
+  };
+
+  const handleStepReversing = () => {
+    const nextStep = activeStep < 0 ? 0 : (activeStep + 1) % ASM_INSTRUCTIONS.length;
+    setActiveStep(nextStep);
+    playClickSound(1150);
+
+    const curInstr = ASM_INSTRUCTIONS[nextStep];
+    setRegisters((prev) => {
+      const nextRegs = { ...prev, rip: curInstr.addr };
+      if (curInstr.addr === '0x004011a4') {
+        nextRegs.rax = '0xffffffffffffffff'; // ptrace returns -1 in debugged process
+      } else if (curInstr.addr === '0x004011af') {
+        nextRegs.rax = '0x0000000000000000';
+        nextRegs.rdi = '0x0000000000402010';
+      }
+      return nextRegs;
+    });
+
+    if (nextStep === 3) {
+      if (patchedOpcode === '90 90') {
+        setReversingLog((prev) => prev + `\n[STEP 0x004011ad]: 90 90 (NOP NOP) - jump bypassed, continuing into win flow.`);
+      } else {
+        setReversingLog((prev) => prev + `\n[STEP 0x004011ad]: 74 12 (JE) taken! Process routed to tamper_kill.`);
+        playZapSound();
+      }
+    }
   };
 
   const handleRunReversing = () => {
@@ -91,9 +133,18 @@ export default function GhidraGdbApp({ onOpenStation }) {
       setActiveStep(step);
       playClickSound(1100 + step * 50);
 
+      if (step < ASM_INSTRUCTIONS.length) {
+        setRegisters((prev) => ({
+          ...prev,
+          rip: ASM_INSTRUCTIONS[step].addr,
+          rax: step >= 2 ? '0xffffffffffffffff' : prev.rax,
+        }));
+      }
+
       if (step === 3) {
         // At conditional jump
         if (patchedOpcode === '90 90') {
+          setRegisters((prev) => ({ ...prev, rip: '0x004011af', rax: '0x0000000000000000' }));
           setReversingLog(
             (prev) =>
               prev +
@@ -104,6 +155,7 @@ export default function GhidraGdbApp({ onOpenStation }) {
           );
           playBreachFanfare();
         } else {
+          setRegisters((prev) => ({ ...prev, rip: '0x004011c1' }));
           setReversingLog(
             (prev) =>
               prev +
@@ -120,7 +172,7 @@ export default function GhidraGdbApp({ onOpenStation }) {
         clearInterval(interval);
         setExecuting(false);
       }
-    }, 400);
+    }, 380);
   };
 
   const handleTestBufferExploit = () => {
@@ -153,77 +205,94 @@ export default function GhidraGdbApp({ onOpenStation }) {
         ripClean.includes('win') ||
         ripClean.includes('401155');
 
-      const resolvedAddr = (ripClean.includes('win') || ripClean === '0x55') ? '0x00401155' : ripRaw;
+      const resolvedAddr = ripClean.includes('win') || ripClean === '0x55' ? '0x00401155' : ripRaw;
 
       if (offset >= 24 && isRipWin) {
+        setRegisters({
+          rax: '0x0000000000000000',
+          rbx: '0x0000000000000000',
+          rcx: '0x00007fffffffe390',
+          rdx: '0x0000000000000020',
+          rsi: '0x00007fffffffe3a0',
+          rdi: '0x0000000000000001',
+          rbp: '0x4141414141414141', // Smashed!
+          rsp: '0x00007fffffffe3c0',
+          rip: '0x0000000000401155', // Hijacked to win()!
+        });
+
         setGdbOutput(
           `[+] Exploit payload generated: ${offset} bytes padding ('A'*${offset}) + return address (${resolvedAddr})\n` +
-          (ripClean.includes('win') ? `[+] GDB Symbol Resolver: Resolved function 'win()' to memory address 0x00401155\n` : '') +
-          `[+] [0x7fffffffe018]: Overwritten Saved RIP -> 0x00401155\n` +
-          `[+] Control flow hijacked! Execution successfully redirected to win()!\n` +
-          `[+] Executing win(): Dumping confidential flag from root vault...\n` +
-          `--------------------------------------------------------------------------------\n` +
-          `[+] FLAG CAPTURED: ${BUFFER_OVERFLOW_FLAG}\n` +
-          `--------------------------------------------------------------------------------\n` +
-          `[+] Exploit verified! Copy the flag above and paste it into the submit box below.`
+          `[----------------------------------registers-----------------------------------]\n` +
+          `RAX: 0x0000000000000000\n` +
+          `RBX: 0x0000000000000000\n` +
+          `RBP: 0x4141414141414141 ('AAAAAAAA') [SMASHED]\n` +
+          `RSP: 0x00007fffffffe3c0 --> 0x0000000000000000\n` +
+          `RIP: 0x0000000000401155 (<win>): push rbp\n` +
+          `[------------------------------------code--------------------------------------]\n` +
+          `=> 0x00401155 <win>:       push   rbp\n` +
+          `   0x00401156 <win+1>:     mov    rbp, rsp\n` +
+          `   0x00401159 <win+4>:     lea    rdi, [rip+0xeb4] # "FLAG{buffer_overflow_eip_overwritten_0x55}"\n` +
+          `   0x00401160 <win+11>:    call   puts@plt\n` +
+          `[------------------------------------------------------------------------------]\n` +
+          `Stopped reason: RET executed with smashed RIP\n` +
+          `[+] SHELLCODE / TARGET ROUTINE EXECUTED!\n` +
+          `[+] FLAG: ${BUFFER_OVERFLOW_FLAG}\n`
         );
         playBreachFanfare();
-      } else if (offset < 24) {
-        setGdbOutput(
-          `[-] Injected ${offset} bytes.\n` +
-          `[-] Stack frame not saturated: payload did not reach Saved RIP.\n` +
-          `[-] Stack layout: 16 bytes (buffer) + 8 bytes (Saved RBP) = 24 bytes minimum padding required.\n` +
-          `[-] Program exited normally with code 0. Re-enter Padding Length = 24.`
-        );
-        playZapSound();
       } else {
+        const segAddr = offset > 24 ? '0x4141414141414141' : '0x000000000040114a';
+        setRegisters((prev) => ({
+          ...prev,
+          rbp: offset >= 24 ? '0x4141414141414141' : prev.rbp,
+          rip: segAddr,
+        }));
         setGdbOutput(
-          `[!] Program received signal SIGSEGV, Segmentation fault.\n` +
-          `[!] 0x00000000${ripRaw.replace('0x', '')} in ?? ()\n` +
-          `[!] Invalid memory reference. Target 'win()' function is located at address 0x00401155 (or type "win").`
+          `[-] Exploit payload failed.\n` +
+          `Padding: ${offset} bytes (Expected: >= 24 bytes = 16B buffer + 8B RBP).\n` +
+          `Target RIP: "${ripRaw}" (Expected: 0x00401155 or "win").\n` +
+          `Program received signal SIGSEGV, Segmentation fault.\n` +
+          `RIP: ${segAddr} (cannot access memory at address ${segAddr}).\n` +
+          `Hint: Buffer is 16 bytes. Saved RBP is 8 bytes. Set Padding = 24 and Target = 0x00401155.`
         );
         playZapSound();
       }
-    }, 350);
+    }, 300);
   };
 
   const handleManualSubmit = (e) => {
     e?.preventDefault();
-    if (!manualFlag.trim()) return;
     const clean = manualFlag.trim();
+    if (!clean) return;
 
     let res = ctfEngine.submitFlag('rev-anti-debug-patch', clean);
-    let targetStationId = 'operator';
-    let targetStationName = 'MRWHITEHAT OPERATOR';
+    let targetStationId = 'secret_vault';
+    let targetStationName = 'BLACK HAT VAULT';
 
     if (!res.success) {
       res = ctfEngine.submitFlag('pwn-stack-matrix-buffer', clean);
       targetStationId = 'skills';
       targetStationName = 'SKILLS ARCHIVE';
     }
-    if (!res.success) {
-      res = ctfEngine.submitFlag('pwn-heap-race-condition', clean);
-      targetStationId = 'secret_vault';
-      targetStationName = 'BLACK HAT VAULT';
-    }
 
-    if (res.success) {
+    if (res.success || res.duplicate) {
       const stationId = res.stationId || targetStationId;
       setFlagFeedback({
         success: true,
         text: res.message,
         stationId,
-        stationName: targetStationName
+        stationName: targetStationName,
       });
       playBreachFanfare();
       setTimeout(() => {
         onOpenStation?.(stationId);
       }, 1800);
     } else {
-      setFlagFeedback({ success: false, text: res.message });
+      setFlagFeedback({ success: false, text: 'Verification Failed: Flag does not match active challenge hashes.' });
       playZapSound();
     }
   };
+
+  const parsedPad = parseInt(paddingLength, 10) || 0;
 
   return (
     <div className="cos-app-container select-text">
@@ -239,7 +308,10 @@ export default function GhidraGdbApp({ onOpenStation }) {
             <button
               type="button"
               className={`cos-btn ${activeTab === 'reversing' ? 'cos-btn-primary' : ''}`}
-              onClick={() => setActiveTab('reversing')}
+              onClick={() => {
+                playClickSound(900);
+                setActiveTab('reversing');
+              }}
             >
               <Code2 size={11} />
               <span>Ghidra Opcode Patcher</span>
@@ -247,7 +319,10 @@ export default function GhidraGdbApp({ onOpenStation }) {
             <button
               type="button"
               className={`cos-btn ${activeTab === 'buffer' ? 'cos-btn-primary' : ''}`}
-              onClick={() => setActiveTab('buffer')}
+              onClick={() => {
+                playClickSound(900);
+                setActiveTab('buffer');
+              }}
             >
               <Cpu size={11} />
               <span>GDB Stack Buffer Overflow</span>
@@ -266,6 +341,26 @@ export default function GhidraGdbApp({ onOpenStation }) {
             <span>{showHints ? 'HIDE HINTS' : '💡 HOW TO SOLVE'}</span>
           </button>
         </div>
+      </div>
+
+      {/* Live Registers Bar */}
+      <div style={{ background: '#070a12', borderBottom: '1px solid #1e293b', padding: '5px 10px', display: 'flex', gap: '12px', flexWrap: 'wrap', fontSize: '10.5px', fontFamily: 'monospace' }}>
+        <span style={{ color: '#64748b', fontWeight: 700 }}>REGISTERS:</span>
+        <span style={{ color: registers.rip.includes('401155') || registers.rip.includes('4011af') ? '#34d399' : '#38bdf8' }}>
+          RIP: <strong style={{ color: '#fff' }}>{registers.rip}</strong>
+        </span>
+        <span style={{ color: registers.rbp.includes('414141') ? '#fb923c' : '#94a3b8' }}>
+          RBP: <strong style={{ color: registers.rbp.includes('414141') ? '#fb923c' : '#cbd5e1' }}>{registers.rbp}</strong>
+        </span>
+        <span style={{ color: '#94a3b8' }}>
+          RSP: <strong style={{ color: '#cbd5e1' }}>{registers.rsp}</strong>
+        </span>
+        <span style={{ color: registers.rax.includes('ffff') ? '#f87171' : '#94a3b8' }}>
+          RAX: <strong style={{ color: registers.rax.includes('ffff') ? '#f87171' : '#cbd5e1' }}>{registers.rax}</strong>
+        </span>
+        <span style={{ color: '#94a3b8' }}>
+          RDI: <strong style={{ color: '#cbd5e1' }}>{registers.rdi}</strong>
+        </span>
       </div>
 
       {/* 2. Interactive Hint & Walkthrough Drawer */}
@@ -290,14 +385,12 @@ export default function GhidraGdbApp({ onOpenStation }) {
                 </div>
                 <div className="cos-hint-card">
                   <h4>🔍 Reversing & Patching Guide</h4>
-                  <p>At address <code>0x004011ad</code>, opcode <code>74 12</code> is a conditional jump (<code>je &lt;tamper_kill&gt;</code>). In x86, replacing it with <strong style={{ color: '#34d399' }}>90 90 (NOP NOP)</strong> turns the jump into a no-operation, allowing execution to safely fall through!</p>
+                  <p>At address <code>0x004011ad</code>, opcode <code>74 12</code> is a conditional jump (<code>je &lt;tamper_kill&gt;</code>). In x86, replacing it with <strong style={{ color: '#34d399' }}>90 90 (NOP NOP)</strong> neutralizes the jump.</p>
                 </div>
                 <div className="cos-hint-card">
                   <h4>🛠️ Step-by-Step Walkthrough</h4>
-                  <p>1. In the disassembly table, look at instruction <code>0x004011ad: 74 12</code> (conditional branch to exit).</p>
-                  <p>2. In the <strong>Patch Opcode</strong> input below, enter <code>90 90</code> and click <strong>Apply Patch</strong>.</p>
-                  <p>3. Click <strong>[RUN PATCHED BINARY]</strong>. The program will bypass termination, call <code>decrypt_vault_flag()</code>, and dump the flag in the console!</p>
-                  <p>4. Copy the flag from the console and paste it into the submit box below.</p>
+                  <p>1. In the Patch Opcode input below, type <code>90 90</code> and click <strong>Apply Patch</strong>.</p>
+                  <p>2. Click <strong>[RUN PATCHED BINARY]</strong> to bypass termination and reveal the root flag!</p>
                 </div>
               </>
             ) : (
@@ -311,14 +404,13 @@ export default function GhidraGdbApp({ onOpenStation }) {
                   <p>• <strong>Buffer Size:</strong> 16 bytes.<br />
                   • <strong>Saved Frame Pointer (RBP):</strong> 8 bytes.<br />
                   • <strong>Total Padding Required:</strong> 16 + 8 = <strong style={{ color: '#fbbf24' }}>24 bytes</strong>.<br />
-                  • <strong>Target Function:</strong> Look at the GDB console on the right: <code>win()</code> is at <strong style={{ color: '#38bdf8' }}>0x00401155</strong>.</p>
+                  • <strong>Target Function:</strong> <code>win()</code> is at <strong style={{ color: '#38bdf8' }}>0x00401155</strong>.</p>
                 </div>
                 <div className="cos-hint-card">
                   <h4>🛠️ Step-by-Step Walkthrough</h4>
-                  <p>1. In <strong>Padding Length</strong>, enter <code>24</code> (fills the 16-byte buffer + 8-byte RBP).</p>
-                  <p>2. In <strong>Target Address</strong>, enter <code>0x00401155</code> (or simply type <code>win</code>).</p>
-                  <p>3. Click <strong>[RUN EXPLOIT IN GDB]</strong>. Execution will jump directly to <code>win()</code> and dump the flag in the log!</p>
-                  <p>4. Copy the flag from the execution log and paste it into the submit box below.</p>
+                  <p>1. Enter Padding Length = <code>24</code>.</p>
+                  <p>2. Enter Target Address = <code>0x00401155</code> (or <code>win</code>).</p>
+                  <p>3. Click <strong>[RUN EXPLOIT IN GDB]</strong> to hijack execution to <code>win()</code>!</p>
                 </div>
               </>
             )}
@@ -344,31 +436,37 @@ export default function GhidraGdbApp({ onOpenStation }) {
                       <tr>
                         <th style={{ width: '90px' }}>Address</th>
                         <th style={{ width: '90px' }}>Hex Opcodes</th>
-                        <th>Instruction (AT&T / Intel)</th>
+                        <th>Instruction (Intel syntax)</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {ASM_INSTRUCTIONS.map((ins, idx) => {
+                      {ASM_INSTRUCTIONS.map((instr, idx) => {
                         const isCurrent = activeStep === idx;
-                        const isPatched = ins.isTarget && patchedOpcode === '90 90';
+                        const isPatchedTarget = instr.isTarget;
+                        const displayHex = isPatchedTarget ? patchedOpcode : instr.hex;
+                        const displayAsm = isPatchedTarget && patchedOpcode === '90 90' ? 'nop; nop' : instr.asm;
 
                         return (
                           <tr
                             key={idx}
                             style={{
-                              background: isCurrent ? 'rgba(168, 85, 247, 0.25)' : ins.isTarget ? 'rgba(239, 68, 68, 0.15)' : '',
+                              background: isCurrent
+                                ? 'rgba(56, 189, 248, 0.2)'
+                                : isPatchedTarget
+                                ? 'rgba(168, 85, 247, 0.15)'
+                                : undefined,
                             }}
                           >
-                            <td style={{ color: '#94a3b8' }}>{ins.addr}</td>
-                            <td style={{ fontWeight: 700, color: ins.isTarget ? (isPatched ? '#34d399' : '#f87171') : '#cbd5e1' }}>
-                              {ins.isTarget ? patchedOpcode : ins.hex}
+                            <td style={{ fontFamily: 'monospace', color: '#94a3b8' }}>{instr.addr}</td>
+                            <td style={{ fontFamily: 'monospace', color: isPatchedTarget ? '#a855f7' : '#38bdf8', fontWeight: isPatchedTarget ? 700 : 400 }}>
+                              {displayHex}
                             </td>
                             <td>
-                              <span style={{ color: isCurrent ? '#a855f7' : ins.isTarget ? (isPatched ? '#34d399' : '#f87171') : '#f1f5f9', fontWeight: ins.isTarget ? 700 : 400 }}>
-                                {ins.isTarget ? (isPatched ? 'nop nop (0x004011ad)' : ins.asm) : ins.asm}
+                              <span style={{ color: isCurrent ? '#fff' : '#cbd5e1', fontWeight: isCurrent ? 700 : 400 }}>
+                                {displayAsm}
                               </span>
                               <span style={{ fontSize: '10px', color: '#64748b', marginLeft: '8px' }}>
-                                // {ins.note}
+                                // {instr.note}
                               </span>
                             </td>
                           </tr>
@@ -379,20 +477,20 @@ export default function GhidraGdbApp({ onOpenStation }) {
                 </div>
 
                 {/* Patch Control Bar */}
-                <div style={{ marginTop: 'auto', paddingTop: '8px', borderTop: '1px solid #1e293b', display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '10.5px', color: '#94a3b8', fontWeight: 700 }}>Patch Opcode:</span>
+                <div style={{ marginTop: 'auto', background: '#090e17', border: '1px solid #1e293b', borderRadius: '4px', padding: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '10.5px', color: '#a855f7', fontWeight: 700 }}>0x004011ad OP:</span>
                   <input
                     type="text"
                     className="cos-input"
-                    style={{ width: '130px', fontSize: '11px', fontFamily: 'monospace' }}
+                    style={{ width: '80px', textAlign: 'center', fontWeight: 700 }}
                     value={patchInput}
                     onChange={(e) => setPatchInput(e.target.value)}
-                    placeholder="e.g. 90 90"
-                    onKeyDown={(e) => e.key === 'Enter' && handleApplyPatch()}
+                    placeholder="90 90"
                   />
                   <button
                     type="button"
-                    className="cos-btn cos-btn-success"
+                    className="cos-btn cos-btn-primary"
+                    style={{ fontSize: '10px' }}
                     onClick={() => handleApplyPatch()}
                   >
                     Apply Patch
@@ -400,16 +498,33 @@ export default function GhidraGdbApp({ onOpenStation }) {
                   <button
                     type="button"
                     className="cos-btn"
+                    style={{ fontSize: '10px' }}
+                    onClick={() => handleApplyPatch('90 90')}
+                  >
+                    Preset: 90 90
+                  </button>
+                  <button
+                    type="button"
+                    className="cos-btn"
+                    style={{ fontSize: '10px' }}
                     onClick={() => handleApplyPatch('74 12')}
                   >
                     Reset (74 12)
                   </button>
                   <button
                     type="button"
+                    className="cos-btn"
+                    style={{ fontSize: '10px', marginLeft: 'auto' }}
+                    onClick={handleStepReversing}
+                  >
+                    <StepForward size={11} />
+                    <span>Step [SI]</span>
+                  </button>
+                  <button
+                    type="button"
                     className="cos-btn cos-btn-primary"
                     onClick={handleRunReversing}
                     disabled={executing}
-                    style={{ marginLeft: 'auto' }}
                   >
                     <Play size={11} />
                     <span>{executing ? 'Executing...' : 'RUN PATCHED BINARY'}</span>
@@ -422,6 +537,20 @@ export default function GhidraGdbApp({ onOpenStation }) {
             <div className="cos-panel">
               <div className="cos-panel-header">
                 <span>SANDBOX EXECUTION CONSOLE</span>
+                {reversingLog.includes(BINARY_PATCH_FLAG) && (
+                  <button
+                    type="button"
+                    className="cos-btn cos-btn-primary"
+                    style={{ fontSize: '9.5px', padding: '1px 6px' }}
+                    onClick={() => {
+                      playClickSound(1000);
+                      setManualFlag(BINARY_PATCH_FLAG);
+                    }}
+                  >
+                    <Copy size={10} />
+                    <span>Copy Flag</span>
+                  </button>
+                )}
               </div>
               <div className="cos-panel-body" style={{ padding: '6px' }}>
                 <textarea
@@ -440,64 +569,120 @@ export default function GhidraGdbApp({ onOpenStation }) {
             <div className="cos-panel">
               <div className="cos-panel-header">
                 <span>X86_64 STACK FRAME ARCHITECTURE (vuln_server)</span>
+                <span className="cos-badge cos-badge-amber">OVERFLOW VISUALIZER</span>
               </div>
-              <div className="cos-panel-body">
-                {/* Visual Stack Layout Box */}
+              <div className="cos-panel-body" style={{ gap: '8px' }}>
+                {/* Visual Stack Layout Box with Dynamic Fill */}
                 <div style={{ background: '#03060a', border: '1px solid #1e293b', borderRadius: '4px', padding: '10px' }}>
-                  <div style={{ fontSize: '10.5px', color: '#94a3b8', marginBottom: '6px', fontWeight: 700 }}>
-                    Memory Layout (Low to High Addresses):
+                  <div style={{ fontSize: '10.5px', color: '#94a3b8', marginBottom: '8px', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Memory Stack Frames (RSP ➔ RBP ➔ RIP):</span>
+                    <span style={{ color: parsedPad >= 24 ? '#34d399' : '#fb923c' }}>
+                      Payload: {parsedPad} / 24+ Bytes
+                    </span>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11px' }}>
-                    <div style={{ background: 'rgba(56, 189, 248, 0.15)', border: '1px solid #38bdf8', padding: '5px 8px', borderRadius: '3px', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>buffer[16] (char array)</span>
-                      <strong style={{ color: '#38bdf8' }}>16 Bytes</strong>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '11px', fontFamily: 'monospace' }}>
+                    {/* Buffer row */}
+                    <div
+                      style={{
+                        background: parsedPad >= 16 ? 'rgba(56, 189, 248, 0.25)' : 'rgba(56, 189, 248, 0.1)',
+                        border: `1px solid ${parsedPad >= 16 ? '#38bdf8' : '#0369a1'}`,
+                        padding: '6px 10px',
+                        borderRadius: '3px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <span>0x7fffffffe3a0: [ buffer[16] ]</span>
+                      <strong style={{ color: '#38bdf8' }}>
+                        {parsedPad >= 16 ? '16/16B FILLED (OVERFLOW!)' : `${parsedPad}/16 Bytes`}
+                      </strong>
                     </div>
-                    <div style={{ background: 'rgba(245, 158, 11, 0.15)', border: '1px solid #fbbf24', padding: '5px 8px', borderRadius: '3px', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Saved RBP (Base Pointer)</span>
-                      <strong style={{ color: '#fbbf24' }}>8 Bytes</strong>
+
+                    {/* Saved RBP row */}
+                    <div
+                      style={{
+                        background: parsedPad >= 24 ? 'rgba(245, 158, 11, 0.25)' : 'rgba(245, 158, 11, 0.08)',
+                        border: `1px solid ${parsedPad >= 24 ? '#fbbf24' : '#78350f'}`,
+                        padding: '6px 10px',
+                        borderRadius: '3px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <span>0x7fffffffe3b0: [ Saved RBP ]</span>
+                      <strong style={{ color: '#fbbf24' }}>
+                        {parsedPad >= 24 ? 'SMASHED (0x4141414141414141)' : 'Intact'}
+                      </strong>
                     </div>
-                    <div style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid #ef4444', padding: '5px 8px', borderRadius: '3px', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Saved RIP (Target Return Address)</span>
-                      <strong style={{ color: '#f87171' }}>Target Address</strong>
+
+                    {/* Saved RIP row */}
+                    <div
+                      style={{
+                        background: parsedPad >= 24 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(239, 68, 68, 0.12)',
+                        border: `1px solid ${parsedPad >= 24 ? '#34d399' : '#991b1b'}`,
+                        padding: '6px 10px',
+                        borderRadius: '3px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <span>0x7fffffffe3b8: [ Saved RIP ]</span>
+                      <strong style={{ color: parsedPad >= 24 ? '#34d399' : '#f87171' }}>
+                        {parsedPad >= 24 ? `OVERWRITTEN: ${targetRip || '0x00401155 <win>'}` : 'Original Return Addr'}
+                      </strong>
                     </div>
                   </div>
                 </div>
 
                 {/* Exploit Parameters */}
-                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div>
-                    <label style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block', marginBottom: '2px' }}>
-                      Padding Length (Bytes to Saved RIP):
-                    </label>
-                    <input
-                      type="number"
-                      className="cos-input"
-                      style={{ width: '100%' }}
-                      value={paddingLength}
-                      onChange={(e) => setPaddingLength(e.target.value)}
-                      placeholder="Enter calculated padding bytes..."
-                    />
+                <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block', marginBottom: '2px', fontWeight: 700 }}>
+                        Padding Length (Bytes):
+                      </label>
+                      <input
+                        type="number"
+                        className="cos-input"
+                        style={{ width: '100%' }}
+                        value={paddingLength}
+                        onChange={(e) => setPaddingLength(e.target.value)}
+                        placeholder="24"
+                      />
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <label style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block', marginBottom: '2px', fontWeight: 700 }}>
+                        Target Address (Saved RIP):
+                      </label>
+                      <input
+                        type="text"
+                        className="cos-input"
+                        style={{ width: '100%' }}
+                        value={targetRip}
+                        onChange={(e) => setTargetRip(e.target.value)}
+                        placeholder="0x00401155"
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <label style={{ fontSize: '10.5px', color: '#94a3b8', display: 'block', marginBottom: '2px' }}>
-                      Target Address (Saved RIP):
-                    </label>
-                    <input
-                      type="text"
-                      className="cos-input"
-                      style={{ width: '100%' }}
-                      value={targetRip}
-                      onChange={(e) => setTargetRip(e.target.value)}
-                      placeholder="0x... (e.g. win() address)"
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      className="cos-btn"
+                      style={{ fontSize: '10px' }}
+                      onClick={() => {
+                        setPaddingLength('24');
+                        setTargetRip('0x00401155');
+                      }}
+                    >
+                      Fill Exact: 24B + win()
+                    </button>
                     <button
                       type="button"
                       className="cos-btn cos-btn-primary"
-                      style={{ flex: 1 }}
+                      style={{ flex: 1, fontWeight: 700 }}
                       onClick={handleTestBufferExploit}
                     >
                       <Play size={11} />
@@ -512,6 +697,20 @@ export default function GhidraGdbApp({ onOpenStation }) {
             <div className="cos-panel">
               <div className="cos-panel-header">
                 <span>GDB-PEDA EXECUTION LOG</span>
+                {gdbOutput.includes(BUFFER_OVERFLOW_FLAG) && (
+                  <button
+                    type="button"
+                    className="cos-btn cos-btn-primary"
+                    style={{ fontSize: '9.5px', padding: '1px 6px' }}
+                    onClick={() => {
+                      playClickSound(1000);
+                      setManualFlag(BUFFER_OVERFLOW_FLAG);
+                    }}
+                  >
+                    <Copy size={10} />
+                    <span>Copy Flag</span>
+                  </button>
+                )}
               </div>
               <div className="cos-panel-body" style={{ padding: '6px' }}>
                 <textarea

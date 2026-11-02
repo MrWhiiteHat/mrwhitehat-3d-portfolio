@@ -11,6 +11,8 @@ import {
   Copy,
   RotateCcw,
   Sliders,
+  ArrowDown,
+  ArrowUp,
 } from 'lucide-react';
 import { playClickSound, playZapSound, playBreachFanfare } from '../../../utils/audio.js';
 import { ctfEngine } from '../../../utils/ctf/ctfEngine.js';
@@ -24,29 +26,101 @@ function caesarShift(text, shift) {
     .map((char) => {
       const code = char.charCodeAt(0);
       if (code >= 65 && code <= 90) {
-        return String.fromCharCode(((code - 65 + shift + 26) % 26) + 65);
+        return String.fromCharCode(((code - 65 + shift + 260) % 26) + 65);
       }
       if (code >= 97 && code <= 122) {
-        return String.fromCharCode(((code - 97 + shift + 26) % 26) + 97);
+        return String.fromCharCode(((code - 97 + shift + 260) % 26) + 97);
       }
       return char;
     })
     .join('');
 }
 
+function xorCipher(text, key) {
+  if (!key) return text;
+  return text
+    .split('')
+    .map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)))
+    .join('');
+}
+
+function fromHex(hex) {
+  const clean = hex.replace(/[^0-9a-fA-F]/g, '');
+  let str = '';
+  for (let i = 0; i < clean.length; i += 2) {
+    str += String.fromCharCode(parseInt(clean.substr(i, 2), 16));
+  }
+  return str;
+}
+
+function toHex(str) {
+  return str
+    .split('')
+    .map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
+    .join(' ');
+}
+
 export default function CyberChefApp({ onOpenStation }) {
   const [inputText, setInputText] = useState(ENCRYPTED_TELEGRAM);
-  const [caesarShiftKey, setCaesarShiftKey] = useState(0);
-  const [activeOps, setActiveOps] = useState([]);
+  const [recipe, setRecipe] = useState([
+    { id: 'op-1', type: 'caesar', label: 'Caesar Cipher', shift: 0 },
+  ]);
   const [showHints, setShowHints] = useState(true);
   const [manualFlag, setManualFlag] = useState('');
   const [flagFeedback, setFlagFeedback] = useState(null);
 
-  // Compute live output through recipe
+  // Compute live output through sequential chained recipe
   let outputText = inputText;
-  if (activeOps.includes('caesar')) {
-    outputText = caesarShift(outputText, caesarShiftKey);
+  for (const op of recipe) {
+    try {
+      if (op.type === 'caesar') {
+        outputText = caesarShift(outputText, op.shift || 0);
+      } else if (op.type === 'rot13') {
+        outputText = caesarShift(outputText, 13);
+      } else if (op.type === 'from_base64') {
+        outputText = atob(outputText.trim());
+      } else if (op.type === 'to_base64') {
+        outputText = btoa(outputText);
+      } else if (op.type === 'from_hex') {
+        outputText = fromHex(outputText);
+      } else if (op.type === 'to_hex') {
+        outputText = toHex(outputText);
+      } else if (op.type === 'url_decode') {
+        outputText = decodeURIComponent(outputText);
+      } else if (op.type === 'url_encode') {
+        outputText = encodeURIComponent(outputText);
+      } else if (op.type === 'xor') {
+        outputText = xorCipher(outputText, op.key || 'secret');
+      } else if (op.type === 'reverse') {
+        outputText = outputText.split('').reverse().join('');
+      }
+    } catch {
+      outputText = `[Error executing operation: ${op.label}]`;
+      break;
+    }
   }
+
+  const addOperation = (type, label, defaultProps = {}) => {
+    playClickSound(950);
+    const newOp = {
+      id: `op-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      type,
+      label,
+      ...defaultProps,
+    };
+    setRecipe((prev) => [...prev, newOp]);
+  };
+
+  const removeOperation = (id) => {
+    playClickSound(800);
+    setRecipe((prev) => prev.filter((o) => o.id !== id));
+  };
+
+  const updateOpProp = (id, prop, val) => {
+    setRecipe((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, [prop]: val } : o))
+    );
+  };
 
   const handleManualSubmit = (e) => {
     e?.preventDefault();
@@ -66,7 +140,7 @@ export default function CyberChefApp({ onOpenStation }) {
         success: true,
         text: res.message,
         stationId,
-        stationName: 'ABOUT DOSSIER'
+        stationName: 'ABOUT DOSSIER',
       });
       playBreachFanfare();
       setTimeout(() => {
@@ -85,7 +159,7 @@ export default function CyberChefApp({ onOpenStation }) {
         <div className="cos-app-title">
           <KeyRound size={15} style={{ color: '#38bdf8' }} />
           <span>CYBERCHEF v10.5 // CRYPTANALYSIS WORKBENCH</span>
-          <span className="cos-badge cos-badge-amber">ROT-3 CAESAR CIPHER</span>
+          <span className="cos-badge cos-badge-amber">CHAINED RECIPE PIPELINE</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -105,12 +179,11 @@ export default function CyberChefApp({ onOpenStation }) {
             onClick={() => {
               playClickSound(800);
               setInputText(ENCRYPTED_TELEGRAM);
-              setCaesarShiftKey(-3);
-              setActiveOps(['caesar']);
+              setRecipe([{ id: 'op-1', type: 'caesar', label: 'Caesar Cipher', shift: -3 }]);
             }}
           >
             <RotateCcw size={12} />
-            <span>Reset Preset</span>
+            <span>Load Cracked Preset (-3)</span>
           </button>
         </div>
       </div>
@@ -144,8 +217,8 @@ export default function CyberChefApp({ onOpenStation }) {
 
             <div className="cos-hint-card">
               <h4>🛠️ Step-by-Step Walkthrough</h4>
-              <p>1. In the <strong>Operations Palette</strong> on the left, click <strong>Caesar Cipher</strong> to add it to the Recipe Pipeline.</p>
-              <p>2. In the <strong>Recipe Pipeline</strong>, drag the <strong>Shift Key</strong> slider to <strong style={{ color: '#38bdf8' }}>-3</strong> (or type <code>-3</code>).</p>
+              <p>1. In the <strong>Operations Palette</strong> on the left, click <strong>Caesar Cipher</strong>.</p>
+              <p>2. In the <strong>Recipe Pipeline</strong>, drag the <strong>Shift Key</strong> slider to <strong style={{ color: '#38bdf8' }}>-3</strong>.</p>
               <p>3. Notice the <strong>Output Plaintext</strong> box immediately deciphers the secret message into readable English!</p>
               <p>4. Locate the decrypted flag inside the text, copy it, and paste it into the submit box below.</p>
             </div>
@@ -157,163 +230,218 @@ export default function CyberChefApp({ onOpenStation }) {
       <div className="cos-app-body">
         <div className="cos-grid-3">
           {/* Column 1: Operations Palette */}
-          <div className="cos-panel">
+          <div className="cos-panel" style={{ flex: '0 0 240px' }}>
             <div className="cos-panel-header">
               <span>OPERATIONS PALETTE</span>
             </div>
-            <div className="cos-panel-body">
-              <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
-                Available Ciphers
+            <div className="cos-panel-body" style={{ gap: '3px' }}>
+              <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', marginBottom: '2px', fontWeight: 700 }}>
+                Ciphers
               </div>
 
               <div
                 className="cos-op-item"
-                onClick={() => {
-                  playClickSound(850);
-                  if (!activeOps.includes('caesar')) setActiveOps([...activeOps, 'caesar']);
-                }}
+                onClick={() => addOperation('caesar', 'Caesar Cipher', { shift: -3 })}
               >
                 <span>Caesar Cipher (Shift)</span>
-                <span className="cos-badge cos-badge-cyan">Active</span>
+                <span className="cos-badge cos-badge-cyan">+Add</span>
               </div>
 
               <div
                 className="cos-op-item"
-                onClick={() => {
-                  playClickSound(850);
-                  setCaesarShiftKey(13);
-                }}
+                onClick={() => addOperation('rot13', 'ROT13', { shift: 13 })}
               >
-                <span>ROT13 (Preset Shift 13)</span>
-                <span className="cos-badge cos-badge-amber">Shift 13</span>
-              </div>
-
-              <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', margin: '8px 0 4px' }}>
-                Encodings
+                <span>ROT13</span>
+                <span className="cos-badge cos-badge-amber">+Add</span>
               </div>
 
               <div
                 className="cos-op-item"
-                onClick={() => {
-                  playClickSound(850);
-                  try {
-                    setInputText(btoa(inputText));
-                  } catch (_) {}
-                }}
+                onClick={() => addOperation('xor', 'XOR Cipher', { key: '1337' })}
               >
-                <span>To Base64</span>
-                <span className="cos-badge">Encode</span>
+                <span>XOR</span>
+                <span className="cos-badge">+Add</span>
+              </div>
+
+              <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', margin: '6px 0 2px', fontWeight: 700 }}>
+                Data Formats & Encodings
               </div>
 
               <div
                 className="cos-op-item"
-                onClick={() => {
-                  playClickSound(850);
-                  try {
-                    setInputText(atob(inputText));
-                  } catch (_) {}
-                }}
+                onClick={() => addOperation('from_base64', 'From Base64')}
               >
-                <span>From Base64</span>
-                <span className="cos-badge">Decode</span>
+                <span>From Base64 (Decode)</span>
+                <span className="cos-badge cos-badge-emerald">+Add</span>
+              </div>
+
+              <div
+                className="cos-op-item"
+                onClick={() => addOperation('to_base64', 'To Base64')}
+              >
+                <span>To Base64 (Encode)</span>
+                <span className="cos-badge">+Add</span>
+              </div>
+
+              <div
+                className="cos-op-item"
+                onClick={() => addOperation('from_hex', 'From Hex')}
+              >
+                <span>From Hex</span>
+                <span className="cos-badge">+Add</span>
+              </div>
+
+              <div
+                className="cos-op-item"
+                onClick={() => addOperation('to_hex', 'To Hex')}
+              >
+                <span>To Hex</span>
+                <span className="cos-badge">+Add</span>
+              </div>
+
+              <div
+                className="cos-op-item"
+                onClick={() => addOperation('url_decode', 'URL Decode')}
+              >
+                <span>URL Decode</span>
+                <span className="cos-badge">+Add</span>
+              </div>
+
+              <div
+                className="cos-op-item"
+                onClick={() => addOperation('reverse', 'Reverse')}
+              >
+                <span>Reverse String</span>
+                <span className="cos-badge">+Add</span>
               </div>
 
               {/* Frequency Analysis Mini-Table */}
-              <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid #1e293b' }}>
-                <div style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 700, marginBottom: '4px' }}>
+              <div style={{ marginTop: 'auto', paddingTop: '8px', borderTop: '1px solid #1e293b' }}>
+                <div style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 700, marginBottom: '2px' }}>
                   FREQUENCY ANALYSIS:
                 </div>
-                <div style={{ fontSize: '10px', color: '#cbd5e1', lineHeight: '1.6' }}>
+                <div style={{ fontSize: '10px', color: '#cbd5e1', lineHeight: '1.5' }}>
                   <div>Cipher <strong>H</strong>: 14.1% ➔ English <strong>E</strong>: 12.7%</div>
-                  <div>Cipher <strong>W</strong>: 10.1% ➔ English <strong>T</strong>: 9.1%</div>
-                  <div>Cipher <strong>D</strong>: 9.0% ➔ English <strong>A</strong>: 8.2%</div>
-                </div>
-                <div style={{ fontSize: '9.5px', color: '#64748b', marginTop: '4px' }}>
-                  Count alphabetical shift distance from cipher letter 'H' to English 'E'.
+                  <div>Shift required: <strong>-3 letters</strong></div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Column 2: Recipe Pipeline */}
-          <div className="cos-panel">
+          <div className="cos-panel" style={{ flex: '0 0 260px' }}>
             <div className="cos-panel-header">
-              <span>RECIPE PIPELINE ({activeOps.length})</span>
+              <span>RECIPE PIPELINE ({recipe.length})</span>
               <button
                 type="button"
                 className="cos-btn"
                 style={{ fontSize: '9.5px', padding: '1px 6px' }}
                 onClick={() => {
-                  setActiveOps([]);
-                  setCaesarShiftKey(0);
+                  playClickSound(800);
+                  setRecipe([]);
                 }}
               >
-                Clear
+                Clear All
               </button>
             </div>
-            <div className="cos-panel-body">
-              {activeOps.includes('caesar') ? (
-                <div className="cos-recipe-card">
+            <div className="cos-panel-body" style={{ gap: '6px' }}>
+              {recipe.map((op, idx) => (
+                <div key={op.id} className="cos-recipe-card">
                   <div className="cos-recipe-header">
-                    <span>1. Caesar Cipher</span>
+                    <span style={{ fontWeight: 700 }}>{idx + 1}. {op.label}</span>
                     <button
                       type="button"
                       className="cos-win-btn btn-close"
                       style={{ width: '18px', height: '18px' }}
-                      onClick={() => setActiveOps(activeOps.filter((o) => o !== 'caesar'))}
+                      onClick={() => removeOperation(op.id)}
                       title="Remove Step"
                     >
                       <Trash2 size={10} />
                     </button>
                   </div>
 
-                  <div style={{ marginTop: '8px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', marginBottom: '4px' }}>
-                      <span style={{ color: '#94a3b8' }}>Shift Key (Offset):</span>
-                      <strong style={{ color: caesarShiftKey === -3 ? '#34d399' : '#38bdf8' }}>
-                        {caesarShiftKey} {caesarShiftKey === -3 ? '(CRACKED KEY!)' : ''}
-                      </strong>
-                    </div>
+                  {op.type === 'caesar' && (
+                    <div style={{ marginTop: '6px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', marginBottom: '2px' }}>
+                        <span style={{ color: '#94a3b8' }}>Shift Key (Offset):</span>
+                        <strong style={{ color: op.shift === -3 ? '#34d399' : '#38bdf8' }}>
+                          {op.shift} {op.shift === -3 ? '(CRACKED KEY!)' : ''}
+                        </strong>
+                      </div>
 
-                    <input
-                      type="range"
-                      min="-25"
-                      max="25"
-                      value={caesarShiftKey}
-                      onChange={(e) => {
-                        playClickSound(1100);
-                        setCaesarShiftKey(parseInt(e.target.value, 10));
-                      }}
-                      style={{ width: '100%', accentColor: '#38bdf8' }}
-                    />
+                      <input
+                        type="range"
+                        min="-25"
+                        max="25"
+                        value={op.shift || 0}
+                        onChange={(e) => {
+                          playClickSound(1100);
+                          updateOpProp(op.id, 'shift', parseInt(e.target.value, 10));
+                        }}
+                        style={{ width: '100%', accentColor: '#38bdf8' }}
+                      />
 
-                    <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
-                      <button
-                        type="button"
-                        className="cos-btn"
-                        style={{ flex: 1, fontSize: '10px' }}
-                        onClick={() => setCaesarShiftKey(0)}
-                      >
-                        Reset Shift: 0
-                      </button>
+                      <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
+                        <button
+                          type="button"
+                          className="cos-btn"
+                          style={{ flex: 1, fontSize: '9.5px' }}
+                          onClick={() => updateOpProp(op.id, 'shift', -3)}
+                        >
+                          Shift -3
+                        </button>
+                        <button
+                          type="button"
+                          className="cos-btn"
+                          style={{ flex: 1, fontSize: '9.5px' }}
+                          onClick={() => updateOpProp(op.id, 'shift', 0)}
+                        >
+                          Shift 0
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {op.type === 'xor' && (
+                    <div style={{ marginTop: '6px' }}>
+                      <label style={{ fontSize: '10px', color: '#94a3b8' }}>XOR Key:</label>
+                      <input
+                        type="text"
+                        className="cos-input"
+                        value={op.key || ''}
+                        onChange={(e) => updateOpProp(op.id, 'key', e.target.value)}
+                        style={{ width: '100%', fontSize: '10.5px', marginTop: '2px' }}
+                      />
+                    </div>
+                  )}
                 </div>
-              ) : (
+              ))}
+
+              {!recipe.length && (
                 <div style={{ textAlign: 'center', color: '#64748b', padding: '30px 10px', fontSize: '11px' }}>
-                  No operations in recipe pipeline.<br />Click Caesar Cipher on the left to add.
+                  No operations in recipe pipeline.<br />Click any operation on the left to add.
                 </div>
               )}
             </div>
           </div>
 
           {/* Column 3: Input & Output Panels */}
-          <div className="cos-split-vertical">
+          <div className="cos-split-vertical" style={{ flex: 1 }}>
             {/* Input Box */}
             <div className="cos-panel" style={{ flex: 1 }}>
               <div className="cos-panel-header">
                 <span>INPUT CIPHERTEXT</span>
-                <span style={{ fontSize: '10px', color: '#64748b' }}>{inputText.length} bytes</span>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    className="cos-btn"
+                    style={{ fontSize: '9.5px', padding: '1px 6px' }}
+                    onClick={() => setInputText(ENCRYPTED_TELEGRAM)}
+                  >
+                    Telegram Preset
+                  </button>
+                  <span style={{ fontSize: '10px', color: '#64748b' }}>{inputText.length} bytes</span>
+                </div>
               </div>
               <div className="cos-panel-body" style={{ padding: '4px' }}>
                 <textarea
@@ -352,6 +480,7 @@ export default function CyberChefApp({ onOpenStation }) {
                   className="cos-textarea cos-textarea-output"
                   readOnly
                   value={outputText}
+                  style={{ color: outputText.includes('FLAG{') ? '#34d399' : '#cbd5e1' }}
                 />
               </div>
             </div>
