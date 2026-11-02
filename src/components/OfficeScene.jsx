@@ -416,6 +416,7 @@ function SceneContents({
           onHover={hackerModeData?.isActive ? undefined : onHover}
         />
         <ArchiveStation
+          activeSection={activeSection}
           onSelect={hackerModeData?.isActive ? undefined : onSelect}
           onHover={hackerModeData?.isActive ? undefined : onHover}
         />
@@ -429,6 +430,7 @@ function SceneContents({
           onHover={hackerModeData?.isActive ? undefined : onHover}
         />
         <PrinterStation
+          activeSection={activeSection}
           onSelect={hackerModeData?.isActive ? undefined : onSelect}
           onHover={hackerModeData?.isActive ? undefined : onHover}
         />

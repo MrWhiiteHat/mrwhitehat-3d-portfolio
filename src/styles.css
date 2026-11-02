@@ -1728,39 +1728,61 @@ button, a {
 
 .board-top-banner {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(52, 211, 153, 0.15);
 }
 
 .board-title-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .board-icon {
   color: #34d399;
+  flex-shrink: 0;
 }
 
 .board-subtitle {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 10px;
   color: #34d399;
   letter-spacing: 0.8px;
   display: block;
 }
 
 .board-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
   color: #fff;
+  letter-spacing: -0.2px;
 }
 
 .filter-chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 6px;
+  padding-bottom: 3px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(52, 211, 153, 0.4) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filter-chips::-webkit-scrollbar {
+  height: 3px;
+}
+
+.filter-chips::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.35);
+  border-radius: 2px;
+}
+
+.filter-chip {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .filter-chip {
@@ -1996,6 +2018,36 @@ button, a {
   border: 1px solid #d1d5db;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
   border-radius: 4px;
+}
+
+
+/* Executive Document Clamp & Clear Visible Scrollbar for Laser Resume */
+.physical-resume .obj-status-bar {
+  background: #0f172a !important;
+  border-bottom: 2px solid #334155 !important;
+}
+
+.physical-resume .obj-device-label {
+  color: #38bdf8 !important;
+  font-weight: 700;
+}
+
+.printer-paper-sheet::-webkit-scrollbar {
+  width: 7px !important;
+}
+
+.printer-paper-sheet::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 3px !important;
+}
+
+.printer-paper-sheet::-webkit-scrollbar-thumb {
+  background: #94a3b8 !important;
+  border-radius: 3px !important;
+}
+
+.printer-paper-sheet::-webkit-scrollbar-thumb:hover {
+  background: #64748b !important;
 }
 
 .printer-paper-sheet {
@@ -14714,7 +14766,8 @@ canvas {
   .physical-object-medium {
     width: min(94vw, 440px) !important;
     max-width: 94vw !important;
-    max-height: min(78vh, 620px) !important;
+    max-height: min(74vh, 580px) !important;
+    margin-top: 34px !important;
   }
 
   .physical-projects,

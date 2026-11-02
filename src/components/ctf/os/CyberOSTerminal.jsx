@@ -414,8 +414,8 @@ export default function CyberOSTerminal({ onOpenApp, onOpenStation, onLaunchEast
       </div>
 
       {/* 2. Terminal Screen & Scrollback */}
-      <div className="cos-app-body" style={{ padding: '10px' }}>
-        <div style={{ flex: 1, overflowY: 'auto', lineHeight: '1.6', fontSize: '11.5px' }}>
+      <div className="cos-app-body" style={{ padding: '10px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', lineHeight: '1.6', fontSize: '11.5px' }}>
           {history.map((line, idx) => (
             <div
               key={idx}
@@ -450,6 +450,7 @@ export default function CyberOSTerminal({ onOpenApp, onOpenStation, onLaunchEast
             handleCommand(inputVal);
           }}
           style={{
+            flexShrink: 0,
             display: 'flex',
             alignItems: 'center',
             gap: '8px',

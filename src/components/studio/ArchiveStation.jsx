@@ -7,7 +7,7 @@ import {
   getBrushedMetalTextures,
 } from '../../utils/textures.js';
 
-export default function ArchiveStation({ onSelect, onHover }) {
+export default function ArchiveStation({ onSelect, onHover, activeSection = null }) {
   const [hovered, setHovered] = useState(false);
   const [pulledBook, setPulledBook] = useState(false);
   const pulledBookRef = useRef();
@@ -134,8 +134,9 @@ export default function ArchiveStation({ onSelect, onHover }) {
         {/* ========================================================================= */}
         {/* BESPOKE SKILLS 3D ASSETS: 4 CLASSIFIED CYBER DATABANK CARTRIDGES         */}
         {/* Represents: 4 Skill Tiers from the Skills Dossier                         */}
+        {/* Hidden during skills inspection so they don't clip the technical dossier  */}
         {/* ========================================================================= */}
-        <group position={[0, 2.06, 0]}>
+        <group position={[0, 2.06, 0]} visible={activeSection !== 'skills'}>
           {[
             { x: -0.75, color: '#ef4444', label: '01_REVERSE_ENG', title: 'Binary & Assembly' },
             { x: -0.25, color: '#38bdf8', label: '02_WEB_CLOUD', title: 'OWASP & Cloud' },

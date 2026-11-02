@@ -9,6 +9,8 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   z-index: 9999;
   background: radial-gradient(circle at 50% 30%, #0d1520 0%, #06090e 65%, #020406 100%);
   color: #e2e8f0;
@@ -198,6 +200,15 @@
   transition: all 0.2s ease;
 }
 
+.cos-recruiter-label {
+  display: inline;
+}
+@media (max-width: 640px) {
+  .cos-recruiter-label {
+    display: none;
+  }
+}
+
 .cos-recruiter-btn:hover {
   background: rgba(245, 158, 11, 0.35);
   border-color: #fbbf24;
@@ -298,17 +309,22 @@
   position: relative;
   z-index: 2;
   overflow: hidden;
-  padding: 16px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .cos-desktop-icons {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 90px);
-  grid-auto-flow: dense;
-  gap: 16px 12px;
-  width: max-content;
-  max-height: calc(100vh - 80px);
+  display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 5px 10px;
+  width: max-content;
+  max-height: calc(100vh - 54px);
+  max-height: calc(100dvh - 54px);
+  padding: 2px;
 }
 
 .cos-desktop-icon {
@@ -316,13 +332,14 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 6px;
-  padding: 8px 6px;
+  gap: 3px;
+  padding: 4px 6px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
   border: 1px solid transparent;
-  width: 86px;
+  width: 80px;
+  flex-shrink: 0;
 }
 
 .cos-desktop-icon:hover {
@@ -332,9 +349,9 @@
 }
 
 .cos-icon-graphic {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
   background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(71, 85, 105, 0.6);
   display: flex;
@@ -351,11 +368,11 @@
 }
 
 .cos-icon-label {
-  font-size: 11px;
+  font-size: 10px;
   color: #f1f5f9;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.8);
   word-break: break-word;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 /* 5. Window Frame Component */
@@ -1251,23 +1268,43 @@
 
 /* Responsive Overrides */
 @media (max-width: 900px) {
-  .cos-app-container {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+  .cos-desktop-area {
+    padding: 0 !important;
+  }
+
+  .cos-window {
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
     height: 100% !important;
+    border: none !important;
+    border-radius: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+  }
+
+  .cos-app-container {
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .cos-app-body {
-    overflow-y: visible !important;
-    min-height: auto !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
     height: auto !important;
-    flex: none !important;
   }
 
   .cos-grid-3, .cos-grid-4 {
     grid-template-columns: 1fr !important;
     height: auto !important;
-    overflow-y: visible !important;
   }
 
   .cos-split-horizontal {
@@ -1277,24 +1314,21 @@
   }
 
   .cos-panel {
-    min-height: 240px !important;
+    min-height: 220px !important;
     height: auto !important;
   }
 
   .cos-flag-bar {
-    position: sticky !important;
-    bottom: 0 !important;
+    position: relative !important;
+    bottom: auto !important;
+    flex-shrink: 0 !important;
     z-index: 30 !important;
     background: #090e17 !important;
     border-top: 1px solid #1e293b !important;
   }
 
   .cos-flag-input {
-    min-width: 140px !important;
-  }
-
-  .cos-window {
-    min-width: 0 !important;
+    min-width: 130px !important;
   }
 
   .cos-taskbar {
@@ -1302,25 +1336,37 @@
   }
 
   .cos-task-tab {
-    max-width: 110px !important;
+    max-width: 100px !important;
     font-size: 10px !important;
     padding: 2px 6px !important;
   }
 }
 
 @media (max-height: 750px) {
+  .cos-desktop-area {
+    padding: 0 !important;
+  }
+
   .cos-app-container {
+    height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .cos-app-body {
+    flex: 1 !important;
+    min-height: 0 !important;
     overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
   }
 
   .cos-hint-drawer {
-    max-height: 140px !important;
+    max-height: 120px !important;
   }
 
   .cos-flag-bar {
-    position: sticky !important;
-    bottom: 0 !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
     z-index: 30 !important;
   }
 }

@@ -192,7 +192,7 @@ export default function CyberOSDesktop({
         [appId]: {
           ...meta,
           isMinimized: false,
-          isMaximized: isMobile,
+          isMaximized: true,
           zIndex: Date.now(),
         },
       };
@@ -387,8 +387,7 @@ export default function CyberOSDesktop({
               title="Recruiter Fast View (Instant 2D Dossier, Projects & Resume)"
             >
               <BriefcaseBusiness size={12} />
-              <span className="hidden sm:inline">RECRUITER DOSSIER</span>
-              <span className="sm:hidden">DOSSIER</span>
+              <span className="cos-recruiter-label">RECRUITER DOSSIER</span>
             </button>
           )}
 

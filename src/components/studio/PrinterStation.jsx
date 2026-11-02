@@ -125,7 +125,7 @@ function createResumeSheetTexture() {
   }
 }
 
-export default function PrinterStation({ onSelect, onHover }) {
+export default function PrinterStation({ onSelect, onHover, activeSection = null }) {
   const [hovered, setHovered] = useState(false);
   const [paperOffset, setPaperOffset] = useState(0);
   const paperRef = useRef();
@@ -242,9 +242,10 @@ export default function PrinterStation({ onSelect, onHover }) {
           <meshStandardMaterial color="#cbd5e1" roughness={0.4} />
         </mesh>
 
-        {/* Printed A4 Document emerging from slot with verified resume texture */}
+        {/* Printed A4 Document emerging from slot with verified resume texture (hidden during station inspection to prevent 3D clipping) */}
         <mesh
           ref={paperRef}
+          visible={activeSection !== 'resume'}
           position={[0, 0.21, 0.28]}
           rotation={[-Math.PI / 3.4, 0, 0]}
           castShadow
