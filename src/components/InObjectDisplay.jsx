@@ -93,15 +93,15 @@ export const stationConfigs = {
     lightPos: [0, 0, 0.45],
   },
   skills: {
-    // Cyber Security Archive Bookcase on Back Wall (positioned cleanly in front of shelves)
+    // Cyber Security Archive Bookcase on Back Wall (scaled to full comfortable view)
     position: [0.6, 1.90, -4.45],
     rotation: [0, 0, 0],
-    camPos: [0.6, 1.90, -2.50],
-    camTarget: [0.6, 1.90, -4.45],
+    camPos: [0.6, 1.85, -2.40],
+    camTarget: [0.6, 1.80, -4.45],
     title: 'Archive Bookcase',
     icon: BookOpen,
-    distanceFactor: 0.98,
-    htmlPosition: [0, -0.12, 0.05],
+    distanceFactor: 1.28,
+    htmlPosition: [0, -0.05, 0.05],
     lightColor: '#34d399',
     lightIntensity: 15,
     lightPos: [0, 0, 0.35],
@@ -121,15 +121,15 @@ export const stationConfigs = {
     lightPos: [0, 0, 0.35],
   },
   resume: {
-    // Laser-Printed Document on Credenza Printer (perpendicular to camera pitch angle)
+    // Laser-Printed Document on Credenza Printer (scaled to full document view)
     position: [-3.6, 1.08, 1.08],
     rotation: [-0.56, 0, 0],
-    camPos: [-3.6, 1.60, 2.00],
-    camTarget: [-3.6, 1.00, 1.05],
+    camPos: [-3.6, 1.82, 2.25],
+    camTarget: [-3.6, 1.04, 1.08],
     title: 'Laser Printer Output Tray',
     icon: BriefcaseBusiness,
-    distanceFactor: 0.88,
-    htmlPosition: [0, -0.06, 0.04],
+    distanceFactor: 1.34,
+    htmlPosition: [0, 0, 0.04],
     lightColor: '#10b981',
     lightIntensity: 12,
     lightPos: [0, 0.15, 0.25],
