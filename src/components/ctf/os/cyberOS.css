@@ -1366,7 +1366,15 @@
 }
 
 /* Responsive Overrides */
+.cos-intruder-config {
+  flex: 0 0 320px;
+}
+
 @media (max-width: 900px) {
+  .cos-intruder-config {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+  }
   .cos-desktop-area {
     padding: 0 !important;
   }
@@ -1467,6 +1475,99 @@
     flex-shrink: 0 !important;
     position: relative !important;
     z-index: 30 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .cos-metric-network,
+  .cos-crt-toggle,
+  .cos-metric-clock {
+    display: none !important;
+  }
+  .cos-taskbar-right {
+    gap: 6px !important;
+  }
+  .cos-score-pill {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+  }
+  .cos-exit-btn {
+    padding: 3px 7px !important;
+    font-size: 10px !important;
+  }
+  .station-cyber-access-card {
+    padding: 10px 12px 14px !important;
+    gap: 6px !important;
+  }
+  .scac-header-strip {
+    padding-bottom: 6px !important;
+    margin-bottom: 6px !important;
+  }
+  .scac-title {
+    font-size: 13px !important;
+    margin-bottom: 4px !important;
+  }
+  .scac-desc {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 6px !important;
+  }
+  .scac-tool-box {
+    padding: 6px 10px !important;
+    margin-bottom: 8px !important;
+    gap: 8px !important;
+  }
+  .scac-tool-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .scac-tool-name {
+    font-size: 11.5px !important;
+  }
+  .scac-actions-row {
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+  }
+  .scac-launch-os-btn {
+    padding: 7px 10px !important;
+    font-size: 11px !important;
+  }
+  .scac-bypass-btn {
+    padding: 7px 10px !important;
+    font-size: 10px !important;
+  }
+  .scac-quick-submit {
+    padding-top: 6px !important;
+  }
+  .scac-qs-input {
+    padding: 5px 8px !important;
+    font-size: 10.5px !important;
+  }
+  .scac-qs-btn {
+    padding: 5px 10px !important;
+    font-size: 10.5px !important;
+  }
+}
+
+@media (max-height: 550px) {
+  .station-cyber-access-card {
+    padding: 8px 10px 10px !important;
+  }
+  .scac-title {
+    font-size: 12px !important;
+    margin-bottom: 2px !important;
+  }
+  .scac-desc {
+    font-size: 10.5px !important;
+    line-height: 1.3 !important;
+    margin-bottom: 4px !important;
+  }
+  .scac-tool-box {
+    padding: 4px 8px !important;
+    margin-bottom: 6px !important;
+  }
+  .scac-actions-row {
+    margin-bottom: 6px !important;
   }
 }
 

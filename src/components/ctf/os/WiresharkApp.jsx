@@ -478,7 +478,7 @@ export default function WiresharkApp({ onOpenStation }) {
               )}
             </div>
             <div className="cos-panel-body" style={{ padding: '6px', fontFamily: 'monospace', fontSize: '11px', lineHeight: '1.5' }}>
-              <div style={{ overflowY: 'auto', maxHeight: '100%' }}>
+              <div style={{ overflowY: 'auto', overflowX: 'auto', maxHeight: '100%', WebkitOverflowScrolling: 'touch' }}>
                 {hexRows.map((row, rIdx) => {
                   const leftBytes = row.bytes.slice(0, 8);
                   const rightBytes = row.bytes.slice(8, 16);

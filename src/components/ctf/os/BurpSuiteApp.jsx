@@ -645,7 +645,7 @@ export default function BurpSuiteApp({ onOpenStation }) {
           /* Intruder (Fuzzer) Tab */
           <div className="cos-split-horizontal">
             {/* Left: Intruder Config & Payload Wordlist */}
-            <div className="cos-panel" style={{ flex: '0 0 320px' }}>
+            <div className="cos-panel cos-intruder-config">
               <div className="cos-panel-header">
                 <span>INTRUDER CONFIGURATION</span>
                 <span className="cos-badge cos-badge-amber">SNIPER ATTACK</span>

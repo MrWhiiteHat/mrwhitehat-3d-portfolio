@@ -477,7 +477,7 @@ export default function GhidraGdbApp({ onOpenStation }) {
                 </div>
 
                 {/* Patch Control Bar */}
-                <div style={{ marginTop: 'auto', background: '#090e17', border: '1px solid #1e293b', borderRadius: '4px', padding: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ marginTop: 'auto', background: '#090e17', border: '1px solid #1e293b', borderRadius: '4px', padding: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '10.5px', color: '#a855f7', fontWeight: 700 }}>0x004011ad OP:</span>
                   <input
                     type="text"

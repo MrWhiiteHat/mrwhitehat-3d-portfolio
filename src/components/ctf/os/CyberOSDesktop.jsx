@@ -354,7 +354,7 @@ export default function CyberOSDesktop({
           </div>
 
           {/* Network Telemetry */}
-          <div className="cos-hud-metric hidden sm:flex" title="Primary Network Interface">
+          <div className="cos-hud-metric cos-metric-network" title="Primary Network Interface">
             <Wifi size={12} className="text-cyan-400" />
             <span>eth0: 192.168.1.45</span>
           </div>
@@ -362,7 +362,7 @@ export default function CyberOSDesktop({
           {/* CRT Scanline Toggle */}
           <button
             type="button"
-            className="cos-btn py-0.5 text-[10px] hidden md:inline-flex"
+            className="cos-btn cos-crt-toggle py-0.5 text-[10px]"
             onClick={() => setIsCrtEnabled((prev) => !prev)}
             title="Toggle Retro CRT Scanlines"
           >
@@ -370,7 +370,7 @@ export default function CyberOSDesktop({
           </button>
 
           {/* Clock */}
-          <div className="cos-hud-metric hidden md:flex" title="System Local Time">
+          <div className="cos-hud-metric cos-metric-clock" title="System Local Time">
             <Clock size={12} className="text-slate-400" />
             <span>{currentTime || '00:00:00'}</span>
           </div>
